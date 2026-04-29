@@ -39,22 +39,32 @@ export default function MaintenanceGate({ children }) {
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
 
-      {/* Invisible trigger — bottom-right corner */}
+      {/* Hidden trigger — bottom-right corner */}
       <button
         onClick={() => setShowPrompt(true)}
         aria-label="Acceso"
         style={{
           position: "absolute",
-          bottom: 24,
-          right: 24,
-          width: 44,
-          height: 44,
-          background: "transparent",
-          border: "none",
-          cursor: "default",
-          opacity: 0,
+          bottom: 28,
+          right: 32,
+          width: 36,
+          height: 36,
+          background: "rgba(255,255,255,0.06)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 8,
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 14,
+          color: "rgba(255,255,255,0.18)",
+          transition: "opacity 0.3s",
         }}
-      />
+        onMouseEnter={e => e.currentTarget.style.opacity = "0.6"}
+        onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+      >
+        🔒
+      </button>
 
       {showPrompt && (
         <div
