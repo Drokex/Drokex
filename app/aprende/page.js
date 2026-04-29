@@ -773,8 +773,11 @@ export default function AprendePage() {
 
       p.vx = Math.max(Math.min(p.vx * FRICTION, p.maxSpeed * spMult), -p.maxSpeed * spMult);
       p.vy += GRAVITY;
+      if (p.vy > 18) p.vy = 18; // terminal velocity cap
       p.x += p.vx; resolvePlatforms("x");
-      p.y += p.vy; p.grounded = false; resolvePlatforms("y");
+      p.y += p.vy; p.grounded = false;
+      const pvySnap = p.vy; // capture falling speed before platform zeroes it
+      resolvePlatforms("y");
 
       if (p.y > H + 200) { loseLife(); if (g.stopped) return; }
       p.x = Math.max(0, Math.min(p.x, lev.width - p.w));
@@ -840,8 +843,9 @@ export default function AprendePage() {
 
         if (g.invincibleFrames > 0) continue;
         if (overlap(p, e)) {
-          const thresh = e.isFinalBoss ? 55 : e.isBosse ? 38 : 26;
-          if (p.vy > 2 && p.y + p.h - e.y < thresh) {
+          // stomp = player was falling AND their center is above the lower half of the enemy
+          const stompLine = e.y + (e.isFinalBoss ? e.h * 0.52 : e.isBosse ? e.h * 0.55 : e.h * 0.5);
+          if (pvySnap > 1.5 && p.y + p.h * 0.6 < stompLine) {
             awardKill(e);
             if (e.isBosse) { e.hp--; p.vy = -11; if (e.hp <= 0) e.dead = true; }
             else { e.dead = true; p.vy = -11; }
