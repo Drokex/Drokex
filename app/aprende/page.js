@@ -248,75 +248,164 @@ export default function AprendePage() {
       }
     }
 
+    // world 0=ciudad, 1=volcán, 2=bosque, 3=fantasma
+    function worldOf(idx) { return idx === 9 ? 3 : Math.min(2, Math.floor(idx / 3)); }
+
     // ─── Draw helpers ──────────────────────────────────────────────
     function drawBg(frame) {
       const lev = LEVELS[gRef.current.currentLevel];
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      if (lev.isFinalLevel) {
-        grad.addColorStop(0, "#000008");
-        grad.addColorStop(1, "#060018");
-      } else if (lev.isBoss) {
-        grad.addColorStop(0, "#110020");
-        grad.addColorStop(1, "#1e0038");
-      } else {
-        grad.addColorStop(0, "#060d1a");
-        grad.addColorStop(1, "#0d1f35");
-      }
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, H);
-
+      const w = worldOf(gRef.current.currentLevel);
       const stars = [
         [50,30],[120,80],[200,20],[320,60],[450,30],[600,70],[720,25],
         [760,90],[80,110],[400,100],[550,50],[850,40],[900,100],
         [150,150],[700,140],[350,170],[480,60],[230,130],[810,55],[660,120],
       ];
-      for (const [sx, sy] of stars) {
-        ctx.globalAlpha = 0.28 + 0.45 * Math.sin(frame * 0.05 + sx);
-        ctx.fillStyle = lev.isFinalLevel ? "#aaddff" : lev.isBoss ? "#ff88ff" : "#fff";
-        ctx.fillRect(sx, sy, 2, 2);
-      }
-      ctx.globalAlpha = 1;
 
-      if (lev.isFinalLevel) {
-        // Ethereal floating orbs background
+      if (w === 3) {
+        // ── Mundo 3: Reino Fantasma ──
+        const g = ctx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, "#000008"); g.addColorStop(1, "#060018");
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+        for (const [sx, sy] of stars) {
+          ctx.globalAlpha = 0.28 + 0.45 * Math.sin(frame * 0.05 + sx);
+          ctx.fillStyle = "#aaddff"; ctx.fillRect(sx, sy, 2, 2);
+        }
+        ctx.globalAlpha = 1;
         for (let oi = 0; oi < 12; oi++) {
           const ox = (oi * 137 + frame * 0.18) % W;
           const oy = 60 + ((oi * 83 + frame * 0.12) % (H - 160));
           ctx.globalAlpha = 0.05 + 0.03 * Math.sin(frame * 0.04 + oi);
           ctx.fillStyle = "#88ccff";
-          ctx.beginPath();
-          ctx.arc(ox, oy, 5 + (oi % 3) * 4, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.beginPath(); ctx.arc(ox, oy, 5 + (oi % 3) * 4, 0, Math.PI * 2); ctx.fill();
         }
         ctx.globalAlpha = 1;
-      } else if (lev.isBoss) {
-        const towers = [
-          [0,175,82],[92,148,56],[162,172,72],[282,138,94],
-          [412,158,62],[502,128,84],[622,153,66],[724,143,78],[832,163,72],[922,138,62],
-        ];
-        for (const [cx, cy, cw] of towers) {
-          ctx.fillStyle = "#19002a";
-          ctx.fillRect(cx, cy, cw, H - cy);
-          ctx.fillStyle = "#110020";
-          for (let bx = cx; bx < cx + cw - 8; bx += 17) ctx.fillRect(bx, cy - 16, 10, 16);
-          ctx.fillStyle = "rgba(180,0,255,0.18)";
-          for (let wy = cy + 18; wy < cy + 105; wy += 24)
-            for (let wx = cx + 8; wx < cx + cw - 8; wx += 18)
-              if (Math.sin(wx * 3 + wy * 5) > 0.25) ctx.fillRect(wx, wy, 8, 12);
+
+      } else if (w === 2) {
+        // ── Mundo 2: Bosque Maldito ──
+        const g = ctx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, lev.isBoss ? "#000600" : "#000a00");
+        g.addColorStop(1, lev.isBoss ? "#000e00" : "#001400");
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+        for (const [sx, sy] of stars) {
+          ctx.globalAlpha = 0.2 + 0.35 * Math.sin(frame * 0.05 + sx);
+          ctx.fillStyle = "#88ff88"; ctx.fillRect(sx, sy, 2, 2);
         }
+        ctx.globalAlpha = 1;
+        // Green eerie moon
+        ctx.globalAlpha = 0.16; ctx.fillStyle = "#44ff44";
+        ctx.beginPath(); ctx.arc(760, 55, 42, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 0.07;
+        ctx.beginPath(); ctx.arc(760, 55, 62, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+        if (lev.isBoss) {
+          // Shadow castle — dark green battlements
+          const towers = [[0,170,80],[88,144,58],[158,168,70],[278,136,92],[408,155,60],[498,126,82],[618,150,64],[720,140,76],[828,160,70],[918,136,60]];
+          for (const [cx, cy, cw] of towers) {
+            ctx.fillStyle = "#010e01"; ctx.fillRect(cx, cy, cw, H - cy);
+            ctx.fillStyle = "#000800";
+            for (let bx = cx; bx < cx + cw - 8; bx += 17) ctx.fillRect(bx, cy - 16, 10, 16);
+            ctx.fillStyle = "rgba(0,180,60,0.14)";
+            for (let wy = cy + 18; wy < cy + 105; wy += 24)
+              for (let wx = cx + 8; wx < cx + cw - 8; wx += 18)
+                if (Math.sin(wx * 3 + wy * 5) > 0.25) ctx.fillRect(wx, wy, 8, 12);
+          }
+        } else {
+          // Twisted trees
+          const trees = [[20,130],[85,108],[168,138],[268,116],[375,132],[485,112],[588,128],[688,106],[796,122],[886,132]];
+          for (const [tx, ty] of trees) {
+            ctx.fillStyle = "#020e02"; ctx.fillRect(tx - 7, ty, 14, H - ty);
+            ctx.strokeStyle = "#020e02"; ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(tx, ty + 22); ctx.lineTo(tx - 28, ty - 8);
+            ctx.moveTo(tx, ty + 44); ctx.lineTo(tx + 26, ty + 18);
+            ctx.moveTo(tx, ty + 62); ctx.lineTo(tx - 20, ty + 44);
+            ctx.stroke();
+            ctx.globalAlpha = 0.05 + 0.025 * Math.sin(frame * 0.04 + tx);
+            ctx.fillStyle = "#003300";
+            ctx.beginPath(); ctx.arc(tx, ty - 8, 38, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+        }
+
+      } else if (w === 1) {
+        // ── Mundo 1: Volcán ──
+        const g = ctx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, lev.isBoss ? "#150000" : "#1a0000");
+        g.addColorStop(0.7, lev.isBoss ? "#2a0500" : "#300500");
+        g.addColorStop(1, "#1a0200");
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+        // Lava glow bottom
+        ctx.globalAlpha = 0.28 + 0.1 * Math.sin(frame * 0.04);
+        const lavaG = ctx.createLinearGradient(0, H - 90, 0, H);
+        lavaG.addColorStop(0, "rgba(255,60,0,0)"); lavaG.addColorStop(1, "rgba(255,80,0,0.5)");
+        ctx.fillStyle = lavaG; ctx.fillRect(0, H - 90, W, 90);
+        ctx.globalAlpha = 1;
+        for (const [sx, sy] of stars) {
+          ctx.globalAlpha = 0.15 + 0.25 * Math.sin(frame * 0.05 + sx);
+          ctx.fillStyle = "#ffaa66"; ctx.fillRect(sx, sy, 2, 2);
+        }
+        ctx.globalAlpha = 1;
+        if (lev.isBoss) {
+          // Lava castle — dark red battlements
+          const towers = [[0,175,82],[92,148,56],[162,172,72],[282,138,94],[412,158,62],[502,128,84],[622,153,66],[724,143,78],[832,163,72],[922,138,62]];
+          for (const [cx, cy, cw] of towers) {
+            ctx.fillStyle = "#1c0200"; ctx.fillRect(cx, cy, cw, H - cy);
+            ctx.fillStyle = "#120000";
+            for (let bx = cx; bx < cx + cw - 8; bx += 17) ctx.fillRect(bx, cy - 16, 10, 16);
+            ctx.fillStyle = "rgba(255,60,0,0.12)";
+            for (let wy = cy + 18; wy < cy + 105; wy += 24)
+              for (let wx = cx + 8; wx < cx + cw - 8; wx += 18)
+                if (Math.sin(wx * 3 + wy * 5) > 0.25) ctx.fillRect(wx, wy, 8, 12);
+          }
+        } else {
+          // Underground cave: stalactites + lava cracks
+          const stalactites = [[30,18,70],[90,14,50],[160,20,80],[240,12,45],[310,22,90],[400,16,60],[480,24,75],[560,14,55],[640,20,70],[720,18,85],[800,16,50],[880,22,65]];
+          for (const [sx, sw, sh] of stalactites) {
+            ctx.fillStyle = "#1a0800";
+            ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx + sw, 0); ctx.lineTo(sx + sw / 2, sh); ctx.closePath(); ctx.fill();
+            ctx.globalAlpha = 0.2 + 0.12 * Math.sin(frame * 0.06 + sx);
+            ctx.fillStyle = "#ff4400";
+            ctx.beginPath(); ctx.arc(sx + sw / 2, sh, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+          // Lava crack lines
+          ctx.strokeStyle = "rgba(255,80,0,0.12)"; ctx.lineWidth = 1;
+          [[100,200,200,360],[320,150,420,310],[600,180,700,400],[800,220,900,380]].forEach(([x1,y1,x2,y2]) => {
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo((x1+x2)/2+20,(y1+y2)/2); ctx.lineTo(x2,y2); ctx.stroke();
+          });
+        }
+
       } else {
-        const buildings = [
-          [0,200,60],[70,220,50],[130,180,70],[210,210,40],[260,170,55],
-          [325,195,45],[380,160,65],[455,205,50],[515,175,60],[585,190,55],
-          [650,165,70],[730,200,70],[820,180,60],[900,210,55],
-        ];
-        for (const [bx, by, bw] of buildings) {
-          ctx.fillStyle = "#0a1628";
-          ctx.fillRect(bx, by, bw, H - by);
-          ctx.fillStyle = "rgba(255,133,0,0.18)";
-          for (let wy = by + 10; wy < by + 120; wy += 18)
-            for (let wx = bx + 6; wx < bx + bw - 6; wx += 12)
-              if (Math.sin(wx * 3 + wy * 7) > 0.3) ctx.fillRect(wx, wy, 6, 8);
+        // ── Mundo 0: Ciudad Nocturna ──
+        const g = ctx.createLinearGradient(0, 0, 0, H);
+        g.addColorStop(0, lev.isBoss ? "#110020" : "#060d1a");
+        g.addColorStop(1, lev.isBoss ? "#1e0038" : "#0d1f35");
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+        for (const [sx, sy] of stars) {
+          ctx.globalAlpha = 0.28 + 0.45 * Math.sin(frame * 0.05 + sx);
+          ctx.fillStyle = lev.isBoss ? "#ff88ff" : "#fff"; ctx.fillRect(sx, sy, 2, 2);
+        }
+        ctx.globalAlpha = 1;
+        if (lev.isBoss) {
+          const towers = [[0,175,82],[92,148,56],[162,172,72],[282,138,94],[412,158,62],[502,128,84],[622,153,66],[724,143,78],[832,163,72],[922,138,62]];
+          for (const [cx, cy, cw] of towers) {
+            ctx.fillStyle = "#19002a"; ctx.fillRect(cx, cy, cw, H - cy);
+            ctx.fillStyle = "#110020";
+            for (let bx = cx; bx < cx + cw - 8; bx += 17) ctx.fillRect(bx, cy - 16, 10, 16);
+            ctx.fillStyle = "rgba(180,0,255,0.18)";
+            for (let wy = cy + 18; wy < cy + 105; wy += 24)
+              for (let wx = cx + 8; wx < cx + cw - 8; wx += 18)
+                if (Math.sin(wx * 3 + wy * 5) > 0.25) ctx.fillRect(wx, wy, 8, 12);
+          }
+        } else {
+          const buildings = [[0,200,60],[70,220,50],[130,180,70],[210,210,40],[260,170,55],[325,195,45],[380,160,65],[455,205,50],[515,175,60],[585,190,55],[650,165,70],[730,200,70],[820,180,60],[900,210,55]];
+          for (const [bx, by, bw] of buildings) {
+            ctx.fillStyle = "#0a1628"; ctx.fillRect(bx, by, bw, H - by);
+            ctx.fillStyle = "rgba(255,133,0,0.18)";
+            for (let wy = by + 10; wy < by + 120; wy += 18)
+              for (let wx = bx + 6; wx < bx + bw - 6; wx += 12)
+                if (Math.sin(wx * 3 + wy * 7) > 0.3) ctx.fillRect(wx, wy, 6, 8);
+          }
         }
       }
     }
@@ -325,15 +414,20 @@ export default function AprendePage() {
       ctx.save();
       ctx.translate(-camX, 0);
       const lev = LEVELS[gRef.current.currentLevel];
+      const w = worldOf(gRef.current.currentLevel);
+      // [base, edge1, edge2] per world
+      const palettes = [
+        ["#1a0a00", "#ff8500", "#ffb347"],   // ciudad
+        ["#1a0500", "#cc3300", "#ff6600"],   // volcán
+        ["#001400", "#006622", "#00cc44"],   // bosque
+        ["#000820", "#4488cc", "#88ccff"],   // fantasma
+      ];
+      const [base, c1, c2] = palettes[lev.isFinalLevel ? 3 : w];
       for (const p of lev.platforms) {
-        ctx.fillStyle = lev.isBoss ? "#1a0028" : "#1a0a00";
-        ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.fillStyle = base; ctx.fillRect(p.x, p.y, p.w, p.h);
         const g2 = ctx.createLinearGradient(p.x, p.y, p.x + p.w, p.y);
-        const c1 = lev.isFinalLevel ? "#4488cc" : lev.isBoss ? "#aa00ff" : "#ff8500";
-        const c2 = lev.isFinalLevel ? "#88ccff" : lev.isBoss ? "#dd44ff" : "#ffb347";
         g2.addColorStop(0, c1); g2.addColorStop(0.5, c2); g2.addColorStop(1, c1);
-        ctx.fillStyle = g2;
-        ctx.fillRect(p.x, p.y, p.w, 5);
+        ctx.fillStyle = g2; ctx.fillRect(p.x, p.y, p.w, 5);
       }
       ctx.restore();
     }
@@ -416,17 +510,23 @@ export default function AprendePage() {
           ctx.fillText("☆ JEFE FINAL ☆", gx + gw / 2, gy - 48);
 
         } else if (e.isBosse) {
-          // ── Castle boss ──
-          ctx.fillStyle = "#4a0082"; ctx.fillRect(e.x, e.y, e.w, e.h);
+          // ── Castle boss — world-themed colors ──
+          const wBoss = worldOf(gRef.current.currentLevel);
+          const bc = wBoss === 1
+            ? { body:"#660000", aura:"#ff3300", tower:"#440000", tip:"#ff6600", eyeBox:"#ff6600", eyeIn:"#ffcc88", pupil:"#330000", jaw:"#1a0000", label:"#ff8800" }
+            : wBoss === 2
+            ? { body:"#003300", aura:"#00cc44", tower:"#001800", tip:"#00ff44", eyeBox:"#00cc00", eyeIn:"#88ff88", pupil:"#001100", jaw:"#001100", label:"#00ff66" }
+            : { body:"#4a0082", aura:"#cc00ff", tower:"#7700cc", tip:"#ff00ff", eyeBox:"#ff0000", eyeIn:"#ff9999", pupil:"#000",    jaw:"#1a0030", label:"#ff00ff" };
+          ctx.fillStyle = bc.body; ctx.fillRect(e.x, e.y, e.w, e.h);
           ctx.globalAlpha = 0.15 + 0.08 * Math.sin(frame * 0.1);
-          ctx.fillStyle = "#cc00ff"; ctx.fillRect(e.x - 6, e.y - 6, e.w + 12, e.h + 12);
+          ctx.fillStyle = bc.aura; ctx.fillRect(e.x - 6, e.y - 6, e.w + 12, e.h + 12);
           ctx.globalAlpha = 1;
-          ctx.fillStyle = "#7700cc"; ctx.fillRect(e.x + 6, e.y - 18, 13, 18); ctx.fillRect(e.x + e.w - 19, e.y - 18, 13, 18);
-          ctx.fillStyle = "#ff00ff"; ctx.fillRect(e.x + 9, e.y - 22, 7, 7); ctx.fillRect(e.x + e.w - 16, e.y - 22, 7, 7);
-          ctx.fillStyle = "#ff0000"; ctx.fillRect(e.x + 10, e.y + 13, 17, 15); ctx.fillRect(e.x + e.w - 27, e.y + 13, 17, 15);
-          ctx.fillStyle = "#ff9999"; ctx.fillRect(e.x + 14, e.y + 16, 9, 9); ctx.fillRect(e.x + e.w - 23, e.y + 16, 9, 9);
-          ctx.fillStyle = "#000"; ctx.fillRect(e.x + 17, e.y + 18, 5, 5); ctx.fillRect(e.x + e.w - 22, e.y + 18, 5, 5);
-          ctx.fillStyle = "#1a0030"; ctx.fillRect(e.x + 11, e.y + e.h - 19, e.w - 22, 11);
+          ctx.fillStyle = bc.tower; ctx.fillRect(e.x + 6, e.y - 18, 13, 18); ctx.fillRect(e.x + e.w - 19, e.y - 18, 13, 18);
+          ctx.fillStyle = bc.tip; ctx.fillRect(e.x + 9, e.y - 22, 7, 7); ctx.fillRect(e.x + e.w - 16, e.y - 22, 7, 7);
+          ctx.fillStyle = bc.eyeBox; ctx.fillRect(e.x + 10, e.y + 13, 17, 15); ctx.fillRect(e.x + e.w - 27, e.y + 13, 17, 15);
+          ctx.fillStyle = bc.eyeIn; ctx.fillRect(e.x + 14, e.y + 16, 9, 9); ctx.fillRect(e.x + e.w - 23, e.y + 16, 9, 9);
+          ctx.fillStyle = bc.pupil; ctx.fillRect(e.x + 17, e.y + 18, 5, 5); ctx.fillRect(e.x + e.w - 22, e.y + 18, 5, 5);
+          ctx.fillStyle = bc.jaw; ctx.fillRect(e.x + 11, e.y + e.h - 19, e.w - 22, 11);
           ctx.fillStyle = "#ddd";
           for (let tx = e.x + 13; tx < e.x + e.w - 17; tx += 13) ctx.fillRect(tx, e.y + e.h - 19, 9, 7);
           const hpR = (e.hp || 0) / (e.maxHp || 1);
@@ -434,31 +534,113 @@ export default function AprendePage() {
           ctx.fillStyle = hpR > 0.6 ? "#00ee44" : hpR > 0.3 ? "#ffaa00" : "#ff2200";
           ctx.fillRect(e.x - 3, e.y - 34, (e.w + 6) * hpR, 11);
           ctx.strokeStyle = "#fff"; ctx.lineWidth = 1; ctx.strokeRect(e.x - 3, e.y - 34, e.w + 6, 11);
-          ctx.fillStyle = "#ff00ff"; ctx.font = "bold 9px monospace"; ctx.textAlign = "center";
+          ctx.fillStyle = bc.label; ctx.font = "bold 9px monospace"; ctx.textAlign = "center";
           ctx.fillText("JEFE", e.x + e.w / 2, e.y - 38);
 
         } else if (e.isFlying) {
-          // ── Flying bat enemy ──
-          const flap = Math.sin(frame * 0.22 + (e.floatPhase || 0)) > 0;
-          ctx.fillStyle = "#003888";
-          if (flap) {
-            ctx.fillRect(e.x - 16, e.y + 4, 16, 12); ctx.fillRect(e.x + e.w, e.y + 4, 16, 12);
-            ctx.fillRect(e.x - 20, e.y, 8, 8); ctx.fillRect(e.x + e.w + 12, e.y, 8, 8);
+          const wFly = worldOf(gRef.current.currentLevel);
+          if (wFly === 1) {
+            // ── Ember Sprite — flame ball, no wings ──
+            const ft = frame * 0.1 + (e.floatPhase || 0);
+            const flicker = Math.sin(ft * 3.1) * 3;
+            ctx.globalAlpha = 0.2 + 0.1 * Math.sin(ft * 4);
+            ctx.fillStyle = "#ff6600"; ctx.fillRect(e.x - 8, e.y - 8, e.w + 16, e.h + 16);
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#cc2200";
+            ctx.beginPath(); ctx.ellipse(e.x + e.w/2, e.y + e.h*0.58 + flicker, e.w*0.52, e.h*0.52, 0, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#ff5500";
+            ctx.beginPath(); ctx.ellipse(e.x + e.w/2, e.y + e.h*0.46 + flicker, e.w*0.38, e.h*0.42, 0, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#ffaa00";
+            ctx.beginPath(); ctx.ellipse(e.x + e.w/2, e.y + e.h*0.36, e.w*0.24, e.h*0.28, 0, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#ffee88";
+            ctx.beginPath(); ctx.ellipse(e.x + e.w/2, e.y + e.h*0.3, e.w*0.12, e.h*0.16, 0, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 7, e.y + 7, 7, 7); ctx.fillRect(e.x + e.w - 14, e.y + 7, 7, 7);
+            ctx.fillStyle = "#000"; ctx.fillRect(e.x + 9, e.y + 9, 3, 3); ctx.fillRect(e.x + e.w - 12, e.y + 9, 3, 3);
+          } else if (wFly === 2) {
+            // ── Shadow Moth — dark wings + green spots, purple body ──
+            const flap = Math.sin(frame * 0.18 + (e.floatPhase || 0)) > 0;
+            ctx.fillStyle = "#1a0033";
+            if (flap) {
+              ctx.fillRect(e.x - 22, e.y, 22, 18); ctx.fillRect(e.x + e.w, e.y, 22, 18);
+              ctx.fillRect(e.x - 28, e.y - 8, 12, 12); ctx.fillRect(e.x + e.w + 16, e.y - 8, 12, 12);
+            } else {
+              ctx.fillRect(e.x - 20, e.y + 8, 20, 14); ctx.fillRect(e.x + e.w, e.y + 8, 20, 14);
+              ctx.fillRect(e.x - 24, e.y + 18, 10, 10); ctx.fillRect(e.x + e.w + 14, e.y + 18, 10, 10);
+            }
+            ctx.globalAlpha = 0.7; ctx.fillStyle = "#00aa44";
+            if (flap) {
+              ctx.beginPath(); ctx.arc(e.x - 11, e.y + 9, 4, 0, Math.PI*2); ctx.fill();
+              ctx.beginPath(); ctx.arc(e.x + e.w + 11, e.y + 9, 4, 0, Math.PI*2); ctx.fill();
+            } else {
+              ctx.beginPath(); ctx.arc(e.x - 10, e.y + 15, 4, 0, Math.PI*2); ctx.fill();
+              ctx.beginPath(); ctx.arc(e.x + e.w + 10, e.y + 15, 4, 0, Math.PI*2); ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#5500aa"; ctx.fillRect(e.x, e.y, e.w, e.h);
+            ctx.fillStyle = "#00ff66"; ctx.fillRect(e.x + 6, e.y + 7, 8, 8); ctx.fillRect(e.x + e.w - 14, e.y + 7, 8, 8);
+            ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 9, e.y + 9, 3, 3); ctx.fillRect(e.x + e.w - 11, e.y + 9, 3, 3);
+            ctx.fillStyle = "#330066"; ctx.fillRect(e.x + 7, e.y - 8, 3, 8); ctx.fillRect(e.x + e.w - 10, e.y - 8, 3, 8);
+            ctx.fillStyle = "#cc00ff"; ctx.fillRect(e.x + 5, e.y - 11, 7, 4); ctx.fillRect(e.x + e.w - 12, e.y - 11, 7, 4);
           } else {
-            ctx.fillRect(e.x - 14, e.y + 10, 14, 8); ctx.fillRect(e.x + e.w, e.y + 10, 14, 8);
-            ctx.fillRect(e.x - 16, e.y + 16, 8, 6); ctx.fillRect(e.x + e.w + 8, e.y + 16, 8, 6);
+            // ── Blue bat (World 0 / World 3 ghost minions) ──
+            const flap = Math.sin(frame * 0.22 + (e.floatPhase || 0)) > 0;
+            const wingColor = wFly === 3 ? "#003333" : "#003888";
+            const bodyColor = wFly === 3 ? "#006655" : "#0055cc";
+            const eyeColor  = wFly === 3 ? "#00ffcc" : "#00ffee";
+            ctx.fillStyle = wingColor;
+            if (flap) {
+              ctx.fillRect(e.x - 16, e.y + 4, 16, 12); ctx.fillRect(e.x + e.w, e.y + 4, 16, 12);
+              ctx.fillRect(e.x - 20, e.y, 8, 8); ctx.fillRect(e.x + e.w + 12, e.y, 8, 8);
+            } else {
+              ctx.fillRect(e.x - 14, e.y + 10, 14, 8); ctx.fillRect(e.x + e.w, e.y + 10, 14, 8);
+              ctx.fillRect(e.x - 16, e.y + 16, 8, 6); ctx.fillRect(e.x + e.w + 8, e.y + 16, 8, 6);
+            }
+            ctx.fillStyle = bodyColor; ctx.fillRect(e.x, e.y, e.w, e.h);
+            ctx.fillStyle = eyeColor; ctx.fillRect(e.x + 6, e.y + 6, 9, 9); ctx.fillRect(e.x + e.w - 15, e.y + 6, 9, 9);
+            ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 8, e.y + 8, 5, 5); ctx.fillRect(e.x + e.w - 13, e.y + 8, 5, 5);
+            ctx.fillRect(e.x + 14, e.y + e.h - 8, 5, 8); ctx.fillRect(e.x + e.w - 19, e.y + e.h - 8, 5, 8);
           }
-          ctx.fillStyle = "#0055cc"; ctx.fillRect(e.x, e.y, e.w, e.h);
-          ctx.fillStyle = "#00ffee"; ctx.fillRect(e.x + 6, e.y + 6, 9, 9); ctx.fillRect(e.x + e.w - 15, e.y + 6, 9, 9);
-          ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 8, e.y + 8, 5, 5); ctx.fillRect(e.x + e.w - 13, e.y + 8, 5, 5);
-          ctx.fillRect(e.x + 14, e.y + e.h - 8, 5, 8); ctx.fillRect(e.x + e.w - 19, e.y + e.h - 8, 5, 8);
 
         } else {
-          // ── Regular ground enemy ──
-          ctx.fillStyle = "#cc0000"; ctx.fillRect(e.x, e.y, e.w, e.h);
-          ctx.fillStyle = "#ff0"; ctx.fillRect(e.x + 7, e.y + 7, 9, 9); ctx.fillRect(e.x + e.w - 16, e.y + 7, 9, 9);
-          ctx.fillStyle = "#000"; ctx.fillRect(e.x + 10, e.y + 10, 4, 4); ctx.fillRect(e.x + e.w - 13, e.y + 10, 4, 4);
-          ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 8, e.y + e.h - 10, e.w - 16, 5);
+          const wGnd = worldOf(gRef.current.currentLevel);
+          if (wGnd === 1) {
+            // ── Lava Golem — dark grey body, orange crack lines, yellow eyes ──
+            const gt = frame * 0.05;
+            ctx.fillStyle = "#2a2a2a"; ctx.fillRect(e.x, e.y, e.w, e.h);
+            ctx.fillStyle = "#333"; ctx.fillRect(e.x - 5, e.y + 4, 8, 12); ctx.fillRect(e.x + e.w - 3, e.y + 4, 8, 12);
+            ctx.strokeStyle = "#ff6600"; ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.65 + 0.35 * Math.sin(gt * 3.2);
+            ctx.beginPath(); ctx.moveTo(e.x + 9, e.y + 4); ctx.lineTo(e.x + 15, e.y + e.h*0.5); ctx.lineTo(e.x + 10, e.y + e.h*0.65); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(e.x + e.w - 10, e.y + 7); ctx.lineTo(e.x + e.w - 17, e.y + e.h*0.48); ctx.lineTo(e.x + e.w - 9, e.y + e.h*0.7); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(e.x + e.w*0.42, e.y + e.h*0.28); ctx.lineTo(e.x + e.w*0.56, e.y + e.h*0.72); ctx.stroke();
+            ctx.globalAlpha = 1; ctx.lineWidth = 1;
+            ctx.fillStyle = "#ff8800"; ctx.fillRect(e.x + 7, e.y + 8, 9, 8); ctx.fillRect(e.x + e.w - 16, e.y + 8, 9, 8);
+            ctx.fillStyle = "#ffee00"; ctx.fillRect(e.x + 9, e.y + 10, 5, 4); ctx.fillRect(e.x + e.w - 14, e.y + 10, 5, 4);
+            ctx.globalAlpha = 0.8; ctx.fillStyle = "#ff4400";
+            ctx.fillRect(e.x + 8, e.y + e.h - 10, e.w - 16, 4);
+            ctx.globalAlpha = 1;
+          } else if (wGnd === 2) {
+            // ── Dark Knight — black armor, shoulder spikes, green glowing eyes ──
+            const kt = frame * 0.04;
+            ctx.fillStyle = "#111"; ctx.fillRect(e.x, e.y, e.w, e.h);
+            ctx.fillStyle = "#003311"; ctx.fillRect(e.x + 3, e.y + 3, e.w - 6, 5); ctx.fillRect(e.x + 3, e.y + e.h*0.5, e.w - 6, 5);
+            ctx.fillStyle = "#222"; ctx.fillRect(e.x - 6, e.y + 2, 9, 14); ctx.fillRect(e.x + e.w - 3, e.y + 2, 9, 14);
+            ctx.fillStyle = "#444"; ctx.fillRect(e.x - 5, e.y - 5, 7, 7); ctx.fillRect(e.x + e.w - 2, e.y - 5, 7, 7);
+            ctx.fillStyle = "#000"; ctx.fillRect(e.x + 4, e.y + 7, e.w - 8, 8);
+            ctx.globalAlpha = 0.85 + 0.15 * Math.sin(kt * 5);
+            ctx.fillStyle = "#00ff44"; ctx.fillRect(e.x + 7, e.y + 9, 8, 5); ctx.fillRect(e.x + e.w - 15, e.y + 9, 8, 5);
+            ctx.globalAlpha = 0.18 + 0.1 * Math.sin(kt * 4);
+            ctx.fillRect(e.x + 3, e.y + 6, e.w - 6, 11);
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#1a1a1a"; ctx.fillRect(e.x + 3, e.y + e.h - 12, e.w - 6, 10);
+            ctx.fillStyle = "#336633"; ctx.fillRect(e.x + e.w/2 - 4, e.y + e.h - 15, 8, 6);
+          } else {
+            // ── Red grunt (World 0 + World 3 undead) ──
+            ctx.fillStyle = wGnd === 3 ? "#330033" : "#cc0000"; ctx.fillRect(e.x, e.y, e.w, e.h);
+            ctx.fillStyle = wGnd === 3 ? "#cc44ff" : "#ff0"; ctx.fillRect(e.x + 7, e.y + 7, 9, 9); ctx.fillRect(e.x + e.w - 16, e.y + 7, 9, 9);
+            ctx.fillStyle = "#000"; ctx.fillRect(e.x + 10, e.y + 10, 4, 4); ctx.fillRect(e.x + e.w - 13, e.y + 10, 4, 4);
+            ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 8, e.y + e.h - 10, e.w - 16, 5);
+          }
         }
       }
       ctx.restore();
