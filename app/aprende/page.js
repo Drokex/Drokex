@@ -139,7 +139,7 @@ function newState() {
     cameraX: 0, frame: 0, projectiles: [],
     powerCooldown: 0, bossAnnounce: 0, levelAnnounce: 90,
     invincibleFrames: 80, // grace period at game start
-    doubleJumpFlash: 0, killScore: 0, bossBlockFlash: 0,
+    doubleJumpFlash: 0, killScore: 0, bossBlockFlash: 0, autoPlay: false,
     player: {
       x: 80, y: 200, w: 46, h: 62, vx: 0, vy: 0,
       speed: 0.9, maxSpeed: 8, jumpPower: 16,
@@ -745,6 +745,10 @@ export default function AprendePage() {
       }
       ctx.fillStyle = "#ff4444"; ctx.textAlign = "right";
       ctx.fillText(`♥ ${g.lives}`, W - 14, 28);
+      if (g.autoPlay) {
+        ctx.fillStyle = "#00ff88"; ctx.textAlign = "left"; ctx.font = "bold 11px monospace";
+        ctx.fillText("⚡ AUTO", 14, 43);
+      }
     }
 
     // ─── Game loop ─────────────────────────────────────────────────
@@ -822,6 +826,14 @@ export default function AprendePage() {
         return true;
       });
 
+      // Auto-play cheat (Cmd+2 / Ctrl+2)
+      if (g.autoPlay) {
+        k.right = true; k.left = false;
+        g.invincibleFrames = 200;
+        g.levelEnemies.forEach(e => { if (!e.dead) { awardKill(e); e.dead = true; } });
+        if (p.grounded && g.frame % 55 === 0) k.jumpPressed = true;
+      }
+
       // Enemies
       for (const e of g.levelEnemies) {
         if (e.dead) continue;
@@ -861,7 +873,7 @@ export default function AprendePage() {
 
       // Flag
       if (overlap(p, lev.flag)) {
-        if (bossAlive) {
+        if (bossAlive && !g.autoPlay) {
           g.bossBlockFlash = 90; // show warning
         } else if (g.currentLevel < LEVELS.length - 1) {
           loadLevel(g.currentLevel + 1);
@@ -935,6 +947,11 @@ export default function AprendePage() {
 
     function onKeyDown(e) {
       const k = keysRef.current;
+      if ((e.metaKey || e.ctrlKey) && e.key === "2") {
+        e.preventDefault();
+        if (gRef.current) gRef.current.autoPlay = !gRef.current.autoPlay;
+        return;
+      }
       if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") k.left = true;
       if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") k.right = true;
       if (e.code === "Space" || e.key === "ArrowUp" || e.key.toLowerCase() === "w") {
