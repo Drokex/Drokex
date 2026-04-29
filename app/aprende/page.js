@@ -783,7 +783,13 @@ export default function AprendePage() {
       const pvySnap = p.vy; // capture falling speed before platform zeroes it
       resolvePlatforms("y");
 
-      if (p.y > H + 200) { loseLife(); if (g.stopped) return; }
+      if (p.y > H + 200) {
+        if (g.autoPlay) {
+          // No life loss — respawn just before where we fell, from above
+          p.x = Math.max(80, p.x - 60); p.y = 80;
+          p.vx = 4; p.vy = 0; p.grounded = false; p.jumpsLeft = 2;
+        } else { loseLife(); if (g.stopped) return; }
+      }
       p.x = Math.max(0, Math.min(p.x, lev.width - p.w));
       g.cameraX = Math.max(0, Math.min(p.x - W / 2 + p.w / 2, lev.width - W));
 
@@ -831,7 +837,17 @@ export default function AprendePage() {
         k.right = true; k.left = false;
         g.invincibleFrames = 200;
         g.levelEnemies.forEach(e => { if (!e.dead) { awardKill(e); e.dead = true; } });
-        if (p.grounded && g.frame % 55 === 0) k.jumpPressed = true;
+        // Look 210px ahead — jump if gap or no ground
+        const pFront = p.x + p.w;
+        const groundAhead = lev.platforms.some(pl =>
+          pl.y >= 455 && pl.x < pFront + 210 && pl.x + pl.w > pFront + 15
+        );
+        const stuckOrSlow = p.grounded && Math.abs(p.vx) < 1.5;
+        if ((!groundAhead || stuckOrSlow) && p.jumpsLeft > 0) {
+          k.jumpPressed = true;
+        } else if (p.grounded && g.frame % 120 === 0) {
+          k.jumpPressed = true; // occasional hop for floating platforms
+        }
       }
 
       // Enemies
@@ -872,7 +888,12 @@ export default function AprendePage() {
       const bossAlive = lev.isBoss && g.levelEnemies.some((e) => e.isBosse);
 
       // Flag
-      if (overlap(p, lev.flag)) {
+      const reachedFlag = overlap(p, lev.flag) || (
+        g.autoPlay &&
+        p.x + p.w >= lev.flag.x &&
+        p.x <= lev.flag.x + lev.flag.w + 120
+      );
+      if (reachedFlag) {
         if (bossAlive && !g.autoPlay) {
           g.bossBlockFlash = 90; // show warning
         } else if (g.currentLevel < LEVELS.length - 1) {
