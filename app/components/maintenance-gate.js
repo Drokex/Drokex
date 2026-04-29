@@ -34,7 +34,7 @@ export default function MaintenanceGate({ children }) {
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, overflow: "hidden" }}>
       <img
-        src="/banner%20mantenimiento.png"
+        src="/banner-mantenimiento.png"
         alt="Sitio en mantenimiento"
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
