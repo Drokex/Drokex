@@ -10,110 +10,82 @@ const FRICTION = 0.82;
 const SPRITE_FRAMES = 6;
 const SPRITE_SRC_W = 1424 / SPRITE_FRAMES;
 const SPRITE_SRC_H = 510;
+const TOTAL_LEVELS = 10;
+const HIGH_SCORE_STORAGE_KEY = "drokex-game-high-scores";
 
-const LEVELS = [
-  {
-    name: "Nivel 1",
-    width: 1800,
-    platforms: [
-      { x: 0, y: 480, w: 1800, h: 60 },
-      { x: 260, y: 390, w: 150, h: 28 },
-      { x: 520, y: 330, w: 160, h: 28 },
-      { x: 840, y: 390, w: 180, h: 28 },
-      { x: 1170, y: 335, w: 180, h: 28 },
-    ],
-    coins: [
-      { x: 300, y: 350 }, { x: 570, y: 290 }, { x: 910, y: 350 },
-      { x: 1230, y: 295 }, { x: 1500, y: 430 },
-    ],
-    enemies: [
-      { x: 700, y: 440, w: 42, h: 40, minX: 650, maxX: 900, vx: 2 },
-      { x: 1350, y: 440, w: 42, h: 40, minX: 1280, maxX: 1520, vx: 2.4 },
-    ],
-    flag: { x: 1660, y: 380, w: 44, h: 100 },
-  },
-  {
-    name: "Nivel 2",
-    width: 2200,
-    platforms: [
-      { x: 0, y: 480, w: 675, h: 60 },
-      { x: 725, y: 480, w: 535, h: 60 },
-      { x: 1390, y: 480, w: 810, h: 60 },
-      { x: 360, y: 380, w: 130, h: 28 },
-      { x: 640, y: 315, w: 175, h: 28 },
-      { x: 1030, y: 380, w: 160, h: 28 },
-      { x: 1420, y: 325, w: 160, h: 28 },
-      { x: 1750, y: 380, w: 170, h: 28 },
-    ],
-    coins: [
-      { x: 395, y: 340 }, { x: 720, y: 275 }, { x: 1080, y: 340 },
-      { x: 1480, y: 285 }, { x: 1810, y: 340 }, { x: 2020, y: 430 },
-    ],
-    enemies: [
-      { x: 860, y: 440, w: 42, h: 40, minX: 780, maxX: 1200, vx: 2.6 },
-      { x: 1600, y: 440, w: 42, h: 40, minX: 1450, maxX: 1980, vx: 3 },
-    ],
-    flag: { x: 2070, y: 380, w: 44, h: 100 },
-  },
-  {
-    name: "Nivel 3",
-    width: 2500,
-    platforms: [
-      { x: 0, y: 480, w: 420, h: 60 },
-      { x: 550, y: 480, w: 360, h: 60 },
-      { x: 1040, y: 480, w: 380, h: 60 },
-      { x: 1560, y: 480, w: 940, h: 60 },
-      { x: 300, y: 370, w: 140, h: 28 },
-      { x: 620, y: 315, w: 150, h: 28 },
-      { x: 980, y: 360, w: 140, h: 28 },
-      { x: 1320, y: 300, w: 150, h: 28 },
-      { x: 1700, y: 360, w: 150, h: 28 },
-      { x: 2040, y: 320, w: 160, h: 28 },
-    ],
-    coins: [
-      { x: 340, y: 330 }, { x: 665, y: 275 }, { x: 1025, y: 320 },
-      { x: 1370, y: 260 }, { x: 1760, y: 320 }, { x: 2100, y: 280 },
-      { x: 2300, y: 430 },
-    ],
-    enemies: [
-      { x: 610, y: 440, w: 42, h: 40, minX: 560, maxX: 870, vx: 3 },
-      { x: 1120, y: 440, w: 42, h: 40, minX: 1060, maxX: 1370, vx: 3.2 },
-      { x: 1840, y: 440, w: 42, h: 40, minX: 1600, maxX: 2320, vx: 3.4 },
-    ],
-    flag: { x: 2380, y: 380, w: 44, h: 100 },
-  },
-  {
-    name: "Nivel 4",
-    width: 3000,
-    platforms: [
-      { x: 0, y: 480, w: 500, h: 60 },
-      { x: 630, y: 480, w: 340, h: 60 },
-      { x: 1100, y: 480, w: 360, h: 60 },
-      { x: 1600, y: 480, w: 400, h: 60 },
-      { x: 2120, y: 480, w: 880, h: 60 },
-      { x: 280, y: 375, w: 130, h: 28 },
-      { x: 570, y: 315, w: 140, h: 28 },
-      { x: 890, y: 365, w: 140, h: 28 },
-      { x: 1230, y: 310, w: 150, h: 28 },
-      { x: 1540, y: 365, w: 150, h: 28 },
-      { x: 1880, y: 305, w: 150, h: 28 },
-      { x: 2250, y: 365, w: 150, h: 28 },
-      { x: 2560, y: 315, w: 160, h: 28 },
-    ],
-    coins: [
-      { x: 320, y: 335 }, { x: 615, y: 275 }, { x: 940, y: 325 },
-      { x: 1285, y: 270 }, { x: 1590, y: 325 }, { x: 1935, y: 265 },
-      { x: 2310, y: 325 }, { x: 2620, y: 275 }, { x: 2820, y: 430 },
-    ],
-    enemies: [
-      { x: 680, y: 440, w: 42, h: 40, minX: 640, maxX: 930, vx: 3.5 },
-      { x: 1180, y: 440, w: 42, h: 40, minX: 1120, maxX: 1420, vx: 3.8 },
-      { x: 1720, y: 440, w: 42, h: 40, minX: 1620, maxX: 1960, vx: 4 },
-      { x: 2320, y: 440, w: 42, h: 40, minX: 2150, maxX: 2880, vx: 4.2 },
-    ],
-    flag: { x: 2860, y: 380, w: 44, h: 100 },
-  },
-];
+function buildLevel(index) {
+  const difficulty = index + 1;
+  const width = 1700 + index * 230;
+  const platforms = [];
+  const groundSegments = Math.min(2 + Math.floor(index / 2), 7);
+  const gap = 45 + index * 8;
+  const minGroundWidth = 320;
+  const totalGapWidth = gap * (groundSegments - 1);
+  const segmentWidth = Math.max(
+    minGroundWidth,
+    Math.floor((width - totalGapWidth) / groundSegments),
+  );
+  let x = 0;
+
+  for (let i = 0; i < groundSegments; i++) {
+    const isLast = i === groundSegments - 1;
+    const remainingWidth = width - x;
+    platforms.push({ x, y: 480, w: isLast ? remainingWidth : segmentWidth, h: 60 });
+    x += segmentWidth + gap;
+  }
+
+  const floatingCount = 4 + Math.floor(index * 0.8);
+  for (let i = 0; i < floatingCount; i++) {
+    const px = 280 + i * Math.max(230, Math.floor((width - 620) / Math.max(1, floatingCount - 1)));
+    const yPattern = [380, 330, 365, 310, 350];
+    const py = yPattern[(i + index) % yPattern.length] - Math.min(index * 3, 22);
+    platforms.push({
+      x: Math.min(px, width - 330),
+      y: Math.max(270, py),
+      w: Math.max(130, 190 - index * 5),
+      h: 28,
+    });
+  }
+
+  const coins = [];
+  const coinCount = 5 + index;
+  for (let i = 0; i < coinCount; i++) {
+    const basePlatform = platforms[3 + (i % floatingCount)] || platforms[i % platforms.length];
+    coins.push({
+      x: Math.min(basePlatform.x + basePlatform.w / 2, width - 160),
+      y: basePlatform.y - 40,
+    });
+  }
+  coins.push({ x: width - 210, y: 430 });
+
+  const enemies = [];
+  const enemyCount = Math.min(2 + Math.floor(index / 2), 6);
+  for (let i = 0; i < enemyCount; i++) {
+    const ground = platforms[i % groundSegments];
+    const minX = ground.x + 45;
+    const maxX = Math.max(minX + 120, ground.x + ground.w - 80);
+    enemies.push({
+      x: minX + 25,
+      y: 440,
+      w: 42,
+      h: 40,
+      minX,
+      maxX,
+      vx: 2 + index * 0.32 + i * 0.18,
+    });
+  }
+
+  return {
+    name: `Nivel ${difficulty}`,
+    width,
+    platforms,
+    coins,
+    enemies,
+    flag: { x: width - 150, y: 380, w: 44, h: 100 },
+  };
+}
+
+const LEVELS = Array.from({ length: TOTAL_LEVELS }, (_, index) => buildLevel(index));
 
 function newState() {
   return {
@@ -144,13 +116,44 @@ export default function AprendePage() {
   const [hudCoins, setHudCoins] = useState(0);
   const [hudLevel, setHudLevel] = useState("Nivel 1");
   const [hudLives, setHudLives] = useState(3);
+  const [finalScore, setFinalScore] = useState(0);
+  const [playerName, setPlayerName] = useState("");
+  const [highScores, setHighScores] = useState([]);
+
+  useEffect(() => {
+    try {
+      const savedScores = JSON.parse(window.localStorage.getItem(HIGH_SCORE_STORAGE_KEY) || "[]");
+      setHighScores(Array.isArray(savedScores) ? savedScores.slice(0, 3) : []);
+    } catch {
+      setHighScores([]);
+    }
+  }, []);
+
+  function calculateScore(game) {
+    const levelBonus = (game.currentLevel + 1) * 100;
+    return game.coins * 25 + game.lives * 150 + levelBonus;
+  }
 
   function startGame() {
     gRef.current = newState();
     setHudCoins(0);
     setHudLevel("Nivel 1");
     setHudLives(3);
+    setFinalScore(0);
+    setPlayerName("");
     setScreen("playing");
+  }
+
+  function saveHighScore(e) {
+    e.preventDefault();
+    const name = playerName.trim() || "Jugador";
+    const nextScores = [...highScores, { name, score: finalScore }]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+
+    window.localStorage.setItem(HIGH_SCORE_STORAGE_KEY, JSON.stringify(nextScores));
+    setHighScores(nextScores);
+    setScreen("scores");
   }
 
   useEffect(() => {
@@ -343,7 +346,7 @@ export default function AprendePage() {
       ctx.fillText(LEVELS[g.currentLevel].name.toUpperCase(), 16, 28);
       ctx.fillStyle = "#ffd700";
       ctx.textAlign = "center";
-      ctx.fillText(`● ${g.coins}`, W / 2, 28);
+      ctx.fillText(`● ${g.coins}   PTS ${calculateScore(g)}`, W / 2, 28);
       ctx.fillStyle = "#ff4444";
       ctx.textAlign = "right";
       ctx.fillText(`♥ ${g.lives}`, W - 16, 28);
@@ -413,6 +416,7 @@ export default function AprendePage() {
           loadLevel(g.currentLevel + 1);
         } else {
           g.stopped = true;
+          setFinalScore(calculateScore(g));
           setScreen("win");
           return;
         }
@@ -490,7 +494,17 @@ export default function AprendePage() {
             <div style={overlayStyle}>
               <p style={tagStyle}>Drokex Platform</p>
               <h2 style={titleStyle}>¿Listo para jugar?</h2>
-              <p style={subStyle}>4 niveles · monedas · enemigos · bandera</p>
+              <p style={subStyle}>10 niveles · monedas · enemigos · ranking top 3</p>
+              {highScores.length > 0 && (
+                <div style={scoreListStyle}>
+                  <strong>Mejores puntajes</strong>
+                  {highScores.map((score, index) => (
+                    <p key={`${score.name}-${index}`}>
+                      {index + 1}. {score.name} · {score.score} pts
+                    </p>
+                  ))}
+                </div>
+              )}
               <button onClick={startGame} style={btnStyle}>Comenzar</button>
             </div>
           )}
@@ -507,8 +521,33 @@ export default function AprendePage() {
           {screen === "win" && (
             <div style={overlayStyle}>
               <p style={{ ...tagStyle, color: "#84cc16" }}>¡Completado!</p>
-              <h2 style={titleStyle}>¡Ganaste! 🏆</h2>
-              <p style={subStyle}>Terminaste los 4 niveles con {hudCoins} monedas.</p>
+              <h2 style={titleStyle}>¡Ganaste!</h2>
+              <p style={subStyle}>Terminaste los 10 niveles con {finalScore} puntos.</p>
+              <form onSubmit={saveHighScore} style={scoreFormStyle}>
+                <input
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder="Tu nombre"
+                  maxLength={18}
+                  style={scoreInputStyle}
+                  autoFocus
+                />
+                <button type="submit" style={btnStyle}>Guardar puntaje</button>
+              </form>
+            </div>
+          )}
+
+          {screen === "scores" && (
+            <div style={overlayStyle}>
+              <p style={{ ...tagStyle, color: "#84cc16" }}>Ranking</p>
+              <h2 style={titleStyle}>Top 3 Drokex</h2>
+              <div style={scoreListStyle}>
+                {highScores.map((score, index) => (
+                  <p key={`${score.name}-${index}`}>
+                    {index + 1}. {score.name} · {score.score} pts
+                  </p>
+                ))}
+              </div>
               <button onClick={startGame} style={btnStyle}>Jugar de nuevo</button>
             </div>
           )}
@@ -540,6 +579,33 @@ const tagStyle = {
 };
 const titleStyle = { color: "#fff", fontSize: "2rem", fontWeight: 800, margin: "0 0 8px" };
 const subStyle = { color: "rgba(255,255,255,0.6)", margin: "0 0 28px", fontSize: "0.95rem" };
+const scoreListStyle = {
+  minWidth: 260,
+  margin: "0 0 24px",
+  padding: "14px 18px",
+  borderRadius: 12,
+  background: "rgba(255,255,255,0.08)",
+  color: "#fff",
+  fontSize: "0.95rem",
+  lineHeight: 1.7,
+  textAlign: "left",
+};
+const scoreFormStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 14,
+  width: "min(320px, 100%)",
+};
+const scoreInputStyle = {
+  width: "100%",
+  border: "1px solid rgba(255,255,255,0.24)",
+  borderRadius: 12,
+  background: "rgba(255,255,255,0.1)",
+  color: "#fff",
+  padding: "14px 16px",
+  fontSize: "1rem",
+  outline: "none",
+};
 const btnStyle = {
   background: "#ff8500", color: "#fff", border: "none",
   borderRadius: 12, padding: "14px 40px", fontSize: "1rem",
