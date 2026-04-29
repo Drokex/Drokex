@@ -834,16 +834,50 @@ export default function AprendePage() {
 
       // Auto-play cheat (Cmd+2 / Ctrl+2)
       if (g.autoPlay) {
-        k.right = true; k.left = false;
-        g.invincibleFrames = 200;
-        g.levelEnemies.forEach(e => { if (!e.dead) { awardKill(e); e.dead = true; } });
+        const bossTarget = g.levelEnemies.find(e => e.isBosse && !e.dead);
+        const targetEnemy = bossTarget || g.levelEnemies.find(e =>
+          !e.dead &&
+          e.x + e.w >= p.x - 70 &&
+          e.x <= p.x + 500
+        );
+        const targetCenter = targetEnemy ? targetEnemy.x + targetEnemy.w / 2 : null;
+        const playerCenter = p.x + p.w / 2;
+        const chaseBossLeft = bossTarget && targetCenter < playerCenter - 90;
+        k.right = !chaseBossLeft; k.left = Boolean(chaseBossLeft); k.sprint = true;
+        g.invincibleFrames = 24;
+
+        if (targetEnemy) {
+          p.facing = targetCenter >= playerCenter ? 1 : -1;
+          const closeX = Math.abs(targetCenter - playerCenter) < 76;
+          const closeY = Math.abs((targetEnemy.y + targetEnemy.h / 2) - (p.y + p.h / 2)) < 88;
+          if (g.frame % 18 === 0 && g.projectiles.length < 3) {
+            g.projectiles.push({
+              x: p.x + (p.facing > 0 ? p.w + 5 : -22),
+              y: p.y + p.h * 0.38,
+              vx: p.facing * 17,
+            });
+          }
+          if (closeX && closeY) {
+            awardKill(targetEnemy);
+            if (targetEnemy.isBosse) {
+              targetEnemy.hp--;
+              p.vy = -11;
+              if (targetEnemy.hp <= 0) targetEnemy.dead = true;
+            } else {
+              targetEnemy.dead = true;
+              p.vy = -11;
+            }
+          }
+        }
+
         // Look 210px ahead — jump if gap or no ground
         const pFront = p.x + p.w;
         const groundAhead = lev.platforms.some(pl =>
           pl.y >= 455 && pl.x < pFront + 210 && pl.x + pl.w > pFront + 15
         );
         const stuckOrSlow = p.grounded && Math.abs(p.vx) < 1.5;
-        if ((!groundAhead || stuckOrSlow) && p.jumpsLeft > 0) {
+        const enemyJump = targetEnemy && targetEnemy.x > p.x && targetEnemy.x - pFront < 130 && p.y + p.h > targetEnemy.y;
+        if ((!groundAhead || stuckOrSlow || enemyJump) && p.jumpsLeft > 0) {
           k.jumpPressed = true;
         } else if (p.grounded && g.frame % 120 === 0) {
           k.jumpPressed = true; // occasional hop for floating platforms
@@ -894,7 +928,7 @@ export default function AprendePage() {
         p.x <= lev.flag.x + lev.flag.w + 120
       );
       if (reachedFlag) {
-        if (bossAlive && !g.autoPlay) {
+        if (bossAlive) {
           g.bossBlockFlash = 90; // show warning
         } else if (g.currentLevel < LEVELS.length - 1) {
           loadLevel(g.currentLevel + 1);
