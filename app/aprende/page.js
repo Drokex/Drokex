@@ -137,6 +137,7 @@ function newState() {
   return {
     stopped: false, currentLevel: 0, coins: 0, lives: 3,
     cameraX: 0, frame: 0, projectiles: [],
+    impacts: [], particles: [], screenShake: 0,
     powerCooldown: 0, bossAnnounce: 0, levelAnnounce: 90,
     invincibleFrames: 80, // grace period at game start
     doubleJumpFlash: 0, killScore: 0, bossBlockFlash: 0, autoPlay: false,
@@ -155,6 +156,7 @@ export default function AprendePage() {
   const gRef = useRef(null);
   const keysRef = useRef({ left: false, right: false, jump: false, jumpPressed: false, power: false, sprint: false });
   const rafRef = useRef(null);
+  const audioRef = useRef(null);
 
   const [screen, setScreen] = useState("start");
   const [hudCoins, setHudCoins] = useState(0);
@@ -174,7 +176,15 @@ export default function AprendePage() {
     return game.coins * 25 + game.lives * 150 + (game.currentLevel + 1) * 120 + (game.killScore || 0);
   }
 
+  function ensureAudio() {
+    if (typeof window === "undefined") return null;
+    if (!audioRef.current) audioRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioRef.current.state === "suspended") audioRef.current.resume().catch(() => {});
+    return audioRef.current;
+  }
+
   function startGame() {
+    ensureAudio();
     gRef.current = newState();
     setHudCoins(0); setHudLives(3); setFinalScore(0); setPlayerName("");
     setScreen("playing");
@@ -195,6 +205,67 @@ export default function AprendePage() {
     const ctx = canvas.getContext("2d");
     const sprite = new Image();
     sprite.src = "/game-sprite.png";
+    const bgImages = ["/aprende-bg-city.png", "/aprende-bg-volcano.png", "/aprende-bg-forest.png", "/aprende-bg-ghost.png"].map((src) => {
+      const img = new Image();
+      img.src = src;
+      return img;
+    });
+    const enemySheet = new Image();
+    enemySheet.src = "/aprende-enemies.png";
+    const explosionSheet = new Image();
+    explosionSheet.src = "/aprende-explosions.png";
+
+    function playSound(type) {
+      const audio = audioRef.current;
+      if (!audio) return;
+      const now = audio.currentTime;
+      const osc = audio.createOscillator();
+      const gain = audio.createGain();
+      const filter = audio.createBiquadFilter();
+      const cfg = {
+        coin: [980, 1480, 0.09, "triangle", 0.035],
+        jump: [220, 520, 0.12, "sine", 0.035],
+        shoot: [620, 180, 0.12, "sawtooth", 0.025],
+        hit: [160, 54, 0.16, "square", 0.04],
+        level: [440, 880, 0.18, "triangle", 0.045],
+        win: [520, 1320, 0.42, "sine", 0.04],
+      }[type] || [300, 120, 0.1, "sine", 0.03];
+      const [from, to, dur, wave, vol] = cfg;
+      osc.type = wave;
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(type === "shoot" ? 1800 : 3200, now);
+      osc.frequency.setValueAtTime(from, now);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(35, to), now + dur);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(vol, now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audio.destination);
+      osc.start(now);
+      osc.stop(now + dur + 0.03);
+    }
+
+    function spawnImpact(x, y, type = "hit") {
+      const g = gRef.current;
+      const theme = worldTheme(g.currentLevel);
+      g.screenShake = Math.max(g.screenShake, type === "boss" ? 14 : 8);
+      g.impacts.push({ x, y, age: 0, maxAge: type === "boss" ? 26 : 18, type });
+      const count = type === "boss" ? 22 : 12;
+      for (let i = 0; i < count; i++) {
+        const a = (Math.PI * 2 * i) / count + g.frame * 0.03;
+        const speed = 1.6 + (i % 5) * 0.75;
+        g.particles.push({
+          x, y,
+          vx: Math.cos(a) * speed,
+          vy: Math.sin(a) * speed - 1.2,
+          life: type === "boss" ? 34 : 24,
+          age: 0,
+          size: 2 + (i % 4),
+          color: i % 3 === 0 ? "#fff" : theme.glow,
+        });
+      }
+    }
 
     function overlap(a, b) {
       return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
@@ -223,6 +294,9 @@ export default function AprendePage() {
       g.levelCoins = LEVELS[idx].coins.map((c) => ({ ...c, collected: false }));
       g.levelEnemies = LEVELS[idx].enemies.map((e) => ({ ...e }));
       g.projectiles = [];
+      g.impacts = [];
+      g.particles = [];
+      g.screenShake = 12;
       g.powerCooldown = 0;
       g.invincibleFrames = 80; // grace period on level entry
       g.doubleJumpFlash = 0;
@@ -230,6 +304,7 @@ export default function AprendePage() {
       g.bossAnnounce = LEVELS[idx].isBoss ? (LEVELS[idx].isFinalLevel ? 220 : 180) : 0;
       g.levelAnnounce = LEVELS[idx].isBoss ? 0 : 90;
       Object.assign(g.player, { x: 80, y: 200, vx: 0, vy: 0, grounded: false, jumpsLeft: 2 });
+      playSound("level");
     }
 
     function loseLife() {
@@ -239,6 +314,9 @@ export default function AprendePage() {
       else {
         setHudLives(g.lives);
         g.projectiles = [];
+        g.impacts = [];
+        g.particles = [];
+        g.screenShake = 16;
         g.invincibleFrames = 110;
         g.bossBlockFlash = 0;
         Object.assign(g.player, { x: 80, y: 200, vx: 0, vy: 0, grounded: false, jumpsLeft: 2 });
@@ -288,6 +366,17 @@ export default function AprendePage() {
     function drawBg(frame) {
       const lev = LEVELS[gRef.current.currentLevel];
       const w = worldOf(gRef.current.currentLevel);
+      const bg = bgImages[w];
+      if (bg?.complete && bg.naturalWidth > 0) {
+        const drift = (gRef.current.cameraX * 0.07) % W;
+        ctx.drawImage(bg, -drift, 0, W, H);
+        ctx.drawImage(bg, W - drift, 0, W, H);
+        ctx.globalAlpha = lev.isBoss ? 0.34 : 0.18;
+        ctx.fillStyle = lev.isBoss ? "rgba(0,0,0,0.42)" : "rgba(0,0,0,0.16)";
+        ctx.fillRect(0, 0, W, H);
+        ctx.globalAlpha = 1;
+        return;
+      }
       const stars = [
         [50,30],[120,80],[200,20],[320,60],[450,30],[600,70],[720,25],
         [760,90],[80,110],[400,100],[550,50],[850,40],[900,100],
@@ -532,11 +621,40 @@ export default function AprendePage() {
       ctx.restore();
     }
 
+    function enemySpriteIndex(e) {
+      const w = worldOf(gRef.current.currentLevel);
+      if (e.isFinalBoss) return 5;
+      if (e.isBosse) return 4;
+      if (e.isFlying) return w === 1 ? 1 : w === 2 ? 1 : 1;
+      if (w === 1) return 2;
+      if (w === 2) return 3;
+      return 0;
+    }
+
+    function drawEnemyBitmap(e, frame) {
+      if (!enemySheet.complete || enemySheet.naturalWidth <= 0) return false;
+      const idx = enemySpriteIndex(e);
+      const bob = e.isFlying || e.isFinalBoss ? Math.sin(frame * 0.08 + e.x) * 3 : 0;
+      const scale = e.isBosse ? 1.22 : e.isFinalBoss ? 1.35 : 1.18;
+      const dw = e.w * scale;
+      const dh = e.h * scale;
+      const dx = e.x + e.w / 2 - dw / 2;
+      const dy = e.y + e.h / 2 - dh / 2 + bob;
+      const theme = worldTheme(gRef.current.currentLevel);
+      ctx.save();
+      ctx.shadowColor = e.isBosse || e.isFinalBoss ? theme.glow : "rgba(255,255,255,0.28)";
+      ctx.shadowBlur = e.isBosse || e.isFinalBoss ? 22 : 10;
+      ctx.drawImage(enemySheet, idx * 128, 0, 128, 128, dx, dy, dw, dh);
+      ctx.restore();
+      return true;
+    }
+
     function drawEnemies(camX, enemies, frame) {
       ctx.save();
       ctx.translate(-camX, 0);
       for (const e of enemies) {
         if (e.dead) continue;
+        if (drawEnemyBitmap(e, frame) && !e.isBosse && !e.isFinalBoss) continue;
         if (e.isFinalBoss) {
           // ── Ghost final boss ──
           const gx = e.x, gy = e.y, gw = e.w, gh = e.h;
@@ -767,6 +885,53 @@ export default function AprendePage() {
       ctx.restore();
     }
 
+    function drawImpacts(camX, impacts) {
+      if (!impacts.length) return;
+      ctx.save();
+      ctx.translate(-camX, 0);
+      const theme = worldTheme(gRef.current.currentLevel);
+      for (const impact of impacts) {
+        const progress = impact.age / impact.maxAge;
+        const frame = Math.min(5, Math.floor(progress * 6));
+        const size = impact.type === "boss" ? 118 : impact.type === "coin" ? 52 : 82;
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        ctx.globalAlpha = 1 - progress;
+        if (explosionSheet.complete && explosionSheet.naturalWidth > 0) {
+          ctx.drawImage(explosionSheet, frame * 128, 0, 128, 128, impact.x - size / 2, impact.y - size / 2, size, size);
+        } else {
+          ctx.shadowColor = theme.glow;
+          ctx.shadowBlur = 22;
+          ctx.fillStyle = impact.type === "coin" ? "#ffd700" : theme.glow;
+          ctx.beginPath();
+          ctx.arc(impact.x, impact.y, size * (0.12 + progress * 0.38), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    function drawParticles(camX, particles) {
+      if (!particles.length) return;
+      ctx.save();
+      ctx.translate(-camX, 0);
+      ctx.globalCompositeOperation = "lighter";
+      for (const part of particles) {
+        const fade = 1 - part.age / part.life;
+        ctx.globalAlpha = fade;
+        ctx.fillStyle = part.color;
+        ctx.shadowColor = part.color;
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(part.x, part.y, part.size * fade, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
+
     function drawFlag(camX, bossAlive) {
       const f = LEVELS[gRef.current.currentLevel].flag;
       const frame = gRef.current.frame;
@@ -965,6 +1130,7 @@ export default function AprendePage() {
           p.vy = -power; p.grounded = false;
           if (p.jumpsLeft === 1) g.doubleJumpFlash = 15;
           p.jumpsLeft--;
+          playSound("jump");
         }
       }
 
@@ -991,6 +1157,8 @@ export default function AprendePage() {
       for (const c of g.levelCoins) {
         if (!c.collected && Math.hypot(c.x - cx, c.y - cy) < p.w / 2 + 12) {
           c.collected = true; g.coins++; setHudCoins(g.coins);
+          playSound("coin");
+          spawnImpact(c.x, c.y, "coin");
         }
       }
 
@@ -1005,6 +1173,7 @@ export default function AprendePage() {
           g.coins -= POWER_COST; setHudCoins(g.coins);
           g.powerCooldown = POWER_COOLDOWN;
           g.projectiles.push({ x: p.x + (p.facing > 0 ? p.w + 5 : -22), y: p.y + p.h * 0.38, vx: p.facing * 17 });
+          playSound("shoot");
         }
       }
       if (g.powerCooldown > 0) g.powerCooldown--;
@@ -1017,7 +1186,9 @@ export default function AprendePage() {
           if (e.dead) continue;
           if (overlap({ x: proj.x - 10, y: proj.y - 10, w: 20, h: 20 }, e)) {
             awardKill(e);
-            if (e.isBosse) { e.hp--; if (e.hp <= 0) e.dead = true; }
+            spawnImpact(e.x + e.w / 2, e.y + e.h / 2, e.isBosse ? "boss" : "hit");
+            playSound("hit");
+            if (e.isBosse) { e.hp--; if (e.hp <= 0) { e.dead = true; spawnImpact(e.x + e.w / 2, e.y + e.h / 2, "boss"); } }
             else e.dead = true;
             return false;
           }
@@ -1049,9 +1220,12 @@ export default function AprendePage() {
               y: p.y + p.h * 0.38,
               vx: p.facing * 17,
             });
+            playSound("shoot");
           }
           if (closeX && closeY) {
             awardKill(targetEnemy);
+            spawnImpact(targetEnemy.x + targetEnemy.w / 2, targetEnemy.y + targetEnemy.h / 2, targetEnemy.isBosse ? "boss" : "hit");
+            playSound("hit");
             if (targetEnemy.isBosse) {
               targetEnemy.hp--;
               p.vy = -11;
@@ -1102,6 +1276,8 @@ export default function AprendePage() {
           const stompLine = e.y + (e.isFinalBoss ? e.h * 0.52 : e.isBosse ? e.h * 0.55 : e.h * 0.5);
           if (pvySnap > 1.5 && p.y + p.h * 0.6 < stompLine) {
             awardKill(e);
+            spawnImpact(e.x + e.w / 2, e.y + e.h / 2, e.isBosse ? "boss" : "hit");
+            playSound("hit");
             if (e.isBosse) { e.hp--; p.vy = -11; if (e.hp <= 0) e.dead = true; }
             else { e.dead = true; p.vy = -11; }
           } else {
@@ -1126,25 +1302,44 @@ export default function AprendePage() {
         } else if (g.currentLevel < LEVELS.length - 1) {
           loadLevel(g.currentLevel + 1);
         } else {
+          playSound("win");
           g.stopped = true; setFinalScore(calculateScore(g)); setScreen("win"); return;
         }
       }
 
       if (g.bossAnnounce > 0) g.bossAnnounce--;
       if (g.levelAnnounce > 0) g.levelAnnounce--;
+      if (g.screenShake > 0) g.screenShake--;
+      for (const part of g.particles) {
+        part.age++;
+        part.x += part.vx;
+        part.y += part.vy;
+        part.vy += 0.08;
+      }
+      g.particles = g.particles.filter((part) => part.age < part.life);
+      for (const impact of g.impacts) impact.age++;
+      g.impacts = g.impacts.filter((impact) => impact.age < impact.maxAge);
 
       // ── Draw ──
       ctx.clearRect(0, 0, W, H);
+      ctx.save();
+      if (g.screenShake > 0) {
+        const shake = g.screenShake * 0.32;
+        ctx.translate(Math.sin(g.frame * 1.9) * shake, Math.cos(g.frame * 1.4) * shake);
+      }
       drawBg(g.frame);
       drawPlatforms(g.cameraX);
       drawCoins(g.cameraX, g.levelCoins);
       drawEnemies(g.cameraX, g.levelEnemies, g.frame);
       drawProjectiles(g.cameraX, g.projectiles);
+      drawImpacts(g.cameraX, g.impacts);
+      drawParticles(g.cameraX, g.particles);
       drawFlag(g.cameraX, bossAlive);
       drawDoubleJumpFlash(p, g.cameraX, g.doubleJumpFlash);
       drawChar(p, g.frame, g.cameraX, g.invincibleFrames, k.sprint);
       drawAtmosphere(g.frame);
       drawHUD(g);
+      ctx.restore();
 
       // Progress bar
       const prog = Math.min(1, (p.x + p.w) / lev.width);
