@@ -1,5 +1,6 @@
 import "./globals.css";
 import CountryEntryGate from "@/app/components/country-entry-gate";
+import MaintenanceGate from "@/app/components/maintenance-gate";
 
 export const metadata = {
   title: "Drokex",
@@ -10,6 +11,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es" data-scroll-behavior="smooth">
       <body>
+        <MaintenanceGate>
         <CountryEntryGate>{children}</CountryEntryGate>
         <a
           href="https://wa.me/573209654384"
@@ -23,6 +25,7 @@ export default function RootLayout({ children }) {
             <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L.057 23.617a.75.75 0 0 0 .921.92l5.934-1.502A11.954 11.954 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.694 9.694 0 0 1-4.92-1.337l-.351-.21-3.652.925.972-3.55-.228-.364A9.693 9.693 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z" />
           </svg>
         </a>
+        </MaintenanceGate>
       </body>
     </html>
   );
