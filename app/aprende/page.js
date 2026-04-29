@@ -262,6 +262,27 @@ export default function AprendePage() {
 
     // world 0=ciudad, 1=volcán, 2=bosque, 3=fantasma
     function worldOf(idx) { return idx === 9 ? 3 : Math.min(2, Math.floor(idx / 3)); }
+    function worldTheme(idx) {
+      const w = worldOf(idx);
+      if (w === 1) return { glow: "#ff5a00", glowSoft: "rgba(255,90,0,0.25)", edge: "#ff7a00", accent: "#ffd166", fog: "rgba(255,64,0,0.12)" };
+      if (w === 2) return { glow: "#00ff66", glowSoft: "rgba(0,255,102,0.22)", edge: "#12d66f", accent: "#a7ff83", fog: "rgba(0,255,102,0.1)" };
+      if (w === 3) return { glow: "#84d8ff", glowSoft: "rgba(132,216,255,0.22)", edge: "#62b7ff", accent: "#d8f4ff", fog: "rgba(120,170,255,0.12)" };
+      return { glow: "#ff9b21", glowSoft: "rgba(255,155,33,0.23)", edge: "#ff8500", accent: "#ffe08a", fog: "rgba(255,133,0,0.1)" };
+    }
+    function roundRect(x, y, w, h, r) {
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.lineTo(x + w - rr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+      ctx.lineTo(x + w, y + h - rr);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+      ctx.lineTo(x + rr, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+      ctx.lineTo(x, y + rr);
+      ctx.quadraticCurveTo(x, y, x + rr, y);
+      ctx.closePath();
+    }
 
     // ─── Draw helpers ──────────────────────────────────────────────
     function drawBg(frame) {
@@ -435,11 +456,43 @@ export default function AprendePage() {
         ["#000820", "#4488cc", "#88ccff"],   // fantasma
       ];
       const [base, c1, c2] = palettes[lev.isFinalLevel ? 3 : w];
+      const theme = worldTheme(gRef.current.currentLevel);
       for (const p of lev.platforms) {
-        ctx.fillStyle = base; ctx.fillRect(p.x, p.y, p.w, p.h);
+        ctx.save();
+        ctx.shadowColor = c1;
+        ctx.shadowBlur = p.y >= 455 ? 14 : 22;
+        ctx.globalAlpha = 0.48;
+        ctx.fillStyle = c1;
+        roundRect(p.x - 2, p.y - 2, p.w + 4, Math.min(18, p.h + 6), 8);
+        ctx.fill();
+        ctx.restore();
+
+        const body = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
+        body.addColorStop(0, base);
+        body.addColorStop(0.42, base);
+        body.addColorStop(1, "rgba(0,0,0,0.85)");
+        ctx.fillStyle = body;
+        roundRect(p.x, p.y, p.w, p.h, p.y >= 455 ? 0 : 7);
+        ctx.fill();
+
         const g2 = ctx.createLinearGradient(p.x, p.y, p.x + p.w, p.y);
         g2.addColorStop(0, c1); g2.addColorStop(0.5, c2); g2.addColorStop(1, c1);
-        ctx.fillStyle = g2; ctx.fillRect(p.x, p.y, p.w, 5);
+        ctx.shadowColor = theme.glow;
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = g2;
+        roundRect(p.x, p.y, p.w, 7, 4);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 0.36;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(p.x + 8, p.y + 2, Math.max(0, p.w - 16), 1);
+        ctx.globalAlpha = 0.22;
+        ctx.fillStyle = c2;
+        for (let sx = p.x + 18; sx < p.x + p.w - 12; sx += 42) {
+          ctx.fillRect(sx, p.y + 12, 15, 2);
+          if (p.h > 32) ctx.fillRect(sx + 10, p.y + 30, 19, 2);
+        }
+        ctx.globalAlpha = 1;
       }
       ctx.restore();
     }
@@ -447,13 +500,34 @@ export default function AprendePage() {
     function drawCoins(camX, coins) {
       ctx.save();
       ctx.translate(-camX, 0);
+      const theme = worldTheme(gRef.current.currentLevel);
+      const frame = gRef.current.frame;
       for (const c of coins) {
         if (c.collected) continue;
-        ctx.fillStyle = "#ff8500";
-        ctx.beginPath(); ctx.arc(c.x, c.y, 11, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = "#ffd700"; ctx.lineWidth = 2; ctx.stroke();
+        const bob = Math.sin(frame * 0.08 + c.x * 0.02) * 3;
+        const spin = 0.72 + 0.28 * Math.sin(frame * 0.12 + c.x);
+        ctx.save();
+        ctx.translate(c.x, c.y + bob);
+        ctx.scale(spin, 1);
+        ctx.globalCompositeOperation = "lighter";
+        ctx.globalAlpha = 0.28;
+        ctx.fillStyle = theme.glow;
+        ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = "source-over";
+        const cg = ctx.createRadialGradient(-4, -5, 2, 0, 0, 13);
+        cg.addColorStop(0, "#fff6b0");
+        cg.addColorStop(0.45, "#ffd700");
+        cg.addColorStop(1, "#ff8500");
+        ctx.shadowColor = "#ffd700";
+        ctx.shadowBlur = 14;
+        ctx.fillStyle = cg;
+        ctx.beginPath(); ctx.arc(0, 0, 11, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "#fff1a8"; ctx.lineWidth = 2; ctx.stroke();
         ctx.fillStyle = "#fff"; ctx.font = "bold 9px monospace"; ctx.textAlign = "center";
-        ctx.fillText("$", c.x, c.y + 3);
+        ctx.fillText("$", 0, 3);
+        ctx.restore();
       }
       ctx.restore();
     }
@@ -662,58 +736,118 @@ export default function AprendePage() {
       if (!projectiles.length) return;
       ctx.save();
       ctx.translate(-camX, 0);
+      const theme = worldTheme(gRef.current.currentLevel);
       for (const proj of projectiles) {
-        ctx.shadowColor = "#ffd700"; ctx.shadowBlur = 20;
-        ctx.fillStyle = "#ff8500";
+        const dir = Math.sign(proj.vx) || 1;
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        const beam = ctx.createLinearGradient(proj.x - dir * 42, proj.y, proj.x + dir * 12, proj.y);
+        beam.addColorStop(0, "rgba(255,255,255,0)");
+        beam.addColorStop(0.4, theme.glowSoft);
+        beam.addColorStop(1, theme.accent);
+        ctx.strokeStyle = beam;
+        ctx.lineWidth = 8;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(proj.x - dir * 42, proj.y);
+        ctx.lineTo(proj.x + dir * 4, proj.y);
+        ctx.stroke();
+        ctx.shadowColor = theme.glow;
+        ctx.shadowBlur = 28;
+        const pg = ctx.createRadialGradient(proj.x - 3, proj.y - 3, 2, proj.x, proj.y, 13);
+        pg.addColorStop(0, "#ffffff");
+        pg.addColorStop(0.38, theme.accent);
+        pg.addColorStop(1, theme.edge);
+        ctx.fillStyle = pg;
         ctx.beginPath(); ctx.arc(proj.x, proj.y, 10, 0, Math.PI * 2); ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = "#fff";
-        ctx.beginPath(); ctx.arc(proj.x - 2, proj.y - 2, 4, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 0.4; ctx.fillStyle = "#ff8500";
-        ctx.beginPath(); ctx.arc(proj.x - proj.vx * 0.5, proj.y, 6, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 0.18;
-        ctx.beginPath(); ctx.arc(proj.x - proj.vx, proj.y, 3, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 1;
+        ctx.globalAlpha = 0.35;
+        ctx.beginPath(); ctx.arc(proj.x - dir * 21, proj.y, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
       }
       ctx.restore();
     }
 
     function drawFlag(camX, bossAlive) {
       const f = LEVELS[gRef.current.currentLevel].flag;
+      const frame = gRef.current.frame;
+      const theme = worldTheme(gRef.current.currentLevel);
       ctx.save();
       ctx.translate(-camX, 0);
-      ctx.fillStyle = "#888"; ctx.fillRect(f.x + 2, f.y, 6, f.h);
+      ctx.shadowColor = bossAlive ? "#ff3333" : theme.glow;
+      ctx.shadowBlur = 14;
+      const pole = ctx.createLinearGradient(f.x, f.y, f.x + 10, f.y);
+      pole.addColorStop(0, "#e8edf7");
+      pole.addColorStop(0.5, "#7b8494");
+      pole.addColorStop(1, "#f8fbff");
+      ctx.fillStyle = pole;
+      roundRect(f.x + 2, f.y, 7, f.h, 4);
+      ctx.fill();
       if (bossAlive) {
-        // Blocked — red flag
-        ctx.fillStyle = "#cc0000"; ctx.fillRect(f.x + 8, f.y, 50, 28);
+        const blocked = ctx.createLinearGradient(f.x + 8, f.y, f.x + 58, f.y + 28);
+        blocked.addColorStop(0, "#ff1e1e");
+        blocked.addColorStop(1, "#8b0000");
+        ctx.fillStyle = blocked;
+        ctx.beginPath();
+        ctx.moveTo(f.x + 8, f.y);
+        ctx.quadraticCurveTo(f.x + 34, f.y + 4 + Math.sin(frame * 0.08) * 3, f.x + 58, f.y);
+        ctx.lineTo(f.x + 58, f.y + 28);
+        ctx.quadraticCurveTo(f.x + 34, f.y + 24 + Math.sin(frame * 0.08 + 1.2) * 3, f.x + 8, f.y + 28);
+        ctx.closePath();
+        ctx.fill();
         ctx.fillStyle = "#fff"; ctx.font = "bold 10px monospace"; ctx.textAlign = "center";
         ctx.fillText("¡JEFE!", f.x + 33, f.y + 18);
       } else {
-        ctx.fillStyle = "#ff8500"; ctx.fillRect(f.x + 8, f.y, 50, 28);
+        const free = ctx.createLinearGradient(f.x + 8, f.y, f.x + 58, f.y + 28);
+        free.addColorStop(0, theme.accent);
+        free.addColorStop(0.52, theme.edge);
+        free.addColorStop(1, "#ff5a00");
+        ctx.fillStyle = free;
+        ctx.beginPath();
+        ctx.moveTo(f.x + 8, f.y);
+        ctx.quadraticCurveTo(f.x + 34, f.y + 5 + Math.sin(frame * 0.08) * 4, f.x + 58, f.y);
+        ctx.lineTo(f.x + 58, f.y + 28);
+        ctx.quadraticCurveTo(f.x + 34, f.y + 23 + Math.sin(frame * 0.08 + 1.2) * 4, f.x + 8, f.y + 28);
+        ctx.closePath();
+        ctx.fill();
         ctx.fillStyle = "#fff"; ctx.font = "bold 14px monospace"; ctx.textAlign = "center";
         ctx.fillText("GO", f.x + 33, f.y + 20);
       }
+      ctx.shadowBlur = 0;
       ctx.restore();
     }
 
     function drawChar(p, frame, camX, invincible, sprinting) {
       if (invincible > 0 && Math.floor(invincible / 5) % 2 === 0) return;
       ctx.save();
+      const theme = worldTheme(gRef.current.currentLevel);
+      ctx.globalAlpha = 0.32;
+      ctx.fillStyle = "#000";
+      ctx.beginPath();
+      ctx.ellipse(p.x - camX + p.w / 2, p.y + p.h + 6, p.w * 0.52, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
       if (sprinting && Math.abs(p.vx) > 3) {
-        ctx.globalAlpha = 0.22; ctx.fillStyle = "#84cc16";
-        ctx.fillRect(p.x - camX - p.vx * 2.2, p.y + 12, p.w, p.h - 12);
-        ctx.globalAlpha = 0.1;
-        ctx.fillRect(p.x - camX - p.vx * 4.4, p.y + 24, p.w, p.h - 24);
+        ctx.globalCompositeOperation = "lighter";
+        ctx.globalAlpha = 0.26; ctx.fillStyle = theme.glow;
+        roundRect(p.x - camX - p.vx * 2.1, p.y + 10, p.w, p.h - 10, 10);
+        ctx.fill();
+        ctx.globalAlpha = 0.11;
+        roundRect(p.x - camX - p.vx * 4.3, p.y + 22, p.w, p.h - 22, 10);
+        ctx.fill();
         ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = "source-over";
       }
       ctx.translate(p.x - camX + p.w / 2, p.y + p.h / 2);
       ctx.scale(p.facing, 1);
+      ctx.shadowColor = theme.glow;
+      ctx.shadowBlur = sprinting ? 18 : 8;
       if (sprite.complete && sprite.naturalWidth > 0) {
         const animFrame = p.grounded ? Math.floor(frame / 5) % SPRITE_FRAMES : 2;
         ctx.drawImage(sprite, animFrame * SPRITE_SRC_W, 0, SPRITE_SRC_W, SPRITE_SRC_H, -p.w / 2, -p.h / 2, p.w, p.h);
       } else {
         ctx.fillStyle = "#84cc16"; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
       }
+      ctx.shadowBlur = 0;
       ctx.restore();
     }
 
@@ -722,15 +856,72 @@ export default function AprendePage() {
       const progress = 1 - flash / 15;
       ctx.save();
       ctx.translate(p.x - camX + p.w / 2, p.y + p.h / 2);
+      ctx.globalCompositeOperation = "lighter";
       ctx.globalAlpha = flash / 15;
+      ctx.shadowColor = "#00ffee";
+      ctx.shadowBlur = 20;
       ctx.strokeStyle = "#00ffee"; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(0, 0, p.w * (0.7 + progress * 1.4), 0, Math.PI * 2); ctx.stroke();
+      ctx.globalAlpha = (flash / 15) * 0.28;
+      ctx.fillStyle = "#00ffee";
+      ctx.beginPath(); ctx.arc(0, 0, p.w * (0.55 + progress * 0.9), 0, Math.PI * 2); ctx.fill();
       ctx.globalAlpha = 1;
       ctx.restore();
     }
 
+    function drawAtmosphere(frame) {
+      const theme = worldTheme(gRef.current.currentLevel);
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      const haze = ctx.createRadialGradient(W * 0.5, H * 0.18, 20, W * 0.5, H * 0.22, W * 0.65);
+      haze.addColorStop(0, theme.glowSoft);
+      haze.addColorStop(0.5, "rgba(255,255,255,0.025)");
+      haze.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = haze;
+      ctx.fillRect(0, 0, W, H);
+      for (let i = 0; i < 34; i++) {
+        const drift = (frame * (0.16 + (i % 5) * 0.028) + i * 113) % (W + 220);
+        const px = drift - 110;
+        const py = 68 + ((i * 71 + Math.sin(frame * 0.015 + i) * 38) % (H - 175));
+        const radius = 1.2 + (i % 4) * 0.9;
+        ctx.globalAlpha = 0.08 + (i % 3) * 0.035;
+        ctx.fillStyle = i % 5 === 0 ? theme.accent : theme.glow;
+        ctx.beginPath();
+        ctx.arc(px, py, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalCompositeOperation = "source-over";
+      ctx.globalAlpha = 1;
+      const floorFog = ctx.createLinearGradient(0, H - 165, 0, H);
+      floorFog.addColorStop(0, "rgba(0,0,0,0)");
+      floorFog.addColorStop(0.5, theme.fog);
+      floorFog.addColorStop(1, "rgba(0,0,0,0.26)");
+      ctx.fillStyle = floorFog;
+      ctx.fillRect(0, H - 165, W, 165);
+      const vignette = ctx.createRadialGradient(W / 2, H / 2, W * 0.2, W / 2, H / 2, W * 0.72);
+      vignette.addColorStop(0, "rgba(0,0,0,0)");
+      vignette.addColorStop(0.78, "rgba(0,0,0,0.08)");
+      vignette.addColorStop(1, "rgba(0,0,0,0.48)");
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalAlpha = 0.055;
+      ctx.fillStyle = "#ffffff";
+      for (let y = 1; y < H; y += 4) ctx.fillRect(0, y, W, 1);
+      ctx.restore();
+    }
+
     function drawHUD(g) {
-      ctx.fillStyle = "rgba(0,0,0,0.58)"; ctx.fillRect(0, 0, W, 46);
+      const theme = worldTheme(g.currentLevel);
+      const hud = ctx.createLinearGradient(0, 0, W, 46);
+      hud.addColorStop(0, "rgba(2,6,16,0.88)");
+      hud.addColorStop(0.5, "rgba(7,16,32,0.72)");
+      hud.addColorStop(1, "rgba(2,6,16,0.88)");
+      ctx.fillStyle = hud; ctx.fillRect(0, 0, W, 46);
+      ctx.globalAlpha = 0.75;
+      ctx.strokeStyle = theme.glow;
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, 45.5); ctx.lineTo(W, 45.5); ctx.stroke();
+      ctx.globalAlpha = 1;
       ctx.font = "bold 13px monospace";
       ctx.fillStyle = "#ff8500"; ctx.textAlign = "left";
       ctx.fillText(LEVELS[g.currentLevel].name.toUpperCase(), 14, 28);
@@ -746,8 +937,10 @@ export default function AprendePage() {
       ctx.fillStyle = "#ff4444"; ctx.textAlign = "right";
       ctx.fillText(`♥ ${g.lives}`, W - 14, 28);
       if (g.autoPlay) {
+        ctx.shadowColor = "#00ff88"; ctx.shadowBlur = 10;
         ctx.fillStyle = "#00ff88"; ctx.textAlign = "left"; ctx.font = "bold 11px monospace";
         ctx.fillText("⚡ AUTO", 14, 43);
+        ctx.shadowBlur = 0;
       }
     }
 
@@ -950,6 +1143,7 @@ export default function AprendePage() {
       drawFlag(g.cameraX, bossAlive);
       drawDoubleJumpFlash(p, g.cameraX, g.doubleJumpFlash);
       drawChar(p, g.frame, g.cameraX, g.invincibleFrames, k.sprint);
+      drawAtmosphere(g.frame);
       drawHUD(g);
 
       // Progress bar
