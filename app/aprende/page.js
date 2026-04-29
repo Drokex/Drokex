@@ -36,11 +36,11 @@ const LEVELS = [
     name: "Nivel 2",
     width: 2200,
     platforms: [
-      { x: 0, y: 480, w: 620, h: 60 },
-      { x: 760, y: 480, w: 500, h: 60 },
+      { x: 0, y: 480, w: 675, h: 60 },
+      { x: 725, y: 480, w: 535, h: 60 },
       { x: 1390, y: 480, w: 810, h: 60 },
       { x: 360, y: 380, w: 130, h: 28 },
-      { x: 680, y: 315, w: 140, h: 28 },
+      { x: 640, y: 315, w: 175, h: 28 },
       { x: 1030, y: 380, w: 160, h: 28 },
       { x: 1420, y: 325, w: 160, h: 28 },
       { x: 1750, y: 380, w: 170, h: 28 },
@@ -126,7 +126,7 @@ function newState() {
     player: {
       x: 80, y: 200, w: 46, h: 62,
       vx: 0, vy: 0,
-      speed: 0.8, maxSpeed: 7, jumpPower: 15,
+      speed: 0.9, maxSpeed: 8, jumpPower: 16,
       grounded: false, facing: 1,
     },
     levelCoins: LEVELS[0].coins.map((c) => ({ ...c, collected: false })),
