@@ -12,99 +12,141 @@ const SPRITE_SRC_W = 1424 / SPRITE_FRAMES;
 const SPRITE_SRC_H = 510;
 const TOTAL_LEVELS = 10;
 const HIGH_SCORE_STORAGE_KEY = "drokex-game-high-scores";
-const POWER_COST = 10;
-const POWER_COOLDOWN = 45;
+const POWER_COST = 40;
+const POWER_COOLDOWN = 50;
 
 function buildLevel(index) {
   const difficulty = index + 1;
-  const isBoss = difficulty % 3 === 0; // Levels 3, 6, 9
-  const width = 1700 + index * 230;
+  const isBoss = difficulty % 3 === 0;
+  const castleNum = isBoss ? Math.ceil(difficulty / 3) : 0;
+  const width = 2500 + index * 400;
+
   const platforms = [];
-  const groundSegments = Math.min(2 + Math.floor(index / 2), 7);
-  const gap = 45 + index * 8;
-  const minGroundWidth = 320;
+  const groundSegments = Math.min(3 + Math.floor(index * 0.65), 10);
+  const gap = 72 + index * 15;
+  const minGroundWidth = 260;
   const totalGapWidth = gap * (groundSegments - 1);
   const segmentWidth = Math.max(
     minGroundWidth,
     Math.floor((width - totalGapWidth) / groundSegments),
   );
   let x = 0;
-
   for (let i = 0; i < groundSegments; i++) {
     const isLast = i === groundSegments - 1;
-    const remainingWidth = width - x;
-    platforms.push({ x, y: 480, w: isLast ? remainingWidth : segmentWidth, h: 60 });
+    platforms.push({ x, y: 480, w: isLast ? width - x : segmentWidth, h: 60 });
     x += segmentWidth + gap;
   }
 
-  const floatingCount = 4 + Math.floor(index * 0.8);
+  const floatingCount = 5 + Math.floor(index * 1.3);
   for (let i = 0; i < floatingCount; i++) {
-    const px = 280 + i * Math.max(230, Math.floor((width - 620) / Math.max(1, floatingCount - 1)));
-    const yPattern = [380, 330, 365, 310, 350];
-    const py = yPattern[(i + index) % yPattern.length] - Math.min(index * 3, 22);
+    const px = 300 + i * Math.max(190, Math.floor((width - 620) / Math.max(1, floatingCount - 1)));
+    const yPattern = [375, 315, 350, 290, 335, 300];
+    const py = yPattern[(i + index) % yPattern.length] - Math.min(index * 4, 32);
     platforms.push({
-      x: Math.min(px, width - 330),
-      y: Math.max(270, py),
-      w: Math.max(130, 190 - index * 5),
+      x: Math.min(px, width - 280),
+      y: Math.max(245, py),
+      w: Math.max(90, 178 - index * 8),
       h: 28,
     });
   }
 
   const coins = [];
-  const coinCount = 5 + index;
+  const coinCount = 12 + index * 2;
   for (let i = 0; i < coinCount; i++) {
     const basePlatform = platforms[3 + (i % floatingCount)] || platforms[i % platforms.length];
     coins.push({
-      x: Math.min(basePlatform.x + basePlatform.w / 2, width - 160),
-      y: basePlatform.y - 40,
+      x: Math.min(basePlatform.x + basePlatform.w / 2 + (i % 3 - 1) * 22, width - 140),
+      y: basePlatform.y - 38,
     });
   }
-  coins.push({ x: width - 210, y: 430 });
+  coins.push({ x: width - 220, y: 430 });
 
   const enemies = [];
-  const enemyCount = Math.min(2 + Math.floor(index / 2), 6);
+  const enemyCount = Math.min(3 + Math.floor(index * 0.85), 12);
   for (let i = 0; i < enemyCount; i++) {
     const ground = platforms[i % groundSegments];
     const minX = ground.x + 45;
-    const maxX = Math.max(minX + 120, ground.x + ground.w - 80);
+    const maxX = Math.max(minX + 130, ground.x + ground.w - 80);
     enemies.push({
-      x: minX + 25,
+      x: minX + 30,
       y: 440,
       w: 42,
       h: 40,
       minX,
       maxX,
-      vx: 2 + index * 0.32 + i * 0.18,
+      vx: 2.6 + index * 0.42 + i * 0.22,
+    });
+  }
+
+  // Flying enemies — appear from index 1 onwards
+  const flyingCount = Math.floor(index * 0.65);
+  for (let i = 0; i < flyingCount; i++) {
+    const fx = 520 + i * Math.floor((width - 720) / Math.max(1, flyingCount));
+    const baseY = 185 + (i % 4) * 58;
+    enemies.push({
+      x: Math.min(fx, width - 200),
+      y: baseY,
+      w: 40,
+      h: 34,
+      minX: Math.max(80, fx - 240),
+      maxX: Math.min(width - 100, fx + 240),
+      vx: 3 + index * 0.38 + i * 0.16,
+      isFlying: true,
+      baseY,
+      floatPhase: i * (Math.PI / 2.2),
     });
   }
 
   if (isBoss) {
     const midX = Math.floor(width * 0.55);
+    const bossHP = 2 * castleNum + 1;    // 3 / 5 / 7
+    const bossW = 60 + castleNum * 14;   // 74 / 88 / 102
+    const bossH = 60 + castleNum * 9;    // 69 / 78 / 87
     enemies.push({
       x: midX,
-      y: 415,
-      w: 72,
-      h: 65,
-      minX: midX - 200,
-      maxX: midX + 200,
-      vx: 1.6 + index * 0.12,
-      hp: 3,
+      y: 480 - bossH,
+      w: bossW,
+      h: bossH,
+      minX: midX - 270,
+      maxX: midX + 270,
+      vx: 1.8 + index * 0.18,
+      hp: bossHP,
+      maxHp: bossHP,
       isBosse: true,
+      castleNum,
     });
+    // Extra flying minions in harder castles
+    for (let fi = 0; fi < castleNum - 1; fi++) {
+      const fmx = midX + (fi % 2 === 0 ? -380 : 380);
+      const fmy = 205 + fi * 55;
+      enemies.push({
+        x: fmx,
+        y: fmy,
+        w: 42,
+        h: 36,
+        minX: midX - 550,
+        maxX: midX + 550,
+        vx: 3.2 + castleNum * 0.55,
+        isFlying: true,
+        baseY: fmy,
+        floatPhase: fi * Math.PI,
+      });
+    }
   }
 
   return {
-    name: isBoss ? `Castillo ${Math.ceil(difficulty / 3)}` : `Nivel ${difficulty}`,
+    name: isBoss ? `Castillo ${castleNum}` : `Nivel ${difficulty}`,
     isBoss,
+    castleNum,
     width,
     platforms,
     coins,
     enemies,
-    flag: { x: width - 150, y: 380, w: 44, h: 100 },
+    flag: { x: width - 160, y: 380, w: 44, h: 100 },
   };
 }
 
-const LEVELS = Array.from({ length: TOTAL_LEVELS }, (_, index) => buildLevel(index));
+const LEVELS = Array.from({ length: TOTAL_LEVELS }, (_, i) => buildLevel(i));
 
 function newState() {
   return {
@@ -117,11 +159,15 @@ function newState() {
     projectiles: [],
     powerCooldown: 0,
     bossAnnounce: 0,
+    levelAnnounce: 90,
+    invincibleFrames: 0,
+    doubleJumpFlash: 0,
     player: {
       x: 80, y: 200, w: 46, h: 62,
       vx: 0, vy: 0,
       speed: 0.9, maxSpeed: 8, jumpPower: 16,
       grounded: false, facing: 1,
+      jumpsLeft: 2,
     },
     levelCoins: LEVELS[0].coins.map((c) => ({ ...c, collected: false })),
     levelEnemies: LEVELS[0].enemies.map((e) => ({ ...e })),
@@ -131,12 +177,11 @@ function newState() {
 export default function AprendePage() {
   const canvasRef = useRef(null);
   const gRef = useRef(null);
-  const keysRef = useRef({ left: false, right: false, jump: false, power: false });
+  const keysRef = useRef({ left: false, right: false, jump: false, jumpPressed: false, power: false, sprint: false });
   const rafRef = useRef(null);
 
   const [screen, setScreen] = useState("start");
   const [hudCoins, setHudCoins] = useState(0);
-  const [hudLevel, setHudLevel] = useState("Nivel 1");
   const [hudLives, setHudLives] = useState(3);
   const [finalScore, setFinalScore] = useState(0);
   const [playerName, setPlayerName] = useState("");
@@ -144,22 +189,18 @@ export default function AprendePage() {
 
   useEffect(() => {
     try {
-      const savedScores = JSON.parse(window.localStorage.getItem(HIGH_SCORE_STORAGE_KEY) || "[]");
-      setHighScores(Array.isArray(savedScores) ? savedScores.slice(0, 3) : []);
-    } catch {
-      setHighScores([]);
-    }
+      const saved = JSON.parse(window.localStorage.getItem(HIGH_SCORE_STORAGE_KEY) || "[]");
+      setHighScores(Array.isArray(saved) ? saved.slice(0, 3) : []);
+    } catch { setHighScores([]); }
   }, []);
 
   function calculateScore(game) {
-    const levelBonus = (game.currentLevel + 1) * 100;
-    return game.coins * 25 + game.lives * 150 + levelBonus;
+    return game.coins * 25 + game.lives * 150 + (game.currentLevel + 1) * 120;
   }
 
   function startGame() {
     gRef.current = newState();
     setHudCoins(0);
-    setHudLevel("Nivel 1");
     setHudLives(3);
     setFinalScore(0);
     setPlayerName("");
@@ -169,18 +210,15 @@ export default function AprendePage() {
   function saveHighScore(e) {
     e.preventDefault();
     const name = playerName.trim() || "Jugador";
-    const nextScores = [...highScores, { name, score: finalScore }]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3);
-
-    window.localStorage.setItem(HIGH_SCORE_STORAGE_KEY, JSON.stringify(nextScores));
-    setHighScores(nextScores);
+    const next = [...highScores, { name, score: finalScore }]
+      .sort((a, b) => b.score - a.score).slice(0, 3);
+    window.localStorage.setItem(HIGH_SCORE_STORAGE_KEY, JSON.stringify(next));
+    setHighScores(next);
     setScreen("scores");
   }
 
   useEffect(() => {
     if (screen !== "playing") return;
-
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const sprite = new Image();
@@ -202,6 +240,7 @@ export default function AprendePage() {
             player.y = pl.y - player.h;
             player.vy = 0;
             player.grounded = true;
+            player.jumpsLeft = 2;
           } else {
             player.y = pl.y + pl.h;
             player.vy = 0;
@@ -218,9 +257,11 @@ export default function AprendePage() {
       g.levelEnemies = LEVELS[idx].enemies.map((e) => ({ ...e }));
       g.projectiles = [];
       g.powerCooldown = 0;
+      g.invincibleFrames = 0;
+      g.doubleJumpFlash = 0;
       g.bossAnnounce = LEVELS[idx].isBoss ? 180 : 0;
-      Object.assign(g.player, { x: 80, y: 200, vx: 0, vy: 0, grounded: false });
-      setHudLevel(LEVELS[idx].name);
+      g.levelAnnounce = LEVELS[idx].isBoss ? 0 : 90;
+      Object.assign(g.player, { x: 80, y: 200, vx: 0, vy: 0, grounded: false, jumpsLeft: 2 });
     }
 
     function loseLife() {
@@ -232,7 +273,8 @@ export default function AprendePage() {
       } else {
         setHudLives(g.lives);
         g.projectiles = [];
-        Object.assign(g.player, { x: 80, y: 200, vx: 0, vy: 0, grounded: false });
+        g.invincibleFrames = 100;
+        Object.assign(g.player, { x: 80, y: 200, vx: 0, vy: 0, grounded: false, jumpsLeft: 2 });
         g.cameraX = 0;
       }
     }
@@ -242,8 +284,8 @@ export default function AprendePage() {
       const isBoss = LEVELS[gRef.current.currentLevel].isBoss;
       const grad = ctx.createLinearGradient(0, 0, 0, H);
       if (isBoss) {
-        grad.addColorStop(0, "#120020");
-        grad.addColorStop(1, "#200040");
+        grad.addColorStop(0, "#110020");
+        grad.addColorStop(1, "#1e0038");
       } else {
         grad.addColorStop(0, "#060d1a");
         grad.addColorStop(1, "#0d1f35");
@@ -254,37 +296,34 @@ export default function AprendePage() {
       const stars = [
         [50,30],[120,80],[200,20],[320,60],[450,30],[600,70],[720,25],
         [760,90],[80,110],[400,100],[550,50],[850,40],[900,100],
-        [150,150],[700,140],[350,170],[480,60],[230,130],
+        [150,150],[700,140],[350,170],[480,60],[230,130],[810,55],[660,120],
       ];
       for (const [sx, sy] of stars) {
-        ctx.globalAlpha = 0.3 + 0.4 * Math.sin(frame * 0.05 + sx);
+        ctx.globalAlpha = 0.28 + 0.45 * Math.sin(frame * 0.05 + sx);
         ctx.fillStyle = isBoss ? "#ff88ff" : "#fff";
         ctx.fillRect(sx, sy, 2, 2);
       }
       ctx.globalAlpha = 1;
 
       if (isBoss) {
-        const castles = [
-          [0, 180, 80], [90, 150, 55], [160, 170, 70], [280, 140, 90],
-          [410, 160, 60], [500, 130, 80], [620, 155, 65], [720, 145, 75],
-          [830, 165, 70], [920, 140, 60],
+        const towers = [
+          [0,175,82],[92,148,56],[162,172,72],[282,138,94],
+          [412,158,62],[502,128,84],[622,153,66],[724,143,78],
+          [832,163,72],[922,138,62],
         ];
-        for (const [cx, cy, cw] of castles) {
-          ctx.fillStyle = "#1a0028";
+        for (const [cx, cy, cw] of towers) {
+          ctx.fillStyle = "#19002a";
           ctx.fillRect(cx, cy, cw, H - cy);
-          ctx.fillStyle = "#120020";
-          for (let bx = cx; bx < cx + cw - 8; bx += 16) {
-            ctx.fillRect(bx, cy - 14, 9, 14);
-          }
-          ctx.fillStyle = "rgba(200,0,255,0.2)";
-          for (let wy = cy + 20; wy < cy + 100; wy += 22) {
-            for (let wx = cx + 8; wx < cx + cw - 8; wx += 16) {
-              if (Math.sin(wx * 3 + wy * 5) > 0.3) ctx.fillRect(wx, wy, 8, 11);
+          ctx.fillStyle = "#110020";
+          for (let bx = cx; bx < cx + cw - 8; bx += 17) ctx.fillRect(bx, cy - 16, 10, 16);
+          ctx.fillStyle = "rgba(180,0,255,0.18)";
+          for (let wy = cy + 18; wy < cy + 105; wy += 24) {
+            for (let wx = cx + 8; wx < cx + cw - 8; wx += 18) {
+              if (Math.sin(wx * 3 + wy * 5) > 0.25) ctx.fillRect(wx, wy, 8, 12);
             }
           }
         }
       } else {
-        ctx.fillStyle = "#0a1628";
         const buildings = [
           [0,200,60],[70,220,50],[130,180,70],[210,210,40],[260,170,55],
           [325,195,45],[380,160,65],[455,205,50],[515,175,60],[585,190,55],
@@ -306,13 +345,14 @@ export default function AprendePage() {
     function drawPlatforms(camX) {
       ctx.save();
       ctx.translate(-camX, 0);
+      const isBoss = LEVELS[gRef.current.currentLevel].isBoss;
       for (const p of LEVELS[gRef.current.currentLevel].platforms) {
-        ctx.fillStyle = "#1a0a00";
+        ctx.fillStyle = isBoss ? "#1a0028" : "#1a0a00";
         ctx.fillRect(p.x, p.y, p.w, p.h);
         const g2 = ctx.createLinearGradient(p.x, p.y, p.x + p.w, p.y);
-        g2.addColorStop(0, "#ff8500");
-        g2.addColorStop(0.5, "#ffb347");
-        g2.addColorStop(1, "#ff8500");
+        g2.addColorStop(0, isBoss ? "#aa00ff" : "#ff8500");
+        g2.addColorStop(0.5, isBoss ? "#dd44ff" : "#ffb347");
+        g2.addColorStop(1, isBoss ? "#aa00ff" : "#ff8500");
         ctx.fillStyle = g2;
         ctx.fillRect(p.x, p.y, p.w, 5);
       }
@@ -339,53 +379,88 @@ export default function AprendePage() {
       ctx.restore();
     }
 
-    function drawEnemies(camX, enemies) {
+    function drawEnemies(camX, enemies, frame) {
       ctx.save();
       ctx.translate(-camX, 0);
       for (const e of enemies) {
         if (e.dead) continue;
         if (e.isBosse) {
           // Castle boss
-          ctx.fillStyle = "#4a0080";
+          const pulse = Math.sin(frame * 0.08) * 6;
+          ctx.fillStyle = "#4a0082";
           ctx.fillRect(e.x, e.y, e.w, e.h);
+          // Aura
+          ctx.globalAlpha = 0.15 + 0.08 * Math.sin(frame * 0.1);
+          ctx.fillStyle = "#cc00ff";
+          ctx.fillRect(e.x - 6 + pulse * 0.3, e.y - 6, e.w + 12, e.h + 12);
+          ctx.globalAlpha = 1;
           // Horns
-          ctx.fillStyle = "#6600aa";
-          ctx.fillRect(e.x + 6, e.y - 16, 12, 16);
-          ctx.fillRect(e.x + e.w - 18, e.y - 16, 12, 16);
+          ctx.fillStyle = "#7700cc";
+          ctx.fillRect(e.x + 6, e.y - 18, 13, 18);
+          ctx.fillRect(e.x + e.w - 19, e.y - 18, 13, 18);
           ctx.fillStyle = "#ff00ff";
-          ctx.fillRect(e.x + 9, e.y - 20, 6, 6);
-          ctx.fillRect(e.x + e.w - 15, e.y - 20, 6, 6);
+          ctx.fillRect(e.x + 9, e.y - 22, 7, 7);
+          ctx.fillRect(e.x + e.w - 16, e.y - 22, 7, 7);
           // Eyes
           ctx.fillStyle = "#ff0000";
-          ctx.fillRect(e.x + 10, e.y + 12, 16, 14);
-          ctx.fillRect(e.x + e.w - 26, e.y + 12, 16, 14);
-          ctx.fillStyle = "#ff8888";
-          ctx.fillRect(e.x + 14, e.y + 15, 8, 8);
-          ctx.fillRect(e.x + e.w - 22, e.y + 15, 8, 8);
+          ctx.fillRect(e.x + 10, e.y + 13, 17, 15);
+          ctx.fillRect(e.x + e.w - 27, e.y + 13, 17, 15);
+          ctx.fillStyle = "#ff9999";
+          ctx.fillRect(e.x + 14, e.y + 16, 9, 9);
+          ctx.fillRect(e.x + e.w - 23, e.y + 16, 9, 9);
           ctx.fillStyle = "#000";
-          ctx.fillRect(e.x + 17, e.y + 17, 4, 4);
-          ctx.fillRect(e.x + e.w - 21, e.y + 17, 4, 4);
+          ctx.fillRect(e.x + 17, e.y + 18, 5, 5);
+          ctx.fillRect(e.x + e.w - 22, e.y + 18, 5, 5);
           // Mouth
           ctx.fillStyle = "#1a0030";
-          ctx.fillRect(e.x + 12, e.y + e.h - 18, e.w - 24, 10);
+          ctx.fillRect(e.x + 11, e.y + e.h - 19, e.w - 22, 11);
           ctx.fillStyle = "#ddd";
-          for (let tx = e.x + 14; tx < e.x + e.w - 18; tx += 12) {
-            ctx.fillRect(tx, e.y + e.h - 18, 8, 6);
-          }
+          for (let tx = e.x + 13; tx < e.x + e.w - 17; tx += 13) ctx.fillRect(tx, e.y + e.h - 19, 9, 7);
           // HP bar
-          ctx.fillStyle = "rgba(0,0,0,0.7)";
-          ctx.fillRect(e.x - 2, e.y - 32, e.w + 4, 10);
-          const hpRatio = (e.hp || 0) / 3;
-          ctx.fillStyle = hpRatio > 0.6 ? "#00ff44" : hpRatio > 0.3 ? "#ffaa00" : "#ff2200";
-          ctx.fillRect(e.x - 2, e.y - 32, (e.w + 4) * hpRatio, 10);
+          const hpRatio = (e.hp || 0) / (e.maxHp || 1);
+          ctx.fillStyle = "rgba(0,0,0,0.75)";
+          ctx.fillRect(e.x - 3, e.y - 34, e.w + 6, 11);
+          ctx.fillStyle = hpRatio > 0.6 ? "#00ee44" : hpRatio > 0.3 ? "#ffaa00" : "#ff2200";
+          ctx.fillRect(e.x - 3, e.y - 34, (e.w + 6) * hpRatio, 11);
           ctx.strokeStyle = "#fff";
           ctx.lineWidth = 1;
-          ctx.strokeRect(e.x - 2, e.y - 32, e.w + 4, 10);
+          ctx.strokeRect(e.x - 3, e.y - 34, e.w + 6, 11);
           ctx.fillStyle = "#ff00ff";
           ctx.font = "bold 9px monospace";
           ctx.textAlign = "center";
-          ctx.fillText("JEFE", e.x + e.w / 2, e.y - 36);
+          ctx.fillText("JEFE", e.x + e.w / 2, e.y - 38);
+        } else if (e.isFlying) {
+          // Flying enemy — blue bat-like creature
+          const flap = Math.sin(frame * 0.22 + (e.floatPhase || 0)) > 0;
+          // Wings
+          ctx.fillStyle = "#003888";
+          if (flap) {
+            ctx.fillRect(e.x - 16, e.y + 4, 16, 12);
+            ctx.fillRect(e.x + e.w, e.y + 4, 16, 12);
+            ctx.fillRect(e.x - 20, e.y, 8, 8);
+            ctx.fillRect(e.x + e.w + 12, e.y, 8, 8);
+          } else {
+            ctx.fillRect(e.x - 14, e.y + 10, 14, 8);
+            ctx.fillRect(e.x + e.w, e.y + 10, 14, 8);
+            ctx.fillRect(e.x - 16, e.y + 16, 8, 6);
+            ctx.fillRect(e.x + e.w + 8, e.y + 16, 8, 6);
+          }
+          // Body
+          ctx.fillStyle = "#0055cc";
+          ctx.fillRect(e.x, e.y, e.w, e.h);
+          // Eyes
+          ctx.fillStyle = "#00ffee";
+          ctx.fillRect(e.x + 6, e.y + 6, 9, 9);
+          ctx.fillRect(e.x + e.w - 15, e.y + 6, 9, 9);
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(e.x + 8, e.y + 8, 5, 5);
+          ctx.fillRect(e.x + e.w - 13, e.y + 8, 5, 5);
+          // Fang
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(e.x + 14, e.y + e.h - 8, 5, 8);
+          ctx.fillRect(e.x + e.w - 19, e.y + e.h - 8, 5, 8);
         } else {
+          // Regular ground enemy
           ctx.fillStyle = "#cc0000";
           ctx.fillRect(e.x, e.y, e.w, e.h);
           ctx.fillStyle = "#ff0";
@@ -407,10 +482,10 @@ export default function AprendePage() {
       ctx.translate(-camX, 0);
       for (const proj of projectiles) {
         ctx.shadowColor = "#ffd700";
-        ctx.shadowBlur = 18;
+        ctx.shadowBlur = 20;
         ctx.fillStyle = "#ff8500";
         ctx.beginPath();
-        ctx.arc(proj.x, proj.y, 9, 0, Math.PI * 2);
+        ctx.arc(proj.x, proj.y, 10, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0;
         ctx.fillStyle = "#ffffff";
@@ -420,9 +495,9 @@ export default function AprendePage() {
         ctx.globalAlpha = 0.4;
         ctx.fillStyle = "#ff8500";
         ctx.beginPath();
-        ctx.arc(proj.x - proj.vx * 0.5, proj.y, 5, 0, Math.PI * 2);
+        ctx.arc(proj.x - proj.vx * 0.5, proj.y, 6, 0, Math.PI * 2);
         ctx.fill();
-        ctx.globalAlpha = 0.2;
+        ctx.globalAlpha = 0.18;
         ctx.beginPath();
         ctx.arc(proj.x - proj.vx, proj.y, 3, 0, Math.PI * 2);
         ctx.fill();
@@ -446,17 +521,23 @@ export default function AprendePage() {
       ctx.restore();
     }
 
-    function drawChar(p, frame, camX) {
+    function drawChar(p, frame, camX, invincible, sprinting) {
+      if (invincible > 0 && Math.floor(invincible / 5) % 2 === 0) return;
       ctx.save();
+      // Sprint trail
+      if (sprinting && Math.abs(p.vx) > 3) {
+        ctx.globalAlpha = 0.22;
+        ctx.fillStyle = "#84cc16";
+        ctx.fillRect(p.x - camX - p.vx * 2.2, p.y + 12, p.w, p.h - 12);
+        ctx.globalAlpha = 0.1;
+        ctx.fillRect(p.x - camX - p.vx * 4.4, p.y + 24, p.w, p.h - 24);
+        ctx.globalAlpha = 1;
+      }
       ctx.translate(p.x - camX + p.w / 2, p.y + p.h / 2);
       ctx.scale(p.facing, 1);
       if (sprite.complete && sprite.naturalWidth > 0) {
         const animFrame = p.grounded ? Math.floor(frame / 5) % SPRITE_FRAMES : 2;
-        ctx.drawImage(
-          sprite,
-          animFrame * SPRITE_SRC_W, 0, SPRITE_SRC_W, SPRITE_SRC_H,
-          -p.w / 2, -p.h / 2, p.w, p.h
-        );
+        ctx.drawImage(sprite, animFrame * SPRITE_SRC_W, 0, SPRITE_SRC_W, SPRITE_SRC_H, -p.w / 2, -p.h / 2, p.w, p.h);
       } else {
         ctx.fillStyle = "#84cc16";
         ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
@@ -464,27 +545,45 @@ export default function AprendePage() {
       ctx.restore();
     }
 
+    function drawDoubleJumpFlash(p, camX, flash) {
+      if (flash <= 0) return;
+      const progress = 1 - flash / 15;
+      ctx.save();
+      ctx.translate(p.x - camX + p.w / 2, p.y + p.h / 2);
+      ctx.globalAlpha = flash / 15;
+      ctx.strokeStyle = "#00ffee";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.w * (0.7 + progress * 1.4), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
     function drawHUD(g) {
-      ctx.fillStyle = "rgba(0,0,0,0.55)";
-      ctx.fillRect(0, 0, W, 44);
-      ctx.font = "bold 14px monospace";
+      ctx.fillStyle = "rgba(0,0,0,0.58)";
+      ctx.fillRect(0, 0, W, 46);
+      ctx.font = "bold 13px monospace";
+      // Level name
       ctx.fillStyle = "#ff8500";
       ctx.textAlign = "left";
-      ctx.fillText(LEVELS[g.currentLevel].name.toUpperCase(), 16, 28);
+      ctx.fillText(LEVELS[g.currentLevel].name.toUpperCase(), 14, 28);
+      // Coins + score
       ctx.fillStyle = "#ffd700";
       ctx.textAlign = "center";
-      ctx.fillText(`● ${g.coins}   PTS ${calculateScore(g)}`, 350, 28);
-      // Power charge indicator
+      ctx.fillText(`● ${g.coins}   PTS ${calculateScore(g)}`, 345, 28);
+      // Power status
       if (g.coins >= POWER_COST) {
-        ctx.fillStyle = g.powerCooldown > 0 ? "#888888" : "#00ff88";
+        ctx.fillStyle = g.powerCooldown > 0 ? "#888" : "#00ff88";
         ctx.fillText(g.powerCooldown > 0 ? "** ESPERA **" : "** PODER [X] **", 650, 28);
       } else {
-        ctx.fillStyle = "rgba(255,200,0,0.5)";
+        ctx.fillStyle = "rgba(255,200,0,0.45)";
         ctx.fillText(`poder: ${g.coins}/${POWER_COST}`, 640, 28);
       }
+      // Lives
       ctx.fillStyle = "#ff4444";
       ctx.textAlign = "right";
-      ctx.fillText(`♥ ${g.lives}`, W - 16, 28);
+      ctx.fillText(`♥ ${g.lives}`, W - 14, 28);
     }
 
     // ─── Game loop ─────────────────────────────────────────────────
@@ -497,11 +596,25 @@ export default function AprendePage() {
       const p = g.player;
       const lev = LEVELS[g.currentLevel];
 
-      if (k.left) { p.vx -= p.speed; p.facing = -1; }
-      if (k.right) { p.vx += p.speed; p.facing = 1; }
-      if (k.jump && p.grounded) { p.vy = -p.jumpPower; p.grounded = false; }
+      // Sprint multiplier
+      const spMult = k.sprint ? 2 : 1;
 
-      p.vx = Math.max(Math.min(p.vx * FRICTION, p.maxSpeed), -p.maxSpeed);
+      if (k.left) { p.vx -= p.speed * spMult; p.facing = -1; }
+      if (k.right) { p.vx += p.speed * spMult; p.facing = 1; }
+
+      // Double jump
+      if (k.jumpPressed) {
+        k.jumpPressed = false;
+        if (p.jumpsLeft > 0) {
+          const power = p.jumpsLeft === 2 ? p.jumpPower : p.jumpPower * 0.88;
+          p.vy = -power;
+          p.grounded = false;
+          if (p.jumpsLeft === 1) g.doubleJumpFlash = 15;
+          p.jumpsLeft--;
+        }
+      }
+
+      p.vx = Math.max(Math.min(p.vx * FRICTION, p.maxSpeed * spMult), -p.maxSpeed * spMult);
       p.vy += GRAVITY;
 
       p.x += p.vx;
@@ -521,12 +634,16 @@ export default function AprendePage() {
       // Coins
       const cx = p.x + p.w / 2, cy = p.y + p.h / 2;
       for (const c of g.levelCoins) {
-        if (!c.collected && Math.hypot(c.x - cx, c.y - cy) < p.w / 2 + 11) {
+        if (!c.collected && Math.hypot(c.x - cx, c.y - cy) < p.w / 2 + 12) {
           c.collected = true;
           g.coins++;
           setHudCoins(g.coins);
         }
       }
+
+      // Invincibility countdown
+      if (g.invincibleFrames > 0) g.invincibleFrames--;
+      if (g.doubleJumpFlash > 0) g.doubleJumpFlash--;
 
       // Power firing
       if (k.power) {
@@ -536,29 +653,23 @@ export default function AprendePage() {
           setHudCoins(g.coins);
           g.powerCooldown = POWER_COOLDOWN;
           g.projectiles.push({
-            x: p.x + (p.facing > 0 ? p.w + 4 : -20),
-            y: p.y + p.h * 0.4,
-            vx: p.facing * 16,
+            x: p.x + (p.facing > 0 ? p.w + 5 : -22),
+            y: p.y + p.h * 0.38,
+            vx: p.facing * 17,
           });
         }
       }
       if (g.powerCooldown > 0) g.powerCooldown--;
 
-      // Move and collide projectiles
-      for (const proj of g.projectiles) {
-        proj.x += proj.vx;
-      }
+      // Move projectiles and check collisions
+      for (const proj of g.projectiles) proj.x += proj.vx;
       g.projectiles = g.projectiles.filter((proj) => {
-        if (proj.x < -60 || proj.x > lev.width + 60) return false;
+        if (proj.x < -80 || proj.x > lev.width + 80) return false;
         for (const e of g.levelEnemies) {
           if (e.dead) continue;
-          if (overlap({ x: proj.x - 9, y: proj.y - 9, w: 18, h: 18 }, e)) {
-            if (e.isBosse) {
-              e.hp--;
-              if (e.hp <= 0) e.dead = true;
-            } else {
-              e.dead = true;
-            }
+          if (overlap({ x: proj.x - 10, y: proj.y - 10, w: 20, h: 20 }, e)) {
+            if (e.isBosse) { e.hp--; if (e.hp <= 0) e.dead = true; }
+            else e.dead = true;
             return false;
           }
         }
@@ -570,18 +681,22 @@ export default function AprendePage() {
         if (e.dead) continue;
         e.x += e.vx;
         if (e.x < e.minX || e.x > e.maxX) e.vx *= -1;
+        if (e.isFlying) {
+          e.y = e.baseY + Math.sin(g.frame * 0.05 + (e.floatPhase || 0)) * 22;
+        }
+        if (g.invincibleFrames > 0) continue;
         if (overlap(p, e)) {
-          const stompThreshold = e.isBosse ? 35 : 25;
-          if (p.vy > 2 && p.y + p.h - e.y < stompThreshold) {
+          const thresh = e.isBosse ? 38 : 26;
+          if (p.vy > 2 && p.y + p.h - e.y < thresh) {
             if (e.isBosse) {
               e.hp--;
-              p.vy = -10;
+              p.vy = -11;
               if (e.hp <= 0) e.dead = true;
             } else {
               e.dead = true;
-              p.vy = -10;
+              p.vy = -11;
             }
-          } else {
+          } else if (!e.isFlying || (e.isFlying && !( p.vy > 2 && p.y + p.h - e.y < thresh + 20))) {
             loseLife();
             if (g.stopped) return;
             break;
@@ -602,24 +717,36 @@ export default function AprendePage() {
         }
       }
 
-      // Boss announce countdown
       if (g.bossAnnounce > 0) g.bossAnnounce--;
+      if (g.levelAnnounce > 0) g.levelAnnounce--;
 
+      // ── Draw ──
       ctx.clearRect(0, 0, W, H);
       drawBg(g.frame);
       drawPlatforms(g.cameraX);
       drawCoins(g.cameraX, g.levelCoins);
-      drawEnemies(g.cameraX, g.levelEnemies);
+      drawEnemies(g.cameraX, g.levelEnemies, g.frame);
       drawProjectiles(g.cameraX, g.projectiles);
       drawFlag(g.cameraX);
-      drawChar(p, g.frame, g.cameraX);
+      drawDoubleJumpFlash(p, g.cameraX, g.doubleJumpFlash);
+      drawChar(p, g.frame, g.cameraX, g.invincibleFrames, k.sprint);
       drawHUD(g);
 
-      // Boss level announcement overlay
+      // Level progress bar
+      const prog = Math.min(1, (p.x + p.w) / lev.width);
+      ctx.fillStyle = "rgba(255,133,0,0.22)";
+      ctx.fillRect(0, 46, W, 4);
+      ctx.fillStyle = "#ff8500";
+      ctx.fillRect(0, 46, W * prog, 4);
+      // Flag marker on progress bar
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(W - 6, 44, 4, 8);
+
+      // Boss announce overlay
       if (g.bossAnnounce > 0) {
         const alpha = g.bossAnnounce > 30 ? 1 : g.bossAnnounce / 30;
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = "rgba(74,0,128,0.88)";
+        ctx.fillStyle = "rgba(60,0,110,0.9)";
         ctx.fillRect(W / 2 - 230, H / 2 - 58, 460, 116);
         ctx.strokeStyle = "#ff00ff";
         ctx.lineWidth = 3;
@@ -630,7 +757,20 @@ export default function AprendePage() {
         ctx.fillText("! JEFE !", W / 2, H / 2 - 8);
         ctx.font = "bold 15px monospace";
         ctx.fillStyle = "#ffffff";
-        ctx.fillText("CASTILLO — DERROTA AL MONSTRUO", W / 2, H / 2 + 32);
+        ctx.fillText("CASTILLO — DERROTA AL MONSTRUO", W / 2, H / 2 + 30);
+        ctx.globalAlpha = 1;
+      }
+
+      // Regular level announce
+      if (g.levelAnnounce > 0) {
+        const alpha = g.levelAnnounce > 15 ? 1 : g.levelAnnounce / 15;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = "rgba(0,0,0,0.72)";
+        ctx.fillRect(W / 2 - 155, H - 96, 310, 50);
+        ctx.fillStyle = "#ff8500";
+        ctx.font = "bold 20px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(LEVELS[g.currentLevel].name.toUpperCase(), W / 2, H - 64);
         ctx.globalAlpha = 1;
       }
 
@@ -644,17 +784,17 @@ export default function AprendePage() {
       if (e.code === "Space" || e.key === "ArrowUp" || e.key.toLowerCase() === "w") {
         e.preventDefault();
         k.jump = true;
+        k.jumpPressed = true;
       }
-      if (e.key.toLowerCase() === "x") {
-        e.preventDefault();
-        k.power = true;
-      }
+      if (e.key.toLowerCase() === "x") { e.preventDefault(); k.power = true; }
+      if (e.key.toLowerCase() === "z") { e.preventDefault(); k.sprint = true; }
     }
     function onKeyUp(e) {
       const k = keysRef.current;
       if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") k.left = false;
       if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") k.right = false;
       if (e.code === "Space" || e.key === "ArrowUp" || e.key.toLowerCase() === "w") k.jump = false;
+      if (e.key.toLowerCase() === "z") k.sprint = false;
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -678,6 +818,20 @@ export default function AprendePage() {
     };
   }
 
+  function mobileJumpHandlers() {
+    return {
+      onTouchStart: (e) => {
+        e.preventDefault();
+        keysRef.current.jump = true;
+        keysRef.current.jumpPressed = true;
+      },
+      onTouchEnd: (e) => { e.preventDefault(); keysRef.current.jump = false; },
+      onMouseDown: () => { keysRef.current.jump = true; keysRef.current.jumpPressed = true; },
+      onMouseUp: () => { keysRef.current.jump = false; },
+      onMouseLeave: () => { keysRef.current.jump = false; },
+    };
+  }
+
   function mobilePowerHandler() {
     return {
       onTouchStart: (e) => { e.preventDefault(); keysRef.current.power = true; },
@@ -696,10 +850,11 @@ export default function AprendePage() {
         <h1 style={{ color: "#fff", fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 700, margin: "0 0 6px", textAlign: "center" }}>
           Drokex Platform
         </h1>
-        <p style={{ color: "rgba(255,255,255,0.5)", margin: "0 0 32px", fontSize: "0.95rem" }}>
-          <kbd style={kbdStyle}>←</kbd> <kbd style={kbdStyle}>→</kbd> moverse &nbsp;·&nbsp;{" "}
-          <kbd style={kbdStyle}>Espacio</kbd> / <kbd style={kbdStyle}>↑</kbd> saltar &nbsp;·&nbsp;{" "}
-          <kbd style={kbdStyle}>X</kbd> poder (10 monedas)
+        <p style={{ color: "rgba(255,255,255,0.5)", margin: "0 0 32px", fontSize: "0.9rem", textAlign: "center" }}>
+          <kbd style={kbdStyle}>←</kbd> <kbd style={kbdStyle}>→</kbd> moverse &nbsp;·&nbsp;
+          <kbd style={kbdStyle}>↑/W</kbd> saltar (doble) &nbsp;·&nbsp;
+          <kbd style={kbdStyle}>Z</kbd> correr &nbsp;·&nbsp;
+          <kbd style={kbdStyle}>X</kbd> poder (40 monedas)
         </p>
 
         <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", boxShadow: "0 0 60px rgba(255,133,0,0.2), 0 0 0 2px rgba(255,133,0,0.3)" }}>
@@ -709,15 +864,11 @@ export default function AprendePage() {
             <div style={overlayStyle}>
               <p style={tagStyle}>Drokex Platform</p>
               <h2 style={titleStyle}>¿Listo para jugar?</h2>
-              <p style={subStyle}>10 niveles · castillos cada 3 · poder especial con 10 monedas</p>
+              <p style={subStyle}>10 niveles largos · castillos cada 3 · doble salto · sprint · poder especial</p>
               {highScores.length > 0 && (
                 <div style={scoreListStyle}>
                   <strong>Mejores puntajes</strong>
-                  {highScores.map((score, index) => (
-                    <p key={`${score.name}-${index}`}>
-                      {index + 1}. {score.name} · {score.score} pts
-                    </p>
-                  ))}
+                  {highScores.map((s, i) => <p key={i}>{i + 1}. {s.name} · {s.score} pts</p>)}
                 </div>
               )}
               <button onClick={startGame} style={btnStyle}>Comenzar</button>
@@ -739,14 +890,8 @@ export default function AprendePage() {
               <h2 style={titleStyle}>¡Ganaste!</h2>
               <p style={subStyle}>Terminaste los 10 niveles con {finalScore} puntos.</p>
               <form onSubmit={saveHighScore} style={scoreFormStyle}>
-                <input
-                  value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  placeholder="Tu nombre"
-                  maxLength={18}
-                  style={scoreInputStyle}
-                  autoFocus
-                />
+                <input value={playerName} onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder="Tu nombre" maxLength={18} style={scoreInputStyle} autoFocus />
                 <button type="submit" style={btnStyle}>Guardar puntaje</button>
               </form>
             </div>
@@ -757,22 +902,19 @@ export default function AprendePage() {
               <p style={{ ...tagStyle, color: "#84cc16" }}>Ranking</p>
               <h2 style={titleStyle}>Top 3 Drokex</h2>
               <div style={scoreListStyle}>
-                {highScores.map((score, index) => (
-                  <p key={`${score.name}-${index}`}>
-                    {index + 1}. {score.name} · {score.score} pts
-                  </p>
-                ))}
+                {highScores.map((s, i) => <p key={i}>{i + 1}. {s.name} · {s.score} pts</p>)}
               </div>
               <button onClick={startGame} style={btnStyle}>Jugar de nuevo</button>
             </div>
           )}
         </div>
 
-        <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
+        <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
           <button style={mobileBtnStyle} {...mobileHandlers("left")}>←</button>
-          <button style={mobileBtnStyle} {...mobileHandlers("jump")}>↑</button>
+          <button style={mobileBtnStyle} {...mobileJumpHandlers()}>↑↑</button>
           <button style={mobileBtnStyle} {...mobileHandlers("right")}>→</button>
-          <button style={{ ...mobileBtnStyle, background: "#6600aa", fontSize: 18 }} {...mobilePowerHandler()}>X</button>
+          <button style={{ ...mobileBtnStyle, background: "#0055cc" }} {...mobileHandlers("sprint")}>Z</button>
+          <button style={{ ...mobileBtnStyle, background: "#6600aa", fontSize: 15 }} {...mobilePowerHandler()}>POW</button>
         </div>
       </div>
     </main>
@@ -794,33 +936,17 @@ const tagStyle = {
   letterSpacing: "0.14em", textTransform: "uppercase", margin: "0 0 12px",
 };
 const titleStyle = { color: "#fff", fontSize: "2rem", fontWeight: 800, margin: "0 0 8px" };
-const subStyle = { color: "rgba(255,255,255,0.6)", margin: "0 0 28px", fontSize: "0.95rem" };
+const subStyle = { color: "rgba(255,255,255,0.6)", margin: "0 0 28px", fontSize: "0.95rem", textAlign: "center" };
 const scoreListStyle = {
-  minWidth: 260,
-  margin: "0 0 24px",
-  padding: "14px 18px",
-  borderRadius: 12,
-  background: "rgba(255,255,255,0.08)",
-  color: "#fff",
-  fontSize: "0.95rem",
-  lineHeight: 1.7,
-  textAlign: "left",
+  minWidth: 260, margin: "0 0 24px", padding: "14px 18px",
+  borderRadius: 12, background: "rgba(255,255,255,0.08)",
+  color: "#fff", fontSize: "0.95rem", lineHeight: 1.7, textAlign: "left",
 };
-const scoreFormStyle = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 14,
-  width: "min(320px, 100%)",
-};
+const scoreFormStyle = { display: "flex", flexDirection: "column", gap: 14, width: "min(320px, 100%)" };
 const scoreInputStyle = {
-  width: "100%",
-  border: "1px solid rgba(255,255,255,0.24)",
-  borderRadius: 12,
-  background: "rgba(255,255,255,0.1)",
-  color: "#fff",
-  padding: "14px 16px",
-  fontSize: "1rem",
-  outline: "none",
+  width: "100%", border: "1px solid rgba(255,255,255,0.24)", borderRadius: 12,
+  background: "rgba(255,255,255,0.1)", color: "#fff", padding: "14px 16px",
+  fontSize: "1rem", outline: "none",
 };
 const btnStyle = {
   background: "#ff8500", color: "#fff", border: "none",
@@ -828,7 +954,7 @@ const btnStyle = {
   fontWeight: 800, cursor: "pointer", letterSpacing: "0.05em",
 };
 const mobileBtnStyle = {
-  width: 64, height: 52, border: "none", borderRadius: 14,
-  background: "#ff8500", fontSize: 24, fontWeight: "bold",
+  width: 60, height: 52, border: "none", borderRadius: 14,
+  background: "#ff8500", fontSize: 20, fontWeight: "bold",
   cursor: "pointer", color: "#fff", touchAction: "none",
 };
