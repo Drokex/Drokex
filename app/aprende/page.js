@@ -60,25 +60,37 @@ function buildLevel(index) {
   coins.push({ x: width - 220, y: 430 });
 
   const enemies = [];
-  const enemyCount = Math.min(3 + Math.floor(index * 0.85), 12);
-  for (let i = 0; i < enemyCount; i++) {
-    const ground = platforms[i % groundSegments];
-    const minX = ground.x + 45;
-    const maxX = Math.max(minX + 130, ground.x + ground.w - 80);
-    // Keep enemies far from player spawn (x=80) — push them to safe start
-    const startX = ground.x < 300 ? Math.max(minX + 30, Math.min(500, maxX - 10)) : minX + 30;
-    enemies.push({ x: startX, y: 440, w: 42, h: 40, minX, maxX, vx: 2.6 + index * 0.42 + i * 0.22 });
-  }
-
-  const flyingCount = Math.floor(index * 0.65);
-  for (let i = 0; i < flyingCount; i++) {
-    const fx = 600 + i * Math.floor((width - 800) / Math.max(1, flyingCount));
-    const baseY = 185 + (i % 4) * 58;
-    enemies.push({
-      x: Math.min(fx, width - 200), y: baseY, w: 40, h: 34,
-      minX: Math.max(300, fx - 240), maxX: Math.min(width - 100, fx + 240),
-      vx: 3 + index * 0.38 + i * 0.16, isFlying: true, baseY, floatPhase: i * (Math.PI / 2.2),
-    });
+  if (!isFinalLevel) {
+    const enemyCount = Math.min(3 + Math.floor(index * 0.85), 12);
+    for (let i = 0; i < enemyCount; i++) {
+      const ground = platforms[i % groundSegments];
+      const minX = ground.x + 45;
+      const maxX = Math.max(minX + 130, ground.x + ground.w - 80);
+      const startX = ground.x < 300 ? Math.max(minX + 30, Math.min(500, maxX - 10)) : minX + 30;
+      const ex = Math.max(minX, Math.min(startX, maxX - 10));
+      enemies.push({ x: ex, y: 440, w: 42, h: 40, minX, maxX, vx: 2.6 + index * 0.42 + i * 0.22 });
+    }
+    const flyingCount = Math.floor(index * 0.65);
+    for (let i = 0; i < flyingCount; i++) {
+      const fx = 600 + i * Math.floor((width - 800) / Math.max(1, flyingCount));
+      const baseY = 185 + (i % 4) * 58;
+      enemies.push({
+        x: Math.min(fx, width - 200), y: baseY, w: 40, h: 34,
+        minX: Math.max(300, fx - 240), maxX: Math.min(width - 100, fx + 240),
+        vx: 3 + index * 0.38 + i * 0.16, isFlying: true, baseY, floatPhase: i * (Math.PI / 2.2),
+      });
+    }
+  } else {
+    // Final level: only ghost minions + boss (no ground enemies)
+    for (let i = 0; i < 5; i++) {
+      const fx = 500 + i * Math.floor((width - 700) / 4);
+      const baseY = 155 + (i % 3) * 75;
+      enemies.push({
+        x: Math.min(fx, width - 200), y: baseY, w: 40, h: 34,
+        minX: Math.max(200, fx - 320), maxX: Math.min(width - 100, fx + 320),
+        vx: 3.8 + i * 0.25, isFlying: true, baseY, floatPhase: i * (Math.PI / 2.5),
+      });
+    }
   }
 
   if (isFinalLevel) {
@@ -223,7 +235,7 @@ export default function AprendePage() {
     function loseLife() {
       const g = gRef.current;
       g.lives--;
-      if (g.lives <= 0) { g.stopped = true; setScreen("dead"); }
+      if (g.lives <= 0) { g.stopped = true; setHudLives(0); setScreen("dead"); }
       else {
         setHudLives(g.lives);
         g.projectiles = [];
@@ -739,7 +751,7 @@ export default function AprendePage() {
     function loop() {
       const g = gRef.current;
       if (!g || g.stopped) return;
-
+      try {
       g.frame++;
       const k = keysRef.current;
       const p = g.player;
@@ -821,7 +833,8 @@ export default function AprendePage() {
           e.y = Math.max(55, Math.min(430, e.y));
         } else {
           e.x += e.vx;
-          if (e.x < e.minX || e.x > e.maxX) e.vx *= -1;
+          if (e.x < e.minX) { e.x = e.minX; e.vx = Math.abs(e.vx); }
+          else if (e.x + e.w > e.maxX) { e.x = e.maxX - e.w; e.vx = -Math.abs(e.vx); }
           if (e.isFlying) e.y = e.baseY + Math.sin(g.frame * 0.05 + (e.floatPhase || 0)) * 22;
         }
 
@@ -912,6 +925,7 @@ export default function AprendePage() {
         ctx.globalAlpha = 1;
       }
 
+      } catch (err) { console.error("[game]", err); }
       rafRef.current = requestAnimationFrame(loop);
     }
 
@@ -932,13 +946,20 @@ export default function AprendePage() {
       if (e.code === "Space" || e.key === "ArrowUp" || e.key.toLowerCase() === "w") k.jump = false;
       if (e.key.toLowerCase() === "z") k.sprint = false;
     }
+    function onBlur() {
+      const k = keysRef.current;
+      k.left = false; k.right = false; k.jump = false;
+      k.jumpPressed = false; k.sprint = false; k.power = false;
+    }
 
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onBlur);
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", onBlur);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [screen]);
