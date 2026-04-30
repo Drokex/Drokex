@@ -34,9 +34,9 @@ const rocketIcon = (
 
 const compareRows = [
   { label: "Mostrar productos",           explorer: checkIcon,  pro: checkIcon },
-  { label: "Generar leads / cotizaciones", explorer: checkIcon,  pro: checkIcon },
+  { label: "Generar leads / cotizaciones", explorer: checkIcon, pro: dashIcon },
   { label: "Venta directa",               explorer: dashIcon,   pro: checkIcon },
-  { label: "Landing page personalizada",  explorer: <span style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)" }}>Básica</span>, pro: starIcon },
+  { label: "Landing page personalizada",  explorer: <span style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)" }}>Básica</span>, pro: <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8rem", fontWeight: 700, color: "#fbbf24" }}>★ PRO</span> },
   { label: "Gestión de pedidos",          explorer: dashIcon,   pro: checkIcon },
   { label: "Herramientas de publicidad con IA", explorer: checkIcon, pro: checkIcon },
   { label: "Escalar a nuevos mercados",   explorer: <span style={{ fontSize: "0.78rem" }}>⚡</span>, pro: rocketIcon },
@@ -239,17 +239,31 @@ export default function ParaProveedoresPage() {
             }}>
               {/* Header */}
               <div style={{
-                display: "grid", gridTemplateColumns: "1fr 120px 120px",
-                padding: "14px 24px", borderBottom: "1px solid rgba(255,255,255,0.08)",
-                background: "rgba(255,255,255,0.03)",
+                display: "grid", gridTemplateColumns: "1fr 160px 160px",
+                padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.03)", alignItems: "center",
               }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.82rem", fontWeight: 600 }}>Características</span>
-                <span style={{ textAlign: "center", fontSize: "0.82rem", fontWeight: 700, color: "rgba(255,255,255,0.8)" }}>① Explorer</span>
-                <span style={{ textAlign: "center", fontSize: "0.82rem", fontWeight: 700, color: "#84cc16" }}>② Pro</span>
+                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", fontWeight: 600 }}>Características</span>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                    background: "#84cc16", display: "flex", alignItems: "center", justifyContent: "center",
+                    fontWeight: 800, color: "#050505", fontSize: "0.85rem",
+                  }}>1</div>
+                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: "#fff" }}>Proveedor Explorer</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                    background: "#84cc16", display: "flex", alignItems: "center", justifyContent: "center",
+                    fontWeight: 800, color: "#050505", fontSize: "0.85rem",
+                  }}>2</div>
+                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: "#fff" }}>Proveedor Pro</span>
+                </div>
               </div>
               {compareRows.map((row, i) => (
                 <div key={row.label} style={{
-                  display: "grid", gridTemplateColumns: "1fr 120px 120px",
+                  display: "grid", gridTemplateColumns: "1fr 160px 160px",
                   padding: "14px 24px",
                   borderBottom: i < compareRows.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
                   alignItems: "center",
@@ -265,19 +279,30 @@ export default function ParaProveedoresPage() {
           {/* Side card */}
           <div style={{
             background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 16, padding: 28, maxWidth: 220, marginTop: 52,
+            borderRadius: 16, padding: 28, maxWidth: 230, marginTop: 52,
           }}>
-            <div style={{ fontSize: "2rem", marginBottom: 12 }}>🌐</div>
-            <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "0.92rem", lineHeight: 1.6, margin: "0 0 20px" }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 14, marginBottom: 16,
+              background: "rgba(132,204,22,0.15)", border: "1px solid rgba(132,204,22,0.3)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "1rem", lineHeight: 1.6, margin: "0 0 22px", fontWeight: 600 }}>
               Empieza como Explorer y escala a Pro cuando estés listo.
             </p>
             <Link href="/registro" style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
-              background: "rgba(255,255,255,0.07)", color: "#fff", fontWeight: 600,
-              padding: "12px 16px", borderRadius: 10, fontSize: "0.88rem",
-              border: "1px solid rgba(255,255,255,0.14)", textDecoration: "none",
+              background: "transparent", color: "#fff", fontWeight: 700,
+              padding: "12px 18px", borderRadius: 10, fontSize: "0.92rem",
+              border: "1px solid rgba(132,204,22,0.5)", textDecoration: "none",
+              transition: "border-color 0.15s",
             }}>
-              Así de simple <span>→</span>
+              Asi de simple <span style={{ color: "#84cc16" }}>→</span>
             </Link>
           </div>
         </div>
