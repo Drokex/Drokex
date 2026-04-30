@@ -43,10 +43,22 @@ const compareRows = [
 ];
 
 const footerStats = [
-  { icon: "👥", label: "Comunidad en crecimiento", sub: "Miles de compradores" },
-  { icon: "🌎", label: "Presencia en LATAM",       sub: "Múltiples países" },
-  { icon: "🔒", label: "Transacciones seguras",    sub: "Pagos protegidos" },
-  { icon: "💬", label: "Soporte dedicado",         sub: "Estamos contigo" },
+  {
+    label: "Comunidad en crecimiento", sub: "Miles de compradores",
+    icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  },
+  {
+    label: "Presencia en LATAM", sub: "Múltiples países",
+    icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>,
+  },
+  {
+    label: "Transacciones seguras", sub: "Pagos protegidos",
+    icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+  },
+  {
+    label: "Soporte dedicado", sub: "Estamos contigo",
+    icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 5.29 5.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+  },
 ];
 
 export default function ParaProveedoresPage() {
@@ -80,7 +92,7 @@ export default function ParaProveedoresPage() {
                 display: "inline-flex", alignItems: "center", gap: 8,
                 background: "#84cc16", color: "#050505", fontWeight: 700,
                 padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
-                textDecoration: "none",
+                textDecoration: "none", boxShadow: "0 4px 24px rgba(132,204,22,0.4)",
               }}>
                 Quiero ser proveedor <span>→</span>
               </Link>
@@ -479,25 +491,30 @@ export default function ParaProveedoresPage() {
       </section>
 
       {/* ── CTA FINAL ───────────────────────────────────── */}
-      <section style={{
-        background: "rgba(132,204,22,0.06)", borderTop: "1px solid rgba(132,204,22,0.2)",
-        borderBottom: "1px solid rgba(132,204,22,0.2)", padding: "64px 0",
-      }}>
-        <div className="shell" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
-          <h2 style={{ fontSize: "clamp(1.4rem, 3vw, 2rem)", fontWeight: 800, margin: 0 }}>
-            Empieza hoy en <span style={{ color: "#84cc16" }}>Drokex</span><br />
-            <span style={{ fontSize: "0.85em", color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>
-              y lleva tu marca a nuevos países.
-            </span>
-          </h2>
-          <Link href="/registro" style={{
-            display: "inline-flex", alignItems: "center", gap: 10,
-            background: "#84cc16", color: "#050505", fontWeight: 800,
-            padding: "16px 32px", borderRadius: 12, fontSize: "1rem",
-            textDecoration: "none", whiteSpace: "nowrap",
+      <section style={{ padding: "40px 0 48px" }}>
+        <div className="shell">
+          <div style={{
+            background: "linear-gradient(135deg, #0a1a0a 0%, #0d2010 100%)",
+            border: "1px solid rgba(132,204,22,0.3)",
+            borderRadius: 20, padding: "52px 56px",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            flexWrap: "wrap", gap: 24,
+            boxShadow: "0 0 60px rgba(132,204,22,0.08)",
           }}>
-            Crear cuenta de proveedor <span>→</span>
-          </Link>
+            <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 800, margin: 0, lineHeight: 1.2 }}>
+              Empieza hoy en <span style={{ color: "#84cc16" }}>Drokex</span><br />
+              y lleva tu marca a nuevos países.
+            </h2>
+            <Link href="/registro" style={{
+              display: "inline-flex", alignItems: "center", gap: 10,
+              background: "#84cc16", color: "#050505", fontWeight: 800,
+              padding: "16px 36px", borderRadius: 12, fontSize: "1rem",
+              textDecoration: "none", whiteSpace: "nowrap",
+              boxShadow: "0 4px 28px rgba(132,204,22,0.4)",
+            }}>
+              Crear cuenta de proveedor <span>→</span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -509,7 +526,11 @@ export default function ParaProveedoresPage() {
         <div className="shell" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
           {footerStats.map(s => (
             <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <span style={{ fontSize: "1.6rem" }}>{s.icon}</span>
+              <div style={{
+                width: 48, height: 48, borderRadius: 12, flexShrink: 0,
+                background: "rgba(132,204,22,0.1)", border: "1px solid rgba(132,204,22,0.2)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>{s.icon}</div>
               <div>
                 <p style={{ margin: 0, fontWeight: 700, fontSize: "0.88rem" }}>{s.label}</p>
                 <p style={{ margin: 0, color: "rgba(255,255,255,0.45)", fontSize: "0.78rem" }}>{s.sub}</p>
