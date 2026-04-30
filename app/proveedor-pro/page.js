@@ -60,6 +60,14 @@ export default function ProveedorProPage() {
     textColor: "#fff8ee",
     mutedTextColor: "#c7b9a7",
     buttonTextColor: "#15100a",
+    heroTitleSize: 60,
+    heroTitleColor: "",
+    heroSubtitleSize: 18,
+    heroSubtitleColor: "",
+    aboutTitleSize: 36,
+    aboutTitleColor: "",
+    aboutBodySize: 16,
+    aboutBodyColor: "",
   });
 
   const [products, setProducts] = useState([
@@ -332,7 +340,7 @@ export default function ProveedorProPage() {
           </aside>
 
           <section className="overflow-y-auto p-6" style={{ backgroundColor: store.backgroundColor }}>
-            <LandingPreview store={store} products={products} />
+            <LandingPreview store={store} products={products} isEditable onUpdate={updateStore} />
           </section>
         </section>
       )}
@@ -340,7 +348,7 @@ export default function ProveedorProPage() {
   );
 }
 
-function LandingPreview({ store, products, fullWidth = false }) {
+function LandingPreview({ store, products, fullWidth = false, isEditable = false, onUpdate }) {
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
 
@@ -418,13 +426,25 @@ function LandingPreview({ store, products, fullWidth = false }) {
           {store.promoText}
         </span>
 
-        <h1 className="mt-8 max-w-3xl text-6xl font-black leading-none">
-          {store.heroTitle}
-        </h1>
+        <EditableText
+          tag="h1" value={store.heroTitle}
+          fontSize={store.heroTitleSize} fontColor={store.heroTitleColor || store.textColor}
+          onTextChange={v => onUpdate?.("heroTitle", v)}
+          onFontSizeChange={v => onUpdate?.("heroTitleSize", v)}
+          onFontColorChange={v => onUpdate?.("heroTitleColor", v)}
+          isEditable={isEditable}
+          className="mt-8 max-w-3xl font-black leading-none"
+        />
 
-        <p className="mt-6 max-w-xl text-lg" style={{ color: store.mutedTextColor }}>
-          {store.heroSubtitle}
-        </p>
+        <EditableText
+          tag="p" value={store.heroSubtitle}
+          fontSize={store.heroSubtitleSize} fontColor={store.heroSubtitleColor || store.mutedTextColor}
+          onTextChange={v => onUpdate?.("heroSubtitle", v)}
+          onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)}
+          onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)}
+          isEditable={isEditable}
+          className="mt-6 max-w-xl"
+        />
 
         <button
           className="mt-8 rounded-2xl px-8 py-4 font-black"
@@ -455,10 +475,24 @@ function LandingPreview({ store, products, fullWidth = false }) {
 
       <section className="grid gap-8 p-8 md:grid-cols-2">
         <div>
-          <h2 className="text-4xl font-black">{store.aboutTitle}</h2>
-          <p className="mt-4" style={{ color: store.mutedTextColor }}>
-            {store.aboutText}
-          </p>
+          <EditableText
+            tag="h2" value={store.aboutTitle}
+            fontSize={store.aboutTitleSize} fontColor={store.aboutTitleColor || store.textColor}
+            onTextChange={v => onUpdate?.("aboutTitle", v)}
+            onFontSizeChange={v => onUpdate?.("aboutTitleSize", v)}
+            onFontColorChange={v => onUpdate?.("aboutTitleColor", v)}
+            isEditable={isEditable}
+            className="font-black"
+          />
+          <EditableText
+            tag="p" value={store.aboutText}
+            fontSize={store.aboutBodySize} fontColor={store.aboutBodyColor || store.mutedTextColor}
+            onTextChange={v => onUpdate?.("aboutText", v)}
+            onFontSizeChange={v => onUpdate?.("aboutBodySize", v)}
+            onFontColorChange={v => onUpdate?.("aboutBodyColor", v)}
+            isEditable={isEditable}
+            className="mt-4"
+          />
         </div>
 
         <div className="min-h-[280px] overflow-hidden rounded-[2rem]" style={{ backgroundColor: store.backgroundColor }}>
@@ -535,6 +569,51 @@ function LandingPreview({ store, products, fullWidth = false }) {
           ))}
         </div>
       </section>
+    </div>
+  );
+}
+
+function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange, onFontSizeChange, onFontColorChange, isEditable, className, style }) {
+  const ref = useRef(null);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (ref.current && !focused) ref.current.innerText = value || "";
+  }, [value, focused]);
+
+  const computedStyle = { ...style, fontSize: fontSize ? `${fontSize}px` : undefined, color: fontColor || undefined };
+
+  if (!isEditable) return <Tag className={className} style={computedStyle}>{value}</Tag>;
+
+  const btnStyle = { background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, color: "#fff", fontWeight: 900, fontSize: "0.72rem", padding: "3px 8px", cursor: "pointer", lineHeight: 1.4 };
+
+  return (
+    <div style={{ position: "relative" }}>
+      {focused && (
+        <div onMouseDown={e => e.preventDefault()}
+          style={{ position: "absolute", top: -50, left: 0, zIndex: 400, background: "#0c140c", border: "1px solid rgba(89,255,53,0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
+          <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.(Math.max(10, (fontSize || 16) - 2)); }}>A−</button>
+          <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.45)", minWidth: 34, textAlign: "center" }}>{fontSize || "auto"}px</span>
+          <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.((fontSize || 16) + 2); }}>A+</button>
+          <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.12)", margin: "0 2px" }} />
+          <label style={{ display: "flex", alignItems: "center", gap: 5, cursor: "pointer" }} onMouseDown={e => e.stopPropagation()}>
+            <div style={{ width: 20, height: 20, borderRadius: 5, background: fontColor || "#fff", border: "1px solid rgba(255,255,255,0.25)", flexShrink: 0 }} />
+            <span style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.4)" }}>Color</span>
+            <input type="color" value={fontColor || "#ffffff"} onChange={e => onFontColorChange?.(e.target.value)}
+              style={{ width: 0, height: 0, opacity: 0, position: "absolute", pointerEvents: "none" }}
+              ref={el => { if (el) el.style.pointerEvents = "auto"; }}
+            />
+          </label>
+        </div>
+      )}
+      <Tag
+        ref={ref}
+        contentEditable suppressContentEditableWarning
+        onFocus={() => setFocused(true)}
+        onBlur={() => { setFocused(false); onTextChange?.(ref.current?.innerText || ""); }}
+        className={className}
+        style={{ ...computedStyle, outline: focused ? "2px dashed rgba(89,255,53,0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40 }}
+      />
     </div>
   );
 }
