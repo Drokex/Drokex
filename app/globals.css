@@ -7543,7 +7543,7 @@ button {
 }
 
 .cdk-filter-icon {
-  color: rgba(255, 255, 255, 0.4);
+  color: #4ade80;
   display: flex;
   align-items: center;
   flex-shrink: 0;
@@ -7674,11 +7674,13 @@ button {
   color: #0a1a0a;
   font-weight: 700;
   font-size: 0.95rem;
-  transition: background 0.15s;
+  box-shadow: 0 6px 28px rgba(74, 222, 128, 0.45);
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
 .cdk-hero-cta:hover {
   background: #22c55e;
+  box-shadow: 0 8px 36px rgba(74, 222, 128, 0.6);
 }
 
 .cdk-hero-trust {
@@ -7941,11 +7943,13 @@ button {
   font-size: 0.82rem;
   font-weight: 700;
   text-decoration: none;
-  transition: background 0.15s;
+  box-shadow: 0 4px 18px rgba(74, 222, 128, 0.35);
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
 .cdk-btn-primary:hover {
   background: #22c55e;
+  box-shadow: 0 6px 24px rgba(74, 222, 128, 0.5);
 }
 
 /* Bottom trust bar */
