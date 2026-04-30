@@ -176,9 +176,9 @@ export default function ParaProveedoresPage() {
             <div style={{
               background: "rgba(132,204,22,0.06)", border: "1px solid rgba(132,204,22,0.25)",
               borderRadius: 20, overflow: "hidden", position: "relative",
-              display: "grid", gridTemplateColumns: "1fr 180px",
+              display: "grid", gridTemplateColumns: "1fr 1fr",
             }}>
-              <div style={{ padding: 32 }}>
+              <div style={{ padding: "24px 20px 24px 24px" }}>
                 <div style={{
                   position: "absolute", top: 16, right: 16,
                   background: "#84cc16", color: "#050505",
