@@ -140,7 +140,7 @@ function newState() {
     impacts: [], particles: [], screenShake: 0,
     powerCooldown: 0, bossAnnounce: 0, levelAnnounce: 90,
     invincibleFrames: 80, // grace period at game start
-    doubleJumpFlash: 0, killScore: 0, bossBlockFlash: 0, autoPlay: false,
+    doubleJumpFlash: 0, killScore: 0, bossBlockFlash: 0, autoPlay: false, hasPower: false,
     player: {
       x: 80, y: 200, w: 46, h: 62, vx: 0, vy: 0,
       speed: 0.9, maxSpeed: 8, jumpPower: 16,
@@ -309,6 +309,7 @@ export default function AprendePage() {
 
     function loseLife() {
       const g = gRef.current;
+      g.hasPower = false;
       g.lives--;
       if (g.lives <= 0) { g.stopped = true; setHudLives(0); setScreen("dead"); }
       else {
@@ -1016,6 +1017,44 @@ export default function AprendePage() {
       ctx.restore();
     }
 
+    function drawPowerAura(p, camX, frame) {
+      ctx.save();
+      ctx.translate(p.x - camX + p.w / 2, p.y + p.h / 2);
+      ctx.globalCompositeOperation = "lighter";
+      const pulse = 0.5 + 0.5 * Math.sin(frame * 0.14);
+      // inner glow
+      ctx.globalAlpha = 0.13 + pulse * 0.1;
+      ctx.fillStyle = "#ffd700";
+      ctx.shadowColor = "#ffd700";
+      ctx.shadowBlur = 28;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.w * 0.72, 0, Math.PI * 2);
+      ctx.fill();
+      // outer ring
+      ctx.globalAlpha = 0.22 + pulse * 0.18;
+      ctx.strokeStyle = "#ffd700";
+      ctx.lineWidth = 2.5;
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.w * (0.9 + pulse * 0.18), 0, Math.PI * 2);
+      ctx.stroke();
+      // orbiting sparks
+      for (let i = 0; i < 5; i++) {
+        const angle = frame * 0.09 + (Math.PI * 2 * i) / 5;
+        const r = p.w * (0.95 + pulse * 0.12);
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = i % 2 === 0 ? "#fff" : "#ffd700";
+        ctx.shadowColor = "#ffd700";
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(Math.cos(angle) * r, Math.sin(angle) * r * 0.65, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+      ctx.restore();
+    }
+
     function drawDoubleJumpFlash(p, camX, flash) {
       if (flash <= 0) return;
       const progress = 1 - flash / 15;
@@ -1092,12 +1131,15 @@ export default function AprendePage() {
       ctx.fillText(LEVELS[g.currentLevel].name.toUpperCase(), 14, 28);
       ctx.fillStyle = "#ffd700"; ctx.textAlign = "center";
       ctx.fillText(`● ${g.coins}   PTS ${calculateScore(g)}`, 345, 28);
-      if (g.coins >= POWER_COST) {
-        ctx.fillStyle = g.powerCooldown > 0 ? "#888" : "#00ff88";
-        ctx.fillText(g.powerCooldown > 0 ? "** ESPERA **" : "** PODER [X] **", 650, 28);
+      if (g.hasPower) {
+        ctx.fillStyle = g.powerCooldown > 0 ? "#888" : "#ffd700";
+        ctx.shadowColor = g.powerCooldown > 0 ? "transparent" : "#ffd700";
+        ctx.shadowBlur = g.powerCooldown > 0 ? 0 : 10;
+        ctx.fillText(g.powerCooldown > 0 ? "⚡ ESPERA..." : "⚡ PODER [X]", 650, 28);
+        ctx.shadowBlur = 0;
       } else {
         ctx.fillStyle = "rgba(255,200,0,0.45)";
-        ctx.fillText(`poder: ${g.coins}/${POWER_COST}`, 640, 28);
+        ctx.fillText(`poder: ${g.coins}/10`, 640, 28);
       }
       ctx.fillStyle = "#ff4444"; ctx.textAlign = "right";
       ctx.fillText(`♥ ${g.lives}`, W - 14, 28);
@@ -1159,6 +1201,11 @@ export default function AprendePage() {
           c.collected = true; g.coins++; setHudCoins(g.coins);
           playSound("coin");
           spawnImpact(c.x, c.y, "coin");
+          if (!g.hasPower && g.coins >= 10) {
+            g.hasPower = true;
+            g.screenShake = 10;
+            spawnImpact(p.x + p.w / 2, p.y + p.h / 2, "hit");
+          }
         }
       }
 
@@ -1169,8 +1216,7 @@ export default function AprendePage() {
       // Power
       if (k.power) {
         k.power = false;
-        if (g.coins >= POWER_COST && g.powerCooldown <= 0) {
-          g.coins -= POWER_COST; setHudCoins(g.coins);
+        if (g.hasPower && g.powerCooldown <= 0) {
           g.powerCooldown = POWER_COOLDOWN;
           g.projectiles.push({ x: p.x + (p.facing > 0 ? p.w + 5 : -22), y: p.y + p.h * 0.38, vx: p.facing * 17 });
           playSound("shoot");
@@ -1336,6 +1382,7 @@ export default function AprendePage() {
       drawParticles(g.cameraX, g.particles);
       drawFlag(g.cameraX, bossAlive);
       drawDoubleJumpFlash(p, g.cameraX, g.doubleJumpFlash);
+      if (g.hasPower) drawPowerAura(p, g.cameraX, g.frame);
       drawChar(p, g.frame, g.cameraX, g.invincibleFrames, k.sprint);
       drawAtmosphere(g.frame);
       drawHUD(g);
