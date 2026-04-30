@@ -67,52 +67,48 @@ export default function ParaProveedoresPage() {
       <SiteHeader />
 
       {/* ── HERO ────────────────────────────────────────── */}
-      <section style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 480, alignItems: "stretch" }}>
-          <div style={{ padding: "80px 0 64px 0", maxWidth: 600, marginLeft: "auto", paddingLeft: 40, paddingRight: 40 }}>
-            <span style={{
-              display: "inline-block", background: "rgba(132,204,22,0.15)",
-              color: "#84cc16", fontSize: "0.72rem", fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              padding: "4px 12px", borderRadius: 4, marginBottom: 20,
-              border: "1px solid rgba(132,204,22,0.3)",
+      <section style={{ position: "relative", minHeight: 480, display: "flex", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
+        <img
+          src="/Banner mapa casas.jpg"
+          alt="Red Drokex en LATAM"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+        />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.75) 50%, rgba(5,5,5,0.2) 100%)" }} />
+        <div className="shell" style={{ position: "relative", zIndex: 1, padding: "80px 0" }}>
+          <span style={{
+            display: "inline-block", background: "rgba(132,204,22,0.15)",
+            color: "#84cc16", fontSize: "0.72rem", fontWeight: 700,
+            letterSpacing: "0.14em", textTransform: "uppercase",
+            padding: "4px 12px", borderRadius: 4, marginBottom: 20,
+            border: "1px solid rgba(132,204,22,0.3)",
+          }}>
+            Para proveedores
+          </span>
+          <h1 style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 20px", maxWidth: 560 }}>
+            Lleva tu marca<br />
+            <span style={{ color: "#84cc16" }}>a nuevos mercados</span><br />
+            sin fronteras
+          </h1>
+          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "1rem", lineHeight: 1.7, margin: "0 0 36px", maxWidth: 440 }}>
+            Drokex te ofrece dos caminos para expandir tu negocio en Latinoamérica. Tú eliges cómo empezar.
+          </p>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+            <Link href="/registro" style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              background: "#84cc16", color: "#050505", fontWeight: 700,
+              padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
+              textDecoration: "none", boxShadow: "0 4px 24px rgba(132,204,22,0.4)",
             }}>
-              Para proveedores
-            </span>
-            <h1 style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 20px" }}>
-              Lleva tu marca<br />
-              <span style={{ color: "#84cc16" }}>a nuevos mercados</span><br />
-              sin fronteras
-            </h1>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "1rem", lineHeight: 1.7, margin: "0 0 36px", maxWidth: 440 }}>
-              Drokex te ofrece dos caminos para expandir tu negocio en Latinoamérica. Tú eliges cómo empezar.
-            </p>
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-              <Link href="/registro" style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                background: "#84cc16", color: "#050505", fontWeight: 700,
-                padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
-                textDecoration: "none", boxShadow: "0 4px 24px rgba(132,204,22,0.4)",
-              }}>
-                Quiero ser proveedor <span>→</span>
-              </Link>
-              <Link href="/servicios/proveedor" style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                background: "rgba(255,255,255,0.07)", color: "#fff", fontWeight: 600,
-                padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
-                border: "1px solid rgba(255,255,255,0.14)", textDecoration: "none",
-              }}>
-                Ver cómo funciona <span style={{ opacity: 0.7 }}>▷</span>
-              </Link>
-            </div>
-          </div>
-
-          <div style={{ position: "relative", overflow: "hidden" }}>
-            <img
-              src="/Banner mapa casas.jpg"
-              alt="Red Drokex en LATAM"
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
-            />
+              Quiero ser proveedor <span>→</span>
+            </Link>
+            <Link href="/servicios/proveedor" style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              background: "rgba(255,255,255,0.07)", color: "#fff", fontWeight: 600,
+              padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
+              border: "1px solid rgba(255,255,255,0.14)", textDecoration: "none",
+            }}>
+              Ver cómo funciona <span style={{ opacity: 0.7 }}>▷</span>
+            </Link>
           </div>
         </div>
       </section>
