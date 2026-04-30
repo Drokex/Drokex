@@ -19,11 +19,22 @@ function hexToRgba(hex, alpha) {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
+function slugify(value) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function ProveedorProPage() {
   const [code, setCode] = useState("");
   const [isPro, setIsPro] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [landingLink, setLandingLink] = useState("");
+  const [copiedLink, setCopiedLink] = useState(false);
   const [error, setError] = useState("");
 
   const [store, setStore] = useState({
@@ -93,6 +104,22 @@ export default function ProveedorProPage() {
     const copy = [...products];
     copy[index] = { ...copy[index], [field]: value };
     setProducts(copy);
+  }
+
+  async function createLanding() {
+    const slug = slugify(store.brand) || "mi-tienda";
+    const origin = window.location.origin;
+    const link = `${origin}/proveedor-pro/tienda/${slug}`;
+
+    setLandingLink(link);
+    setCopiedLink(false);
+  }
+
+  async function copyLandingLink() {
+    if (!landingLink) return;
+
+    await navigator.clipboard?.writeText(landingLink);
+    setCopiedLink(true);
   }
 
   return (
@@ -189,6 +216,38 @@ export default function ProveedorProPage() {
             >
               Previsualizar landing completa
             </button>
+
+            <button
+              type="button"
+              onClick={createLanding}
+              className="mt-3 w-full rounded-2xl bg-[#59ff35] px-5 py-4 font-black text-black transition hover:brightness-110"
+            >
+              Crear landing
+            </button>
+
+            {landingLink ? (
+              <div className="mt-4 rounded-3xl border border-[#59ff35]/35 bg-[#59ff35]/10 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#59ff35]">
+                  Landing creada
+                </p>
+                <h3 className="mt-2 text-lg font-black">
+                  Mira, este es el link de tu landing page
+                </h3>
+                <a
+                  href={landingLink}
+                  className="mt-3 block break-all rounded-2xl bg-black/45 p-3 text-sm font-bold text-white/75"
+                >
+                  {landingLink}
+                </a>
+                <button
+                  type="button"
+                  onClick={copyLandingLink}
+                  className="mt-3 w-full rounded-xl border border-[#59ff35]/50 px-4 py-3 text-sm font-black text-[#59ff35] transition hover:bg-[#59ff35] hover:text-black"
+                >
+                  {copiedLink ? "Link copiado" : "Copiar link"}
+                </button>
+              </div>
+            ) : null}
 
             <div className="mt-6 grid grid-cols-2 gap-2">
               {[
