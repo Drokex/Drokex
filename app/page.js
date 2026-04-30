@@ -422,7 +422,7 @@ export default function Home() {
           <motion.div className="hero-actions hero-actions-split" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.72, ease: [0.22, 1, 0.36, 1] }}>
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
               <Link
-                href="/registro"
+                href="/para-proveedores"
                 className="hero-option-button hero-option-button-green"
                 onMouseEnter={() => setHeroTheme("green")}
                 onFocus={() => setHeroTheme("green")}

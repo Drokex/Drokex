@@ -25,6 +25,7 @@ const menuItems = [
   { label: "Portal", href: "/portal" },
   { label: "Productos", href: "/productos" },
   { label: "Directorio", href: "/directorio" },
+  { label: "Para proveedores", href: "/para-proveedores" },
   {
     label: "Servicios",
     submenu: [
