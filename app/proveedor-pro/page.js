@@ -111,6 +111,15 @@ export default function ProveedorProPage() {
     const origin = window.location.origin;
     const link = `${origin}/proveedor-pro/tienda/${slug}`;
 
+    window.localStorage.setItem(
+      `drokex-proveedor-pro:${slug}`,
+      JSON.stringify({
+        store,
+        products,
+        createdAt: new Date().toISOString(),
+      })
+    );
+
     setLandingLink(link);
     setCopiedLink(false);
   }
