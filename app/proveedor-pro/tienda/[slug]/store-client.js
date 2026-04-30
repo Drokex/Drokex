@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const fallbackStore = {
@@ -71,14 +70,15 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
 
   return (
     <section
-      className="px-4 py-8 sm:px-6 lg:px-10"
+      className="min-h-screen"
       style={{
         backgroundColor: store.backgroundColor,
         color: store.textColor,
       }}
     >
       {!landing && hasLoaded ? (
-        <div className="mx-auto mb-5 max-w-7xl rounded-3xl border border-[#c89b5c]/30 bg-[#c89b5c]/10 p-5">
+        <div className="mx-auto max-w-7xl p-5">
+          <div className="rounded-3xl border border-[#c89b5c]/30 bg-[#c89b5c]/10 p-5">
           <p className="font-black text-[#c89b5c]">
             Esta landing todavia no tiene datos guardados en este navegador.
           </p>
@@ -86,14 +86,15 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
             Vuelve al constructor, ajusta la tienda y presiona Crear landing
             para publicar el contenido en este link.
           </p>
+          </div>
         </div>
       ) : null}
 
       <div
-        className="mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-white/10"
+        className="min-h-screen w-full overflow-hidden"
         style={{ backgroundColor: store.surfaceColor }}
       >
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-8 py-5">
+        <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-6 py-5 backdrop-blur-xl md:px-10 lg:px-14">
           <div className="flex items-center gap-3">
             {store.logo ? (
               <img
@@ -118,29 +119,37 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
                 className="text-xs font-black uppercase tracking-[0.2em]"
                 style={{ color: store.primaryColor }}
               >
-                Landing Proveedor Pro
-              </p>
-              <h1 className="mt-1 text-3xl font-black">{store.brand}</h1>
-              <p className="text-xs" style={{ color: store.mutedTextColor }}>
                 {store.country}
               </p>
+              <h1 className="mt-1 text-3xl font-black">{store.brand}</h1>
             </div>
           </div>
 
-          <Link
-            href="/proveedor-pro"
+          <nav
+            className="hidden items-center gap-8 text-sm font-bold md:flex"
+            style={{ color: store.mutedTextColor }}
+          >
+            <a href="#inicio">Inicio</a>
+            <a href="#beneficios">Beneficios</a>
+            <a href="#marca">Marca</a>
+            <a href="#productos">Productos</a>
+          </nav>
+
+          <a
+            href="#productos"
             className="rounded-2xl px-5 py-3 font-black"
             style={{
               backgroundColor: store.primaryColor,
               color: store.buttonTextColor,
             }}
           >
-            Editar landing
-          </Link>
+            Comprar
+          </a>
         </header>
 
         <section
-          className="min-h-[560px] bg-cover bg-center px-8 py-16"
+          id="inicio"
+          className="grid min-h-[calc(100vh-84px)] items-center bg-cover bg-center px-6 py-16 md:px-10 lg:px-14"
           style={{
             backgroundColor: store.backgroundColor,
             backgroundImage: store.heroImage
@@ -148,40 +157,44 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
               : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 36%)`,
           }}
         >
-          <span
-            className="rounded-full px-4 py-2 text-sm font-black"
-            style={{
-              backgroundColor: primarySoft,
-              color: store.primaryColor,
-            }}
-          >
-            {store.promoText}
-          </span>
+          <div className="max-w-3xl">
+            <span
+              className="rounded-full px-4 py-2 text-sm font-black"
+              style={{
+                backgroundColor: primarySoft,
+                color: store.primaryColor,
+              }}
+            >
+              {store.promoText}
+            </span>
 
-          <h2 className="mt-8 max-w-3xl text-6xl font-black leading-none">
-            {store.heroTitle}
-          </h2>
+            <h2 className="mt-8 text-6xl font-black leading-none md:text-7xl">
+              {store.heroTitle}
+            </h2>
 
-          <p
-            className="mt-6 max-w-xl text-lg"
-            style={{ color: store.mutedTextColor }}
-          >
-            {store.heroSubtitle}
-          </p>
+            <p
+              className="mt-6 max-w-xl text-lg font-semibold md:text-xl"
+              style={{ color: store.mutedTextColor }}
+            >
+              {store.heroSubtitle}
+            </p>
 
-          <button
-            className="mt-8 rounded-2xl px-8 py-4 font-black"
-            style={{
-              backgroundColor: store.primaryColor,
-              color: store.buttonTextColor,
-            }}
-          >
-            {store.ctaText}
-          </button>
+            <a
+              href="#productos"
+              className="mt-8 inline-flex rounded-2xl px-8 py-4 font-black"
+              style={{
+                backgroundColor: store.primaryColor,
+                color: store.buttonTextColor,
+              }}
+            >
+              {store.ctaText}
+            </a>
+          </div>
         </section>
 
         <section
-          className="grid gap-4 p-8 md:grid-cols-3"
+          id="beneficios"
+          className="grid gap-5 px-6 py-10 md:grid-cols-3 md:px-10 lg:px-14"
           style={{ backgroundColor: store.backgroundColor }}
         >
           {[store.benefit1, store.benefit2, store.benefit3].map((benefit) => (
@@ -199,8 +212,14 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
           ))}
         </section>
 
-        <section className="grid gap-8 p-8 md:grid-cols-2">
+        <section id="marca" className="grid gap-10 px-6 py-16 md:grid-cols-2 md:px-10 lg:px-14">
           <div>
+            <p
+              className="text-sm font-black uppercase tracking-[0.24em]"
+              style={{ color: store.primaryColor }}
+            >
+              Nuestra marca
+            </p>
             <h2 className="text-4xl font-black">{store.aboutTitle}</h2>
             <p className="mt-4" style={{ color: store.mutedTextColor }}>
               {store.aboutText}
@@ -228,10 +247,14 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
           </div>
         </section>
 
-        <section className="p-8" style={{ backgroundColor: store.backgroundColor }}>
+        <section
+          id="productos"
+          className="px-6 py-16 md:px-10 lg:px-14"
+          style={{ backgroundColor: store.backgroundColor }}
+        >
           <h2 className="text-4xl font-black">Productos destacados</h2>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-3">
+          <div className="mt-8 grid gap-6 md:grid-cols-3 xl:grid-cols-4">
             {products.map((product, index) => (
               <article
                 key={index}
