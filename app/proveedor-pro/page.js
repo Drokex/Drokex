@@ -186,7 +186,28 @@ export default function ProveedorProPage() {
               alt="Drokex Proveedor Pro"
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
             />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(3,5,3,0.6) 0%, rgba(3,5,3,0) 40%)" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(3,5,3,0.75) 0%, rgba(3,5,3,0.1) 50%)" }} />
+
+            {/* Benefits overlay */}
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 48px" }}>
+              <p style={{ margin: "0 0 20px", fontSize: "0.7rem", fontWeight: 900, letterSpacing: "0.16em", textTransform: "uppercase", color: "#59ff35" }}>¿Por qué tener una landing?</p>
+              <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 16 }}>
+                {[
+                  ["Tu vitrina 24/7", "Vende mientras duermes con una página siempre activa."],
+                  ["Más confianza, más ventas", "Los compradores confían más en marcas con presencia propia."],
+                  ["Control total", "Tú decides el diseño, los productos y los precios."],
+                  ["Sin intermediarios", "Conecta directo con tus clientes desde Drokex."],
+                ].map(([title, desc]) => (
+                  <li key={title} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <span style={{ marginTop: 3, flexShrink: 0, width: 7, height: 7, borderRadius: "50%", background: "#59ff35", boxShadow: "0 0 8px #59ff35" }} />
+                    <div>
+                      <p style={{ margin: 0, fontSize: "0.82rem", fontWeight: 800, color: "#fff" }}>{title}</p>
+                      <p style={{ margin: "2px 0 0", fontSize: "0.73rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.5 }}>{desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
       ) : isPreviewMode ? (
