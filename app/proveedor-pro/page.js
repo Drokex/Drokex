@@ -31,7 +31,7 @@ function slugify(value) {
 export default function ProveedorProPage() {
   const [code, setCode] = useState("");
   const [isPro, setIsPro] = useState(false);
-  const [activeTab, setActiveTab] = useState("home");
+  const [openSection, setOpenSection] = useState("hero");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [landingLink, setLandingLink] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
@@ -235,261 +235,99 @@ export default function ProveedorProPage() {
         </section>
       ) : (
         <section className="grid min-h-[calc(100vh-80px)] grid-cols-1 lg:grid-cols-[360px_1fr]">
-          <aside className="border-r border-white/10 bg-[#080c08] p-5">
-            <div className="rounded-3xl bg-[#59ff35] p-5 text-black">
-              <h2 className="text-xl font-black">Proveedor Pro activo</h2>
-              <p className="text-sm">Constructor de landing Drokex</p>
+          <aside style={{ borderRight: "1px solid rgba(255,255,255,0.08)", background: "#060906", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+            {/* Brand header */}
+            <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: "50%", background: store.primaryColor, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "1rem", color: store.buttonTextColor, flexShrink: 0 }}>
+                  {store.logo
+                    ? <img src={store.logo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
+                    : store.brand.charAt(0)}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ margin: 0, fontWeight: 900, fontSize: "0.9rem", color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{store.brand}</p>
+                  <p style={{ margin: 0, fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>{store.country}</p>
+                </div>
+                <span style={{ marginLeft: "auto", flexShrink: 0, background: "rgba(89,255,53,0.15)", color: "#59ff35", fontSize: "0.62rem", fontWeight: 900, letterSpacing: "0.1em", padding: "3px 8px", borderRadius: 6, textTransform: "uppercase" }}>Pro</span>
+              </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsPreviewMode(true)}
-              className="mt-4 w-full rounded-2xl bg-white px-5 py-4 font-black text-black transition hover:bg-[#59ff35]"
-            >
-              Previsualizar landing completa
-            </button>
+            {/* Action buttons */}
+            <div style={{ padding: "14px 16px", display: "flex", gap: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+              <button type="button" onClick={createLanding}
+                style={{ flex: 1, borderRadius: 12, background: "#59ff35", color: "#050505", fontWeight: 900, fontSize: "0.82rem", padding: "11px 8px", border: "none", cursor: "pointer" }}>
+                Publicar
+              </button>
+              <button type="button" onClick={() => setIsPreviewMode(true)}
+                style={{ flex: 1, borderRadius: 12, background: "rgba(255,255,255,0.06)", color: "#fff", fontWeight: 700, fontSize: "0.82rem", padding: "11px 8px", border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer" }}>
+                Previsualizar
+              </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={createLanding}
-              className="mt-3 w-full rounded-2xl bg-[#59ff35] px-5 py-4 font-black text-black transition hover:brightness-110"
-            >
-              Crear landing
-            </button>
-
-            {landingLink ? (
-              <div className="mt-4 rounded-3xl border border-[#59ff35]/35 bg-[#59ff35]/10 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#59ff35]">
-                  Landing creada
-                </p>
-                <h3 className="mt-2 text-lg font-black">
-                  Mira, este es el link de tu landing page
-                </h3>
-                <a
-                  href={landingLink}
-                  className="mt-3 block break-all rounded-2xl bg-black/45 p-3 text-sm font-bold text-white/75"
-                >
-                  {landingLink}
-                </a>
-                <button
-                  type="button"
-                  onClick={copyLandingLink}
-                  className="mt-3 w-full rounded-xl border border-[#59ff35]/50 px-4 py-3 text-sm font-black text-[#59ff35] transition hover:bg-[#59ff35] hover:text-black"
-                >
-                  {copiedLink ? "Link copiado" : "Copiar link"}
+            {/* Landing link */}
+            {landingLink && (
+              <div style={{ margin: "12px 16px", borderRadius: 14, border: "1px solid rgba(89,255,53,0.3)", background: "rgba(89,255,53,0.07)", padding: "14px" }}>
+                <p style={{ margin: "0 0 6px", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "#59ff35" }}>Landing publicada</p>
+                <a href={landingLink} style={{ display: "block", wordBreak: "break-all", fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", marginBottom: 8 }}>{landingLink}</a>
+                <button type="button" onClick={copyLandingLink}
+                  style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(89,255,53,0.4)", background: "transparent", color: "#59ff35", fontWeight: 900, fontSize: "0.78rem", padding: "8px", cursor: "pointer" }}>
+                  {copiedLink ? "Copiado" : "Copiar link"}
                 </button>
               </div>
-            ) : null}
+            )}
 
-            <div className="mt-6 grid grid-cols-2 gap-2">
-              {[
-                ["home", "Home"],
-                ["brand", "Marca"],
-                ["media", "Imagenes"],
-                ["style", "Estilo"],
-                ["products", "Productos"],
-              ].map(([id, label]) => (
-                <button
-                  key={id}
-                  onClick={() => setActiveTab(id)}
-                  className={`rounded-xl px-4 py-3 text-sm font-bold ${
-                    activeTab === id
-                      ? "bg-[#59ff35] text-black"
-                      : "bg-white/5 text-white/60"
-                  }`}
-                >
-                  {label}
+            {/* Section list */}
+            <div style={{ padding: "12px 16px 24px", display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+              <p style={{ margin: "0 0 8px", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)" }}>Secciones de tu landing</p>
+
+              <SectionCard id="hero" label="Portada" icon={<HeroIcon />} open={openSection === "hero"} onToggle={() => setOpenSection(s => s === "hero" ? null : "hero")}>
+                <Input label="Titulo principal" value={store.heroTitle} onChange={v => updateStore("heroTitle", v)} />
+                <Textarea label="Subtitulo" value={store.heroSubtitle} onChange={v => updateStore("heroSubtitle", v)} />
+                <Input label="Texto del boton" value={store.ctaText} onChange={v => updateStore("ctaText", v)} />
+                <Input label="Texto promocional" value={store.promoText} onChange={v => updateStore("promoText", v)} />
+                <ImageUploader label="Imagen de fondo" value={store.heroImage} onChange={v => updateStore("heroImage", v)} />
+              </SectionCard>
+
+              <SectionCard id="benefits" label="Beneficios" icon={<CheckIcon />} open={openSection === "benefits"} onToggle={() => setOpenSection(s => s === "benefits" ? null : "benefits")}>
+                <Input label="Beneficio 1" value={store.benefit1} onChange={v => updateStore("benefit1", v)} />
+                <Input label="Beneficio 2" value={store.benefit2} onChange={v => updateStore("benefit2", v)} />
+                <Input label="Beneficio 3" value={store.benefit3} onChange={v => updateStore("benefit3", v)} />
+                <ImageUploader label="Banner secundario" value={store.bannerSecondary} onChange={v => updateStore("bannerSecondary", v)} />
+              </SectionCard>
+
+              <SectionCard id="brand" label="Tu marca" icon={<BrandIcon />} open={openSection === "brand"} onToggle={() => setOpenSection(s => s === "brand" ? null : "brand")}>
+                <Input label="Nombre de marca" value={store.brand} onChange={v => updateStore("brand", v)} />
+                <Input label="Pais" value={store.country} onChange={v => updateStore("country", v)} />
+                <ImageUploader label="Logo" value={store.logo} onChange={v => updateStore("logo", v)} />
+                <Input label="Titulo seccion marca" value={store.aboutTitle} onChange={v => updateStore("aboutTitle", v)} />
+                <Textarea label="Historia / descripcion" value={store.aboutText} onChange={v => updateStore("aboutText", v)} />
+              </SectionCard>
+
+              <SectionCard id="products" label="Productos" icon={<ProductIcon />} open={openSection === "products"} onToggle={() => setOpenSection(s => s === "products" ? null : "products")}>
+                {products.map((product, index) => (
+                  <div key={index} style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.3)", padding: "14px", display: "flex", flexDirection: "column", gap: 12 }}>
+                    <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 900, color: "#59ff35" }}>Producto {index + 1}</p>
+                    <Input label="Nombre" value={product.name} onChange={v => updateProduct(index, "name", v)} />
+                    <Input label="Categoria" value={product.category} onChange={v => updateProduct(index, "category", v)} />
+                    <Input label="Precio" value={product.price} onChange={v => updateProduct(index, "price", v)} />
+                    <Input label="Stock" value={product.stock} onChange={v => updateProduct(index, "stock", v)} />
+                    <ImageUploader label="Imagen" value={product.image} onChange={v => updateProduct(index, "image", v)} />
+                    <Textarea label="Descripcion" value={product.description} onChange={v => updateProduct(index, "description", v)} />
+                  </div>
+                ))}
+                <button onClick={addProduct} style={{ width: "100%", borderRadius: 12, border: "1px dashed rgba(89,255,53,0.4)", background: "transparent", color: "#59ff35", fontWeight: 900, fontSize: "0.82rem", padding: "12px", cursor: "pointer" }}>
+                  + Agregar producto
                 </button>
-              ))}
-            </div>
+              </SectionCard>
 
-            <div className="mt-6 space-y-4">
-              {activeTab === "home" && (
-                <>
-                  <Input
-                    label="Titulo principal"
-                    value={store.heroTitle}
-                    onChange={(value) => updateStore("heroTitle", value)}
-                  />
-                  <Textarea
-                    label="Texto del hero"
-                    value={store.heroSubtitle}
-                    onChange={(value) => updateStore("heroSubtitle", value)}
-                  />
-                  <Input
-                    label="Texto del boton"
-                    value={store.ctaText}
-                    onChange={(value) => updateStore("ctaText", value)}
-                  />
-                  <Input
-                    label="Texto promocional"
-                    value={store.promoText}
-                    onChange={(value) => updateStore("promoText", value)}
-                  />
-                </>
-              )}
-
-              {activeTab === "brand" && (
-                <>
-                  <Input
-                    label="Nombre de marca"
-                    value={store.brand}
-                    onChange={(value) => updateStore("brand", value)}
-                  />
-                  <Input
-                    label="Pais"
-                    value={store.country}
-                    onChange={(value) => updateStore("country", value)}
-                  />
-                  <ImageUploader
-                    label="Logo de marca"
-                    value={store.logo}
-                    onChange={(value) => updateStore("logo", value)}
-                  />
-                  <Input
-                    label="Titulo seccion marca"
-                    value={store.aboutTitle}
-                    onChange={(value) => updateStore("aboutTitle", value)}
-                  />
-                  <Textarea
-                    label="Historia / descripcion de marca"
-                    value={store.aboutText}
-                    onChange={(value) => updateStore("aboutText", value)}
-                  />
-                </>
-              )}
-
-              {activeTab === "media" && (
-                <>
-                  <ImageUploader
-                    label="Banner principal"
-                    value={store.heroImage}
-                    onChange={(value) => updateStore("heroImage", value)}
-                  />
-                  <ImageUploader
-                    label="Banner secundario"
-                    value={store.bannerSecondary}
-                    onChange={(value) =>
-                      updateStore("bannerSecondary", value)
-                    }
-                  />
-                  <Input
-                    label="Beneficio 1"
-                    value={store.benefit1}
-                    onChange={(value) => updateStore("benefit1", value)}
-                  />
-                  <Input
-                    label="Beneficio 2"
-                    value={store.benefit2}
-                    onChange={(value) => updateStore("benefit2", value)}
-                  />
-                  <Input
-                    label="Beneficio 3"
-                    value={store.benefit3}
-                    onChange={(value) => updateStore("benefit3", value)}
-                  />
-                </>
-              )}
-
-              {activeTab === "style" && (
-                <>
-                  <ColorInput
-                    label="Color principal"
-                    value={store.primaryColor}
-                    onChange={(value) => updateStore("primaryColor", value)}
-                  />
-                  <ColorInput
-                    label="Fondo de landing"
-                    value={store.backgroundColor}
-                    onChange={(value) => updateStore("backgroundColor", value)}
-                  />
-                  <ColorInput
-                    label="Color de secciones"
-                    value={store.surfaceColor}
-                    onChange={(value) => updateStore("surfaceColor", value)}
-                  />
-                  <ColorInput
-                    label="Texto principal"
-                    value={store.textColor}
-                    onChange={(value) => updateStore("textColor", value)}
-                  />
-                  <ColorInput
-                    label="Texto secundario"
-                    value={store.mutedTextColor}
-                    onChange={(value) => updateStore("mutedTextColor", value)}
-                  />
-                  <ColorInput
-                    label="Texto de botones"
-                    value={store.buttonTextColor}
-                    onChange={(value) => updateStore("buttonTextColor", value)}
-                  />
-                </>
-              )}
-
-              {activeTab === "products" && (
-                <>
-                  {products.map((product, index) => (
-                    <div
-                      key={index}
-                      className="rounded-2xl border border-white/10 bg-black/40 p-4"
-                    >
-                      <p className="mb-3 font-black text-[#59ff35]">
-                        Producto {index + 1}
-                      </p>
-
-                      <Input
-                        label="Nombre"
-                        value={product.name}
-                        onChange={(value) =>
-                          updateProduct(index, "name", value)
-                        }
-                      />
-                      <Input
-                        label="Categoria"
-                        value={product.category}
-                        onChange={(value) =>
-                          updateProduct(index, "category", value)
-                        }
-                      />
-                      <Input
-                        label="Precio"
-                        value={product.price}
-                        onChange={(value) =>
-                          updateProduct(index, "price", value)
-                        }
-                      />
-                      <Input
-                        label="Stock"
-                        value={product.stock}
-                        onChange={(value) =>
-                          updateProduct(index, "stock", value)
-                        }
-                      />
-                      <ImageUploader
-                        label="Imagen del producto"
-                        value={product.image}
-                        onChange={(value) =>
-                          updateProduct(index, "image", value)
-                        }
-                      />
-                      <Textarea
-                        label="Descripcion"
-                        value={product.description}
-                        onChange={(value) =>
-                          updateProduct(index, "description", value)
-                        }
-                      />
-                    </div>
-                  ))}
-
-                  <button
-                    onClick={addProduct}
-                    className="w-full rounded-2xl border border-[#59ff35] py-4 font-black text-[#59ff35]"
-                  >
-                    + Agregar producto
-                  </button>
-                </>
-              )}
+              <SectionCard id="style" label="Colores y diseño" icon={<PaletteIcon />} open={openSection === "style"} onToggle={() => setOpenSection(s => s === "style" ? null : "style")}>
+                <ColorInput label="Color principal" value={store.primaryColor} onChange={v => updateStore("primaryColor", v)} />
+                <ColorInput label="Fondo de landing" value={store.backgroundColor} onChange={v => updateStore("backgroundColor", v)} />
+                <ColorInput label="Color de secciones" value={store.surfaceColor} onChange={v => updateStore("surfaceColor", v)} />
+                <ColorInput label="Texto principal" value={store.textColor} onChange={v => updateStore("textColor", v)} />
+                <ColorInput label="Texto secundario" value={store.mutedTextColor} onChange={v => updateStore("mutedTextColor", v)} />
+                <ColorInput label="Texto de botones" value={store.buttonTextColor} onChange={v => updateStore("buttonTextColor", v)} />
+              </SectionCard>
             </div>
           </aside>
 
@@ -698,6 +536,63 @@ function LandingPreview({ store, products, fullWidth = false }) {
         </div>
       </section>
     </div>
+  );
+}
+
+function SectionCard({ id, label, icon, open, onToggle, children }) {
+  return (
+    <div style={{ borderRadius: 14, border: open ? "1px solid rgba(89,255,53,0.25)" : "1px solid rgba(255,255,255,0.07)", overflow: "hidden", background: open ? "rgba(89,255,53,0.04)" : "rgba(255,255,255,0.02)" }}>
+      <button type="button" onClick={onToggle}
+        style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "13px 14px", background: "transparent", border: "none", cursor: "pointer", color: "#fff" }}>
+        <span style={{ color: open ? "#59ff35" : "rgba(255,255,255,0.35)", display: "flex", alignItems: "center" }}>{icon}</span>
+        <span style={{ fontWeight: 700, fontSize: "0.85rem", flex: 1, textAlign: "left" }}>{label}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={open ? "#59ff35" : "rgba(255,255,255,0.3)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "none" }}>
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      {open && (
+        <div style={{ padding: "0 14px 16px", display: "flex", flexDirection: "column", gap: 12 }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function HeroIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+    </svg>
+  );
+}
+function CheckIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+  );
+}
+function BrandIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="5"/><path d="M3 21v-2a7 7 0 0 1 14 0v2"/>
+    </svg>
+  );
+}
+function ProductIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+    </svg>
+  );
+}
+function PaletteIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/>
+      <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+    </svg>
   );
 }
 
