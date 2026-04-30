@@ -371,45 +371,95 @@ export default function ParaProveedoresPage() {
 
       {/* ── DROKEX STUDIO ───────────────────────────────── */}
       <section style={{ padding: "80px 0" }}>
-        <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }}>
+        <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center" }}>
+
           {/* Studio preview card */}
           <div style={{
-            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 20, padding: 28, minHeight: 240,
-            display: "flex", flexDirection: "column", gap: 14,
+            background: "#131313", border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 20, overflow: "hidden",
+            display: "grid", gridTemplateColumns: "140px 1fr 160px",
+            minHeight: 280,
           }}>
-            <div style={{ display: "flex", gap: 12 }}>
-              <div style={{
-                background: "#84cc16", color: "#050505", fontWeight: 700,
-                padding: "6px 16px", borderRadius: 8, fontSize: "0.82rem",
-              }}>Drokex Studio</div>
-            </div>
-            <div style={{
-              flex: 1, background: "rgba(0,0,0,0.3)", borderRadius: 12, padding: 20,
-              display: "flex", flexDirection: "column", gap: 10,
-            }}>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>Describe tu banner</p>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.7)", fontSize: "0.85rem" }}>
-                Banner moderno para promocionar tus productos en Latinoamérica
+            {/* Sidebar */}
+            <div style={{ borderRight: "1px solid rgba(255,255,255,0.07)", padding: "20px 0" }}>
+              <p style={{ margin: "0 0 16px", padding: "0 16px", color: "rgba(255,255,255,0.5)", fontSize: "0.75rem", fontWeight: 700 }}>
+                Drokex Studio
               </p>
+              {["Crear banner", "Mis diseños", "Plantillas", "Inspiración"].map((item, i) => (
+                <div key={item} style={{
+                  padding: "9px 16px", fontSize: "0.82rem", cursor: "pointer",
+                  background: i === 0 ? "rgba(132,204,22,0.12)" : "transparent",
+                  color: i === 0 ? "#84cc16" : "rgba(255,255,255,0.45)",
+                  fontWeight: i === 0 ? 700 : 400,
+                  borderLeft: i === 0 ? "2px solid #84cc16" : "2px solid transparent",
+                }}>
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            {/* Form area */}
+            <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", letterSpacing: "0.05em" }}>
+                Describe tu banner
+              </p>
+              <div style={{
+                flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 10, padding: 14,
+                color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", lineHeight: 1.6,
+              }}>
+                Banner moderno para promocionar sofás de lujo en Colombia
+              </div>
               <button style={{
                 background: "#84cc16", color: "#050505", fontWeight: 700,
-                padding: "10px 20px", borderRadius: 8, border: "none",
-                fontSize: "0.85rem", alignSelf: "flex-start", cursor: "pointer",
+                padding: "10px 18px", borderRadius: 8, border: "none",
+                fontSize: "0.82rem", cursor: "pointer", textAlign: "center",
+                boxShadow: "0 4px 16px rgba(132,204,22,0.35)",
               }}>
-                Generar con IA ✨
+                Generar con IA
               </button>
+            </div>
+
+            {/* Banner previews */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 0, borderLeft: "1px solid rgba(255,255,255,0.07)" }}>
+              <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+                <img src="/sillas.jpeg" alt="Banner sofás de lujo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: "linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 100%)",
+                  display: "flex", alignItems: "flex-end", padding: 10,
+                }}>
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 800, fontSize: "0.78rem", color: "#fff", lineHeight: 1.2 }}>SOFÁS<br />DE LUJO</p>
+                    <p style={{ margin: "3px 0 0", fontSize: "0.6rem", color: "rgba(255,255,255,0.55)" }}>★ DROKEX STU...</p>
+                  </div>
+                </div>
+              </div>
+              <div style={{ flex: 1, position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                <img src="/landing sillas.jpeg" alt="Banner comodidad y estilo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: "linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 100%)",
+                  display: "flex", alignItems: "flex-end", padding: 10,
+                }}>
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 800, fontSize: "0.78rem", color: "#fff", lineHeight: 1.2 }}>COMODIDAD<br />Y ESTILO</p>
+                    <p style={{ margin: "3px 0 0", fontSize: "0.6rem", color: "rgba(255,255,255,0.55)" }}>★ DROKEX STU...</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
+          {/* Text */}
           <div>
-            <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 800, margin: "0 0 16px" }}>
+            <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 800, margin: "0 0 16px" }}>
               Drokex <span style={{ color: "#84cc16" }}>Studio</span>
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7, margin: "0 0 24px" }}>
+            <p style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7, margin: "0 0 24px", fontSize: "0.95rem" }}>
               Crea banners y publicidad profesional con inteligencia artificial en segundos.
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 28 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
               {["Genera imágenes impactantes", "Personaliza tu tienda", "Atrae más compradores"].map(f => (
                 <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.92rem", color: "rgba(255,255,255,0.8)" }}>
                   {checkIcon} {f}
@@ -417,10 +467,10 @@ export default function ParaProveedoresPage() {
               ))}
             </div>
             <Link href="/registro" style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              background: "transparent", color: "#84cc16", fontWeight: 600,
-              padding: "12px 24px", borderRadius: 10, fontSize: "0.9rem",
-              border: "1px solid rgba(132,204,22,0.4)", textDecoration: "none",
+              display: "inline-flex", alignItems: "center", gap: 10,
+              background: "#84cc16", color: "#050505", fontWeight: 700,
+              padding: "13px 26px", borderRadius: 10, fontSize: "0.92rem",
+              textDecoration: "none", boxShadow: "0 4px 20px rgba(132,204,22,0.35)",
             }}>
               Probar Drokex Studio <span>→</span>
             </Link>
