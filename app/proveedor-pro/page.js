@@ -46,14 +46,31 @@ export default function ProveedorProPage() {
       "Muebles elegantes, cómodos y listos para transformar cualquier espacio.",
     heroImage: "",
     ctaText: "Comprar colección",
+    secondaryCtaText: "Conocer marca",
     promoText: "Nueva colección 2026",
+    headerCtaText: "Comprar",
+    trustEyebrow: "Vitrina activa",
+    trustText:
+      "Compra directa, identidad propia y productos listos para compartir con clientes.",
+    stockLabel: "Stock",
+    stockValue: "Local",
     aboutTitle: "Una marca pensada para espacios con estilo",
     aboutText:
       "Creamos productos funcionales, modernos y de alta calidad para hogares que buscan diseño y comodidad.",
     bannerSecondary: "",
     benefit1: "Stock disponible en Colombia",
+    benefit1Text: "Una razón clara para confiar en la marca antes de comprar.",
     benefit2: "Envíos rápidos y seguros",
+    benefit2Text: "Entrega una promesa comercial concreta y fácil de entender.",
     benefit3: "Garantía directa del proveedor",
+    benefit3Text: "Refuerza seguridad, respaldo y decisión de compra.",
+    catalogEyebrow: "Catálogo",
+    catalogTitle: "Productos destacados",
+    catalogText:
+      "Selecciona, cotiza o compra productos directamente desde la vitrina del proveedor.",
+    finalEyebrow: "Listo para comprar",
+    finalTitle: "Descubre la colección de Muebles del Sur",
+    finalCtaText: "Ver catálogo",
     primaryColor: "#c89b5c",
     backgroundColor: "#11100d",
     surfaceColor: "#1c1712",
@@ -91,7 +108,18 @@ export default function ProveedorProPage() {
   }
 
   function updateStore(field, value) {
-    setStore({ ...store, [field]: value });
+    setStore((current) => {
+      const nextStore = { ...current, [field]: value };
+
+      if (
+        field === "brand" &&
+        current.finalTitle === `Descubre la colección de ${current.brand}`
+      ) {
+        nextStore.finalTitle = `Descubre la colección de ${value}`;
+      }
+
+      return nextStore;
+    });
   }
 
   function addProduct() {
@@ -292,14 +320,23 @@ export default function ProveedorProPage() {
                 <Input label="Titulo principal" value={store.heroTitle} onChange={v => updateStore("heroTitle", v)} />
                 <Textarea label="Subtitulo" value={store.heroSubtitle} onChange={v => updateStore("heroSubtitle", v)} />
                 <Input label="Texto del boton" value={store.ctaText} onChange={v => updateStore("ctaText", v)} />
+                <Input label="Boton secundario" value={store.secondaryCtaText} onChange={v => updateStore("secondaryCtaText", v)} />
+                <Input label="Boton del menu" value={store.headerCtaText} onChange={v => updateStore("headerCtaText", v)} />
                 <Input label="Texto promocional" value={store.promoText} onChange={v => updateStore("promoText", v)} />
+                <Input label="Titulo tarjeta de confianza" value={store.trustEyebrow} onChange={v => updateStore("trustEyebrow", v)} />
+                <Textarea label="Texto tarjeta de confianza" value={store.trustText} onChange={v => updateStore("trustText", v)} />
+                <Input label="Etiqueta estadistica" value={store.stockLabel} onChange={v => updateStore("stockLabel", v)} />
+                <Input label="Valor estadistica" value={store.stockValue} onChange={v => updateStore("stockValue", v)} />
                 <ImageUploader label="Imagen de fondo" value={store.heroImage} onChange={v => updateStore("heroImage", v)} />
               </SectionCard>
 
               <SectionCard id="benefits" label="Beneficios" icon={<CheckIcon />} open={openSection === "benefits"} onToggle={() => setOpenSection(s => s === "benefits" ? null : "benefits")}>
                 <Input label="Beneficio 1" value={store.benefit1} onChange={v => updateStore("benefit1", v)} />
+                <Textarea label="Descripcion beneficio 1" value={store.benefit1Text} onChange={v => updateStore("benefit1Text", v)} />
                 <Input label="Beneficio 2" value={store.benefit2} onChange={v => updateStore("benefit2", v)} />
+                <Textarea label="Descripcion beneficio 2" value={store.benefit2Text} onChange={v => updateStore("benefit2Text", v)} />
                 <Input label="Beneficio 3" value={store.benefit3} onChange={v => updateStore("benefit3", v)} />
+                <Textarea label="Descripcion beneficio 3" value={store.benefit3Text} onChange={v => updateStore("benefit3Text", v)} />
                 <ImageUploader label="Banner secundario" value={store.bannerSecondary} onChange={v => updateStore("bannerSecondary", v)} />
               </SectionCard>
 
@@ -312,6 +349,9 @@ export default function ProveedorProPage() {
               </SectionCard>
 
               <SectionCard id="products" label="Productos" icon={<ProductIcon />} open={openSection === "products"} onToggle={() => setOpenSection(s => s === "products" ? null : "products")}>
+                <Input label="Etiqueta de catalogo" value={store.catalogEyebrow} onChange={v => updateStore("catalogEyebrow", v)} />
+                <Input label="Titulo de catalogo" value={store.catalogTitle} onChange={v => updateStore("catalogTitle", v)} />
+                <Textarea label="Texto de catalogo" value={store.catalogText} onChange={v => updateStore("catalogText", v)} />
                 {products.map((product, index) => (
                   <div key={index} style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.3)", padding: "14px", display: "flex", flexDirection: "column", gap: 12 }}>
                     <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 900, color: "#59ff35" }}>Producto {index + 1}</p>
@@ -326,6 +366,9 @@ export default function ProveedorProPage() {
                 <button onClick={addProduct} style={{ width: "100%", borderRadius: 12, border: "1px dashed rgba(89,255,53,0.4)", background: "transparent", color: "#59ff35", fontWeight: 900, fontSize: "0.82rem", padding: "12px", cursor: "pointer" }}>
                   + Agregar producto
                 </button>
+                <Input label="Etiqueta cierre final" value={store.finalEyebrow} onChange={v => updateStore("finalEyebrow", v)} />
+                <Input label="Titulo cierre final" value={store.finalTitle} onChange={v => updateStore("finalTitle", v)} />
+                <Input label="Boton cierre final" value={store.finalCtaText} onChange={v => updateStore("finalCtaText", v)} />
               </SectionCard>
 
               <SectionCard id="style" label="Colores y diseño" icon={<PaletteIcon />} open={openSection === "style"} onToggle={() => setOpenSection(s => s === "style" ? null : "style")}>
@@ -403,7 +446,7 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
             color: store.buttonTextColor,
           }}
         >
-          Comprar
+          {store.headerCtaText}
         </button>
       </header>
 
@@ -455,10 +498,20 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
         >
           {store.ctaText}
         </button>
+        <button
+          className="ml-3 mt-8 rounded-2xl border border-white/15 px-8 py-4 font-black"
+          style={{ color: store.textColor }}
+        >
+          {store.secondaryCtaText}
+        </button>
       </section>
 
       <section className="grid gap-4 p-8 md:grid-cols-3" style={{ backgroundColor: store.backgroundColor }}>
-        {[store.benefit1, store.benefit2, store.benefit3].map((benefit) => (
+        {[
+          [store.benefit1, store.benefit1Text],
+          [store.benefit2, store.benefit2Text],
+          [store.benefit3, store.benefit3Text],
+        ].map(([benefit, description]) => (
           <div
             key={benefit}
             className="rounded-3xl border border-white/10 p-6"
@@ -469,6 +522,9 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
               style={{ backgroundColor: store.primaryColor }}
             />
             <h4 className="font-black">{benefit}</h4>
+            <p className="mt-3 text-sm" style={{ color: store.mutedTextColor }}>
+              {description}
+            </p>
           </div>
         ))}
       </section>
@@ -511,7 +567,13 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
       </section>
 
       <section className="p-8" style={{ backgroundColor: store.backgroundColor }}>
-        <h2 className="text-4xl font-black">Productos destacados</h2>
+        <p className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: store.primaryColor }}>
+          {store.catalogEyebrow}
+        </p>
+        <h2 className="mt-3 text-4xl font-black">{store.catalogTitle}</h2>
+        <p className="mt-3 max-w-2xl text-sm" style={{ color: store.mutedTextColor }}>
+          {store.catalogText}
+        </p>
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {products.map((product, index) => (

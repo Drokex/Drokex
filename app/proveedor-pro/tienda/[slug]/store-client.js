@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const fallbackStore = {
   brand: "Mi Tienda",
@@ -11,14 +11,31 @@ const fallbackStore = {
     "Vuelve al constructor para crear o actualizar el contenido de esta tienda.",
   heroImage: "",
   ctaText: "Ver productos",
+  secondaryCtaText: "Conocer marca",
   promoText: "Pagina publicada",
+  headerCtaText: "Comprar",
+  trustEyebrow: "Vitrina activa",
+  trustText:
+    "Compra directa, identidad propia y productos listos para compartir con clientes.",
+  stockLabel: "Stock",
+  stockValue: "Local",
   aboutTitle: "Contenido pendiente de sincronizar",
   aboutText:
     "Esta vista usa los datos guardados en este navegador cuando presionas Crear landing.",
   bannerSecondary: "",
   benefit1: "Landing personalizada",
+  benefit1Text: "Una razon clara para confiar en la marca antes de comprar.",
   benefit2: "Productos destacados",
+  benefit2Text: "Entrega una promesa comercial concreta y facil de entender.",
   benefit3: "Link para compartir",
+  benefit3Text: "Refuerza seguridad, respaldo y decision de compra.",
+  catalogEyebrow: "Catalogo",
+  catalogTitle: "Productos destacados",
+  catalogText:
+    "Selecciona, cotiza o compra productos directamente desde la vitrina del proveedor.",
+  finalEyebrow: "Listo para comprar",
+  finalTitle: "Descubre la coleccion de Mi Tienda",
+  finalCtaText: "Ver catalogo",
   primaryColor: "#c89b5c",
   backgroundColor: "#11100d",
   surfaceColor: "#1c1712",
@@ -27,18 +44,35 @@ const fallbackStore = {
   buttonTextColor: "#15100a",
 };
 
+const fallbackProducts = [
+  {
+    name: "Producto destacado",
+    category: "Coleccion",
+    price: "0",
+    stock: "Disponible",
+    image: "",
+    description: "Agrega productos desde el constructor para completar esta vitrina.",
+  },
+];
+
 function hexToRgba(hex, alpha) {
-  const normalized = hex.replace("#", "");
+  const normalized = (hex || "#000000").replace("#", "");
   const value =
     normalized.length === 3
       ? normalized.split("").map((char) => `${char}${char}`).join("")
-      : normalized;
+      : normalized.padEnd(6, "0").slice(0, 6);
   const number = Number.parseInt(value, 16);
   const red = (number >> 16) & 255;
   const green = (number >> 8) & 255;
   const blue = number & 255;
 
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
+function formatPrice(price) {
+  const numeric = Number(price);
+  if (!numeric) return "Consultar precio";
+  return `$${numeric.toLocaleString("es-CO")} COP`;
 }
 
 export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
@@ -64,261 +98,378 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
     brand: fallbackBrand || fallbackStore.brand,
     ...(landing?.store || {}),
   };
-  const products = landing?.products || [];
-  const primaryGlow = hexToRgba(store.primaryColor, 0.35);
-  const primarySoft = hexToRgba(store.primaryColor, 0.16);
+
+  const products = landing?.products?.length ? landing.products : fallbackProducts;
+
+  const palette = useMemo(
+    () => ({
+      primary: store.primaryColor,
+      primarySoft: hexToRgba(store.primaryColor, 0.14),
+      primaryGlow: hexToRgba(store.primaryColor, 0.35),
+      bg: store.backgroundColor,
+      surface: store.surfaceColor,
+      text: store.textColor,
+      muted: store.mutedTextColor,
+      buttonText: store.buttonTextColor,
+    }),
+    [store]
+  );
+
+  const stats = [
+    { label: "Productos", value: products.length },
+    { label: "Pais", value: store.country },
+    { label: store.stockLabel || "Stock", value: store.stockValue || "Local" },
+  ];
 
   return (
-    <section
-      className="min-h-screen"
-      style={{
-        backgroundColor: store.backgroundColor,
-        color: store.textColor,
-      }}
+    <main
+      className="min-h-screen scroll-smooth"
+      style={{ backgroundColor: palette.bg, color: palette.text }}
     >
       {!landing && hasLoaded ? (
-        <div className="mx-auto max-w-7xl p-5">
-          <div className="rounded-3xl border border-[#c89b5c]/30 bg-[#c89b5c]/10 p-5">
-          <p className="font-black text-[#c89b5c]">
+        <div className="fixed inset-x-4 top-4 z-50 mx-auto max-w-3xl rounded-3xl border border-white/10 p-4 shadow-2xl backdrop-blur-xl" style={{ backgroundColor: palette.surface }}>
+          <p className="font-black" style={{ color: palette.primary }}>
             Esta landing todavia no tiene datos guardados en este navegador.
           </p>
-          <p className="mt-2 text-sm text-[#c7b9a7]">
+          <p className="mt-1 text-sm" style={{ color: palette.muted }}>
             Vuelve al constructor, ajusta la tienda y presiona Crear landing
             para publicar el contenido en este link.
           </p>
-          </div>
         </div>
       ) : null}
 
-      <div
-        className="min-h-screen w-full overflow-hidden"
-        style={{ backgroundColor: store.surfaceColor }}
+      <header
+        className="fixed inset-x-0 top-0 z-40 border-b border-white/10 backdrop-blur-2xl"
+        style={{ backgroundColor: hexToRgba(store.surfaceColor, 0.82) }}
       >
-        <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-6 py-5 backdrop-blur-xl md:px-10 lg:px-14">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
+          <a href="#inicio" className="flex min-w-0 items-center gap-3">
             {store.logo ? (
               <img
                 src={store.logo}
                 alt={`${store.brand} logo`}
-                className="h-11 w-11 rounded-full object-cover"
+                className="h-12 w-12 shrink-0 rounded-2xl object-cover"
               />
             ) : (
               <div
-                className="flex h-11 w-11 items-center justify-center rounded-full font-black"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-black"
                 style={{
-                  backgroundColor: store.primaryColor,
-                  color: store.buttonTextColor,
+                  backgroundColor: palette.primary,
+                  color: palette.buttonText,
                 }}
               >
                 {store.brand.charAt(0)}
               </div>
             )}
 
-            <div>
+            <div className="min-w-0">
               <p
-                className="text-xs font-black uppercase tracking-[0.2em]"
-                style={{ color: store.primaryColor }}
+                className="text-[10px] font-black uppercase tracking-[0.22em]"
+                style={{ color: palette.primary }}
               >
                 {store.country}
               </p>
-              <h1 className="mt-1 text-3xl font-black">{store.brand}</h1>
+              <h1 className="truncate text-xl font-black md:text-2xl">
+                {store.brand}
+              </h1>
             </div>
-          </div>
+          </a>
 
           <nav
-            className="hidden items-center gap-8 text-sm font-bold md:flex"
-            style={{ color: store.mutedTextColor }}
+            className="hidden items-center gap-7 text-sm font-black lg:flex"
+            style={{ color: palette.muted }}
           >
-            <a href="#inicio">Inicio</a>
-            <a href="#beneficios">Beneficios</a>
-            <a href="#marca">Marca</a>
-            <a href="#productos">Productos</a>
+            <a href="#inicio" className="hover:opacity-100">Inicio</a>
+            <a href="#beneficios" className="hover:opacity-100">Beneficios</a>
+            <a href="#marca" className="hover:opacity-100">Marca</a>
+            <a href="#productos" className="hover:opacity-100">Productos</a>
           </nav>
 
           <a
             href="#productos"
-            className="rounded-2xl px-5 py-3 font-black"
+            className="rounded-2xl px-5 py-3 text-sm font-black transition hover:scale-[1.02]"
             style={{
-              backgroundColor: store.primaryColor,
-              color: store.buttonTextColor,
+              backgroundColor: palette.primary,
+              color: palette.buttonText,
             }}
           >
-            Comprar
+            {store.headerCtaText}
           </a>
-        </header>
+        </div>
+      </header>
 
-        <section
-          id="inicio"
-          className="grid min-h-[calc(100vh-84px)] items-center bg-cover bg-center px-6 py-16 md:px-10 lg:px-14"
-          style={{
-            backgroundColor: store.backgroundColor,
-            backgroundImage: store.heroImage
-              ? `linear-gradient(90deg, rgba(0,0,0,.82), rgba(0,0,0,.22)), url(${store.heroImage})`
-              : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 36%)`,
-          }}
-        >
-          <div className="max-w-3xl">
+      <section
+        id="inicio"
+        className="relative grid min-h-screen overflow-hidden bg-cover bg-center px-4 pb-16 pt-32 sm:px-6 lg:px-10"
+        style={{
+          backgroundColor: palette.bg,
+          backgroundImage: store.heroImage
+            ? `linear-gradient(90deg, ${hexToRgba(store.backgroundColor, 0.94)}, ${hexToRgba(store.backgroundColor, 0.44)}), url(${store.heroImage})`
+            : `radial-gradient(circle at 72% 24%, ${palette.primaryGlow}, transparent 34%)`,
+        }}
+      >
+        <div className="mx-auto grid w-full max-w-[1680px] items-center gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,0.55fr)]">
+          <div className="max-w-4xl">
             <span
-              className="rounded-full px-4 py-2 text-sm font-black"
+              className="inline-flex rounded-full px-4 py-2 text-sm font-black"
               style={{
-                backgroundColor: primarySoft,
-                color: store.primaryColor,
+                backgroundColor: palette.primarySoft,
+                color: palette.primary,
               }}
             >
               {store.promoText}
             </span>
 
-            <h2 className="mt-8 text-6xl font-black leading-none md:text-7xl">
+            <h2 className="mt-8 text-5xl font-black leading-[0.95] sm:text-6xl lg:text-7xl xl:text-8xl">
               {store.heroTitle}
             </h2>
 
             <p
-              className="mt-6 max-w-xl text-lg font-semibold md:text-xl"
-              style={{ color: store.mutedTextColor }}
+              className="mt-6 max-w-2xl text-lg font-semibold leading-relaxed sm:text-xl"
+              style={{ color: palette.muted }}
             >
               {store.heroSubtitle}
             </p>
 
-            <a
-              href="#productos"
-              className="mt-8 inline-flex rounded-2xl px-8 py-4 font-black"
-              style={{
-                backgroundColor: store.primaryColor,
-                color: store.buttonTextColor,
-              }}
-            >
-              {store.ctaText}
-            </a>
+            <div className="mt-9 flex flex-wrap gap-4">
+              <a
+                href="#productos"
+                className="rounded-2xl px-8 py-4 font-black transition hover:scale-[1.03]"
+                style={{
+                  backgroundColor: palette.primary,
+                  color: palette.buttonText,
+                }}
+              >
+                {store.ctaText}
+              </a>
+              <a
+                href="#marca"
+                className="rounded-2xl border border-white/15 px-8 py-4 font-black transition hover:border-white/40"
+                style={{ color: palette.text }}
+              >
+                {store.secondaryCtaText}
+              </a>
+            </div>
           </div>
-        </section>
 
-        <section
-          id="beneficios"
-          className="grid gap-5 px-6 py-10 md:grid-cols-3 md:px-10 lg:px-14"
-          style={{ backgroundColor: store.backgroundColor }}
-        >
-          {[store.benefit1, store.benefit2, store.benefit3].map((benefit) => (
-            <div
+          <aside
+            className="rounded-[2rem] border border-white/10 p-5 shadow-2xl"
+            style={{ backgroundColor: hexToRgba(store.surfaceColor, 0.76) }}
+          >
+            <p className="text-sm font-black uppercase tracking-[0.22em]" style={{ color: palette.primary }}>
+              {store.trustEyebrow}
+            </p>
+            <div className="mt-5 grid gap-3">
+              {stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="flex items-center justify-between rounded-2xl border border-white/10 px-4 py-4"
+                  style={{ backgroundColor: hexToRgba(store.backgroundColor, 0.6) }}
+                >
+                  <span className="text-sm" style={{ color: palette.muted }}>
+                    {stat.label}
+                  </span>
+                  <strong>{stat.value}</strong>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 rounded-3xl p-5" style={{ backgroundColor: palette.primarySoft }}>
+              <p className="text-sm font-bold" style={{ color: palette.muted }}>
+                {store.trustText}
+              </p>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section
+        id="beneficios"
+        className="px-4 py-14 sm:px-6 lg:px-10"
+        style={{ backgroundColor: palette.bg }}
+      >
+        <div className="mx-auto grid max-w-[1680px] gap-5 md:grid-cols-3">
+          {[
+            [store.benefit1, store.benefit1Text],
+            [store.benefit2, store.benefit2Text],
+            [store.benefit3, store.benefit3Text],
+          ].map(([benefit, description], index) => (
+            <article
               key={benefit}
-              className="rounded-3xl border border-white/10 p-6"
-              style={{ backgroundColor: store.surfaceColor }}
+              className="rounded-[2rem] border border-white/10 p-7"
+              style={{ backgroundColor: palette.surface }}
             >
               <div
-                className="mb-4 h-10 w-10 rounded-full"
-                style={{ backgroundColor: store.primaryColor }}
-              />
-              <h3 className="font-black">{benefit}</h3>
-            </div>
+                className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl font-black"
+                style={{
+                  backgroundColor: palette.primary,
+                  color: palette.buttonText,
+                }}
+              >
+                0{index + 1}
+              </div>
+              <h3 className="text-2xl font-black">{benefit}</h3>
+              <p className="mt-3 text-sm leading-relaxed" style={{ color: palette.muted }}>
+                {description}
+              </p>
+            </article>
           ))}
-        </section>
+        </div>
+      </section>
 
-        <section id="marca" className="grid gap-10 px-6 py-16 md:grid-cols-2 md:px-10 lg:px-14">
+      <section
+        id="marca"
+        className="px-4 py-20 sm:px-6 lg:px-10"
+        style={{ backgroundColor: palette.surface }}
+      >
+        <div className="mx-auto grid max-w-[1680px] items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <p
               className="text-sm font-black uppercase tracking-[0.24em]"
-              style={{ color: store.primaryColor }}
+              style={{ color: palette.primary }}
             >
               Nuestra marca
             </p>
-            <h2 className="text-4xl font-black">{store.aboutTitle}</h2>
-            <p className="mt-4" style={{ color: store.mutedTextColor }}>
+            <h2 className="mt-4 text-4xl font-black leading-tight md:text-6xl">
+              {store.aboutTitle}
+            </h2>
+            <p
+              className="mt-6 max-w-2xl text-lg leading-relaxed"
+              style={{ color: palette.muted }}
+            >
               {store.aboutText}
             </p>
           </div>
 
           <div
-            className="min-h-[280px] overflow-hidden rounded-[2rem]"
-            style={{ backgroundColor: store.backgroundColor }}
+            className="min-h-[380px] overflow-hidden rounded-[2.5rem] border border-white/10"
+            style={{ backgroundColor: palette.bg }}
           >
             {store.bannerSecondary ? (
               <img
                 src={store.bannerSecondary}
                 alt="Banner secundario"
-                className="h-full w-full object-cover"
+                className="h-full min-h-[380px] w-full object-cover"
               />
             ) : (
-              <div
-                className="flex h-full items-center justify-center"
-                style={{ color: store.mutedTextColor }}
-              >
-                Banner secundario
+              <div className="flex min-h-[380px] items-center justify-center px-8 text-center" style={{ color: palette.muted }}>
+                Agrega un banner secundario para contar mejor la historia visual
+                de tu marca.
               </div>
             )}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section
-          id="productos"
-          className="px-6 py-16 md:px-10 lg:px-14"
-          style={{ backgroundColor: store.backgroundColor }}
-        >
-          <h2 className="text-4xl font-black">Productos destacados</h2>
+      <section
+        id="productos"
+        className="px-4 py-20 sm:px-6 lg:px-10"
+        style={{ backgroundColor: palette.bg }}
+      >
+        <div className="mx-auto max-w-[1680px]">
+          <div className="flex flex-wrap items-end justify-between gap-5">
+            <div>
+              <p
+                className="text-sm font-black uppercase tracking-[0.24em]"
+                style={{ color: palette.primary }}
+              >
+                {store.catalogEyebrow}
+              </p>
+              <h2 className="mt-4 text-4xl font-black md:text-6xl">
+                {store.catalogTitle}
+              </h2>
+            </div>
+            <p className="max-w-md text-sm leading-relaxed" style={{ color: palette.muted }}>
+              {store.catalogText}
+            </p>
+          </div>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
             {products.map((product, index) => (
               <article
-                key={index}
-                className="overflow-hidden rounded-[2rem] border border-white/10 p-4"
-                style={{ backgroundColor: store.surfaceColor }}
+                key={`${product.name}-${index}`}
+                className="group overflow-hidden rounded-[2rem] border border-white/10 p-4 transition hover:-translate-y-1"
+                style={{ backgroundColor: palette.surface }}
               >
                 <div
-                  className="h-56 overflow-hidden rounded-[1.5rem]"
-                  style={{ backgroundColor: store.backgroundColor }}
+                  className="relative h-64 overflow-hidden rounded-[1.5rem]"
+                  style={{ backgroundColor: palette.bg }}
                 >
                   {product.image ? (
                     <img
                       src={product.image}
                       alt={product.name || "Producto"}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <div
-                      className="flex h-full items-center justify-center"
-                      style={{ color: store.mutedTextColor }}
-                    >
+                    <div className="flex h-full items-center justify-center px-6 text-center" style={{ color: palette.muted }}>
                       Imagen producto
                     </div>
                   )}
+                  <span
+                    className="absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-black"
+                    style={{
+                      backgroundColor: palette.primary,
+                      color: palette.buttonText,
+                    }}
+                  >
+                    {product.category || "Categoria"}
+                  </span>
                 </div>
 
-                <p
-                  className="mt-4 text-xs font-black"
-                  style={{ color: store.primaryColor }}
-                >
-                  {product.category || "Categoria"}
-                </p>
-                <h3 className="mt-1 text-xl font-black">
-                  {product.name || "Nombre producto"}
-                </h3>
-                <p className="mt-2 text-sm" style={{ color: store.mutedTextColor }}>
-                  {product.description || "Descripcion del producto"}
-                </p>
-                <p
-                  className="mt-4 text-xl font-black"
-                  style={{ color: store.primaryColor }}
-                >
-                  {product.price
-                    ? `$${Number(product.price).toLocaleString("es-CO")} COP`
-                    : "$0 COP"}
-                </p>
-                <p className="text-sm" style={{ color: store.mutedTextColor }}>
-                  Stock: {product.stock || "0"}
-                </p>
-
-                <button
-                  className="mt-5 w-full rounded-xl px-5 py-3 font-black"
-                  style={{
-                    backgroundColor: store.primaryColor,
-                    color: store.buttonTextColor,
-                  }}
-                >
-                  Agregar al carrito
-                </button>
+                <div className="p-2 pt-5">
+                  <h3 className="text-2xl font-black">
+                    {product.name || "Nombre producto"}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed" style={{ color: palette.muted }}>
+                    {product.description || "Descripcion del producto"}
+                  </p>
+                  <p className="mt-5 text-2xl font-black" style={{ color: palette.primary }}>
+                    {formatPrice(product.price)}
+                  </p>
+                  <p className="mt-1 text-sm" style={{ color: palette.muted }}>
+                    Stock: {product.stock || "0"}
+                  </p>
+                  <button
+                    className="mt-5 w-full rounded-2xl px-5 py-4 font-black transition hover:scale-[1.02]"
+                    style={{
+                      backgroundColor: palette.primary,
+                      color: palette.buttonText,
+                    }}
+                  >
+                    Agregar al carrito
+                  </button>
+                </div>
               </article>
             ))}
           </div>
-        </section>
-      </div>
-    </section>
+        </div>
+      </section>
+
+      <section className="px-4 pb-20 sm:px-6 lg:px-10" style={{ backgroundColor: palette.bg }}>
+        <div
+          className="mx-auto max-w-[1680px] rounded-[2.5rem] border border-white/10 p-8 md:p-12"
+          style={{ backgroundColor: palette.surface }}
+        >
+          <p className="text-sm font-black uppercase tracking-[0.24em]" style={{ color: palette.primary }}>
+            {store.finalEyebrow}
+          </p>
+          <div className="mt-5 flex flex-wrap items-end justify-between gap-6">
+            <h2 className="max-w-3xl text-4xl font-black leading-tight md:text-6xl">
+              {store.finalTitle}
+            </h2>
+            <a
+              href="#productos"
+              className="rounded-2xl px-8 py-4 font-black"
+              style={{
+                backgroundColor: palette.primary,
+                color: palette.buttonText,
+              }}
+            >
+              {store.finalCtaText}
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
