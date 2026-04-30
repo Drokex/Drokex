@@ -10,22 +10,22 @@ const FRICTION = 0.82;
 const SPRITE_FRAMES = 6;
 const SPRITE_SRC_W = 1424 / SPRITE_FRAMES;
 const SPRITE_SRC_H = 510;
-const TOTAL_LEVELS = 10;
+const TOTAL_LEVELS = 15;
 const HIGH_SCORE_STORAGE_KEY = "drokex-game-high-scores";
 const POWER_COST = 40;
 const POWER_COOLDOWN = 50;
 
 function buildLevel(index) {
   const difficulty = index + 1;
-  const isFinalLevel = index === 9;
+  const isFinalLevel = index === 14;
   const isBoss = (difficulty % 3 === 0) || isFinalLevel;
-  const castleNum = isFinalLevel ? 4 : (isBoss ? Math.ceil(difficulty / 3) : 0);
-  const width = 2500 + index * 400;
+  const castleNum = isFinalLevel ? 5 : (isBoss ? Math.ceil(difficulty / 3) : 0);
+  const width = 2500 + index * 420;
 
   const platforms = [];
-  const groundSegments = Math.min(3 + Math.floor(index * 0.65), 10);
-  const gap = 72 + index * 15;
-  const minGroundWidth = 260;
+  const groundSegments = Math.min(3 + Math.floor(index * 0.55), 11);
+  const gap = 68 + index * 13;
+  const minGroundWidth = 240;
   const totalGapWidth = gap * (groundSegments - 1);
   const segmentWidth = Math.max(minGroundWidth, Math.floor((width - totalGapWidth) / groundSegments));
   let x = 0;
@@ -35,21 +35,21 @@ function buildLevel(index) {
     x += segmentWidth + gap;
   }
 
-  const floatingCount = 5 + Math.floor(index * 1.3);
+  const floatingCount = 5 + Math.floor(index * 1.4);
   for (let i = 0; i < floatingCount; i++) {
-    const px = 300 + i * Math.max(190, Math.floor((width - 620) / Math.max(1, floatingCount - 1)));
-    const yPattern = [375, 315, 350, 290, 335, 300];
-    const py = yPattern[(i + index) % yPattern.length] - Math.min(index * 4, 32);
+    const px = 300 + i * Math.max(175, Math.floor((width - 580) / Math.max(1, floatingCount - 1)));
+    const yPattern = [370, 310, 345, 285, 330, 295];
+    const py = yPattern[(i + index) % yPattern.length] - Math.min(index * 5, 40);
     platforms.push({
-      x: Math.min(px, width - 280),
-      y: Math.max(245, py),
-      w: Math.max(90, 178 - index * 8),
+      x: Math.min(px, width - 260),
+      y: Math.max(230, py),
+      w: Math.max(80, 172 - index * 7),
       h: 28,
     });
   }
 
   const coins = [];
-  const coinCount = 12 + index * 2;
+  const coinCount = 14 + index * 2;
   for (let i = 0; i < coinCount; i++) {
     const basePlatform = platforms[3 + (i % floatingCount)] || platforms[i % platforms.length];
     coins.push({
@@ -60,72 +60,105 @@ function buildLevel(index) {
   coins.push({ x: width - 220, y: 430 });
 
   const enemies = [];
+  const baseSpeed = 2.4 + index * 0.45;
+
   if (!isFinalLevel) {
-    const enemyCount = Math.min(3 + Math.floor(index * 0.85), 12);
+    const enemyCount = Math.min(4 + Math.floor(index * 0.95), 14);
     for (let i = 0; i < enemyCount; i++) {
       const ground = platforms[i % groundSegments];
       const minX = ground.x + 45;
       const maxX = Math.max(minX + 130, ground.x + ground.w - 80);
       const startX = ground.x < 300 ? Math.max(minX + 30, Math.min(500, maxX - 10)) : minX + 30;
       const ex = Math.max(minX, Math.min(startX, maxX - 10));
-      enemies.push({ x: ex, y: 440, w: 42, h: 40, minX, maxX, vx: 2.6 + index * 0.42 + i * 0.22 });
-    }
-    const flyingCount = Math.floor(index * 0.65);
-    for (let i = 0; i < flyingCount; i++) {
-      const fx = 600 + i * Math.floor((width - 800) / Math.max(1, flyingCount));
-      const baseY = 185 + (i % 4) * 58;
+      const isChaser = index >= 3 && (i % Math.max(1, 5 - Math.floor(index / 3)) === 0);
+      const canShoot = index >= 5 && !isChaser && (i % Math.max(1, 4 - Math.floor(index / 4)) === 1);
       enemies.push({
-        x: Math.min(fx, width - 200), y: baseY, w: 40, h: 34,
-        minX: Math.max(300, fx - 240), maxX: Math.min(width - 100, fx + 240),
-        vx: 3 + index * 0.38 + i * 0.16, isFlying: true, baseY, floatPhase: i * (Math.PI / 2.2),
+        x: ex, y: 440, w: 44, h: 42,
+        minX, maxX,
+        vx: baseSpeed + i * 0.18,
+        isChaser,
+        canShoot,
+        shootCooldown: canShoot ? 60 + Math.random() * 80 : 0,
+        maxShootCooldown: Math.max(50, 140 - index * 6),
+        isVoid: index >= 12,
+      });
+    }
+    const flyingCount = 1 + Math.floor(index * 0.7);
+    for (let i = 0; i < flyingCount; i++) {
+      const fx = 500 + i * Math.floor((width - 700) / Math.max(1, flyingCount));
+      const baseY = 180 + (i % 4) * 55;
+      const isChaser = index >= 6 && (i % Math.max(1, 3 - Math.floor(index / 5)) === 0);
+      const canShoot = index >= 5 && !isChaser && (i % 2 === 0);
+      enemies.push({
+        x: Math.min(fx, width - 200), y: baseY, w: 42, h: 36,
+        minX: Math.max(280, fx - 260), maxX: Math.min(width - 100, fx + 260),
+        vx: 2.8 + index * 0.35 + i * 0.14,
+        isFlying: true, baseY, floatPhase: i * (Math.PI / 2.2),
+        isChaser,
+        canShoot,
+        shootCooldown: canShoot ? 40 + Math.random() * 60 : 0,
+        maxShootCooldown: Math.max(45, 130 - index * 7),
+        isVoid: index >= 12,
       });
     }
   } else {
-    // Final level: only ghost minions + boss (no ground enemies)
-    for (let i = 0; i < 5; i++) {
-      const fx = 500 + i * Math.floor((width - 700) / 4);
-      const baseY = 155 + (i % 3) * 75;
+    for (let i = 0; i < 7; i++) {
+      const fx = 400 + i * Math.floor((width - 600) / 6);
+      const baseY = 140 + (i % 3) * 80;
       enemies.push({
-        x: Math.min(fx, width - 200), y: baseY, w: 40, h: 34,
-        minX: Math.max(200, fx - 320), maxX: Math.min(width - 100, fx + 320),
-        vx: 3.8 + i * 0.25, isFlying: true, baseY, floatPhase: i * (Math.PI / 2.5),
+        x: Math.min(fx, width - 200), y: baseY, w: 44, h: 38,
+        minX: Math.max(180, fx - 350), maxX: Math.min(width - 100, fx + 350),
+        vx: 4.2 + i * 0.3, isFlying: true, baseY, floatPhase: i * (Math.PI / 2.5),
+        isChaser: i % 2 === 0,
+        canShoot: i % 2 === 1,
+        shootCooldown: 50 + i * 15,
+        maxShootCooldown: 55,
+        isVoid: true,
       });
     }
   }
 
   if (isFinalLevel) {
-    // Ghost final boss — chases the player
     const midX = Math.floor(width * 0.5);
     enemies.push({
-      x: midX, y: 220, w: 96, h: 96,
-      minX: 80, maxX: width - 160,
-      vx: 0, hp: 12, maxHp: 12,
+      x: midX, y: 200, w: 110, h: 110,
+      minX: 60, maxX: width - 160,
+      vx: 0, hp: 18, maxHp: 18,
       isBosse: true, isFinalBoss: true,
+      canShoot: true, shootCooldown: 80, maxShootCooldown: 60,
+      isVoid: true,
     });
   } else if (isBoss) {
     const midX = Math.floor(width * 0.55);
-    const bossHP = 2 * castleNum + 1;
-    const bossW = 60 + castleNum * 14;
-    const bossH = 60 + castleNum * 9;
+    const bossHP = 3 * castleNum + 2;
+    const bossW = 62 + castleNum * 14;
+    const bossH = 62 + castleNum * 9;
     enemies.push({
       x: midX, y: 480 - bossH, w: bossW, h: bossH,
-      minX: midX - 270, maxX: midX + 270,
-      vx: 1.8 + index * 0.18, hp: bossHP, maxHp: bossHP,
+      minX: midX - 280, maxX: midX + 280,
+      vx: 1.6 + index * 0.2, hp: bossHP, maxHp: bossHP,
       isBosse: true, castleNum,
+      canShoot: castleNum >= 3,
+      shootCooldown: 90, maxShootCooldown: 80,
     });
     for (let fi = 0; fi < castleNum - 1; fi++) {
-      const fmx = midX + (fi % 2 === 0 ? -380 : 380);
-      const fmy = 205 + fi * 55;
+      const fmx = midX + (fi % 2 === 0 ? -400 : 400);
+      const fmy = 200 + fi * 55;
+      const isChaser = fi % 2 === 0 && castleNum >= 3;
       enemies.push({
-        x: fmx, y: fmy, w: 42, h: 36,
-        minX: midX - 550, maxX: midX + 550,
-        vx: 3.2 + castleNum * 0.55, isFlying: true, baseY: fmy, floatPhase: fi * Math.PI,
+        x: fmx, y: fmy, w: 44, h: 38,
+        minX: midX - 580, maxX: midX + 580,
+        vx: 3 + castleNum * 0.5, isFlying: true, baseY: fmy, floatPhase: fi * Math.PI,
+        isChaser,
+        canShoot: !isChaser && castleNum >= 4,
+        shootCooldown: 70 + fi * 20,
+        maxShootCooldown: 75,
       });
     }
   }
 
   return {
-    name: isFinalLevel ? "Jefe Final" : isBoss ? `Castillo ${castleNum}` : `Nivel ${difficulty}`,
+    name: isFinalLevel ? "Jefe del Vacío" : isBoss ? `Castillo ${castleNum}` : `Nivel ${difficulty}`,
     isBoss, isFinalLevel, castleNum, width, platforms, coins, enemies,
     flag: { x: width - 160, y: 380, w: 44, h: 100 },
   };
@@ -136,7 +169,7 @@ const LEVELS = Array.from({ length: TOTAL_LEVELS }, (_, i) => buildLevel(i));
 function newState() {
   return {
     stopped: false, currentLevel: 0, coins: 0, lives: 3,
-    cameraX: 0, frame: 0, projectiles: [],
+    cameraX: 0, frame: 0, projectiles: [], enemyProjectiles: [],
     impacts: [], particles: [], screenShake: 0,
     powerCooldown: 0, bossAnnounce: 0, levelAnnounce: 90,
     invincibleFrames: 80, // grace period at game start
@@ -216,7 +249,7 @@ export default function AprendePage() {
     const ctx = canvas.getContext("2d");
     const sprite = new Image();
     sprite.src = "/game-sprite.png";
-    const bgImages = ["/aprende-bg-city.png", "/aprende-bg-volcano.png", "/aprende-bg-forest.png", "/aprende-bg-ghost.png"].map((src) => {
+    const bgImages = ["/aprende-bg-city.png", "/aprende-bg-volcano.png", "/aprende-bg-forest.png", "/aprende-bg-ghost.png", "/aprende-bg-ghost.png"].map((src) => {
       const img = new Image();
       img.src = src;
       return img;
@@ -305,6 +338,7 @@ export default function AprendePage() {
       g.levelCoins = LEVELS[idx].coins.map((c) => ({ ...c, collected: false }));
       g.levelEnemies = LEVELS[idx].enemies.map((e) => ({ ...e }));
       g.projectiles = [];
+      g.enemyProjectiles = [];
       g.impacts = [];
       g.particles = [];
       g.screenShake = 12;
@@ -326,6 +360,7 @@ export default function AprendePage() {
       else {
         setHudLives(g.lives);
         g.projectiles = [];
+        g.enemyProjectiles = [];
         g.impacts = [];
         g.particles = [];
         g.screenShake = 16;
@@ -350,13 +385,14 @@ export default function AprendePage() {
       }
     }
 
-    // world 0=ciudad, 1=volcán, 2=bosque, 3=fantasma
-    function worldOf(idx) { return idx === 9 ? 3 : Math.min(2, Math.floor(idx / 3)); }
+    // world 0=ciudad, 1=volcán, 2=bosque, 3=fantasma, 4=vacío
+    function worldOf(idx) { return Math.min(4, Math.floor(idx / 3)); }
     function worldTheme(idx) {
       const w = worldOf(idx);
       if (w === 1) return { glow: "#ff5a00", glowSoft: "rgba(255,90,0,0.25)", edge: "#ff7a00", accent: "#ffd166", fog: "rgba(255,64,0,0.12)" };
       if (w === 2) return { glow: "#00ff66", glowSoft: "rgba(0,255,102,0.22)", edge: "#12d66f", accent: "#a7ff83", fog: "rgba(0,255,102,0.1)" };
       if (w === 3) return { glow: "#84d8ff", glowSoft: "rgba(132,216,255,0.22)", edge: "#62b7ff", accent: "#d8f4ff", fog: "rgba(120,170,255,0.12)" };
+      if (w === 4) return { glow: "#cc44ff", glowSoft: "rgba(204,68,255,0.22)", edge: "#aa00ff", accent: "#ee88ff", fog: "rgba(100,0,200,0.15)" };
       return { glow: "#ff9b21", glowSoft: "rgba(255,155,33,0.23)", edge: "#ff8500", accent: "#ffe08a", fog: "rgba(255,133,0,0.1)" };
     }
     function roundRect(x, y, w, h, r) {
@@ -508,6 +544,38 @@ export default function AprendePage() {
             ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo((x1+x2)/2+20,(y1+y2)/2); ctx.lineTo(x2,y2); ctx.stroke();
           });
         }
+
+      } else if (w === 4) {
+        // ── Mundo 4: El Vacío ──
+        const gv = ctx.createLinearGradient(0, 0, 0, H);
+        gv.addColorStop(0, "#000000"); gv.addColorStop(1, "#0a0018");
+        ctx.fillStyle = gv; ctx.fillRect(0, 0, W, H);
+        const stars = [
+          [50,30],[120,80],[200,20],[320,60],[450,30],[600,70],[720,25],
+          [760,90],[80,110],[400,100],[550,50],[850,40],[900,100],
+          [150,150],[700,140],[350,170],[480,60],[230,130],[810,55],[660,120],
+        ];
+        for (const [sx, sy] of stars) {
+          ctx.globalAlpha = 0.25 + 0.5 * Math.sin(frame * 0.07 + sx);
+          ctx.fillStyle = "#cc44ff"; ctx.fillRect(sx, sy, 2, 2);
+        }
+        ctx.globalAlpha = 1;
+        for (let oi = 0; oi < 5; oi++) {
+          const ox = (oi * 180 + 60 + frame * 0.1) % W;
+          const oy = 60 + (oi * 110) % (H - 180);
+          ctx.globalAlpha = 0.04 + 0.03 * Math.sin(frame * 0.05 + oi);
+          ctx.fillStyle = "#9900ff";
+          ctx.beginPath(); ctx.ellipse(ox, oy, 80 + oi * 20, 18, 0, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.globalAlpha = 0.08 + 0.04 * Math.sin(frame * 0.03);
+        ctx.fillStyle = "#660099";
+        for (let rx = 0; rx < W; rx += 60) {
+          ctx.fillRect(rx, 0, 1, H);
+        }
+        for (let ry = 0; ry < H; ry += 60) {
+          ctx.fillRect(0, ry, W, 1);
+        }
+        ctx.globalAlpha = 1;
 
       } else {
         // ── Mundo 0: Ciudad Nocturna ──
@@ -797,6 +865,32 @@ export default function AprendePage() {
             ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 9, e.y + 9, 3, 3); ctx.fillRect(e.x + e.w - 11, e.y + 9, 3, 3);
             ctx.fillStyle = "#330066"; ctx.fillRect(e.x + 7, e.y - 8, 3, 8); ctx.fillRect(e.x + e.w - 10, e.y - 8, 3, 8);
             ctx.fillStyle = "#cc00ff"; ctx.fillRect(e.x + 5, e.y - 11, 7, 4); ctx.fillRect(e.x + e.w - 12, e.y - 11, 7, 4);
+          } else if (e.isVoid || wFly === 4) {
+            // ── Void Phantom — flying shooter, dark with purple glow ──
+            const vpt = frame * 0.08 + (e.floatPhase || 0);
+            const flap = Math.sin(vpt * 2.2) > 0;
+            ctx.fillStyle = "#0a0018";
+            if (flap) {
+              ctx.fillRect(e.x - 24, e.y + 2, 24, 16); ctx.fillRect(e.x + e.w, e.y + 2, 24, 16);
+              ctx.fillRect(e.x - 30, e.y - 6, 12, 12); ctx.fillRect(e.x + e.w + 18, e.y - 6, 12, 12);
+            } else {
+              ctx.fillRect(e.x - 20, e.y + 10, 20, 12); ctx.fillRect(e.x + e.w, e.y + 10, 20, 12);
+              ctx.fillRect(e.x - 24, e.y + 20, 10, 8); ctx.fillRect(e.x + e.w + 14, e.y + 20, 10, 8);
+            }
+            ctx.globalAlpha = 0.5 + 0.3 * Math.sin(vpt * 3);
+            ctx.fillStyle = "#9900ff";
+            ctx.beginPath(); ctx.arc(e.x - (flap ? 12 : 10), e.y + (flap ? 10 : 16), 5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(e.x + e.w + (flap ? 12 : 10), e.y + (flap ? 10 : 16), 5, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#1a0035"; ctx.fillRect(e.x, e.y, e.w, e.h);
+            ctx.fillStyle = "#cc44ff"; ctx.fillRect(e.x + 6, e.y + 6, 10, 10); ctx.fillRect(e.x + e.w - 16, e.y + 6, 10, 10);
+            ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 9, e.y + 9, 4, 4); ctx.fillRect(e.x + e.w - 13, e.y + 9, 4, 4);
+            if (e.canShoot) {
+              ctx.globalAlpha = 0.4 + 0.4 * Math.sin(vpt * 6);
+              ctx.fillStyle = "#ff44ff";
+              ctx.beginPath(); ctx.arc(e.x + e.w / 2, e.y + e.h / 2, 14, 0, Math.PI * 2); ctx.fill();
+              ctx.globalAlpha = 1;
+            }
           } else {
             // ── Blue bat (World 0 / World 3 ghost minions) ──
             const flap = Math.sin(frame * 0.22 + (e.floatPhase || 0)) > 0;
@@ -819,7 +913,27 @@ export default function AprendePage() {
 
         } else {
           const wGnd = worldOf(gRef.current.currentLevel);
-          if (wGnd === 1) {
+          if (e.isVoid || wGnd === 4) {
+            // ── Void Specter — angular dark creature, purple cracks ──
+            const vt = frame * 0.06 + (e.x * 0.01);
+            ctx.fillStyle = "#0a0018"; ctx.fillRect(e.x, e.y, e.w, e.h);
+            ctx.globalAlpha = 0.4 + 0.3 * Math.sin(vt * 2);
+            ctx.fillStyle = "#9900ff"; ctx.fillRect(e.x - 4, e.y + 3, 7, 10); ctx.fillRect(e.x + e.w - 3, e.y + 3, 7, 10);
+            ctx.globalAlpha = 0.7 + 0.3 * Math.sin(vt * 3);
+            ctx.strokeStyle = "#cc44ff"; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(e.x + 8, e.y + 4); ctx.lineTo(e.x + 14, e.y + e.h * 0.5); ctx.lineTo(e.x + 9, e.y + e.h * 0.7); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(e.x + e.w - 9, e.y + 6); ctx.lineTo(e.x + e.w - 16, e.y + e.h * 0.48); ctx.lineTo(e.x + e.w - 8, e.y + e.h * 0.72); ctx.stroke();
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#cc44ff"; ctx.fillRect(e.x + 7, e.y + 8, 10, 8); ctx.fillRect(e.x + e.w - 17, e.y + 8, 10, 8);
+            ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 10, e.y + 10, 4, 4); ctx.fillRect(e.x + e.w - 14, e.y + 10, 4, 4);
+            if (e.canShoot) {
+              const chargeGlow = 0.3 + 0.4 * Math.sin(vt * 8);
+              ctx.globalAlpha = chargeGlow;
+              ctx.fillStyle = "#ff44ff";
+              ctx.beginPath(); ctx.arc(e.x + e.w / 2, e.y - 8, 5, 0, Math.PI * 2); ctx.fill();
+              ctx.globalAlpha = 1;
+            }
+          } else if (wGnd === 1) {
             // ── Lava Golem — dark grey body, orange crack lines, yellow eyes ──
             const gt = frame * 0.05;
             ctx.fillStyle = "#2a2a2a"; ctx.fillRect(e.x, e.y, e.w, e.h);
@@ -892,6 +1006,37 @@ export default function AprendePage() {
         ctx.beginPath(); ctx.arc(proj.x, proj.y, 10, 0, Math.PI * 2); ctx.fill();
         ctx.globalAlpha = 0.35;
         ctx.beginPath(); ctx.arc(proj.x - dir * 21, proj.y, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+      ctx.restore();
+    }
+
+    function drawEnemyProjectiles(camX, enemyProjectiles) {
+      if (!enemyProjectiles.length) return;
+      ctx.save();
+      ctx.translate(-camX, 0);
+      for (const ep of enemyProjectiles) {
+        const dir = ep.vx >= 0 ? 1 : -1;
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        ctx.shadowColor = ep.isVoid ? "#cc44ff" : "#ff2200";
+        ctx.shadowBlur = 22;
+        const beam = ctx.createLinearGradient(ep.x - dir * 32, ep.y, ep.x + dir * 8, ep.y);
+        beam.addColorStop(0, "rgba(255,0,0,0)");
+        beam.addColorStop(1, ep.isVoid ? "#cc44ff" : "#ff2200");
+        ctx.strokeStyle = beam;
+        ctx.lineWidth = 6;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(ep.x - dir * 32, ep.y);
+        ctx.lineTo(ep.x + dir * 6, ep.y);
+        ctx.stroke();
+        const pg = ctx.createRadialGradient(ep.x, ep.y, 1, ep.x, ep.y, 9);
+        pg.addColorStop(0, "#ffffff");
+        pg.addColorStop(0.4, ep.isVoid ? "#ee88ff" : "#ff6600");
+        pg.addColorStop(1, ep.isVoid ? "#aa00ff" : "#cc0000");
+        ctx.fillStyle = pg;
+        ctx.beginPath(); ctx.arc(ep.x, ep.y, 8, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
       }
       ctx.restore();
@@ -1312,19 +1457,56 @@ export default function AprendePage() {
       for (const e of g.levelEnemies) {
         if (e.dead) continue;
         if (e.isFinalBoss) {
-          // Ghost chases player slowly
           const tx = p.x + p.w / 2 - e.w / 2;
           const ty = p.y + p.h / 2 - e.h / 2 - 30;
-          e.x += (tx - e.x) * 0.016;
-          e.y += (ty - e.y) * 0.013;
-          e.y += Math.sin(g.frame * 0.06) * 1.5; // eerie floating
+          e.x += (tx - e.x) * 0.02;
+          e.y += (ty - e.y) * 0.016;
+          e.y += Math.sin(g.frame * 0.06) * 1.5;
           e.x = Math.max(e.minX, Math.min(e.maxX, e.x));
           e.y = Math.max(55, Math.min(430, e.y));
+        } else if (e.isChaser) {
+          const dx = (p.x + p.w / 2) - (e.x + e.w / 2);
+          const chaserSpd = (e.vx > 0 ? 1 : -1) * Math.abs(e.vx) * 1.15;
+          const moveDir = dx > 0 ? 1 : -1;
+          e.x += moveDir * Math.abs(chaserSpd);
+          e.x = Math.max(e.minX, Math.min(e.maxX - e.w, e.x));
+          if (e.isFlying) {
+            const dy = (p.y + p.h / 2) - (e.y + e.h / 2);
+            e.y += (dy > 0 ? 1 : -1) * Math.abs(chaserSpd) * 0.65;
+            e.y = Math.max(55, Math.min(440, e.y));
+          } else {
+            e.y = 440;
+          }
         } else {
           e.x += e.vx;
           if (e.x < e.minX) { e.x = e.minX; e.vx = Math.abs(e.vx); }
           else if (e.x + e.w > e.maxX) { e.x = e.maxX - e.w; e.vx = -Math.abs(e.vx); }
           if (e.isFlying) e.y = e.baseY + Math.sin(g.frame * 0.05 + (e.floatPhase || 0)) * 22;
+        }
+
+        // Shooting enemies
+        if (e.canShoot) {
+          if (e.shootCooldown > 0) {
+            e.shootCooldown--;
+          } else {
+            const dx = (p.x + p.w / 2) - (e.x + e.w / 2);
+            const dy = (p.y + p.h / 2) - (e.y + e.h / 2);
+            const dist = Math.hypot(dx, dy);
+            if (dist < 520) {
+              const spd = 5.5 + (g.currentLevel * 0.12);
+              g.enemyProjectiles.push({
+                x: e.x + e.w / 2,
+                y: e.y + e.h / 2,
+                vx: (dx / dist) * spd,
+                vy: (dy / dist) * spd,
+                isVoid: !!e.isVoid,
+              });
+              playSound("hit");
+              e.shootCooldown = e.maxShootCooldown || 100;
+            } else {
+              e.shootCooldown = 25;
+            }
+          }
         }
 
         if (g.invincibleFrames > 0) continue;
@@ -1343,6 +1525,17 @@ export default function AprendePage() {
         }
       }
       g.levelEnemies = g.levelEnemies.filter((e) => !e.dead);
+
+      // Enemy projectiles
+      for (const ep of g.enemyProjectiles) { ep.x += ep.vx; ep.y += ep.vy; }
+      g.enemyProjectiles = g.enemyProjectiles.filter((ep) => {
+        if (ep.x < -100 || ep.x > lev.width + 100 || ep.y < -100 || ep.y > H + 100) return false;
+        if (g.invincibleFrames <= 0 && overlap({ x: ep.x - 9, y: ep.y - 9, w: 18, h: 18 }, p)) {
+          loseLife(); if (g.stopped) return false;
+          return false;
+        }
+        return true;
+      });
 
       // Boss alive check
       const bossAlive = lev.isBoss && g.levelEnemies.some((e) => e.isBosse);
@@ -1389,6 +1582,7 @@ export default function AprendePage() {
       drawCoins(g.cameraX, g.levelCoins);
       drawEnemies(g.cameraX, g.levelEnemies, g.frame);
       drawProjectiles(g.cameraX, g.projectiles);
+      drawEnemyProjectiles(g.cameraX, g.enemyProjectiles);
       drawImpacts(g.cameraX, g.impacts);
       drawParticles(g.cameraX, g.particles);
       drawFlag(g.cameraX, bossAlive);
@@ -1526,7 +1720,7 @@ export default function AprendePage() {
           <kbd style={kbdStyle}>←</kbd> <kbd style={kbdStyle}>→</kbd> moverse &nbsp;·&nbsp;
           <kbd style={kbdStyle}>↑/W</kbd> saltar (doble) &nbsp;·&nbsp;
           <kbd style={kbdStyle}>Z</kbd> correr &nbsp;·&nbsp;
-          <kbd style={kbdStyle}>X</kbd> poder (40 monedas)
+          <kbd style={kbdStyle}>X</kbd> poder (10 monedas)
         </p>
         <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", boxShadow: "0 0 60px rgba(255,133,0,0.2), 0 0 0 2px rgba(255,133,0,0.3)" }}>
           <canvas ref={canvasRef} width={W} height={H} style={{ display: "block", maxWidth: "100%" }} />
