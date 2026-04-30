@@ -315,13 +315,18 @@ export default function ParaProveedoresPage() {
       {/* ── EXPERIENCIA ─────────────────────────────────── */}
       <section style={{ padding: "40px 0 80px" }}>
         <div className="shell">
-          <div style={{
-            position: "relative", borderRadius: 20, overflow: "hidden",
-            border: "1px solid rgba(132,204,22,0.15)", minHeight: 280,
-            display: "grid", gridTemplateColumns: "420px 1fr",
-          }}>
-            {/* Left text */}
-            <div style={{ position: "relative", zIndex: 2, padding: "44px 40px", background: "rgba(5,5,5,0.72)" }}>
+          <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(132,204,22,0.15)", minHeight: 320 }}>
+            {/* Background image */}
+            <img
+              src="/banner tiendas drokex virtual .jpg"
+              alt="Drokex mundo virtual"
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+            />
+            {/* Dark gradient over the left */}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.7) 40%, rgba(5,5,5,0.1) 100%)" }} />
+
+            {/* Content */}
+            <div style={{ position: "relative", zIndex: 2, padding: "44px 40px", maxWidth: 420 }}>
               <h2 style={{ fontSize: "clamp(1.4rem, 2.5vw, 1.9rem)", fontWeight: 800, margin: "0 0 14px", lineHeight: 1.15 }}>
                 Una experiencia de <span style={{ color: "#84cc16" }}>otro nivel</span>
               </h2>
@@ -348,26 +353,18 @@ export default function ParaProveedoresPage() {
               </div>
             </div>
 
-            {/* Right image */}
-            <div style={{ position: "relative" }}>
-              <img
-                src="/banner tiendas drokex virtual .jpg"
-                alt="Drokex mundo virtual"
-                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
-              />
-              {/* Floating brand cards */}
-              <div style={{ position: "absolute", top: "14%", left: "8%", background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
-                <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
-                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
-              </div>
-              <div style={{ position: "absolute", top: "12%", right: "4%", background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
-                <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏬 Design Future</div>
-                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇲🇽 México</div>
-              </div>
-              <div style={{ position: "absolute", bottom: "18%", right: "2%", background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
-                <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏡 Home & Deco</div>
-                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇱 Chile</div>
-              </div>
+            {/* Floating brand cards */}
+            <div style={{ position: "absolute", top: "14%", left: "32%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
+              <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
+            </div>
+            <div style={{ position: "absolute", top: "12%", right: "4%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏬 Design Future</div>
+              <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇲🇽 México</div>
+            </div>
+            <div style={{ position: "absolute", bottom: "18%", right: "2%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏡 Home & Deco</div>
+              <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇱 Chile</div>
             </div>
           </div>
         </div>
