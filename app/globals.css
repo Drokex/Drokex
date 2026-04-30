@@ -7444,6 +7444,594 @@ button {
   }
 }
 
+/* ── Catalog Dark (cdk) ── */
+.cdk-page {
+  background: #0f0f0f;
+  color: #f0f0f0;
+  min-height: 100vh;
+}
+
+.cdk-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 28px;
+  padding-top: 28px;
+  padding-bottom: 80px;
+  align-items: start;
+}
+
+/* Sidebar */
+.cdk-sidebar {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.cdk-sidebar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.cdk-sidebar-kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #4ade80;
+}
+
+.cdk-sidebar-desc {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.55;
+}
+
+.cdk-filter-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cdk-sidebar-section {
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cdk-section-label {
+  margin: 0 0 10px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #4ade80;
+}
+
+.cdk-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 0 6px;
+  transition: background 0.12s;
+}
+
+.cdk-filter-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.cdk-filter-icon {
+  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.cdk-filter-flag {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.cdk-filter-name {
+  flex: 1;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.cdk-filter-count {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-variant-numeric: tabular-nums;
+}
+
+.cdk-show-more {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 0 6px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.cdk-show-more:hover {
+  color: #4ade80;
+}
+
+.cdk-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.cdk-clear-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Main content */
+.cdk-main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Hero */
+.cdk-hero {
+  position: relative;
+  min-height: 320px;
+  border-radius: 20px;
+  background: #0d1f0e;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(74, 222, 128, 0.1);
+}
+
+.cdk-hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 40px 44px;
+  max-width: 560px;
+}
+
+.cdk-hero-eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #4ade80;
+}
+
+.cdk-hero-title {
+  margin: 14px 0 0;
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+.cdk-hero-title span {
+  color: #4ade80;
+}
+
+.cdk-hero-cta {
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: #4ade80;
+  color: #0a1a0a;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: background 0.15s;
+}
+
+.cdk-hero-cta:hover {
+  background: #22c55e;
+}
+
+.cdk-hero-trust {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.cdk-hero-trust span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.cdk-hero-trust svg {
+  color: #4ade80;
+}
+
+.cdk-hero-image {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  width: 52%;
+  pointer-events: none;
+}
+
+/* Toolbar */
+.cdk-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cdk-toolbar p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cdk-toolbar strong {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.cdk-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cdk-sort-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Product grid */
+.cdk-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* Product card */
+.cdk-card {
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.cdk-card:hover {
+  border-color: rgba(74, 222, 128, 0.25);
+  transform: translateY(-2px);
+}
+
+.cdk-card-image-wrap {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: #1e1e1e;
+  overflow: hidden;
+}
+
+.cdk-heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(15, 15, 15, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cdk-heart:hover {
+  color: #ef4444;
+  background: rgba(15, 15, 15, 0.85);
+}
+
+.cdk-card-body {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cdk-card-supplier-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cdk-card-supplier {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #4ade80;
+  text-transform: uppercase;
+}
+
+.cdk-card-origin {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cdk-card-name {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.cdk-card-name a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.cdk-card-name a:hover {
+  color: #4ade80;
+}
+
+.cdk-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cdk-card-tags span {
+  font-size: 0.72rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.cdk-card-offer-badge {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+.cdk-offer-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+}
+
+/* Market price inside card */
+.cdk-market-price {
+  display: grid;
+  gap: 2px;
+}
+
+.cdk-market-price strong {
+  display: block;
+  font-size: 1.55rem;
+  line-height: 1;
+  color: #4ade80;
+}
+
+.cdk-market-price small {
+  display: block;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-decoration: line-through;
+}
+
+.cdk-market-price .market-price-note {
+  display: block;
+  font-size: 0.78rem;
+  color: rgba(74, 222, 128, 0.7);
+}
+
+.cdk-market-price .market-price-origin {
+  display: block;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Card buttons */
+.cdk-card-btns {
+  margin-top: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.cdk-btn-outline {
+  flex: 1;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.cdk-btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.cdk-btn-primary {
+  flex: 1;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  background: #4ade80;
+  color: #0a1a0a;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.cdk-btn-primary:hover {
+  background: #22c55e;
+}
+
+/* Bottom trust bar */
+.cdk-bottom-trust {
+  margin-top: 8px;
+  padding: 32px 36px;
+  background: #161616;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.cdk-trust-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.cdk-trust-item > svg {
+  flex-shrink: 0;
+  color: #4ade80;
+  margin-top: 2px;
+}
+
+.cdk-trust-item strong {
+  display: block;
+  font-size: 0.88rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.cdk-trust-item p {
+  margin: 5px 0 0;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.5;
+}
+
+.cdk-trust-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4ade80;
+  text-decoration: none;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .cdk-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cdk-bottom-trust {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .cdk-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cdk-sidebar {
+    position: static;
+  }
+
+  .cdk-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .cdk-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cdk-bottom-trust {
+    grid-template-columns: 1fr;
+  }
+
+  .cdk-hero-image {
+    display: none;
+  }
+}
+
 /* ── Quote form modal ── */
 .qf-overlay {
   position: fixed;
