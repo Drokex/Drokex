@@ -67,9 +67,9 @@ export default function ParaProveedoresPage() {
       <SiteHeader />
 
       {/* ── HERO ────────────────────────────────────────── */}
-      <section style={{ padding: "80px 0 64px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }}>
-          <div>
+      <section style={{ borderBottom: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 480, alignItems: "stretch" }}>
+          <div style={{ padding: "80px 0 64px 0", maxWidth: 600, marginLeft: "auto", paddingLeft: 40, paddingRight: 40 }}>
             <span style={{
               display: "inline-block", background: "rgba(132,204,22,0.15)",
               color: "#84cc16", fontSize: "0.72rem", fontWeight: 700,
@@ -107,15 +107,11 @@ export default function ParaProveedoresPage() {
             </div>
           </div>
 
-          <div style={{
-            aspectRatio: "4/3", borderRadius: 20,
-            overflow: "hidden", border: "1px solid rgba(132,204,22,0.15)",
-            position: "relative",
-          }}>
+          <div style={{ position: "relative", overflow: "hidden" }}>
             <img
               src="/Banner mapa casas.jpg"
               alt="Red Drokex en LATAM"
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
             />
           </div>
         </div>
