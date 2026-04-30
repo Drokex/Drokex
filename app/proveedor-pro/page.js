@@ -136,55 +136,57 @@ export default function ProveedorProPage() {
       <SiteHeader />
 
       {!isPro ? (
-        <section className="mx-auto grid min-h-[calc(100vh-80px)] max-w-6xl items-center gap-10 px-6 py-16 md:grid-cols-2">
-          <div>
-            <span className="rounded-full bg-[#59ff35]/10 px-4 py-2 text-xs font-black text-[#59ff35]">
-              PROVEEDOR PRO
+        <section style={{ display: "grid", gridTemplateColumns: "420px 1fr", minHeight: "calc(100vh - 80px)", background: "#030503" }}>
+          {/* Left: text + plan + form */}
+          <div style={{ padding: "64px 40px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 24 }}>
+            <span style={{ display: "inline-block", background: "rgba(89,255,53,0.12)", color: "#59ff35", fontSize: "0.7rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(89,255,53,0.25)", alignSelf: "flex-start" }}>
+              Proveedor Pro
             </span>
 
-            <h1 className="mt-6 text-5xl font-black leading-tight">
-              Crea tu tienda premium dentro de{" "}
-              <span className="text-[#59ff35]">Drokex</span>
+            <h1 style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)", fontWeight: 900, lineHeight: 1.1, margin: 0, color: "#fff" }}>
+              Crea tu tienda<br />premium dentro de<br />
+              <span style={{ color: "#59ff35" }}>Drokex</span>
             </h1>
 
-            <p className="mt-5 text-lg text-white/60">
-              Activa el modo Pro para construir una landing personalizada, subir
-              banners, productos, textos comerciales y vender directo.
+            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem", lineHeight: 1.7, margin: 0 }}>
+              Activa el modo Pro para construir una landing personalizada, subir banners, productos, textos comerciales y vender directo.
             </p>
 
-            <div className="mt-8 rounded-[2rem] border border-[#59ff35]/30 bg-[#59ff35]/10 p-6">
-              <p className="text-white/50">Plan demo</p>
-              <h2 className="mt-2 text-4xl font-black text-[#59ff35]">
-                $99.000 COP
-              </h2>
-              <p className="mt-2 text-sm text-white/50">
-                Simulación para validar experiencia.
-              </p>
+            <div style={{ borderRadius: 24, border: "1px solid rgba(89,255,53,0.3)", background: "rgba(89,255,53,0.08)", padding: "24px" }}>
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.45)", fontSize: "0.82rem" }}>Plan demo</p>
+              <h2 style={{ margin: "8px 0 0", fontSize: "2.4rem", fontWeight: 900, color: "#59ff35", lineHeight: 1 }}>$99.000 COP</h2>
+              <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.4)", fontSize: "0.82rem" }}>Simulación para validar experiencia.</p>
+            </div>
+
+            <div style={{ borderRadius: 24, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", padding: "28px" }}>
+              <h2 style={{ margin: "0 0 20px", fontSize: "1.3rem", fontWeight: 900, color: "#fff" }}>Adquiere Proveedor Pro</h2>
+              <input
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Código de activación"
+                style={{ width: "100%", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "#000", color: "#fff", padding: "14px 18px", fontSize: "0.92rem", outline: "none", boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = "#59ff35"}
+                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.12)"}
+              />
+              {error && <p style={{ margin: "8px 0 0", color: "#f87171", fontSize: "0.82rem" }}>{error}</p>}
+              <button
+                onClick={activatePro}
+                style={{ marginTop: 14, width: "100%", borderRadius: 14, background: "#59ff35", color: "#050505", fontWeight: 900, fontSize: "1rem", padding: "14px", border: "none", cursor: "pointer", boxShadow: "0 4px 20px rgba(89,255,53,0.35)" }}
+              >
+                Activar plan Pro
+              </button>
+              <p style={{ margin: "12px 0 0", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: "0.75rem" }}>Código demo: 15472007</p>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-8">
-            <h2 className="text-2xl font-black">Adquiere Proveedor Pro</h2>
-
-            <input
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="Código de activación"
-              className="mt-6 w-full rounded-2xl border border-white/10 bg-black px-5 py-4 outline-none focus:border-[#59ff35]"
+          {/* Right: pago image */}
+          <div style={{ position: "relative", overflow: "hidden" }}>
+            <img
+              src="/pago.png"
+              alt="Drokex Proveedor Pro"
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
             />
-
-            {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
-
-            <button
-              onClick={activatePro}
-              className="mt-6 w-full rounded-2xl bg-[#59ff35] px-6 py-4 font-black text-black"
-            >
-              Activar plan Pro
-            </button>
-
-            <p className="mt-4 text-center text-xs text-white/40">
-              Código demo: 15472007
-            </p>
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(3,5,3,0.6) 0%, rgba(3,5,3,0) 40%)" }} />
           </div>
         </section>
       ) : isPreviewMode ? (
