@@ -217,11 +217,11 @@ export default function ParaProveedoresPage() {
                   Quiero vender ya <span>→</span>
                 </Link>
               </div>
-              <div style={{ position: "relative", background: "#111" }}>
+              <div style={{ position: "relative", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                 <img
                   src="/landing sillas.jpeg"
                   alt="Landing page Proveedor Pro"
-                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
+                  style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center" }}
                 />
               </div>
             </div>
