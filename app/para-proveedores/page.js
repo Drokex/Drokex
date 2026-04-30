@@ -309,47 +309,61 @@ export default function ParaProveedoresPage() {
       </section>
 
       {/* ── EXPERIENCIA ─────────────────────────────────── */}
-      <section style={{ padding: "80px 0", background: "rgba(255,255,255,0.02)", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }}>
-          <div>
-            <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 800, margin: "0 0 16px" }}>
-              Una experiencia de <span style={{ color: "#84cc16" }}>otro nivel</span>
-            </h2>
-            <p style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7, margin: "0 0 36px" }}>
-              Drokex no es un catálogo tradicional. Es un mundo interactivo donde los compradores exploran marcas como si fuera un juego.
-            </p>
-            <div style={{ display: "flex", gap: 32 }}>
-              {["🔍 Explorar", "🔎 Descubrir", "🔗 Conectar", "🛒 Comprar"].map(step => (
-                <div key={step} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: "1.4rem", marginBottom: 6 }}>{step.split(" ")[0]}</div>
-                  <p style={{ margin: 0, fontSize: "0.8rem", color: "rgba(255,255,255,0.5)", fontWeight: 600 }}>{step.split(" ")[1]}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Brand bubbles */}
+      <section style={{ padding: "40px 0 80px" }}>
+        <div className="shell">
           <div style={{
-            background: "radial-gradient(ellipse at 50% 50%, rgba(132,204,22,0.08) 0%, transparent 70%)",
-            border: "1px solid rgba(132,204,22,0.12)", borderRadius: 20,
-            padding: 36, position: "relative", minHeight: 240,
+            position: "relative", borderRadius: 20, overflow: "hidden",
+            border: "1px solid rgba(132,204,22,0.15)", minHeight: 280,
+            display: "grid", gridTemplateColumns: "420px 1fr",
           }}>
-            <div style={{ fontSize: "3.5rem", textAlign: "center", marginBottom: 8 }}>🌆</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
-              {[
-                { flag: "🇨🇴", name: "Muebles del Sur" },
-                { flag: "🇲🇽", name: "Design Future" },
-                { flag: "🇨🇱", name: "Home & Deco" },
-                { flag: "🇵🇪", name: "Casa Lima" },
-              ].map(b => (
-                <div key={b.name} style={{
-                  display: "flex", alignItems: "center", gap: 6,
-                  background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: 20, padding: "6px 14px", fontSize: "0.8rem",
-                }}>
-                  {b.flag} {b.name}
-                </div>
-              ))}
+            {/* Left text */}
+            <div style={{ position: "relative", zIndex: 2, padding: "44px 40px", background: "rgba(5,5,5,0.72)" }}>
+              <h2 style={{ fontSize: "clamp(1.4rem, 2.5vw, 1.9rem)", fontWeight: 800, margin: "0 0 14px", lineHeight: 1.15 }}>
+                Una experiencia de <span style={{ color: "#84cc16" }}>otro nivel</span>
+              </h2>
+              <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.7, margin: "0 0 32px", fontSize: "0.92rem" }}>
+                Drokex no es un catálogo tradicional.<br />
+                <strong style={{ color: "rgba(255,255,255,0.85)" }}>Es un mundo interactivo donde los compradores exploran marcas como si fuera un juego.</strong>
+              </p>
+              <div style={{ display: "flex", gap: 28 }}>
+                {[
+                  { label: "Explorar", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
+                  { label: "Descubrir", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
+                  { label: "Conectar", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> },
+                  { label: "Comprar", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> },
+                ].map(step => (
+                  <div key={step.label} style={{ textAlign: "center" }}>
+                    <div style={{
+                      width: 48, height: 48, borderRadius: 12, marginBottom: 8,
+                      background: "rgba(132,204,22,0.12)", border: "1px solid rgba(132,204,22,0.2)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>{step.icon}</div>
+                    <p style={{ margin: 0, fontSize: "0.78rem", color: "rgba(255,255,255,0.6)", fontWeight: 600 }}>{step.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right image */}
+            <div style={{ position: "relative" }}>
+              <img
+                src="/banner tiendas drokex virtual .jpg"
+                alt="Drokex mundo virtual"
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+              />
+              {/* Floating brand cards */}
+              <div style={{ position: "absolute", top: "14%", left: "8%", background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+                <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
+                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
+              </div>
+              <div style={{ position: "absolute", top: "12%", right: "4%", background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+                <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏬 Design Future</div>
+                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇲🇽 México</div>
+              </div>
+              <div style={{ position: "absolute", bottom: "18%", right: "2%", background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+                <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏡 Home & Deco</div>
+                <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇱 Chile</div>
+              </div>
             </div>
           </div>
         </div>
