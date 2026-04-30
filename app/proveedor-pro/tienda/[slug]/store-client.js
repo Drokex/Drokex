@@ -19,6 +19,13 @@ const fallbackStore = {
     "Compra directa, identidad propia y productos listos para compartir con clientes.",
   stockLabel: "Stock",
   stockValue: "Local",
+  partner1: "Apple",
+  partner2: "Microsoft",
+  partner3: "Google",
+  partner4: "Zoho",
+  searchTitle: "Busca productos",
+  searchPlaceholder: "Buscar en esta tienda...",
+  searchButtonText: "Buscar",
   aboutTitle: "Contenido pendiente de sincronizar",
   aboutText:
     "Esta vista usa los datos guardados en este navegador cuando presionas Crear landing.",
@@ -36,12 +43,14 @@ const fallbackStore = {
   finalEyebrow: "Listo para comprar",
   finalTitle: "Descubre la coleccion de Mi Tienda",
   finalCtaText: "Ver catalogo",
-  primaryColor: "#c89b5c",
-  backgroundColor: "#11100d",
-  surfaceColor: "#1c1712",
-  textColor: "#fff8ee",
-  mutedTextColor: "#c7b9a7",
-  buttonTextColor: "#15100a",
+  primaryColor: "#ff9f2e",
+  backgroundColor: "#fff7fb",
+  surfaceColor: "#ffffff",
+  textColor: "#191421",
+  mutedTextColor: "#6f6477",
+  buttonTextColor: "#ffffff",
+  gradientFromColor: "#b86cff",
+  gradientToColor: "#ff7db8",
 };
 
 const fallbackProducts = [
@@ -111,6 +120,8 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
       text: store.textColor,
       muted: store.mutedTextColor,
       buttonText: store.buttonTextColor,
+      gradientFrom: store.gradientFromColor || "#b86cff",
+      gradientTo: store.gradientToColor || "#ff7db8",
     }),
     [store]
   );
@@ -120,6 +131,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
     { label: "Pais", value: store.country },
     { label: store.stockLabel || "Stock", value: store.stockValue || "Local" },
   ];
+  const partners = [store.partner1, store.partner2, store.partner3, store.partner4].filter(Boolean);
 
   return (
     <main
@@ -139,10 +151,10 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
       ) : null}
 
       <header
-        className="fixed inset-x-0 top-0 z-40 border-b border-white/10 backdrop-blur-2xl"
-        style={{ backgroundColor: hexToRgba(store.surfaceColor, 0.82) }}
+        className="fixed inset-x-0 top-0 z-40 backdrop-blur-2xl"
+        style={{ backgroundColor: hexToRgba(store.surfaceColor, 0.9) }}
       >
-        <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
           <a href="#inicio" className="flex min-w-0 items-center gap-3">
             {store.logo ? (
               <img
@@ -200,16 +212,21 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
 
       <section
         id="inicio"
-        className="relative grid min-h-screen overflow-hidden bg-cover bg-center px-4 pb-16 pt-32 sm:px-6 lg:px-10"
+        className="relative overflow-hidden px-4 pb-10 pt-28 sm:px-6 lg:px-10"
         style={{
-          backgroundColor: palette.bg,
-          backgroundImage: store.heroImage
-            ? `linear-gradient(90deg, ${hexToRgba(store.backgroundColor, 0.94)}, ${hexToRgba(store.backgroundColor, 0.44)}), url(${store.heroImage})`
-            : `radial-gradient(circle at 72% 24%, ${palette.primaryGlow}, transparent 34%)`,
+          background: `linear-gradient(135deg, ${hexToRgba(palette.gradientFrom, 0.28)}, ${hexToRgba(palette.gradientTo, 0.28)})`,
         }}
       >
-        <div className="mx-auto grid w-full max-w-[1680px] items-center gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(360px,0.55fr)]">
-          <div className="max-w-4xl">
+        <div
+          className="mx-auto grid min-h-[760px] w-full max-w-[1440px] items-center gap-10 overflow-hidden rounded-[2.75rem] bg-cover bg-center p-7 shadow-2xl md:p-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(360px,0.7fr)]"
+          style={{
+            backgroundColor: palette.surface,
+            backgroundImage: store.heroImage
+              ? `linear-gradient(90deg, ${hexToRgba(store.surfaceColor, 0.96)}, ${hexToRgba(store.surfaceColor, 0.62)}), url(${store.heroImage})`
+              : `radial-gradient(circle at 76% 36%, ${palette.primaryGlow}, transparent 34%)`,
+          }}
+        >
+          <div className="max-w-3xl">
             <span
               className="inline-flex rounded-full px-4 py-2 text-sm font-black"
               style={{
@@ -220,7 +237,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
               {store.promoText}
             </span>
 
-            <h2 className="mt-8 text-5xl font-black leading-[0.95] sm:text-6xl lg:text-7xl xl:text-8xl">
+            <h2 className="mt-8 text-5xl font-black leading-[0.95] sm:text-6xl lg:text-7xl">
               {store.heroTitle}
             </h2>
 
@@ -253,18 +270,27 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
           </div>
 
           <aside
-            className="rounded-[2rem] border border-white/10 p-5 shadow-2xl"
-            style={{ backgroundColor: hexToRgba(store.surfaceColor, 0.76) }}
+            className="relative min-h-[500px] rounded-[2.5rem] p-6"
+            style={{
+              background: `linear-gradient(135deg, ${hexToRgba(palette.gradientFrom, 0.42)}, ${hexToRgba(palette.gradientTo, 0.56)})`,
+            }}
           >
-            <p className="text-sm font-black uppercase tracking-[0.22em]" style={{ color: palette.primary }}>
-              {store.trustEyebrow}
-            </p>
-            <div className="mt-5 grid gap-3">
+            <div className="absolute inset-6 rounded-[2rem] border-2 border-dashed border-white/35" />
+            <div className="relative z-10 flex h-full min-h-[452px] flex-col justify-between">
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.22em]" style={{ color: palette.buttonText }}>
+                  {store.trustEyebrow}
+                </p>
+                <p className="mt-4 max-w-sm text-2xl font-black leading-tight" style={{ color: palette.text }}>
+                  {store.trustText}
+                </p>
+              </div>
+              <div className="grid gap-3">
               {stats.map((stat) => (
                 <div
                   key={stat.label}
-                  className="flex items-center justify-between rounded-2xl border border-white/10 px-4 py-4"
-                  style={{ backgroundColor: hexToRgba(store.backgroundColor, 0.6) }}
+                  className="flex items-center justify-between rounded-2xl border border-white/20 px-4 py-4 shadow-lg"
+                  style={{ backgroundColor: hexToRgba(store.surfaceColor, 0.84) }}
                 >
                   <span className="text-sm" style={{ color: palette.muted }}>
                     {stat.label}
@@ -272,22 +298,56 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
                   <strong>{stat.value}</strong>
                 </div>
               ))}
-            </div>
-            <div className="mt-5 rounded-3xl p-5" style={{ backgroundColor: palette.primarySoft }}>
-              <p className="text-sm font-bold" style={{ color: palette.muted }}>
-                {store.trustText}
-              </p>
+              </div>
             </div>
           </aside>
         </div>
       </section>
 
       <section
-        id="beneficios"
-        className="px-4 py-14 sm:px-6 lg:px-10"
+        className="px-4 py-0 sm:px-6 lg:px-10"
         style={{ backgroundColor: palette.bg }}
       >
-        <div className="mx-auto grid max-w-[1680px] gap-5 md:grid-cols-3">
+        <div
+          className="mx-auto grid max-w-[1440px] items-center gap-4 overflow-hidden rounded-[2rem] px-6 py-5 md:grid-cols-[1fr_auto_1fr]"
+          style={{
+            background: `linear-gradient(90deg, ${palette.gradientFrom}, ${palette.gradientTo})`,
+            color: palette.buttonText,
+          }}
+        >
+          <div className="flex flex-wrap items-center gap-7 text-lg font-black opacity-90">
+            {partners.map((partner) => (
+              <span key={partner}>{partner}</span>
+            ))}
+          </div>
+          <div className="hidden h-8 w-px bg-white/35 md:block" />
+          <form className="flex min-w-0 items-center gap-2 rounded-2xl bg-white p-2 shadow-xl">
+            <input
+              placeholder={store.searchPlaceholder}
+              className="min-w-0 flex-1 rounded-xl px-4 py-3 text-sm outline-none"
+              style={{ color: palette.text }}
+            />
+            <button
+              type="button"
+              className="rounded-xl px-5 py-3 text-sm font-black"
+              style={{ backgroundColor: palette.primary, color: palette.buttonText }}
+            >
+              {store.searchButtonText}
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section
+        id="beneficios"
+        className="px-4 py-20 sm:px-6 lg:px-10"
+        style={{ backgroundColor: palette.bg }}
+      >
+        <div className="mx-auto max-w-[1440px]">
+          <h2 className="text-center text-4xl font-black md:text-5xl">
+            {store.searchTitle}
+          </h2>
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
           {[
             [store.benefit1, store.benefit1Text],
             [store.benefit2, store.benefit2Text],
@@ -313,6 +373,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
               </p>
             </article>
           ))}
+          </div>
         </div>
       </section>
 
@@ -321,7 +382,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
         className="px-4 py-20 sm:px-6 lg:px-10"
         style={{ backgroundColor: palette.surface }}
       >
-        <div className="mx-auto grid max-w-[1680px] items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="mx-auto grid max-w-[1440px] items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <p
               className="text-sm font-black uppercase tracking-[0.24em]"
@@ -365,7 +426,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
         className="px-4 py-20 sm:px-6 lg:px-10"
         style={{ backgroundColor: palette.bg }}
       >
-        <div className="mx-auto max-w-[1680px]">
+        <div className="mx-auto max-w-[1440px]">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
               <p
@@ -447,8 +508,10 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
 
       <section className="px-4 pb-20 sm:px-6 lg:px-10" style={{ backgroundColor: palette.bg }}>
         <div
-          className="mx-auto max-w-[1680px] rounded-[2.5rem] border border-white/10 p-8 md:p-12"
-          style={{ backgroundColor: palette.surface }}
+          className="mx-auto max-w-[1440px] rounded-[2.5rem] border border-white/10 p-8 md:p-12"
+          style={{
+            background: `linear-gradient(135deg, ${hexToRgba(palette.gradientFrom, 0.22)}, ${hexToRgba(palette.gradientTo, 0.28)}), ${palette.surface}`,
+          }}
         >
           <p className="text-sm font-black uppercase tracking-[0.24em]" style={{ color: palette.primary }}>
             {store.finalEyebrow}

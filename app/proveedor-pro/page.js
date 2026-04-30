@@ -54,6 +54,13 @@ export default function ProveedorProPage() {
       "Compra directa, identidad propia y productos listos para compartir con clientes.",
     stockLabel: "Stock",
     stockValue: "Local",
+    partner1: "Apple",
+    partner2: "Microsoft",
+    partner3: "Google",
+    partner4: "Zoho",
+    searchTitle: "Busca productos",
+    searchPlaceholder: "Buscar en esta tienda...",
+    searchButtonText: "Buscar",
     aboutTitle: "Una marca pensada para espacios con estilo",
     aboutText:
       "Creamos productos funcionales, modernos y de alta calidad para hogares que buscan diseño y comodidad.",
@@ -71,12 +78,14 @@ export default function ProveedorProPage() {
     finalEyebrow: "Listo para comprar",
     finalTitle: "Descubre la colección de Muebles del Sur",
     finalCtaText: "Ver catálogo",
-    primaryColor: "#c89b5c",
-    backgroundColor: "#11100d",
-    surfaceColor: "#1c1712",
-    textColor: "#fff8ee",
-    mutedTextColor: "#c7b9a7",
-    buttonTextColor: "#15100a",
+    primaryColor: "#ff9f2e",
+    backgroundColor: "#fff7fb",
+    surfaceColor: "#ffffff",
+    textColor: "#191421",
+    mutedTextColor: "#6f6477",
+    buttonTextColor: "#ffffff",
+    gradientFromColor: "#b86cff",
+    gradientToColor: "#ff7db8",
     heroTitleSize: 60,
     heroTitleColor: "",
     heroSubtitleSize: 18,
@@ -331,6 +340,13 @@ export default function ProveedorProPage() {
               </SectionCard>
 
               <SectionCard id="benefits" label="Beneficios" icon={<CheckIcon />} open={openSection === "benefits"} onToggle={() => setOpenSection(s => s === "benefits" ? null : "benefits")}>
+                <Input label="Marca aliada 1" value={store.partner1} onChange={v => updateStore("partner1", v)} />
+                <Input label="Marca aliada 2" value={store.partner2} onChange={v => updateStore("partner2", v)} />
+                <Input label="Marca aliada 3" value={store.partner3} onChange={v => updateStore("partner3", v)} />
+                <Input label="Marca aliada 4" value={store.partner4} onChange={v => updateStore("partner4", v)} />
+                <Input label="Titulo del buscador" value={store.searchTitle} onChange={v => updateStore("searchTitle", v)} />
+                <Input label="Placeholder del buscador" value={store.searchPlaceholder} onChange={v => updateStore("searchPlaceholder", v)} />
+                <Input label="Boton del buscador" value={store.searchButtonText} onChange={v => updateStore("searchButtonText", v)} />
                 <Input label="Beneficio 1" value={store.benefit1} onChange={v => updateStore("benefit1", v)} />
                 <Textarea label="Descripcion beneficio 1" value={store.benefit1Text} onChange={v => updateStore("benefit1Text", v)} />
                 <Input label="Beneficio 2" value={store.benefit2} onChange={v => updateStore("benefit2", v)} />
@@ -378,6 +394,8 @@ export default function ProveedorProPage() {
                 <ColorInput label="Texto principal" value={store.textColor} onChange={v => updateStore("textColor", v)} />
                 <ColorInput label="Texto secundario" value={store.mutedTextColor} onChange={v => updateStore("mutedTextColor", v)} />
                 <ColorInput label="Texto de botones" value={store.buttonTextColor} onChange={v => updateStore("buttonTextColor", v)} />
+                <ColorInput label="Inicio degradado" value={store.gradientFromColor} onChange={v => updateStore("gradientFromColor", v)} />
+                <ColorInput label="Fin degradado" value={store.gradientToColor} onChange={v => updateStore("gradientToColor", v)} />
               </SectionCard>
             </div>
           </aside>
