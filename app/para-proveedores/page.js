@@ -354,7 +354,7 @@ export default function ParaProveedoresPage() {
             </div>
 
             {/* Floating brand cards */}
-            <div style={{ position: "absolute", top: "14%", left: "32%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+            <div style={{ position: "absolute", top: "14%", left: "22%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
               <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
               <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
             </div>
