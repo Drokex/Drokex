@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import SiteHeader from "@/app/components/site-header";
 
 const VALID_CODE = "15472007";
