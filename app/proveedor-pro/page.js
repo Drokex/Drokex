@@ -143,8 +143,8 @@ export default function ProveedorProPage() {
               Proveedor Pro
             </span>
 
-            <h1 style={{ fontSize: "clamp(2rem, 3.5vw, 3rem)", fontWeight: 900, lineHeight: 1.1, margin: 0, color: "#fff" }}>
-              Crea tu tienda<br />premium dentro de<br />
+            <h1 style={{ fontSize: "clamp(1.35rem, 2vw, 1.9rem)", fontWeight: 700, lineHeight: 1.25, margin: 0, color: "#fff", letterSpacing: "-0.01em" }}>
+              Crea tu tienda premium<br />dentro de{" "}
               <span style={{ color: "#59ff35" }}>Drokex</span>
             </h1>
 
