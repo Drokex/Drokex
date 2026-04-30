@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import SiteHeader from "@/app/components/site-header";
 
 const VALID_CODE = "15472007";
@@ -197,8 +197,8 @@ export default function ProveedorProPage() {
                     value={store.country}
                     onChange={(value) => updateStore("country", value)}
                   />
-                  <Input
-                    label="Logo URL"
+                  <ImageUploader
+                    label="Logo de marca"
                     value={store.logo}
                     onChange={(value) => updateStore("logo", value)}
                   />
@@ -217,13 +217,13 @@ export default function ProveedorProPage() {
 
               {activeTab === "media" && (
                 <>
-                  <Input
-                    label="Banner principal URL"
+                  <ImageUploader
+                    label="Banner principal"
                     value={store.heroImage}
                     onChange={(value) => updateStore("heroImage", value)}
                   />
-                  <Input
-                    label="Banner secundario URL"
+                  <ImageUploader
+                    label="Banner secundario"
                     value={store.bannerSecondary}
                     onChange={(value) =>
                       updateStore("bannerSecondary", value)
@@ -286,8 +286,8 @@ export default function ProveedorProPage() {
                           updateProduct(index, "stock", value)
                         }
                       />
-                      <Input
-                        label="Imagen URL"
+                      <ImageUploader
+                        label="Imagen del producto"
                         value={product.image}
                         onChange={(value) =>
                           updateProduct(index, "image", value)
@@ -494,5 +494,64 @@ function Textarea({ label, value, onChange }) {
         className="min-h-24 w-full resize-none rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#59ff35]"
       />
     </label>
+  );
+}
+
+function ImageUploader({ label, value, onChange }) {
+  const fileRef = useRef(null);
+
+  function handleFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (readerEvent) => {
+      onChange(readerEvent.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/30 p-3">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <span className="text-xs font-bold text-white/40">{label}</span>
+        {value ? (
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white/60 hover:bg-white/15"
+          >
+            Quitar
+          </button>
+        ) : null}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => fileRef.current?.click()}
+        className="flex min-h-36 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-white/15 bg-[#050705] text-sm font-bold text-white/40 transition hover:border-[#59ff35]/70 hover:text-[#59ff35]"
+      >
+        {value ? (
+          <img src={value} alt={label} className="h-full min-h-36 w-full object-cover" />
+        ) : (
+          <span>Subir imagen</span>
+        )}
+      </button>
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFile}
+        className="hidden"
+      />
+
+      <input
+        value={value?.startsWith("data:") ? "" : value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="O pegar URL de imagen"
+        className="mt-3 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#59ff35]"
+      />
+    </div>
   );
 }
