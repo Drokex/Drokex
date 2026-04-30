@@ -222,9 +222,7 @@ export default async function CategoriasPage() {
                 </span>
               </div>
             </div>
-            <div className="cdk-hero-image">
-              <Image src="/markets-robot-right.png" alt="Drokex AI" fill style={{ objectFit: "contain", objectPosition: "right bottom" }} />
-            </div>
+            <Image src="/banner productor.jpg" alt="Drokex marketplace" fill className="cdk-hero-bg" style={{ objectFit: "cover", objectPosition: "center" }} />
           </div>
 
           {/* Toolbar */}
