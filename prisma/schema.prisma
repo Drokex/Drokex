@@ -144,3 +144,10 @@ model InventoryMovement {
   note       String?
   createdAt  DateTime              @default(now())
 }
+
+model GameScore {
+  id        String   @id @default(cuid())
+  name      String
+  score     Int
+  createdAt DateTime @default(now())
+}

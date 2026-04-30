@@ -164,13 +164,17 @@ export default function AprendePage() {
   const [finalScore, setFinalScore] = useState(0);
   const [playerName, setPlayerName] = useState("");
   const [highScores, setHighScores] = useState([]);
+  const [savingScore, setSavingScore] = useState(false);
 
-  useEffect(() => {
+  async function fetchScores() {
     try {
-      const saved = JSON.parse(window.localStorage.getItem(HIGH_SCORE_STORAGE_KEY) || "[]");
-      setHighScores(Array.isArray(saved) ? saved.slice(0, 3) : []);
+      const res = await fetch("/api/game-scores");
+      const data = await res.json();
+      setHighScores(Array.isArray(data.scores) ? data.scores : []);
     } catch { setHighScores([]); }
-  }, []);
+  }
+
+  useEffect(() => { fetchScores(); }, []);
 
   function calculateScore(game) {
     return game.coins * 25 + game.lives * 150 + (game.currentLevel + 1) * 120 + (game.killScore || 0);
@@ -190,12 +194,19 @@ export default function AprendePage() {
     setScreen("playing");
   }
 
-  function saveHighScore(e) {
+  async function saveHighScore(e) {
     e.preventDefault();
     const name = playerName.trim() || "Jugador";
-    const next = [...highScores, { name, score: finalScore }].sort((a, b) => b.score - a.score).slice(0, 3);
-    window.localStorage.setItem(HIGH_SCORE_STORAGE_KEY, JSON.stringify(next));
-    setHighScores(next);
+    setSavingScore(true);
+    try {
+      await fetch("/api/game-scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, score: finalScore }),
+      });
+      await fetchScores();
+    } catch {}
+    setSavingScore(false);
     setScreen("scores");
   }
 
@@ -1527,8 +1538,8 @@ export default function AprendePage() {
               <p style={subStyle}>10 niveles · castillos cada 3 · fantasma final · doble salto · sprint · poder</p>
               {highScores.length > 0 && (
                 <div style={scoreListStyle}>
-                  <strong>Mejores puntajes</strong>
-                  {highScores.map((s, i) => <p key={i}>{i + 1}. {s.name} · {s.score} pts</p>)}
+                  <strong>🏆 Ranking Global</strong>
+                  {highScores.slice(0, 5).map((s, i) => <p key={s.id ?? i}>{i + 1}. {s.name} · {s.score} pts</p>)}
                 </div>
               )}
               <button onClick={startGame} style={btnStyle}>Comenzar</button>
@@ -1549,17 +1560,22 @@ export default function AprendePage() {
               <p style={subStyle}>Derrotaste al Jefe Final con {finalScore} puntos.</p>
               <form onSubmit={saveHighScore} style={scoreFormStyle}>
                 <input value={playerName} onChange={(e) => setPlayerName(e.target.value)}
-                  placeholder="Tu nombre" maxLength={18} style={scoreInputStyle} autoFocus />
-                <button type="submit" style={btnStyle}>Guardar puntaje</button>
+                  placeholder="Tu nombre" maxLength={18} style={scoreInputStyle} autoFocus disabled={savingScore} />
+                <button type="submit" style={{ ...btnStyle, opacity: savingScore ? 0.6 : 1 }} disabled={savingScore}>
+                  {savingScore ? "Guardando..." : "Guardar puntaje"}
+                </button>
               </form>
             </div>
           )}
           {screen === "scores" && (
             <div style={overlayStyle}>
-              <p style={{ ...tagStyle, color: "#84cc16" }}>Ranking</p>
-              <h2 style={titleStyle}>Top 3 Drokex</h2>
+              <p style={{ ...tagStyle, color: "#84cc16" }}>Ranking Global</p>
+              <h2 style={titleStyle}>Top 10 Drokex</h2>
               <div style={scoreListStyle}>
-                {highScores.map((s, i) => <p key={i}>{i + 1}. {s.name} · {s.score} pts</p>)}
+                {highScores.length === 0
+                  ? <p style={{ opacity: 0.5 }}>Sin puntajes aún</p>
+                  : highScores.map((s, i) => <p key={s.id ?? i}>{i + 1}. {s.name} · {s.score} pts</p>)
+                }
               </div>
               <button onClick={startGame} style={btnStyle}>Jugar de nuevo</button>
             </div>
