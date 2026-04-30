@@ -95,32 +95,16 @@ export default function ParaProveedoresPage() {
             </div>
           </div>
 
-          {/* Network visual placeholder */}
           <div style={{
             aspectRatio: "4/3", borderRadius: 20,
-            background: "radial-gradient(ellipse at 60% 40%, rgba(132,204,22,0.12) 0%, rgba(5,5,5,0) 70%), radial-gradient(ellipse at 30% 70%, rgba(240,122,30,0.08) 0%, transparent 60%)",
-            border: "1px solid rgba(132,204,22,0.15)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            position: "relative", overflow: "hidden",
+            overflow: "hidden", border: "1px solid rgba(132,204,22,0.15)",
+            position: "relative",
           }}>
-            <div style={{ textAlign: "center", opacity: 0.7 }}>
-              <div style={{ fontSize: "4rem", marginBottom: 12 }}>🌐</div>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.9rem" }}>Red Drokex en LATAM</p>
-            </div>
-            {/* Decorative dots */}
-            {[["15%","25%"],["75%","18%"],["60%","72%"],["22%","65%"],["85%","55%"]].map(([l,t], i) => (
-              <div key={i} style={{
-                position: "absolute", left: l, top: t,
-                width: 8, height: 8, borderRadius: "50%",
-                background: i % 2 === 0 ? "#84cc16" : "#f07a1e",
-                boxShadow: `0 0 12px ${i % 2 === 0 ? "#84cc16" : "#f07a1e"}`,
-                opacity: 0.7,
-              }} />
-            ))}
-            <div style={{
-              position: "absolute", inset: 0,
-              background: "repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 40px)",
-            }} />
+            <img
+              src="/Banner mapa casas.jpg"
+              alt="Red Drokex en LATAM"
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            />
           </div>
         </div>
       </section>
