@@ -120,92 +120,108 @@ export default function ParaProveedoresPage() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+
             {/* EXPLORER */}
             <div style={{
               background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 20, padding: 36,
+              borderRadius: 20, overflow: "hidden",
+              display: "grid", gridTemplateColumns: "180px 1fr",
             }}>
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 24 }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 10,
-                  background: "rgba(132,204,22,0.15)", border: "1px solid rgba(132,204,22,0.3)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontWeight: 800, color: "#84cc16", fontSize: "1.1rem", flexShrink: 0,
-                }}>1</div>
-                <div>
-                  <h3 style={{ margin: "0 0 4px", fontSize: "1.3rem", fontWeight: 800 }}>Proveedor Explorer</h3>
-                  <p style={{ margin: 0, color: "#84cc16", fontWeight: 600, fontSize: "0.9rem" }}>Valida tu mercado</p>
-                </div>
+              <div style={{ position: "relative", background: "#111" }}>
+                <img
+                  src="/sillas pequeño.png"
+                  alt="Panel de productos Explorer"
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
+                />
               </div>
-
-              <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.7, marginBottom: 24 }}>
-                Publica tus productos y recibe <strong style={{ color: "#fff" }}>contactos y cotizaciones</strong> de compradores interesados.
-              </p>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
-                {["Publica tus productos", "Recibe contactos y cotizaciones", "Mide el interés real en otros países", "Sin necesidad de tener stock"].map(f => (
-                  <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem", color: "rgba(255,255,255,0.8)" }}>
-                    {checkIcon} {f}
+              <div style={{ padding: 32 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 20 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: "rgba(132,204,22,0.15)", border: "1px solid rgba(132,204,22,0.3)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontWeight: 800, color: "#84cc16", fontSize: "1rem",
+                  }}>1</div>
+                  <div>
+                    <h3 style={{ margin: "0 0 3px", fontSize: "1.2rem", fontWeight: 800 }}>Proveedor Explorer</h3>
+                    <p style={{ margin: 0, color: "#84cc16", fontWeight: 600, fontSize: "0.85rem" }}>Valida tu mercado</p>
                   </div>
-                ))}
+                </div>
+                <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.65, marginBottom: 20, fontSize: "0.9rem" }}>
+                  Publica tus productos y recibe <strong style={{ color: "#fff" }}>contactos y cotizaciones</strong> de compradores interesados.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+                  {["Publica tus productos", "Recibe contactos y cotizaciones", "Mide el interés real en otros países", "Sin necesidad de tener stock"].map(f => (
+                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: "rgba(255,255,255,0.8)" }}>
+                      {checkIcon} {f}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/registro" style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  background: "transparent", color: "#fff", fontWeight: 600,
+                  padding: "11px 22px", borderRadius: 10, fontSize: "0.88rem",
+                  border: "1px solid rgba(255,255,255,0.22)", textDecoration: "none",
+                }}>
+                  Probar sin riesgo <span>→</span>
+                </Link>
               </div>
-
-              <Link href="/registro" style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                background: "transparent", color: "#fff", fontWeight: 600,
-                padding: "12px 24px", borderRadius: 10, fontSize: "0.9rem",
-                border: "1px solid rgba(255,255,255,0.22)", textDecoration: "none",
-              }}>
-                Probar sin riesgo <span>→</span>
-              </Link>
             </div>
 
             {/* PRO */}
             <div style={{
               background: "rgba(132,204,22,0.06)", border: "1px solid rgba(132,204,22,0.25)",
-              borderRadius: 20, padding: 36, position: "relative",
+              borderRadius: 20, overflow: "hidden", position: "relative",
+              display: "grid", gridTemplateColumns: "1fr 180px",
             }}>
-              <div style={{
-                position: "absolute", top: 20, right: 20,
-                background: "#84cc16", color: "#050505",
-                fontSize: "0.7rem", fontWeight: 800, padding: "3px 10px", borderRadius: 20,
-                letterSpacing: "0.08em",
-              }}>PRO</div>
-
-              <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 24 }}>
+              <div style={{ padding: 32 }}>
                 <div style={{
-                  width: 40, height: 40, borderRadius: 10,
-                  background: "rgba(132,204,22,0.2)", border: "1px solid rgba(132,204,22,0.4)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontWeight: 800, color: "#84cc16", fontSize: "1.1rem", flexShrink: 0,
-                }}>2</div>
-                <div>
-                  <h3 style={{ margin: "0 0 4px", fontSize: "1.3rem", fontWeight: 800 }}>Proveedor Pro</h3>
-                  <p style={{ margin: 0, color: "#84cc16", fontWeight: 600, fontSize: "0.9rem" }}>Vende directamente</p>
-                </div>
-              </div>
-
-              <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.7, marginBottom: 24 }}>
-                Si ya tienes stock en el país, vende directo desde Drokex con tu propia tienda y gestión completa.
-              </p>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
-                {["Stock disponible en el país", "Venta directa desde Drokex", "Landing page propia", "Pagos y pedidos gestionados", "Acceso a herramientas de marketing"].map(f => (
-                  <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.9rem", color: "rgba(255,255,255,0.8)" }}>
-                    {checkIcon} {f}
+                  position: "absolute", top: 16, right: 16,
+                  background: "#84cc16", color: "#050505",
+                  fontSize: "0.68rem", fontWeight: 800, padding: "3px 10px", borderRadius: 20,
+                  letterSpacing: "0.08em",
+                }}>PRO</div>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 20 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                    background: "rgba(132,204,22,0.2)", border: "1px solid rgba(132,204,22,0.4)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontWeight: 800, color: "#84cc16", fontSize: "1rem",
+                  }}>2</div>
+                  <div>
+                    <h3 style={{ margin: "0 0 3px", fontSize: "1.2rem", fontWeight: 800 }}>Proveedor Pro</h3>
+                    <p style={{ margin: 0, color: "#84cc16", fontWeight: 600, fontSize: "0.85rem" }}>Vende directamente</p>
                   </div>
-                ))}
+                </div>
+                <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.65, marginBottom: 20, fontSize: "0.9rem" }}>
+                  Si ya tienes stock en el país, vende directo desde Drokex con tu propia tienda y gestión completa.
+                </p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+                  {["Stock disponible en el país", "Venta directa desde Drokex", "Landing page propia", "Pagos y pedidos gestionados", "Acceso a herramientas de marketing"].map(f => (
+                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: "rgba(255,255,255,0.8)" }}>
+                      {checkIcon} {f}
+                    </div>
+                  ))}
+                </div>
+                <Link href="/proveedor-pro" style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  background: "#84cc16", color: "#050505", fontWeight: 700,
+                  padding: "11px 22px", borderRadius: 10, fontSize: "0.88rem",
+                  textDecoration: "none",
+                  boxShadow: "0 4px 18px rgba(132,204,22,0.35)",
+                }}>
+                  Quiero vender ya <span>→</span>
+                </Link>
               </div>
-
-              <Link href="/proveedor-pro" style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                background: "#84cc16", color: "#050505", fontWeight: 700,
-                padding: "12px 24px", borderRadius: 10, fontSize: "0.9rem",
-                textDecoration: "none",
-              }}>
-                Quiero vender ya <span>→</span>
-              </Link>
+              <div style={{ position: "relative", background: "#111" }}>
+                <img
+                  src="/landing sillas.jpeg"
+                  alt="Landing page Proveedor Pro"
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "top" }}
+                />
+              </div>
             </div>
+
           </div>
         </div>
       </section>
