@@ -213,7 +213,7 @@ export default function ParaProveedoresPage() {
                 ))}
               </div>
 
-              <Link href="/registro" style={{
+              <Link href="/proveedor-pro" style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 background: "#84cc16", color: "#050505", fontWeight: 700,
                 padding: "12px 24px", borderRadius: 10, fontSize: "0.9rem",
