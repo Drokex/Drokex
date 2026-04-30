@@ -6996,6 +6996,454 @@ button {
   transform: translateY(-1px);
 }
 
+/* ── Product Detail (dark) ── */
+.pd-page {
+  background: #111111;
+  color: #f0f0f0;
+  min-height: 100vh;
+}
+
+.pd-shell {
+  padding-top: 28px;
+  padding-bottom: 72px;
+}
+
+.pd-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.88rem;
+}
+
+.pd-breadcrumbs a {
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.pd-breadcrumbs a:hover {
+  color: #4ade80;
+}
+
+.pd-grid {
+  margin-top: 24px;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr);
+}
+
+/* Gallery */
+.product-gallery-panel {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.pd-page .detail-image-main {
+  position: relative;
+  aspect-ratio: 1.05 / 1;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #1e1e1e;
+}
+
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.15s;
+}
+
+.gallery-arrow:hover {
+  background: rgba(40, 40, 40, 0.9);
+}
+
+.gallery-arrow-prev { left: 12px; }
+.gallery-arrow-next { right: 12px; }
+
+.gallery-counter {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.gallery-heart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.15s, background 0.15s;
+}
+
+.gallery-heart--active {
+  color: #ef4444;
+}
+
+.gallery-novelos-tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(20, 20, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.detail-thumb-row {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.detail-thumb-btn {
+  flex: 0 0 80px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: #1e1e1e;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s;
+}
+
+.detail-thumb-btn--active {
+  border-color: #4ade80;
+}
+
+/* Info panel */
+.pd-info-panel {
+  padding: 4px 0;
+}
+
+.pd-offer-badge {
+  display: inline-block;
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid #4ade80;
+  color: #4ade80;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.pd-title {
+  margin: 14px 0 0;
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+.pd-subline {
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+}
+
+.pd-supplier {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+/* Price in dark mode */
+.pd-price-block {
+  margin-top: 20px;
+}
+
+.pd-market-price strong {
+  font-size: 2.4rem;
+  color: #4ade80;
+  display: block;
+  line-height: 1;
+}
+
+.pd-market-price small {
+  display: block;
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: line-through;
+  margin-top: 4px;
+}
+
+.pd-market-price .market-price-note {
+  display: block;
+  margin-top: 4px;
+  color: #4ade80;
+  font-size: 0.88rem;
+}
+
+.pd-market-price .market-price-origin {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.88rem;
+}
+
+/* Tags */
+.pd-tags {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pd-tags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.88rem;
+}
+
+/* CTA button in dark mode */
+.pd-page .quote-cta-btn {
+  background: #4ade80;
+  color: #0d1a0d;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  margin: 20px 0 0;
+  border: none;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+}
+
+.pd-page .quote-cta-btn:hover {
+  background: #22c55e;
+  transform: translateY(-1px);
+}
+
+/* Trust row */
+.pd-trust-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
+}
+
+.pd-trust-row span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Accordion */
+.accordion-stack {
+  margin-top: 10px;
+}
+
+.accordion-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.accordion-trigger-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.accordion-icon {
+  color: #4ade80;
+  display: flex;
+  align-items: center;
+}
+
+.accordion-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #4ade80;
+}
+
+.accordion-chevron {
+  color: rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.accordion-chevron--open {
+  transform: rotate(90deg);
+}
+
+.accordion-body {
+  padding-bottom: 18px;
+}
+
+.accordion-text {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.75;
+  font-size: 0.92rem;
+}
+
+.accordion-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.accordion-tag {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.88rem;
+}
+
+.accordion-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.accordion-spec-card {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.accordion-spec-card span {
+  display: block;
+  color: #4ade80;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.accordion-spec-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #f0f0f0;
+  line-height: 1.4;
+}
+
+/* Features bar */
+.pd-features-bar {
+  background: #161616;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 40px 0;
+}
+
+.pd-features-inner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.pd-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.pd-feature svg {
+  flex-shrink: 0;
+  color: #4ade80;
+  margin-top: 2px;
+}
+
+.pd-feature strong {
+  display: block;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.pd-feature p {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+/* Responsive */
+@media (max-width: 1080px) {
+  .pd-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-features-inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .pd-features-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .accordion-spec-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Quote form modal ── */
 .qf-overlay {
   position: fixed;
