@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import AprendeLink from "@/app/components/aprende-link";
 
 const exploreLinks = [
   { label: "Productos", href: "/productos" },
@@ -70,6 +71,7 @@ export default function SiteFooter() {
             <div className="site-footer-contact">
               <p>Email: soporte@drokex.com</p>
               <p>Region: 🌎 • Moneda:</p>
+              <AprendeLink />
             </div>
           </div>
         </div>

@@ -33,7 +33,6 @@ const menuItems = [
       { label: "Cliente", href: "/servicios/cliente" },
     ],
   },
-  { label: "Aprende", href: "/aprende" },
   { label: "Sobre nosotros", href: "/sobre-nosotros" },
   { label: "Contacto", href: "/#contacto" },
 ];
