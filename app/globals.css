@@ -8001,6 +8001,36 @@ button {
   text-decoration: none;
 }
 
+/* ── Modo claro ── */
+.cdk-light { background: #f2f4f7; color: #111; }
+.cdk-light .cdk-sidebar { background: #fff; border-color: rgba(0,0,0,0.08); }
+.cdk-light .cdk-sidebar-header { border-color: rgba(0,0,0,0.07); }
+.cdk-light .cdk-sidebar-desc { color: rgba(0,0,0,0.5); }
+.cdk-light .cdk-sidebar-section { border-color: rgba(0,0,0,0.06); }
+.cdk-light .cdk-filter-row:hover { background: rgba(0,0,0,0.04); }
+.cdk-light .cdk-filter-name { color: rgba(0,0,0,0.75); }
+.cdk-light .cdk-filter-count { color: rgba(0,0,0,0.35); }
+.cdk-light .cdk-show-more { color: rgba(0,0,0,0.5); }
+.cdk-light .cdk-clear-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.6); }
+.cdk-light .cdk-card { background: #fff; border-color: rgba(0,0,0,0.08); }
+.cdk-light .cdk-card:hover { border-color: rgba(0,0,0,0.18); box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+.cdk-light .cdk-card-supplier { color: rgba(0,0,0,0.85); }
+.cdk-light .cdk-card-origin { color: rgba(0,0,0,0.5); }
+.cdk-light .cdk-card-name a { color: #111; }
+.cdk-light .cdk-card-tags span { background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.65); border-color: rgba(0,0,0,0.08); }
+.cdk-light .cdk-toolbar { border-color: rgba(0,0,0,0.08); }
+.cdk-light .cdk-toolbar p { color: rgba(0,0,0,0.6); }
+.cdk-light .cdk-toolbar strong { color: #111; }
+.cdk-light .cdk-sort-btn { background: #fff; border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.75); }
+.cdk-light .cdk-btn-outline { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.7); }
+.cdk-light .cdk-bottom-trust { background: #fff; border-color: rgba(0,0,0,0.08); }
+.cdk-light .cdk-trust-item strong { color: #111; }
+.cdk-light .cdk-trust-item p { color: rgba(0,0,0,0.5); }
+.cdk-light .cdk-trust-item > svg { color: #16a34a; }
+.cdk-light .cdk-market-price strong { color: #111; }
+.cdk-light .cdk-market-price small { color: rgba(0,0,0,0.4); }
+.cdk-light .cdk-market-price .market-price-note { color: rgba(0,0,0,0.55); }
+
 /* Responsive */
 @media (max-width: 1200px) {
   .cdk-grid {

@@ -5,6 +5,7 @@ import MarketPrice from "@/app/components/market-price";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import CatalogHeart from "@/app/components/catalog-heart";
+import CatalogThemeToggle from "@/app/components/catalog-theme-toggle";
 
 const CATEGORY_META = {
   "Automatizacion industrial": {
@@ -122,6 +123,7 @@ export default async function CategoriasPage() {
   return (
     <main className="cdk-page">
       <SiteHeader />
+      <CatalogThemeToggle />
 
       <div className="shell cdk-layout">
         {/* ── Sidebar ── */}
