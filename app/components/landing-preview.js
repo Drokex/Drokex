@@ -59,7 +59,7 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
               style={{
                 position: "absolute",
                 top: 46,
-                right: 0,
+                left: 0,
                 width: 292,
                 padding: 14,
                 borderRadius: 16,
