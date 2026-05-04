@@ -177,50 +177,50 @@ export default function ProveedorProPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#030503] text-white">
+    <main className="min-h-screen bg-white text-[#111]">
       <SiteHeader />
 
       {!isPro ? (
-        <section style={{ display: "grid", gridTemplateColumns: "420px 1fr", minHeight: "calc(100vh - 80px)", background: "#030503" }}>
+        <section style={{ display: "grid", gridTemplateColumns: "420px 1fr", minHeight: "calc(100vh - 80px)", background: "#ffffff" }}>
           {/* Left: text + plan + form */}
-          <div style={{ padding: "64px 40px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 24 }}>
-            <span style={{ display: "inline-block", background: "rgba(89,255,53,0.12)", color: "#59ff35", fontSize: "0.7rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(89,255,53,0.25)", alignSelf: "flex-start" }}>
+          <div style={{ padding: "64px 40px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 24, background: "#ffffff" }}>
+            <span style={{ display: "inline-block", background: "rgba(46,166,0,0.1)", color: "#2ea600", fontSize: "0.7rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(46,166,0,0.25)", alignSelf: "flex-start" }}>
               Proveedor Pro
             </span>
 
-            <h1 style={{ fontSize: "clamp(1.35rem, 2vw, 1.9rem)", fontWeight: 700, lineHeight: 1.25, margin: 0, color: "#fff", letterSpacing: "-0.01em" }}>
+            <h1 style={{ fontSize: "clamp(1.35rem, 2vw, 1.9rem)", fontWeight: 700, lineHeight: 1.25, margin: 0, color: "#111", letterSpacing: "-0.01em" }}>
               Crea tu tienda premium<br />dentro de{" "}
-              <span style={{ color: "#59ff35" }}>Drokex</span>
+              <span style={{ color: "#2ea600" }}>Drokex</span>
             </h1>
 
-            <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.95rem", lineHeight: 1.7, margin: 0 }}>
+            <p style={{ color: "#666", fontSize: "0.95rem", lineHeight: 1.7, margin: 0 }}>
               Activa el modo Pro para construir una landing personalizada, subir banners, productos, textos comerciales y vender directo.
             </p>
 
-            <div style={{ borderRadius: 24, border: "1px solid rgba(89,255,53,0.3)", background: "rgba(89,255,53,0.08)", padding: "24px" }}>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.45)", fontSize: "0.82rem" }}>Plan demo</p>
-              <h2 style={{ margin: "8px 0 0", fontSize: "2.4rem", fontWeight: 900, color: "#59ff35", lineHeight: 1 }}>$99.000 COP</h2>
-              <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.4)", fontSize: "0.82rem" }}>Simulación para validar experiencia.</p>
+            <div style={{ borderRadius: 24, border: "1px solid rgba(46,166,0,0.25)", background: "rgba(46,166,0,0.06)", padding: "24px" }}>
+              <p style={{ margin: 0, color: "#888", fontSize: "0.82rem" }}>Plan demo</p>
+              <h2 style={{ margin: "8px 0 0", fontSize: "2.4rem", fontWeight: 900, color: "#2ea600", lineHeight: 1 }}>$99.000 COP</h2>
+              <p style={{ margin: "8px 0 0", color: "#999", fontSize: "0.82rem" }}>Simulación para validar experiencia.</p>
             </div>
 
-            <div style={{ borderRadius: 24, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", padding: "28px" }}>
-              <h2 style={{ margin: "0 0 20px", fontSize: "1.3rem", fontWeight: 900, color: "#fff" }}>Adquiere Proveedor Pro</h2>
+            <div style={{ borderRadius: 24, border: "1px solid rgba(0,0,0,0.1)", background: "#f7f7f7", padding: "28px" }}>
+              <h2 style={{ margin: "0 0 20px", fontSize: "1.3rem", fontWeight: 900, color: "#111" }}>Adquiere Proveedor Pro</h2>
               <input
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Código de activación"
-                style={{ width: "100%", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "#000", color: "#fff", padding: "14px 18px", fontSize: "0.92rem", outline: "none", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#59ff35"}
-                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.12)"}
+                style={{ width: "100%", borderRadius: 14, border: "1px solid rgba(0,0,0,0.15)", background: "#fff", color: "#111", padding: "14px 18px", fontSize: "0.92rem", outline: "none", boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = "#2ea600"}
+                onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.15)"}
               />
-              {error && <p style={{ margin: "8px 0 0", color: "#f87171", fontSize: "0.82rem" }}>{error}</p>}
+              {error && <p style={{ margin: "8px 0 0", color: "#dc2626", fontSize: "0.82rem" }}>{error}</p>}
               <button
                 onClick={activatePro}
-                style={{ marginTop: 14, width: "100%", borderRadius: 14, background: "#59ff35", color: "#050505", fontWeight: 900, fontSize: "1rem", padding: "14px", border: "none", cursor: "pointer", boxShadow: "0 4px 20px rgba(89,255,53,0.35)" }}
+                style={{ marginTop: 14, width: "100%", borderRadius: 14, background: "#2ea600", color: "#fff", fontWeight: 900, fontSize: "1rem", padding: "14px", border: "none", cursor: "pointer", boxShadow: "0 4px 20px rgba(46,166,0,0.3)" }}
               >
                 Activar plan Pro
               </button>
-              <p style={{ margin: "12px 0 0", textAlign: "center", color: "rgba(255,255,255,0.3)", fontSize: "0.75rem" }}>Código demo: 15472007</p>
+              <p style={{ margin: "12px 0 0", textAlign: "center", color: "#aaa", fontSize: "0.75rem" }}>Código demo: 15472007</p>
             </div>
           </div>
 
