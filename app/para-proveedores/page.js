@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
@@ -8,13 +9,6 @@ const checkIcon = (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
     <circle cx="9" cy="9" r="9" fill="#84cc16" fillOpacity="0.15" />
     <path d="M5 9.5l3 3 5-5.5" stroke="#84cc16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const dashIcon = (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
-    <circle cx="9" cy="9" r="9" fill="rgba(255,255,255,0.06)" />
-    <path d="M6 9h6" stroke="rgba(255,255,255,0.3)" strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
 
@@ -31,16 +25,6 @@ const rocketIcon = (
     <text x="9" y="13" textAnchor="middle" fontSize="10" fill="#84cc16">🚀</text>
   </svg>
 );
-
-const compareRows = [
-  { label: "Mostrar productos",           explorer: checkIcon,  pro: checkIcon },
-  { label: "Generar leads / cotizaciones", explorer: checkIcon, pro: dashIcon },
-  { label: "Venta directa",               explorer: dashIcon,   pro: checkIcon },
-  { label: "Landing page personalizada",  explorer: <span style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)" }}>Básica</span>, pro: <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8rem", fontWeight: 700, color: "#fbbf24" }}>★ PRO</span> },
-  { label: "Gestión de pedidos",          explorer: dashIcon,   pro: checkIcon },
-  { label: "Herramientas de publicidad con IA", explorer: checkIcon, pro: checkIcon },
-  { label: "Escalar a nuevos mercados",   explorer: <span style={{ fontSize: "0.78rem" }}>⚡</span>, pro: rocketIcon },
-];
 
 const footerStats = [
   {
@@ -62,12 +46,72 @@ const footerStats = [
 ];
 
 export default function ParaProveedoresPage() {
+  const [lightMode, setLightMode] = useState(false);
+
+  const bg    = lightMode ? "#f5f5f5" : "#050505";
+  const card  = lightMode ? "#fff"    : "rgba(255,255,255,0.04)";
+  const cardDark = lightMode ? "#f0f0f0" : "#131313";
+  const txt   = lightMode ? "#111"    : "#fff";
+  const w     = (op) => lightMode ? `rgba(0,0,0,${op})` : `rgba(255,255,255,${op})`;
+
+  const dashIcon = (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
+      <circle cx="9" cy="9" r="9" fill={w(0.06)} />
+      <path d="M6 9h6" stroke={w(0.3)} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+
+  const compareRows = [
+    { label: "Mostrar productos",           explorer: checkIcon,  pro: checkIcon },
+    { label: "Generar leads / cotizaciones", explorer: checkIcon, pro: dashIcon },
+    { label: "Venta directa",               explorer: dashIcon,   pro: checkIcon },
+    { label: "Landing page personalizada",  explorer: <span style={{ fontSize: "0.78rem", color: w(0.5) }}>Básica</span>, pro: <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: "0.8rem", fontWeight: 700, color: "#fbbf24" }}>★ PRO</span> },
+    { label: "Gestión de pedidos",          explorer: dashIcon,   pro: checkIcon },
+    { label: "Herramientas de publicidad con IA", explorer: checkIcon, pro: checkIcon },
+    { label: "Escalar a nuevos mercados",   explorer: <span style={{ fontSize: "0.78rem" }}>⚡</span>, pro: rocketIcon },
+  ];
+
   return (
-    <main style={{ background: "#050505", minHeight: "100vh", color: "#fff" }}>
+    <main style={{ background: bg, minHeight: "100vh", color: txt }}>
       <SiteHeader />
 
+      {/* Toggle button */}
+      <button
+        onClick={() => setLightMode((v) => !v)}
+        title={lightMode ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
+        style={{
+          position: "fixed", top: 88, right: 20, zIndex: 999,
+          display: "flex", alignItems: "center", gap: 7,
+          padding: "8px 14px", borderRadius: 10,
+          border: lightMode ? "1px solid rgba(0,0,0,0.12)" : "1px solid rgba(255,255,255,0.12)",
+          background: lightMode ? "#ffffff" : "#1a1a1a",
+          color: lightMode ? "#111" : "#fff",
+          fontSize: "0.78rem", fontWeight: 800, cursor: "pointer",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.2)", transition: "all 0.2s",
+        }}
+      >
+        {lightMode ? (
+          <>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            Modo oscuro
+          </>
+        ) : (
+          <>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            Modo claro
+          </>
+        )}
+      </button>
+
       {/* ── HERO ────────────────────────────────────────── */}
-      <section style={{ position: "relative", minHeight: 480, display: "flex", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.06)", overflow: "hidden" }}>
+      <section style={{ position: "relative", minHeight: 480, display: "flex", alignItems: "center", borderBottom: `1px solid ${w(0.06)}`, overflow: "hidden" }}>
         <img
           src="/Banner mapa casas.jpg"
           alt="Red Drokex en LATAM"
@@ -127,11 +171,11 @@ export default function ParaProveedoresPage() {
 
             {/* EXPLORER */}
             <div style={{
-              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+              background: card, border: `1px solid ${w(0.1)}`,
               borderRadius: 20, overflow: "hidden",
               display: "grid", gridTemplateColumns: "180px 1fr",
             }}>
-              <div style={{ position: "relative", background: "#111" }}>
+              <div style={{ position: "relative", background: cardDark }}>
                 <img
                   src="/sillas pequeño.png"
                   alt="Panel de productos Explorer"
@@ -151,21 +195,21 @@ export default function ParaProveedoresPage() {
                     <p style={{ margin: 0, color: "#84cc16", fontWeight: 600, fontSize: "0.85rem" }}>Valida tu mercado</p>
                   </div>
                 </div>
-                <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.65, marginBottom: 20, fontSize: "0.9rem" }}>
-                  Publica tus productos y recibe <strong style={{ color: "#fff" }}>contactos y cotizaciones</strong> de compradores interesados.
+                <p style={{ color: w(0.6), lineHeight: 1.65, marginBottom: 20, fontSize: "0.9rem" }}>
+                  Publica tus productos y recibe <strong style={{ color: txt }}>contactos y cotizaciones</strong> de compradores interesados.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
                   {["Publica tus productos", "Recibe contactos y cotizaciones", "Mide el interés real en otros países", "Sin necesidad de tener stock"].map(f => (
-                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: "rgba(255,255,255,0.8)" }}>
+                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: w(0.8) }}>
                       {checkIcon} {f}
                     </div>
                   ))}
                 </div>
                 <Link href="/registro" style={{
                   display: "inline-flex", alignItems: "center", gap: 8,
-                  background: "transparent", color: "#fff", fontWeight: 600,
+                  background: "transparent", color: txt, fontWeight: 600,
                   padding: "11px 22px", borderRadius: 10, fontSize: "0.88rem",
-                  border: "1px solid rgba(255,255,255,0.22)", textDecoration: "none",
+                  border: `1px solid ${w(0.22)}`, textDecoration: "none",
                 }}>
                   Probar sin riesgo <span>→</span>
                 </Link>
@@ -197,12 +241,12 @@ export default function ParaProveedoresPage() {
                     <p style={{ margin: 0, color: "#84cc16", fontWeight: 600, fontSize: "0.85rem" }}>Vende directamente</p>
                   </div>
                 </div>
-                <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.65, marginBottom: 20, fontSize: "0.9rem" }}>
+                <p style={{ color: w(0.6), lineHeight: 1.65, marginBottom: 20, fontSize: "0.9rem" }}>
                   Si ya tienes stock en el país, vende directo desde Drokex con tu propia tienda y gestión completa.
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
                   {["Stock disponible en el país", "Venta directa desde Drokex", "Landing page propia", "Pagos y pedidos gestionados", "Acceso a herramientas de marketing"].map(f => (
-                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: "rgba(255,255,255,0.8)" }}>
+                    <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.88rem", color: w(0.8) }}>
                       {checkIcon} {f}
                     </div>
                   ))}
@@ -211,13 +255,12 @@ export default function ParaProveedoresPage() {
                   display: "inline-flex", alignItems: "center", gap: 8,
                   background: "#84cc16", color: "#050505", fontWeight: 700,
                   padding: "11px 22px", borderRadius: 10, fontSize: "0.88rem",
-                  textDecoration: "none",
-                  boxShadow: "0 4px 18px rgba(132,204,22,0.35)",
+                  textDecoration: "none", boxShadow: "0 4px 18px rgba(132,204,22,0.35)",
                 }}>
                   Quiero vender ya <span>→</span>
                 </Link>
               </div>
-              <div style={{ position: "relative", background: "#111", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+              <div style={{ position: "relative", background: cardDark, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
                 <img
                   src="/landing sillas.jpeg"
                   alt="Landing page Proveedor Pro"
@@ -238,23 +281,22 @@ export default function ParaProveedoresPage() {
               ¿Qué incluye <span style={{ color: "#84cc16" }}>cada opción</span>?
             </h2>
             <div style={{
-              background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+              background: card, border: `1px solid ${w(0.08)}`,
               borderRadius: 16, overflow: "hidden",
             }}>
-              {/* Header */}
               <div style={{
                 display: "grid", gridTemplateColumns: "1fr 160px 160px",
-                padding: "16px 24px", borderBottom: "1px solid rgba(255,255,255,0.08)",
-                background: "rgba(255,255,255,0.03)", alignItems: "center",
+                padding: "16px 24px", borderBottom: `1px solid ${w(0.08)}`,
+                background: w(0.03), alignItems: "center",
               }}>
-                <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem", fontWeight: 600 }}>Características</span>
+                <span style={{ color: w(0.45), fontSize: "0.82rem", fontWeight: 600 }}>Características</span>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
                     background: "#84cc16", display: "flex", alignItems: "center", justifyContent: "center",
                     fontWeight: 800, color: "#050505", fontSize: "0.85rem",
                   }}>1</div>
-                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: "#fff" }}>Proveedor Explorer</span>
+                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: txt }}>Proveedor Explorer</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
                   <div style={{
@@ -262,17 +304,17 @@ export default function ParaProveedoresPage() {
                     background: "#84cc16", display: "flex", alignItems: "center", justifyContent: "center",
                     fontWeight: 800, color: "#050505", fontSize: "0.85rem",
                   }}>2</div>
-                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: "#fff" }}>Proveedor Pro</span>
+                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: txt }}>Proveedor Pro</span>
                 </div>
               </div>
               {compareRows.map((row, i) => (
                 <div key={row.label} style={{
                   display: "grid", gridTemplateColumns: "1fr 160px 160px",
                   padding: "14px 24px",
-                  borderBottom: i < compareRows.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
+                  borderBottom: i < compareRows.length - 1 ? `1px solid ${w(0.06)}` : "none",
                   alignItems: "center",
                 }}>
-                  <span style={{ fontSize: "0.88rem", color: "rgba(255,255,255,0.75)" }}>{row.label}</span>
+                  <span style={{ fontSize: "0.88rem", color: w(0.75) }}>{row.label}</span>
                   <div style={{ display: "flex", justifyContent: "center" }}>{row.explorer}</div>
                   <div style={{ display: "flex", justifyContent: "center" }}>{row.pro}</div>
                 </div>
@@ -282,7 +324,7 @@ export default function ParaProveedoresPage() {
 
           {/* Side card */}
           <div style={{
-            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+            background: card, border: `1px solid ${w(0.1)}`,
             borderRadius: 16, padding: 28, maxWidth: 230, marginTop: 52,
           }}>
             <div style={{
@@ -296,17 +338,16 @@ export default function ParaProveedoresPage() {
                 <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
               </svg>
             </div>
-            <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "1rem", lineHeight: 1.6, margin: "0 0 22px", fontWeight: 600 }}>
+            <p style={{ color: w(0.85), fontSize: "1rem", lineHeight: 1.6, margin: "0 0 22px", fontWeight: 600 }}>
               Empieza como Explorer y escala a Pro cuando estés listo.
             </p>
             <Link href="/registro" style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
-              background: "transparent", color: "#fff", fontWeight: 700,
+              background: "transparent", color: txt, fontWeight: 700,
               padding: "12px 18px", borderRadius: 10, fontSize: "0.92rem",
               border: "1px solid rgba(132,204,22,0.5)", textDecoration: "none",
-              transition: "border-color 0.15s",
             }}>
-              Asi de simple <span style={{ color: "#84cc16" }}>→</span>
+              Así de simple <span style={{ color: "#84cc16" }}>→</span>
             </Link>
           </div>
         </div>
@@ -316,16 +357,13 @@ export default function ParaProveedoresPage() {
       <section style={{ padding: "40px 0 80px" }}>
         <div className="shell">
           <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(132,204,22,0.15)", minHeight: 320 }}>
-            {/* Background image */}
             <img
               src="/banner tiendas drokex virtual .jpg"
               alt="Drokex mundo virtual"
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
             />
-            {/* Dark gradient over the left */}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.7) 40%, rgba(5,5,5,0.1) 100%)" }} />
 
-            {/* Content */}
             <div style={{ position: "relative", zIndex: 2, padding: "44px 40px", maxWidth: 420 }}>
               <h2 style={{ fontSize: "clamp(1.4rem, 2.5vw, 1.9rem)", fontWeight: 800, margin: "0 0 14px", lineHeight: 1.15 }}>
                 Una experiencia de <span style={{ color: "#84cc16" }}>otro nivel</span>
@@ -353,7 +391,6 @@ export default function ParaProveedoresPage() {
               </div>
             </div>
 
-            {/* Floating brand cards */}
             <div style={{ position: "absolute", top: "14%", left: "22%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
               <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
               <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
@@ -374,23 +411,21 @@ export default function ParaProveedoresPage() {
       <section style={{ padding: "80px 0" }}>
         <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center" }}>
 
-          {/* Studio preview card */}
           <div style={{
-            background: "#131313", border: "1px solid rgba(255,255,255,0.1)",
+            background: cardDark, border: `1px solid ${w(0.1)}`,
             borderRadius: 20, overflow: "hidden",
             display: "grid", gridTemplateColumns: "140px 1fr 160px",
             minHeight: 280,
           }}>
-            {/* Sidebar */}
-            <div style={{ borderRight: "1px solid rgba(255,255,255,0.07)", padding: "20px 0" }}>
-              <p style={{ margin: "0 0 16px", padding: "0 16px", color: "rgba(255,255,255,0.5)", fontSize: "0.75rem", fontWeight: 700 }}>
+            <div style={{ borderRight: `1px solid ${w(0.07)}`, padding: "20px 0" }}>
+              <p style={{ margin: "0 0 16px", padding: "0 16px", color: w(0.5), fontSize: "0.75rem", fontWeight: 700 }}>
                 Drokex Studio
               </p>
               {["Crear banner", "Mis diseños", "Plantillas", "Inspiración"].map((item, i) => (
                 <div key={item} style={{
                   padding: "9px 16px", fontSize: "0.82rem", cursor: "pointer",
                   background: i === 0 ? "rgba(132,204,22,0.12)" : "transparent",
-                  color: i === 0 ? "#84cc16" : "rgba(255,255,255,0.45)",
+                  color: i === 0 ? "#84cc16" : w(0.45),
                   fontWeight: i === 0 ? 700 : 400,
                   borderLeft: i === 0 ? "2px solid #84cc16" : "2px solid transparent",
                 }}>
@@ -399,15 +434,14 @@ export default function ParaProveedoresPage() {
               ))}
             </div>
 
-            {/* Form area */}
             <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
-              <p style={{ margin: 0, color: "rgba(255,255,255,0.4)", fontSize: "0.72rem", letterSpacing: "0.05em" }}>
+              <p style={{ margin: 0, color: w(0.4), fontSize: "0.72rem", letterSpacing: "0.05em" }}>
                 Describe tu banner
               </p>
               <div style={{
-                flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                flex: 1, background: w(0.04), border: `1px solid ${w(0.08)}`,
                 borderRadius: 10, padding: 14,
-                color: "rgba(255,255,255,0.65)", fontSize: "0.82rem", lineHeight: 1.6,
+                color: w(0.65), fontSize: "0.82rem", lineHeight: 1.6,
               }}>
                 Banner moderno para promocionar sofás de lujo en Colombia
               </div>
@@ -421,28 +455,19 @@ export default function ParaProveedoresPage() {
               </button>
             </div>
 
-            {/* Banner previews */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 0, borderLeft: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0, borderLeft: `1px solid ${w(0.07)}` }}>
               <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
                 <img src="/sillas.jpeg" alt="Banner sofás de lujo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{
-                  position: "absolute", inset: 0,
-                  background: "linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 100%)",
-                  display: "flex", alignItems: "flex-end", padding: 10,
-                }}>
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 100%)", display: "flex", alignItems: "flex-end", padding: 10 }}>
                   <div>
                     <p style={{ margin: 0, fontWeight: 800, fontSize: "0.78rem", color: "#fff", lineHeight: 1.2 }}>SOFÁS<br />DE LUJO</p>
                     <p style={{ margin: "3px 0 0", fontSize: "0.6rem", color: "rgba(255,255,255,0.55)" }}>★ DROKEX STU...</p>
                   </div>
                 </div>
               </div>
-              <div style={{ flex: 1, position: "relative", overflow: "hidden", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+              <div style={{ flex: 1, position: "relative", overflow: "hidden", borderTop: `1px solid ${w(0.07)}` }}>
                 <img src="/landing sillas.jpeg" alt="Banner comodidad y estilo" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{
-                  position: "absolute", inset: 0,
-                  background: "linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 100%)",
-                  display: "flex", alignItems: "flex-end", padding: 10,
-                }}>
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.15) 100%)", display: "flex", alignItems: "flex-end", padding: 10 }}>
                   <div>
                     <p style={{ margin: 0, fontWeight: 800, fontSize: "0.78rem", color: "#fff", lineHeight: 1.2 }}>COMODIDAD<br />Y ESTILO</p>
                     <p style={{ margin: "3px 0 0", fontSize: "0.6rem", color: "rgba(255,255,255,0.55)" }}>★ DROKEX STU...</p>
@@ -452,17 +477,16 @@ export default function ParaProveedoresPage() {
             </div>
           </div>
 
-          {/* Text */}
           <div>
             <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 800, margin: "0 0 16px" }}>
               Drokex <span style={{ color: "#84cc16" }}>Studio</span>
             </h2>
-            <p style={{ color: "rgba(255,255,255,0.55)", lineHeight: 1.7, margin: "0 0 24px", fontSize: "0.95rem" }}>
+            <p style={{ color: w(0.55), lineHeight: 1.7, margin: "0 0 24px", fontSize: "0.95rem" }}>
               Crea banners y publicidad profesional con inteligencia artificial en segundos.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
               {["Genera imágenes impactantes", "Personaliza tu tienda", "Atrae más compradores"].map(f => (
-                <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.92rem", color: "rgba(255,255,255,0.8)" }}>
+                <div key={f} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.92rem", color: w(0.8) }}>
                   {checkIcon} {f}
                 </div>
               ))}
@@ -483,14 +507,14 @@ export default function ParaProveedoresPage() {
       <section style={{ padding: "40px 0 48px" }}>
         <div className="shell">
           <div style={{
-            background: "linear-gradient(135deg, #0a1a0a 0%, #0d2010 100%)",
+            background: lightMode ? "#e8f5e3" : "linear-gradient(135deg, #0a1a0a 0%, #0d2010 100%)",
             border: "1px solid rgba(132,204,22,0.3)",
             borderRadius: 20, padding: "52px 56px",
             display: "flex", alignItems: "center", justifyContent: "space-between",
             flexWrap: "wrap", gap: 24,
             boxShadow: "0 0 60px rgba(132,204,22,0.08)",
           }}>
-            <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 800, margin: 0, lineHeight: 1.2 }}>
+            <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2.2rem)", fontWeight: 800, margin: 0, lineHeight: 1.2, color: txt }}>
               Empieza hoy en <span style={{ color: "#84cc16" }}>Drokex</span><br />
               y lleva tu marca a nuevos países.
             </h2>
@@ -509,7 +533,8 @@ export default function ParaProveedoresPage() {
 
       {/* ── STATS BAR ───────────────────────────────────── */}
       <div style={{
-        background: "#050505", borderBottom: "1px solid rgba(255,255,255,0.06)",
+        background: lightMode ? "#ebebeb" : "#050505",
+        borderBottom: `1px solid ${w(0.06)}`,
         padding: "28px 0",
       }}>
         <div className="shell" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
@@ -522,7 +547,7 @@ export default function ParaProveedoresPage() {
               }}>{s.icon}</div>
               <div>
                 <p style={{ margin: 0, fontWeight: 700, fontSize: "0.88rem" }}>{s.label}</p>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.45)", fontSize: "0.78rem" }}>{s.sub}</p>
+                <p style={{ margin: 0, color: w(0.45), fontSize: "0.78rem" }}>{s.sub}</p>
               </div>
             </div>
           ))}
