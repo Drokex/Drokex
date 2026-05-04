@@ -1707,36 +1707,92 @@ export default function AprendePage() {
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: "#060d1a" }}>
+    <main style={{ minHeight: "100vh", background: "#050505" }}>
       <SiteHeader />
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "48px 16px 80px" }}>
-        <p style={{ color: "#ff8500", fontWeight: 800, letterSpacing: "0.14em", fontSize: "0.75rem", textTransform: "uppercase", margin: "0 0 8px" }}>
-          Aprende Drokex
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 16px 80px" }}>
+        <p style={{ color: "rgba(255,255,255,0.35)", margin: "0 0 20px", fontSize: "0.82rem", textAlign: "center", letterSpacing: "0.08em" }}>
+          <kbd style={kbdStyle}>←→</kbd> mover &nbsp;·&nbsp;
+          <kbd style={kbdStyle}>↑/W</kbd> saltar &nbsp;·&nbsp;
+          <kbd style={kbdStyle}>Z</kbd> sprint &nbsp;·&nbsp;
+          <kbd style={kbdStyle}>X</kbd> poder
         </p>
-        <h1 style={{ color: "#fff", fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 700, margin: "0 0 6px", textAlign: "center" }}>
-          Drokex Platform
-        </h1>
-        <p style={{ color: "rgba(255,255,255,0.5)", margin: "0 0 32px", fontSize: "0.9rem", textAlign: "center" }}>
-          <kbd style={kbdStyle}>←</kbd> <kbd style={kbdStyle}>→</kbd> moverse &nbsp;·&nbsp;
-          <kbd style={kbdStyle}>↑/W</kbd> saltar (doble) &nbsp;·&nbsp;
-          <kbd style={kbdStyle}>Z</kbd> correr &nbsp;·&nbsp;
-          <kbd style={kbdStyle}>X</kbd> poder (10 monedas)
-        </p>
-        <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", boxShadow: "0 0 60px rgba(255,133,0,0.2), 0 0 0 2px rgba(255,133,0,0.3)" }}>
+        <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", boxShadow: "0 0 80px rgba(132,204,22,0.18), 0 0 0 1px rgba(132,204,22,0.25)" }}>
           <canvas ref={canvasRef} width={W} height={H} style={{ display: "block", maxWidth: "100%" }} />
 
           {screen === "start" && (
-            <div style={overlayStyle}>
-              <p style={tagStyle}>Drokex Platform</p>
-              <h2 style={titleStyle}>¿Listo para jugar?</h2>
-              <p style={subStyle}>10 niveles · castillos cada 3 · fantasma final · doble salto · sprint · poder</p>
-              {highScores.length > 0 && (
-                <div style={scoreListStyle}>
-                  <strong>🏆 Ranking Global</strong>
-                  {highScores.slice(0, 5).map((s, i) => <p key={s.id ?? i}>{i + 1}. {s.name} · {s.score} pts</p>)}
+            <div style={{
+              position: "absolute", inset: 0,
+              background: "linear-gradient(160deg, rgba(5,5,5,0.97) 0%, rgba(5,20,5,0.95) 100%)",
+              backdropFilter: "blur(2px)",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              padding: "32px 40px", gap: 0,
+            }}>
+              {/* Portal header */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#84cc16", boxShadow: "0 0 8px #84cc16", display: "inline-block" }} />
+                <span style={{ color: "#84cc16", fontSize: "0.68rem", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase" }}>Portal Drokex</span>
+              </div>
+              <p style={{ color: "rgba(132,204,22,0.6)", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.18em", margin: "0 0 28px", textTransform: "uppercase" }}>
+                GATEWAY ACTIVO / MODO JUEGO
+              </p>
+
+              {/* Big title */}
+              <div style={{ textAlign: "center", marginBottom: 32, lineHeight: 0.9 }}>
+                <div style={{ fontSize: "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "rgba(255,255,255,0.08)", fontFamily: "monospace", lineHeight: 0.88 }}>
+                  DROKEX
                 </div>
-              )}
-              <button onClick={startGame} style={btnStyle}>Comenzar</button>
+                <div style={{ fontSize: "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "#84cc16", fontFamily: "monospace", lineHeight: 0.88 }}>
+                  PLATFORM
+                </div>
+              </div>
+
+              {/* Top 3 scores */}
+              <div style={{ width: "min(420px, 100%)", marginBottom: 32 }}>
+                <p style={{ color: "rgba(132,204,22,0.55)", fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 10px", textAlign: "center" }}>
+                  — Top agentes —
+                </p>
+                {highScores.length === 0 ? (
+                  <div style={{ border: "1px solid rgba(132,204,22,0.12)", borderRadius: 10, padding: "14px 18px", textAlign: "center" }}>
+                    <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.82rem" }}>Sin puntajes aún — sé el primero</span>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {highScores.slice(0, 3).map((s, i) => (
+                      <div key={s.id ?? i} style={{
+                        display: "flex", alignItems: "center", gap: 14,
+                        border: `1px solid ${i === 0 ? "rgba(132,204,22,0.35)" : "rgba(255,255,255,0.07)"}`,
+                        borderRadius: 10, padding: "11px 16px",
+                        background: i === 0 ? "rgba(132,204,22,0.06)" : "rgba(255,255,255,0.02)",
+                      }}>
+                        <span style={{
+                          fontSize: "0.65rem", fontWeight: 900, fontFamily: "monospace",
+                          color: i === 0 ? "#84cc16" : "rgba(255,255,255,0.3)",
+                          letterSpacing: "0.1em", minWidth: 22,
+                        }}>0{i + 1}</span>
+                        <span style={{ flex: 1, fontSize: "0.88rem", fontWeight: 700, color: i === 0 ? "#fff" : "rgba(255,255,255,0.6)" }}>{s.name}</span>
+                        <span style={{ fontSize: "0.85rem", fontWeight: 900, fontFamily: "monospace", color: i === 0 ? "#84cc16" : "rgba(255,255,255,0.4)" }}>
+                          {s.score.toLocaleString()} pts
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* CTA */}
+              <button onClick={startGame} style={{
+                background: "#84cc16", color: "#050505", border: "none",
+                borderRadius: 10, padding: "15px 48px",
+                fontSize: "0.9rem", fontWeight: 900, cursor: "pointer",
+                letterSpacing: "0.12em", textTransform: "uppercase",
+                boxShadow: "0 0 32px rgba(132,204,22,0.4)",
+                transition: "box-shadow 0.2s",
+              }}>
+                Iniciar misión →
+              </button>
+              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.68rem", marginTop: 14, letterSpacing: "0.08em" }}>
+                15 niveles · jefe final · doble salto · sprint
+              </p>
             </div>
           )}
           {screen === "dead" && (
@@ -1787,7 +1843,7 @@ export default function AprendePage() {
   );
 }
 
-const kbdStyle = { background: "#1a2a1a", color: "#ff8500", padding: "2px 8px", borderRadius: 6, border: "1px solid #ff8500" };
+const kbdStyle = { background: "rgba(132,204,22,0.1)", color: "#84cc16", padding: "2px 8px", borderRadius: 6, border: "1px solid rgba(132,204,22,0.3)", fontFamily: "monospace", fontSize: "0.8rem" };
 const overlayStyle = { position: "absolute", inset: 0, background: "rgba(6,13,26,0.88)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 };
 const tagStyle = { color: "#ff8500", fontWeight: 800, fontSize: "0.8rem", letterSpacing: "0.14em", textTransform: "uppercase", margin: "0 0 12px" };
 const titleStyle = { color: "#fff", fontSize: "2rem", fontWeight: 800, margin: "0 0 8px" };
