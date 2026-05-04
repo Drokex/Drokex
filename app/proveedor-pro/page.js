@@ -465,15 +465,6 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
           <a>Contacto</a>
         </nav>
 
-        <button
-          className="rounded-xl px-5 py-3 font-black"
-          style={{
-            backgroundColor: store.primaryColor,
-            color: store.buttonTextColor,
-          }}
-        >
-          {store.headerCtaText}
-        </button>
       </header>
 
       <section
@@ -690,6 +681,19 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="px-8 py-16 text-center" style={{ backgroundColor: store.surfaceColor }}>
+        <p className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: store.primaryColor }}>
+          {store.finalEyebrow}
+        </p>
+        <h2 className="mx-auto mt-4 max-w-2xl text-4xl font-black">{store.finalTitle}</h2>
+        <button
+          className="mt-8 rounded-2xl px-10 py-4 font-black"
+          style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}
+        >
+          {store.finalCtaText}
+        </button>
       </section>
     </div>
   );
