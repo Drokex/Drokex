@@ -14,8 +14,8 @@ export function hexToRgba(hex, alpha) {
 
 function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange, onFontSizeChange, onFontColorChange, isEditable, className, style }) {
   const ref = useRef(null);
-  const colorRef = useRef(null);
   const [focused, setFocused] = useState(false);
+  const [colorOpen, setColorOpen] = useState(false);
 
   useEffect(() => {
     if (ref.current && !focused) ref.current.innerText = value || "";
@@ -26,34 +26,88 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
   if (!isEditable) return <Tag className={className} style={computedStyle}>{value}</Tag>;
 
   const btnStyle = { background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, color: "#fff", fontWeight: 900, fontSize: "0.72rem", padding: "3px 8px", cursor: "pointer", lineHeight: 1.4, display: "flex", alignItems: "center", gap: 4 };
+  const colorOptions = ["#191421", "#ffffff", "#59ff35", "#ff9f2e", "#ff7db8", "#b86cff", "#00cfff", "#111827", "#6f6477", "#dc2626"];
 
   return (
     <div style={{ position: "relative" }}>
       {focused && (
-        <div onMouseDown={e => {
-          if (e.target?.dataset?.colorPicker === "true") return;
-          e.preventDefault();
-        }}
+        <div onMouseDown={e => e.preventDefault()}
           style={{ position: "absolute", top: -50, left: 0, zIndex: 400, background: "#0c140c", border: "1px solid rgba(89,255,53,0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.(Math.max(10, (fontSize || 16) - 2)); }}>A−</button>
           <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.45)", minWidth: 34, textAlign: "center" }}>{fontSize || "auto"}px</span>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.((fontSize || 16) + 2); }}>A+</button>
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.12)", margin: "0 2px" }} />
-          <label
-            style={{ ...btnStyle, position: "relative", overflow: "hidden" }}
+          <button
+            type="button"
+            style={btnStyle}
+            onMouseDown={e => {
+              e.preventDefault();
+              setColorOpen(open => !open);
+            }}
           >
             <span style={{ width: 14, height: 14, borderRadius: 4, background: fontColor || "#ffffff", border: "1px solid rgba(255,255,255,0.4)", display: "inline-block", flexShrink: 0 }} />
             Color
-            <input
-              ref={colorRef}
-              data-color-picker="true"
-              type="color"
-              value={fontColor || "#ffffff"}
-              onInput={e => onFontColorChange?.(e.target.value)}
-              onChange={e => onFontColorChange?.(e.target.value)}
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer" }}
-            />
-          </label>
+          </button>
+          {colorOpen && (
+            <div
+              style={{
+                position: "absolute",
+                top: 42,
+                right: 8,
+                width: 202,
+                padding: 10,
+                borderRadius: 12,
+                border: "1px solid rgba(89,255,53,0.35)",
+                background: "#071007",
+                boxShadow: "0 12px 34px rgba(0,0,0,0.55)",
+                display: "grid",
+                gridTemplateColumns: "repeat(5, 1fr)",
+                gap: 7,
+              }}
+            >
+              {colorOptions.map(color => (
+                <button
+                  key={color}
+                  type="button"
+                  aria-label={`Color ${color}`}
+                  onMouseDown={e => {
+                    e.preventDefault();
+                    onFontColorChange?.(color);
+                  }}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 8,
+                    border: color.toLowerCase() === (fontColor || "").toLowerCase() ? "2px solid #59ff35" : "1px solid rgba(255,255,255,0.22)",
+                    background: color,
+                    boxShadow: "0 0 0 1px rgba(0,0,0,0.28)",
+                  }}
+                />
+              ))}
+              <input
+                value={fontColor || ""}
+                onMouseDown={e => e.stopPropagation()}
+                onChange={e => {
+                  const next = e.target.value;
+                  if (/^#[0-9a-fA-F]{0,6}$/.test(next)) onFontColorChange?.(next);
+                }}
+                placeholder="#191421"
+                maxLength={7}
+                style={{
+                  gridColumn: "1 / -1",
+                  width: "100%",
+                  marginTop: 4,
+                  border: "1px solid rgba(255,255,255,0.16)",
+                  borderRadius: 8,
+                  background: "rgba(255,255,255,0.06)",
+                  color: "#fff",
+                  padding: "7px 9px",
+                  fontSize: "0.75rem",
+                  outline: "none",
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
       <Tag
