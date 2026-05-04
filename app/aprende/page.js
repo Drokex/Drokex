@@ -1600,9 +1600,9 @@ export default function AprendePage() {
 
         if (g.invincibleFrames > 0) continue;
         if (overlap(p, e)) {
-          // stomp = player was falling AND their center is above the lower half of the enemy
-          const stompLine = e.y + (e.isFinalBoss ? e.h * 0.52 : e.isBosse ? e.h * 0.55 : e.h * 0.5);
-          if (pvySnap > 1.5 && p.y + p.h * 0.6 < stompLine) {
+          // stomp = player was falling AND feet land in the top portion of the enemy
+          const stompLine = e.y + (e.isFinalBoss ? e.h * 0.6 : e.isBosse ? e.h * 0.65 : e.h * 0.72);
+          if (pvySnap > 0 && p.y + p.h < stompLine) {
             awardKill(e);
             spawnImpact(e.x + e.w / 2, e.y + e.h / 2, e.isBosse ? "boss" : "hit");
             playSound("hit");
