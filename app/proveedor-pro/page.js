@@ -2,22 +2,11 @@
 
 import { useRef, useState, useEffect } from "react";
 import SiteHeader from "@/app/components/site-header";
+import LandingPreview, { hexToRgba as _hexToRgba } from "@/app/components/landing-preview";
 
 const VALID_CODE = "15472007";
 
-function hexToRgba(hex, alpha) {
-  const normalized = hex.replace("#", "");
-  const value = normalized.length === 3
-    ? normalized.split("").map((char) => `${char}${char}`).join("")
-    : normalized;
-
-  const number = Number.parseInt(value, 16);
-  const red = (number >> 16) & 255;
-  const green = (number >> 8) & 255;
-  const blue = number & 255;
-
-  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-}
+const hexToRgba = _hexToRgba;
 
 function slugify(value) {
   return value
@@ -417,7 +406,8 @@ export default function ProveedorProPage() {
   );
 }
 
-function LandingPreview({ store, products, fullWidth = false, isEditable = false, onUpdate }) {
+// LandingPreview, EditableText, ClickableImageZone → imported from @/app/components/landing-preview
+function _LandingPreview_UNUSED({ store, products, fullWidth = false, isEditable = false, onUpdate }) {
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
 
