@@ -171,7 +171,7 @@ function newState() {
     stopped: false, currentLevel: 0, coins: 0, lives: 3,
     cameraX: 0, frame: 0, projectiles: [], enemyProjectiles: [],
     impacts: [], particles: [], screenShake: 0,
-    powerCooldown: 0, bossAnnounce: 0, levelAnnounce: 90,
+    powerCooldown: 0, megaPower: 0, bossAnnounce: 0, levelAnnounce: 90,
     invincibleFrames: 80, // grace period at game start
     doubleJumpFlash: 0, killScore: 0, bossBlockFlash: 0, autoPlay: false, hasPower: false,
     player: {
@@ -408,9 +408,16 @@ export default function AprendePage() {
     function awardKill(e) {
       const g = gRef.current;
       if (e.isFinalBoss) {
-        g.killScore += 200; // per hit
+        g.killScore += 200;
       } else if (e.isBosse) {
-        g.killScore += 100; // per hit on castle boss
+        g.killScore += 100;
+        // Ganar vida al matar jefe de castillo
+        if (e.hp <= 1) {
+          g.lives++;
+          setHudLives(g.lives);
+          spawnImpact(e.x + e.w / 2, e.y - 20, "boss");
+          g.screenShake = 8;
+        }
       } else if (e.isFlying) {
         g.killScore += 80;
       } else {
@@ -1387,13 +1394,35 @@ export default function AprendePage() {
       const cx = p.x + p.w / 2, cy = p.y + p.h / 2;
       for (const c of g.levelCoins) {
         if (!c.collected && Math.hypot(c.x - cx, c.y - cy) < p.w / 2 + 12) {
-          c.collected = true; g.coins++; setHudCoins(g.coins);
+          c.collected = true;
+          const prevCoins = g.coins;
+          g.coins++;
+          setHudCoins(g.coins);
           playSound("coin");
           spawnImpact(c.x, c.y, "coin");
+
+          // Poder básico al juntar 10 monedas por primera vez
           if (!g.hasPower && g.coins >= 10) {
             g.hasPower = true;
-            g.screenShake = 10;
+            g.screenShake = 8;
             spawnImpact(p.x + p.w / 2, p.y + p.h / 2, "hit");
+          }
+
+          // Cada 50 monedas → +1 vida
+          if (Math.floor(g.coins / 50) > Math.floor(prevCoins / 50)) {
+            g.lives++;
+            setHudLives(g.lives);
+            g.screenShake = 12;
+            spawnImpact(p.x + p.w / 2, p.y - 10, "boss");
+          }
+
+          // Cada 100 monedas → mega poder (triple disparo por 10 segundos)
+          if (Math.floor(g.coins / 100) > Math.floor(prevCoins / 100)) {
+            g.megaPower = 600; // 10 segundos a 60fps
+            g.hasPower = true;
+            g.screenShake = 18;
+            spawnImpact(p.x + p.w / 2, p.y + p.h / 2, "boss");
+            spawnImpact(p.x + p.w / 2, p.y - 20, "boss");
           }
         }
       }
@@ -1403,18 +1432,26 @@ export default function AprendePage() {
       if (g.bossBlockFlash > 0) g.bossBlockFlash--;
 
       // Power
+      if (g.megaPower > 0) g.megaPower--;
       if (k.power) {
         k.power = false;
         if (g.hasPower && g.powerCooldown <= 0) {
           g.powerCooldown = POWER_COOLDOWN;
-          g.projectiles.push({ x: p.x + (p.facing > 0 ? p.w + 5 : -22), y: p.y + p.h * 0.38, vx: p.facing * 17 });
+          const ox = p.facing > 0 ? p.w + 5 : -22;
+          const baseVx = p.facing * 17;
+          g.projectiles.push({ x: p.x + ox, y: p.y + p.h * 0.38, vx: baseVx });
+          if (g.megaPower > 0) {
+            // Triple disparo en abanico
+            g.projectiles.push({ x: p.x + ox, y: p.y + p.h * 0.2, vx: baseVx, vy: -3 });
+            g.projectiles.push({ x: p.x + ox, y: p.y + p.h * 0.55, vx: baseVx, vy: 3 });
+          }
           playSound("shoot");
         }
       }
       if (g.powerCooldown > 0) g.powerCooldown--;
 
       // Projectiles
-      for (const proj of g.projectiles) proj.x += proj.vx;
+      for (const proj of g.projectiles) { proj.x += proj.vx; if (proj.vy) proj.y += proj.vy; }
       g.projectiles = g.projectiles.filter((proj) => {
         if (proj.x < -80 || proj.x > lev.width + 80) return false;
         for (const e of g.levelEnemies) {
@@ -1559,14 +1596,10 @@ export default function AprendePage() {
       }
       g.levelEnemies = g.levelEnemies.filter((e) => !e.dead);
 
-      // Enemy projectiles
-      for (const ep of g.enemyProjectiles) { ep.x += ep.vx; ep.y += ep.vy; }
+      // Enemy projectiles — solo eliminan al ser bloqueados, NO dañan al jugador
+      for (const ep of g.enemyProjectiles) { ep.x += ep.vx; ep.y += (ep.vy || 0); }
       g.enemyProjectiles = g.enemyProjectiles.filter((ep) => {
         if (ep.x < -100 || ep.x > lev.width + 100 || ep.y < -100 || ep.y > H + 100) return false;
-        if (g.invincibleFrames <= 0 && overlap({ x: ep.x - 9, y: ep.y - 9, w: 18, h: 18 }, p)) {
-          loseLife(); if (g.stopped) return false;
-          return false;
-        }
         return true;
       });
 
