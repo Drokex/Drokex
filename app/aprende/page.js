@@ -425,6 +425,24 @@ export default function AprendePage() {
       }
     }
 
+    function spawnDropCoins(e) {
+      const g = gRef.current;
+      const count = (e.isFinalBoss || e.isBosse) ? 10 : 5;
+      const cx = e.x + e.w / 2;
+      const cy = e.y + e.h / 2;
+      for (let i = 0; i < count; i++) {
+        const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+        const dist = 22 + Math.random() * 48;
+        g.levelCoins.push({
+          x: cx + Math.cos(angle) * dist,
+          y: Math.max(32, cy + Math.sin(angle) * dist - 18),
+          collected: false,
+        });
+      }
+      // extra explosion flash on death
+      spawnImpact(cx, cy, e.isBosse || e.isFinalBoss ? "boss" : "hit");
+    }
+
     // world 0=ciudad, 1=volcán, 2=bosque, 3=fantasma, 4=vacío
     function worldOf(idx) { return Math.min(4, Math.floor(idx / 3)); }
     function worldTheme(idx) {
@@ -1460,8 +1478,8 @@ export default function AprendePage() {
             awardKill(e);
             spawnImpact(e.x + e.w / 2, e.y + e.h / 2, e.isBosse ? "boss" : "hit");
             playSound("hit");
-            if (e.isBosse) { e.hp--; if (e.hp <= 0) { e.dead = true; spawnImpact(e.x + e.w / 2, e.y + e.h / 2, "boss"); } }
-            else e.dead = true;
+            if (e.isBosse) { e.hp--; if (e.hp <= 0) { e.dead = true; spawnDropCoins(e); } }
+            else { e.dead = true; spawnDropCoins(e); }
             return false;
           }
         }
@@ -1501,9 +1519,10 @@ export default function AprendePage() {
             if (targetEnemy.isBosse) {
               targetEnemy.hp--;
               p.vy = -11;
-              if (targetEnemy.hp <= 0) targetEnemy.dead = true;
+              if (targetEnemy.hp <= 0) { targetEnemy.dead = true; spawnDropCoins(targetEnemy); }
             } else {
               targetEnemy.dead = true;
+              spawnDropCoins(targetEnemy);
               p.vy = -11;
             }
           }
@@ -1587,8 +1606,8 @@ export default function AprendePage() {
             awardKill(e);
             spawnImpact(e.x + e.w / 2, e.y + e.h / 2, e.isBosse ? "boss" : "hit");
             playSound("hit");
-            if (e.isBosse) { e.hp--; p.vy = -11; if (e.hp <= 0) e.dead = true; }
-            else { e.dead = true; p.vy = -11; }
+            if (e.isBosse) { e.hp--; p.vy = -11; if (e.hp <= 0) { e.dead = true; spawnDropCoins(e); } }
+            else { e.dead = true; spawnDropCoins(e); p.vy = -11; }
           } else {
             loseLife(); if (g.stopped) return; break;
           }
