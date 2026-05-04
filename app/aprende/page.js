@@ -199,12 +199,32 @@ export default function AprendePage() {
   const [highScores, setHighScores] = useState([]);
   const [savingScore, setSavingScore] = useState(false);
 
+  const LS_KEY = "drokex-game-scores-v2";
+
+  function lsGetScores() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); } catch { return []; }
+  }
+
+  function lsSaveScore(name, score) {
+    const list = lsGetScores();
+    list.push({ id: Date.now(), name, score, createdAt: new Date().toISOString() });
+    list.sort((a, b) => b.score - a.score);
+    localStorage.setItem(LS_KEY, JSON.stringify(list.slice(0, 20)));
+    return list;
+  }
+
   async function fetchScores() {
     try {
       const res = await fetch("/api/game-scores");
+      if (!res.ok) throw new Error("api-fail");
       const data = await res.json();
-      setHighScores(Array.isArray(data.scores) ? data.scores : []);
-    } catch { setHighScores([]); }
+      const apiScores = Array.isArray(data.scores) ? data.scores : [];
+      if (apiScores.length > 0) {
+        setHighScores(apiScores);
+        return;
+      }
+    } catch {}
+    setHighScores(lsGetScores());
   }
 
   useEffect(() => { fetchScores(); }, []);
@@ -229,16 +249,29 @@ export default function AprendePage() {
 
   async function saveHighScore(e) {
     e.preventDefault();
+    if (finalScore <= 0) { setScreen("scores"); return; }
     const name = playerName.trim() || "Jugador";
     setSavingScore(true);
+
+    // Siempre guardar en localStorage primero
+    const localList = lsSaveScore(name, finalScore);
+
+    // Intentar guardar en API
     try {
-      await fetch("/api/game-scores", {
+      const res = await fetch("/api/game-scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, score: finalScore }),
       });
-      await fetchScores();
-    } catch {}
+      if (res.ok) {
+        await fetchScores();
+      } else {
+        setHighScores(localList);
+      }
+    } catch {
+      setHighScores(localList);
+    }
+
     setSavingScore(false);
     setScreen("scores");
   }
