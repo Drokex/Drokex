@@ -401,7 +401,15 @@ export default function ProveedorProPage() {
           </aside>
 
           <section className="overflow-y-auto p-6" style={{ backgroundColor: store.backgroundColor }}>
-            <LandingPreview store={store} products={products} isEditable onUpdate={updateStore} />
+            <LandingPreview
+              store={store}
+              products={products}
+              isEditable
+              onUpdate={(field, value) => {
+                if (field === "__products__") setProducts(value);
+                else updateStore(field, value);
+              }}
+            />
           </section>
         </section>
       )}
@@ -473,10 +481,27 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
         style={{
           backgroundColor: store.backgroundColor,
           backgroundImage: store.heroImage
-            ? `linear-gradient(90deg, rgba(0,0,0,.82), rgba(0,0,0,.22)), url(${store.heroImage})`
+            ? `url(${store.heroImage})`
             : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)`,
         }}
       >
+        {isEditable && (
+          <ClickableImageZone
+            value={store.heroImage}
+            onUpload={v => onUpdate?.("heroImage", v)}
+            isEditable={isEditable}
+            style={{ position: "absolute", top: 12, right: 12, zIndex: 30, borderRadius: 12, overflow: "hidden", width: 44, height: 44, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(89,255,53,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </ClickableImageZone>
+        )}
+        <div
+          className="max-w-3xl rounded-[2rem] p-6 backdrop-blur-[2px]"
+          style={{ backgroundColor: hexToRgba(store.surfaceColor, 0.58) }}
+        >
         <span
           className="rounded-full px-4 py-2 text-sm font-black"
           style={{
@@ -522,6 +547,7 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
         >
           {store.secondaryCtaText}
         </button>
+        </div>
       </section>
 
       <section className="grid gap-4 p-8 md:grid-cols-3" style={{ backgroundColor: store.backgroundColor }}>
@@ -569,7 +595,13 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
           />
         </div>
 
-        <div className="min-h-[280px] overflow-hidden rounded-[2rem]" style={{ backgroundColor: store.backgroundColor }}>
+        <ClickableImageZone
+          value={store.bannerSecondary}
+          onUpload={v => onUpdate?.("bannerSecondary", v)}
+          isEditable={isEditable}
+          className="min-h-[280px] overflow-hidden rounded-[2rem]"
+          style={{ backgroundColor: store.backgroundColor }}
+        >
           {store.bannerSecondary ? (
             <img
               src={store.bannerSecondary}
@@ -577,11 +609,11 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full items-center justify-center" style={{ color: store.mutedTextColor }}>
+            <div className="flex h-full min-h-[280px] items-center justify-center" style={{ color: store.mutedTextColor }}>
               Banner secundario
             </div>
           )}
-        </div>
+        </ClickableImageZone>
       </section>
 
       <section className="p-8" style={{ backgroundColor: store.backgroundColor }}>
@@ -600,7 +632,17 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
               className="overflow-hidden rounded-[2rem] border border-white/10 p-4"
               style={{ backgroundColor: store.surfaceColor }}
             >
-              <div className="h-56 overflow-hidden rounded-[1.5rem]" style={{ backgroundColor: store.backgroundColor }}>
+              <ClickableImageZone
+                value={product.image}
+                onUpload={v => {
+                  const copy = [...products];
+                  copy[index] = { ...copy[index], image: v };
+                  onUpdate?.("__products__", copy);
+                }}
+                isEditable={isEditable}
+                className="h-56 overflow-hidden rounded-[1.5rem]"
+                style={{ backgroundColor: store.backgroundColor }}
+              >
                 {product.image ? (
                   <img
                     src={product.image}
@@ -608,11 +650,11 @@ function LandingPreview({ store, products, fullWidth = false, isEditable = false
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full items-center justify-center" style={{ color: store.mutedTextColor }}>
+                  <div className="flex h-56 items-center justify-center" style={{ color: store.mutedTextColor }}>
                     Imagen producto
                   </div>
                 )}
-              </div>
+              </ClickableImageZone>
 
               <p className="mt-4 text-xs font-black" style={{ color: store.primaryColor }}>
                 {product.category || "Categoria"}
@@ -694,6 +736,43 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
         className={className}
         style={{ ...computedStyle, outline: focused ? "2px dashed rgba(89,255,53,0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40 }}
       />
+    </div>
+  );
+}
+
+function ClickableImageZone({ value, onUpload, isEditable, className, style, placeholder, children }) {
+  const [hovered, setHovered] = useState(false);
+  const fileRef = useRef(null);
+
+  function handleFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => onUpload(e.target.result);
+    reader.readAsDataURL(file);
+  }
+
+  if (!isEditable) return <div className={className} style={style}>{children}</div>;
+
+  return (
+    <div
+      className={className}
+      style={{ ...style, position: "relative", cursor: "pointer" }}
+      onClick={() => fileRef.current?.click()}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {children}
+      {hovered && (
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: "inherit", zIndex: 20, pointerEvents: "none" }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span style={{ color: "#59ff35", fontSize: "0.8rem", fontWeight: 900 }}>{value ? "Cambiar imagen" : "Subir imagen"}</span>
+        </div>
+      )}
+      <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} onClick={e => e.stopPropagation()} />
     </div>
   );
 }
@@ -810,6 +889,7 @@ function Textarea({ label, value, onChange }) {
 
 function ImageUploader({ label, value, onChange }) {
   const fileRef = useRef(null);
+  const [hovered, setHovered] = useState(false);
 
   function handleFile(event) {
     const file = event.target.files?.[0];
@@ -840,10 +920,23 @@ function ImageUploader({ label, value, onChange }) {
       <button
         type="button"
         onClick={() => fileRef.current?.click()}
-        className="flex min-h-36 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-white/15 bg-[#050705] text-sm font-bold text-white/40 transition hover:border-[#59ff35]/70 hover:text-[#59ff35]"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        className="relative flex min-h-36 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-white/15 bg-[#050705] text-sm font-bold text-white/40 transition hover:border-[#59ff35]/70 hover:text-[#59ff35]"
       >
         {value ? (
-          <img src={value} alt={label} className="h-full min-h-36 w-full object-cover" />
+          <>
+            <img src={value} alt={label} className="h-full min-h-36 w-full object-cover" />
+            {hovered && (
+              <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+                <span style={{ color: "#59ff35", fontSize: "0.72rem", fontWeight: 900 }}>Cambiar imagen</span>
+              </div>
+            )}
+          </>
         ) : (
           <span>Subir imagen</span>
         )}
