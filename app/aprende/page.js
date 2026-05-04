@@ -411,10 +411,9 @@ export default function AprendePage() {
         g.killScore += 200;
       } else if (e.isBosse) {
         g.killScore += 100;
-        // Ganar vida al matar jefe de castillo
+        // Ganar vida al matar jefe de castillo (máx 5)
         if (e.hp <= 1) {
-          g.lives++;
-          setHudLives(g.lives);
+          if (g.lives < 5) { g.lives++; setHudLives(g.lives); }
           spawnImpact(e.x + e.w / 2, e.y - 20, "boss");
           g.screenShake = 8;
         }
@@ -447,11 +446,11 @@ export default function AprendePage() {
     function worldOf(idx) { return Math.min(4, Math.floor(idx / 3)); }
     function worldTheme(idx) {
       const w = worldOf(idx);
-      if (w === 1) return { glow: "#ff5a00", glowSoft: "rgba(255,90,0,0.25)", edge: "#ff7a00", accent: "#ffd166", fog: "rgba(255,64,0,0.12)" };
-      if (w === 2) return { glow: "#00ff66", glowSoft: "rgba(0,255,102,0.22)", edge: "#12d66f", accent: "#a7ff83", fog: "rgba(0,255,102,0.1)" };
-      if (w === 3) return { glow: "#84d8ff", glowSoft: "rgba(132,216,255,0.22)", edge: "#62b7ff", accent: "#d8f4ff", fog: "rgba(120,170,255,0.12)" };
-      if (w === 4) return { glow: "#cc44ff", glowSoft: "rgba(204,68,255,0.22)", edge: "#aa00ff", accent: "#ee88ff", fog: "rgba(100,0,200,0.15)" };
-      return { glow: "#ff9b21", glowSoft: "rgba(255,155,33,0.23)", edge: "#ff8500", accent: "#ffe08a", fog: "rgba(255,133,0,0.1)" };
+      if (w === 1) return { glow: "#ff5a00", glowSoft: "rgba(255,90,0,0.25)", edge: "#ff7a00", accent: "#ffcc44", fog: "rgba(255,64,0,0.12)", bg1: "#0f0300", bg2: "#1c0600" };
+      if (w === 2) return { glow: "#00ffaa", glowSoft: "rgba(0,255,170,0.22)", edge: "#00cc88", accent: "#88ffdd", fog: "rgba(0,255,170,0.1)", bg1: "#000f0a", bg2: "#001a10" };
+      if (w === 3) return { glow: "#00cfff", glowSoft: "rgba(0,207,255,0.22)", edge: "#0088cc", accent: "#aaeeff", fog: "rgba(0,160,255,0.12)", bg1: "#00080f", bg2: "#001018" };
+      if (w === 4) return { glow: "#cc44ff", glowSoft: "rgba(204,68,255,0.22)", edge: "#aa00ff", accent: "#ee88ff", fog: "rgba(100,0,200,0.15)", bg1: "#060008", bg2: "#0f0020" };
+      return { glow: "#59ff35", glowSoft: "rgba(89,255,53,0.23)", edge: "#2ea600", accent: "#ccffaa", fog: "rgba(89,255,53,0.1)", bg1: "#020805", bg2: "#050f05" };
     }
     function roundRect(x, y, w, h, r) {
       const rr = Math.min(r, w / 2, h / 2);
@@ -468,205 +467,195 @@ export default function AprendePage() {
       ctx.closePath();
     }
 
+    function isoDiamond(cx, cy, tw, th) {
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - th / 2);
+      ctx.lineTo(cx + tw / 2, cy);
+      ctx.lineTo(cx, cy + th / 2);
+      ctx.lineTo(cx - tw / 2, cy);
+      ctx.closePath();
+    }
+
+    function drawIsoBox(x, y, w, d, h, theme, alpha = 1) {
+      const topY = y - h;
+      const skew = d * 0.72;
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+
+      ctx.shadowColor = theme.glow;
+      ctx.shadowBlur = 14;
+      const topGrad = ctx.createLinearGradient(x, topY - d, x + w, y);
+      topGrad.addColorStop(0, theme.glowSoft);
+      topGrad.addColorStop(0.5, "rgba(8,24,10,0.94)");
+      topGrad.addColorStop(1, "rgba(3,9,4,0.98)");
+      ctx.fillStyle = topGrad;
+      ctx.beginPath();
+      ctx.moveTo(x + skew, topY - d);
+      ctx.lineTo(x + w + skew, topY - d);
+      ctx.lineTo(x + w, topY);
+      ctx.lineTo(x, topY);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+      const frontGrad = ctx.createLinearGradient(x, topY, x, y);
+      frontGrad.addColorStop(0, theme.edge + "55");
+      frontGrad.addColorStop(0.35, "rgba(5,18,7,0.95)");
+      frontGrad.addColorStop(1, "rgba(0,0,0,0.92)");
+      ctx.fillStyle = frontGrad;
+      ctx.beginPath();
+      ctx.moveTo(x, topY);
+      ctx.lineTo(x + w, topY);
+      ctx.lineTo(x + w, y);
+      ctx.lineTo(x, y);
+      ctx.closePath();
+      ctx.fill();
+
+      const sideGrad = ctx.createLinearGradient(x + w, topY - d, x + w + skew, y);
+      sideGrad.addColorStop(0, theme.glowSoft);
+      sideGrad.addColorStop(1, "rgba(0,0,0,0.78)");
+      ctx.fillStyle = sideGrad;
+      ctx.beginPath();
+      ctx.moveTo(x + w, topY);
+      ctx.lineTo(x + w + skew, topY - d);
+      ctx.lineTo(x + w + skew, y - d);
+      ctx.lineTo(x + w, y);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = theme.glow + "55";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, topY);
+      ctx.lineTo(x + skew, topY - d);
+      ctx.lineTo(x + w + skew, topY - d);
+      ctx.lineTo(x + w, topY);
+      ctx.lineTo(x, topY);
+      ctx.stroke();
+
+      ctx.globalAlpha *= 0.2;
+      ctx.strokeStyle = theme.accent;
+      for (let gx = x + 28; gx < x + w; gx += 54) {
+        ctx.beginPath();
+        ctx.moveTo(gx, topY);
+        ctx.lineTo(gx + skew, topY - d);
+        ctx.stroke();
+      }
+      for (let gy = 0; gy < d; gy += 11) {
+        ctx.beginPath();
+        ctx.moveTo(x + gy * 0.72, topY - gy);
+        ctx.lineTo(x + w + gy * 0.72, topY - gy);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawCastShadow(cx, cy, rw, rh, alpha = 0.36) {
+      ctx.save();
+      const shadow = ctx.createRadialGradient(cx, cy, 1, cx, cy, rw);
+      shadow.addColorStop(0, `rgba(0,0,0,${alpha})`);
+      shadow.addColorStop(0.65, `rgba(0,0,0,${alpha * 0.34})`);
+      shadow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = shadow;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rw, rh, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     // ─── Draw helpers ──────────────────────────────────────────────
     function drawBg(frame) {
-      const lev = LEVELS[gRef.current.currentLevel];
-      const w = worldOf(gRef.current.currentLevel);
-      const bg = bgImages[w];
-      if (bg?.complete && bg.naturalWidth > 0) {
-        const drift = (gRef.current.cameraX * 0.07) % W;
-        ctx.drawImage(bg, -drift, 0, W, H);
-        ctx.drawImage(bg, W - drift, 0, W, H);
-        ctx.globalAlpha = lev.isBoss ? 0.34 : 0.18;
-        ctx.fillStyle = lev.isBoss ? "rgba(0,0,0,0.42)" : "rgba(0,0,0,0.16)";
+      const g = gRef.current;
+      const lev = LEVELS[g.currentLevel];
+      const w = worldOf(g.currentLevel);
+      const theme = worldTheme(g.currentLevel);
+
+      // Base gradient sky
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, theme.bg1);
+      bgGrad.addColorStop(0.55, theme.bg2);
+      bgGrad.addColorStop(1, theme.bg1);
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Stars / data points
+      const stars = [
+        [52,28],[118,72],[198,18],[318,58],[448,28],[598,68],[718,22],[758,88],
+        [78,108],[398,98],[548,48],[848,38],[898,98],[148,148],[698,138],
+        [348,168],[478,58],[228,128],[808,52],[658,118],[120,42],[540,155],
+        [780,35],[260,90],[440,170],[680,70],[840,130],[160,55],[360,140],[500,100],
+      ];
+      for (const [sx, sy] of stars) {
+        ctx.globalAlpha = 0.12 + 0.22 * Math.sin(frame * 0.05 + sx * 0.02);
+        ctx.fillStyle = theme.glow;
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+      ctx.globalAlpha = 1;
+
+      // Isometric floor grid: diamond tiles fading into the horizon.
+      const horizon = H * 0.82;
+      ctx.save();
+      ctx.globalAlpha = 0.1;
+      ctx.strokeStyle = theme.glow;
+      ctx.lineWidth = 0.8;
+      const gridOffset = (g.cameraX * 0.18) % 64;
+      for (let i = -10; i < 26; i++) {
+        const x = i * 64 - gridOffset;
+        ctx.beginPath();
+        ctx.moveTo(x - W * 0.25, H);
+        ctx.lineTo(x + W * 0.58, horizon);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x + W * 0.25, H);
+        ctx.lineTo(x - W * 0.58, horizon);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 0.055;
+      for (let y = horizon; y < H + 80; y += 28) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Holographic scan line (slow sweep)
+      const scanY = ((frame * 0.55) % (H + 80)) - 40;
+      const scanGrad = ctx.createLinearGradient(0, scanY - 18, 0, scanY + 18);
+      scanGrad.addColorStop(0, "rgba(0,0,0,0)");
+      scanGrad.addColorStop(0.5, theme.glowSoft);
+      scanGrad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanY - 18, W, 36);
+
+      // Background holographic distribution hubs and warehouse blocks.
+      if (!lev.isBoss) {
+        for (let i = 0; i < 6; i++) {
+          const bx = ((i * 163 + 40) % (W - 60));
+          const by = 190 + ((i * 53) % 150);
+          const bw = 42 + (i % 3) * 18;
+          const bd = 18 + (i % 2) * 10;
+          const bh = 22 + (i % 4) * 9;
+          const alpha = 0.1 + 0.04 * Math.sin(frame * 0.018 + i);
+          drawIsoBox(bx, by, bw, bd, bh, theme, alpha);
+        }
+      }
+
+      // Boss mode — pulsing danger overlay
+      if (lev.isBoss) {
+        ctx.globalAlpha = 0.06 + 0.035 * Math.sin(frame * 0.06);
+        ctx.fillStyle = lev.isFinalLevel ? "#4400ff" : "#ff1100";
         ctx.fillRect(0, 0, W, H);
         ctx.globalAlpha = 1;
-        return;
-      }
-      const stars = [
-        [50,30],[120,80],[200,20],[320,60],[450,30],[600,70],[720,25],
-        [760,90],[80,110],[400,100],[550,50],[850,40],[900,100],
-        [150,150],[700,140],[350,170],[480,60],[230,130],[810,55],[660,120],
-      ];
-
-      if (w === 3) {
-        // ── Mundo 3: Reino Fantasma ──
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, "#000008"); g.addColorStop(1, "#060018");
-        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-        for (const [sx, sy] of stars) {
-          ctx.globalAlpha = 0.28 + 0.45 * Math.sin(frame * 0.05 + sx);
-          ctx.fillStyle = "#aaddff"; ctx.fillRect(sx, sy, 2, 2);
-        }
+        // Corner danger marks
+        const dm = 40;
+        ctx.globalAlpha = 0.18 + 0.1 * Math.sin(frame * 0.08);
+        ctx.strokeStyle = lev.isFinalLevel ? "#8844ff" : "#ff2200";
+        ctx.lineWidth = 2;
+        [[0,0,dm,0,0,dm],[W,0,-dm,0,0,dm],[0,H,dm,0,0,-dm],[W,H,-dm,0,0,-dm]].forEach(([x,y,dx1,dy1,dx2,dy2]) => {
+          ctx.beginPath(); ctx.moveTo(x+dx1,y); ctx.lineTo(x,y); ctx.lineTo(x,y+dy2); ctx.stroke();
+        });
         ctx.globalAlpha = 1;
-        for (let oi = 0; oi < 12; oi++) {
-          const ox = (oi * 137 + frame * 0.18) % W;
-          const oy = 60 + ((oi * 83 + frame * 0.12) % (H - 160));
-          ctx.globalAlpha = 0.05 + 0.03 * Math.sin(frame * 0.04 + oi);
-          ctx.fillStyle = "#88ccff";
-          ctx.beginPath(); ctx.arc(ox, oy, 5 + (oi % 3) * 4, 0, Math.PI * 2); ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-
-      } else if (w === 2) {
-        // ── Mundo 2: Bosque Maldito ──
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, lev.isBoss ? "#000600" : "#000a00");
-        g.addColorStop(1, lev.isBoss ? "#000e00" : "#001400");
-        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-        for (const [sx, sy] of stars) {
-          ctx.globalAlpha = 0.2 + 0.35 * Math.sin(frame * 0.05 + sx);
-          ctx.fillStyle = "#88ff88"; ctx.fillRect(sx, sy, 2, 2);
-        }
-        ctx.globalAlpha = 1;
-        // Green eerie moon
-        ctx.globalAlpha = 0.16; ctx.fillStyle = "#44ff44";
-        ctx.beginPath(); ctx.arc(760, 55, 42, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 0.07;
-        ctx.beginPath(); ctx.arc(760, 55, 62, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha = 1;
-        if (lev.isBoss) {
-          // Shadow castle — dark green battlements
-          const towers = [[0,170,80],[88,144,58],[158,168,70],[278,136,92],[408,155,60],[498,126,82],[618,150,64],[720,140,76],[828,160,70],[918,136,60]];
-          for (const [cx, cy, cw] of towers) {
-            ctx.fillStyle = "#010e01"; ctx.fillRect(cx, cy, cw, H - cy);
-            ctx.fillStyle = "#000800";
-            for (let bx = cx; bx < cx + cw - 8; bx += 17) ctx.fillRect(bx, cy - 16, 10, 16);
-            ctx.fillStyle = "rgba(0,180,60,0.14)";
-            for (let wy = cy + 18; wy < cy + 105; wy += 24)
-              for (let wx = cx + 8; wx < cx + cw - 8; wx += 18)
-                if (Math.sin(wx * 3 + wy * 5) > 0.25) ctx.fillRect(wx, wy, 8, 12);
-          }
-        } else {
-          // Twisted trees
-          const trees = [[20,130],[85,108],[168,138],[268,116],[375,132],[485,112],[588,128],[688,106],[796,122],[886,132]];
-          for (const [tx, ty] of trees) {
-            ctx.fillStyle = "#020e02"; ctx.fillRect(tx - 7, ty, 14, H - ty);
-            ctx.strokeStyle = "#020e02"; ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.moveTo(tx, ty + 22); ctx.lineTo(tx - 28, ty - 8);
-            ctx.moveTo(tx, ty + 44); ctx.lineTo(tx + 26, ty + 18);
-            ctx.moveTo(tx, ty + 62); ctx.lineTo(tx - 20, ty + 44);
-            ctx.stroke();
-            ctx.globalAlpha = 0.05 + 0.025 * Math.sin(frame * 0.04 + tx);
-            ctx.fillStyle = "#003300";
-            ctx.beginPath(); ctx.arc(tx, ty - 8, 38, 0, Math.PI * 2); ctx.fill();
-            ctx.globalAlpha = 1;
-          }
-        }
-
-      } else if (w === 1) {
-        // ── Mundo 1: Volcán ──
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, lev.isBoss ? "#150000" : "#1a0000");
-        g.addColorStop(0.7, lev.isBoss ? "#2a0500" : "#300500");
-        g.addColorStop(1, "#1a0200");
-        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-        // Lava glow bottom
-        ctx.globalAlpha = 0.28 + 0.1 * Math.sin(frame * 0.04);
-        const lavaG = ctx.createLinearGradient(0, H - 90, 0, H);
-        lavaG.addColorStop(0, "rgba(255,60,0,0)"); lavaG.addColorStop(1, "rgba(255,80,0,0.5)");
-        ctx.fillStyle = lavaG; ctx.fillRect(0, H - 90, W, 90);
-        ctx.globalAlpha = 1;
-        for (const [sx, sy] of stars) {
-          ctx.globalAlpha = 0.15 + 0.25 * Math.sin(frame * 0.05 + sx);
-          ctx.fillStyle = "#ffaa66"; ctx.fillRect(sx, sy, 2, 2);
-        }
-        ctx.globalAlpha = 1;
-        if (lev.isBoss) {
-          // Lava castle — dark red battlements
-          const towers = [[0,175,82],[92,148,56],[162,172,72],[282,138,94],[412,158,62],[502,128,84],[622,153,66],[724,143,78],[832,163,72],[922,138,62]];
-          for (const [cx, cy, cw] of towers) {
-            ctx.fillStyle = "#1c0200"; ctx.fillRect(cx, cy, cw, H - cy);
-            ctx.fillStyle = "#120000";
-            for (let bx = cx; bx < cx + cw - 8; bx += 17) ctx.fillRect(bx, cy - 16, 10, 16);
-            ctx.fillStyle = "rgba(255,60,0,0.12)";
-            for (let wy = cy + 18; wy < cy + 105; wy += 24)
-              for (let wx = cx + 8; wx < cx + cw - 8; wx += 18)
-                if (Math.sin(wx * 3 + wy * 5) > 0.25) ctx.fillRect(wx, wy, 8, 12);
-          }
-        } else {
-          // Underground cave: stalactites + lava cracks
-          const stalactites = [[30,18,70],[90,14,50],[160,20,80],[240,12,45],[310,22,90],[400,16,60],[480,24,75],[560,14,55],[640,20,70],[720,18,85],[800,16,50],[880,22,65]];
-          for (const [sx, sw, sh] of stalactites) {
-            ctx.fillStyle = "#1a0800";
-            ctx.beginPath(); ctx.moveTo(sx, 0); ctx.lineTo(sx + sw, 0); ctx.lineTo(sx + sw / 2, sh); ctx.closePath(); ctx.fill();
-            ctx.globalAlpha = 0.2 + 0.12 * Math.sin(frame * 0.06 + sx);
-            ctx.fillStyle = "#ff4400";
-            ctx.beginPath(); ctx.arc(sx + sw / 2, sh, 4, 0, Math.PI * 2); ctx.fill();
-            ctx.globalAlpha = 1;
-          }
-          // Lava crack lines
-          ctx.strokeStyle = "rgba(255,80,0,0.12)"; ctx.lineWidth = 1;
-          [[100,200,200,360],[320,150,420,310],[600,180,700,400],[800,220,900,380]].forEach(([x1,y1,x2,y2]) => {
-            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo((x1+x2)/2+20,(y1+y2)/2); ctx.lineTo(x2,y2); ctx.stroke();
-          });
-        }
-
-      } else if (w === 4) {
-        // ── Mundo 4: El Vacío ──
-        const gv = ctx.createLinearGradient(0, 0, 0, H);
-        gv.addColorStop(0, "#000000"); gv.addColorStop(1, "#0a0018");
-        ctx.fillStyle = gv; ctx.fillRect(0, 0, W, H);
-        const stars = [
-          [50,30],[120,80],[200,20],[320,60],[450,30],[600,70],[720,25],
-          [760,90],[80,110],[400,100],[550,50],[850,40],[900,100],
-          [150,150],[700,140],[350,170],[480,60],[230,130],[810,55],[660,120],
-        ];
-        for (const [sx, sy] of stars) {
-          ctx.globalAlpha = 0.25 + 0.5 * Math.sin(frame * 0.07 + sx);
-          ctx.fillStyle = "#cc44ff"; ctx.fillRect(sx, sy, 2, 2);
-        }
-        ctx.globalAlpha = 1;
-        for (let oi = 0; oi < 5; oi++) {
-          const ox = (oi * 180 + 60 + frame * 0.1) % W;
-          const oy = 60 + (oi * 110) % (H - 180);
-          ctx.globalAlpha = 0.04 + 0.03 * Math.sin(frame * 0.05 + oi);
-          ctx.fillStyle = "#9900ff";
-          ctx.beginPath(); ctx.ellipse(ox, oy, 80 + oi * 20, 18, 0, 0, Math.PI * 2); ctx.fill();
-        }
-        ctx.globalAlpha = 0.08 + 0.04 * Math.sin(frame * 0.03);
-        ctx.fillStyle = "#660099";
-        for (let rx = 0; rx < W; rx += 60) {
-          ctx.fillRect(rx, 0, 1, H);
-        }
-        for (let ry = 0; ry < H; ry += 60) {
-          ctx.fillRect(0, ry, W, 1);
-        }
-        ctx.globalAlpha = 1;
-
-      } else {
-        // ── Mundo 0: Ciudad Nocturna ──
-        const g = ctx.createLinearGradient(0, 0, 0, H);
-        g.addColorStop(0, lev.isBoss ? "#110020" : "#060d1a");
-        g.addColorStop(1, lev.isBoss ? "#1e0038" : "#0d1f35");
-        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-        for (const [sx, sy] of stars) {
-          ctx.globalAlpha = 0.28 + 0.45 * Math.sin(frame * 0.05 + sx);
-          ctx.fillStyle = lev.isBoss ? "#ff88ff" : "#fff"; ctx.fillRect(sx, sy, 2, 2);
-        }
-        ctx.globalAlpha = 1;
-        if (lev.isBoss) {
-          const towers = [[0,175,82],[92,148,56],[162,172,72],[282,138,94],[412,158,62],[502,128,84],[622,153,66],[724,143,78],[832,163,72],[922,138,62]];
-          for (const [cx, cy, cw] of towers) {
-            ctx.fillStyle = "#19002a"; ctx.fillRect(cx, cy, cw, H - cy);
-            ctx.fillStyle = "#110020";
-            for (let bx = cx; bx < cx + cw - 8; bx += 17) ctx.fillRect(bx, cy - 16, 10, 16);
-            ctx.fillStyle = "rgba(180,0,255,0.18)";
-            for (let wy = cy + 18; wy < cy + 105; wy += 24)
-              for (let wx = cx + 8; wx < cx + cw - 8; wx += 18)
-                if (Math.sin(wx * 3 + wy * 5) > 0.25) ctx.fillRect(wx, wy, 8, 12);
-          }
-        } else {
-          const buildings = [[0,200,60],[70,220,50],[130,180,70],[210,210,40],[260,170,55],[325,195,45],[380,160,65],[455,205,50],[515,175,60],[585,190,55],[650,165,70],[730,200,70],[820,180,60],[900,210,55]];
-          for (const [bx, by, bw] of buildings) {
-            ctx.fillStyle = "#0a1628"; ctx.fillRect(bx, by, bw, H - by);
-            ctx.fillStyle = "rgba(255,133,0,0.18)";
-            for (let wy = by + 10; wy < by + 120; wy += 18)
-              for (let wx = bx + 6; wx < bx + bw - 6; wx += 12)
-                if (Math.sin(wx * 3 + wy * 7) > 0.3) ctx.fillRect(wx, wy, 6, 8);
-          }
-        }
       }
     }
 
@@ -674,53 +663,109 @@ export default function AprendePage() {
       ctx.save();
       ctx.translate(-camX, 0);
       const lev = LEVELS[gRef.current.currentLevel];
-      const w = worldOf(gRef.current.currentLevel);
-      // [base, edge1, edge2] per world
-      const palettes = [
-        ["#1a0a00", "#ff8500", "#ffb347"],   // ciudad
-        ["#1a0500", "#cc3300", "#ff6600"],   // volcán
-        ["#001400", "#006622", "#00cc44"],   // bosque
-        ["#000820", "#4488cc", "#88ccff"],   // fantasma
-      ];
-      const [base, c1, c2] = palettes[lev.isFinalLevel ? 3 : w];
       const theme = worldTheme(gRef.current.currentLevel);
+
       for (const p of lev.platforms) {
+        const ground = p.y >= 455;
+        const slabDepth = ground ? 62 : 32;
+        const isoDepth = ground ? 34 : 22;
+        const skew = isoDepth * 0.72;
+
+        // Long soft shadow projected behind every platform slab.
+        drawCastShadow(p.x + p.w / 2 + skew * 0.45, p.y + slabDepth * 0.45, p.w * 0.55, ground ? 26 : 15, ground ? 0.28 : 0.2);
+
+        // Top isometric face.
         ctx.save();
-        ctx.shadowColor = c1;
-        ctx.shadowBlur = p.y >= 455 ? 14 : 22;
-        ctx.globalAlpha = 0.48;
-        ctx.fillStyle = c1;
-        roundRect(p.x - 2, p.y - 2, p.w + 4, Math.min(18, p.h + 6), 8);
+        ctx.shadowColor = theme.glow;
+        ctx.shadowBlur = ground ? 18 : 24;
+        const topGrad = ctx.createLinearGradient(p.x, p.y - isoDepth, p.x + p.w + skew, p.y);
+        topGrad.addColorStop(0, theme.glowSoft);
+        topGrad.addColorStop(0.28, "rgba(12,32,14,0.98)");
+        topGrad.addColorStop(0.68, "rgba(4,14,5,0.98)");
+        topGrad.addColorStop(1, theme.edge + "44");
+        ctx.fillStyle = topGrad;
+        ctx.beginPath();
+        ctx.moveTo(p.x + skew, p.y - isoDepth);
+        ctx.lineTo(p.x + p.w + skew, p.y - isoDepth);
+        ctx.lineTo(p.x + p.w, p.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.closePath();
         ctx.fill();
         ctx.restore();
 
-        const body = ctx.createLinearGradient(p.x, p.y, p.x, p.y + p.h);
-        body.addColorStop(0, base);
-        body.addColorStop(0.42, base);
-        body.addColorStop(1, "rgba(0,0,0,0.85)");
-        ctx.fillStyle = body;
-        roundRect(p.x, p.y, p.w, p.h, p.y >= 455 ? 0 : 7);
+        // Front face.
+        const faceGrad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + slabDepth);
+        faceGrad.addColorStop(0, theme.edge + "4d");
+        faceGrad.addColorStop(0.24, "rgba(5,18,7,0.98)");
+        faceGrad.addColorStop(1, "rgba(0,0,0,0.96)");
+        ctx.fillStyle = faceGrad;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + p.w, p.y);
+        ctx.lineTo(p.x + p.w, p.y + slabDepth);
+        ctx.lineTo(p.x, p.y + slabDepth);
+        ctx.closePath();
         ctx.fill();
 
-        const g2 = ctx.createLinearGradient(p.x, p.y, p.x + p.w, p.y);
-        g2.addColorStop(0, c1); g2.addColorStop(0.5, c2); g2.addColorStop(1, c1);
+        // Right side face sells the 3D angle.
+        const sideGrad = ctx.createLinearGradient(p.x + p.w, p.y - isoDepth, p.x + p.w + skew, p.y + slabDepth);
+        sideGrad.addColorStop(0, theme.glowSoft);
+        sideGrad.addColorStop(1, "rgba(0,0,0,0.8)");
+        ctx.fillStyle = sideGrad;
+        ctx.beginPath();
+        ctx.moveTo(p.x + p.w, p.y);
+        ctx.lineTo(p.x + p.w + skew, p.y - isoDepth);
+        ctx.lineTo(p.x + p.w + skew, p.y + slabDepth - isoDepth);
+        ctx.lineTo(p.x + p.w, p.y + slabDepth);
+        ctx.closePath();
+        ctx.fill();
+
+        // Neon bevel and tile grid.
+        ctx.save();
         ctx.shadowColor = theme.glow;
         ctx.shadowBlur = 12;
-        ctx.fillStyle = g2;
-        roundRect(p.x, p.y, p.w, 7, 4);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.globalAlpha = 0.36;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(p.x + 8, p.y + 2, Math.max(0, p.w - 16), 1);
-        ctx.globalAlpha = 0.22;
-        ctx.fillStyle = c2;
-        for (let sx = p.x + 18; sx < p.x + p.w - 12; sx += 42) {
-          ctx.fillRect(sx, p.y + 12, 15, 2);
-          if (p.h > 32) ctx.fillRect(sx + 10, p.y + 30, 19, 2);
+        ctx.strokeStyle = theme.glow;
+        ctx.lineWidth = ground ? 1.4 : 1.1;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x + skew, p.y - isoDepth);
+        ctx.lineTo(p.x + p.w + skew, p.y - isoDepth);
+        ctx.lineTo(p.x + p.w, p.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.globalAlpha = ground ? 0.2 : 0.25;
+        ctx.strokeStyle = theme.glow;
+        ctx.lineWidth = 0.8;
+        for (let sx = p.x + 34; sx < p.x + p.w; sx += 64) {
+          ctx.beginPath();
+          ctx.moveTo(sx, p.y);
+          ctx.lineTo(sx + skew, p.y - isoDepth);
+          ctx.stroke();
+        }
+        for (let gy = 8; gy < isoDepth; gy += 10) {
+          ctx.beginPath();
+          ctx.moveTo(p.x + gy * 0.72, p.y - gy);
+          ctx.lineTo(p.x + p.w + gy * 0.72, p.y - gy);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = theme.accent;
+        for (let sx = p.x + 28; sx < p.x + p.w - 14; sx += 74) {
+          isoDiamond(sx + skew * 0.5, p.y - isoDepth * 0.5, 20, 9);
+          ctx.fill();
         }
         ctx.globalAlpha = 1;
+
+        // Subtle warehouse crate modules on wider ground segments.
+        if (ground && p.w > 320) {
+          for (let bx = p.x + 170; bx < p.x + p.w - 180; bx += 380) {
+            drawIsoBox(bx, p.y - 8, 64, 28, 34, theme, 0.42);
+          }
+        }
       }
+
       ctx.restore();
     }
 
@@ -729,33 +774,55 @@ export default function AprendePage() {
       ctx.translate(-camX, 0);
       const theme = worldTheme(gRef.current.currentLevel);
       const frame = gRef.current.frame;
+
       for (const c of coins) {
         if (c.collected) continue;
-        const bob = Math.sin(frame * 0.08 + c.x * 0.02) * 3;
-        const spin = 0.72 + 0.28 * Math.sin(frame * 0.12 + c.x);
+        const bob = Math.sin(frame * 0.08 + c.x * 0.02) * 4;
+        const spin = 0.6 + 0.4 * Math.abs(Math.cos(frame * 0.09 + c.x * 0.04));
+
+        drawCastShadow(c.x, c.y + 19, 15, 4, 0.18);
         ctx.save();
         ctx.translate(c.x, c.y + bob);
-        ctx.scale(spin, 1);
+
+        // Outer energy field
         ctx.globalCompositeOperation = "lighter";
-        ctx.globalAlpha = 0.28;
+        ctx.globalAlpha = 0.18 + 0.1 * Math.sin(frame * 0.14 + c.x * 0.03);
         ctx.fillStyle = theme.glow;
-        ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, 0, 20, 0, Math.PI * 2);
+        ctx.fill();
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = "source-over";
-        const cg = ctx.createRadialGradient(-4, -5, 2, 0, 0, 13);
-        cg.addColorStop(0, "#fff6b0");
-        cg.addColorStop(0.45, "#ffd700");
-        cg.addColorStop(1, "#ff8500");
-        ctx.shadowColor = "#ffd700";
+
+        // Holographic disc (spins)
+        ctx.scale(spin, 1);
+        ctx.shadowColor = theme.glow;
         ctx.shadowBlur = 14;
+        const cg = ctx.createRadialGradient(-3, -4, 1, 0, 0, 11);
+        cg.addColorStop(0, "#ffffff");
+        cg.addColorStop(0.25, theme.accent);
+        cg.addColorStop(0.65, theme.glow);
+        cg.addColorStop(1, theme.edge);
         ctx.fillStyle = cg;
-        ctx.beginPath(); ctx.arc(0, 0, 11, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, 0, 11, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Neon ring
         ctx.shadowBlur = 0;
-        ctx.strokeStyle = "#fff1a8"; ctx.lineWidth = 2; ctx.stroke();
-        ctx.fillStyle = "#fff"; ctx.font = "bold 9px monospace"; ctx.textAlign = "center";
-        ctx.fillText("$", 0, 3);
+        ctx.strokeStyle = theme.accent;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Center D mark
+        ctx.fillStyle = "#030f03";
+        ctx.font = "bold 8px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("D", 0, 3);
+
         ctx.restore();
       }
+
       ctx.restore();
     }
 
@@ -780,6 +847,7 @@ export default function AprendePage() {
       const dy = e.y + e.h / 2 - dh / 2 + bob;
       const theme = worldTheme(gRef.current.currentLevel);
       ctx.save();
+      drawCastShadow(e.x + e.w / 2, e.y + e.h + 8, e.w * 0.74, 7, e.isBosse || e.isFinalBoss ? 0.38 : 0.28);
       ctx.shadowColor = e.isBosse || e.isFinalBoss ? theme.glow : "rgba(255,255,255,0.28)";
       ctx.shadowBlur = e.isBosse || e.isFinalBoss ? 22 : 10;
       ctx.drawImage(enemySheet, idx * 128, 0, 128, 128, dx, dy, dw, dh);
@@ -792,6 +860,9 @@ export default function AprendePage() {
       ctx.translate(-camX, 0);
       for (const e of enemies) {
         if (e.dead) continue;
+        if (!(enemySheet.complete && enemySheet.naturalWidth > 0)) {
+          drawCastShadow(e.x + e.w / 2, e.y + e.h + 8, e.w * 0.72, 7, e.isBosse || e.isFinalBoss ? 0.38 : 0.28);
+        }
         if (drawEnemyBitmap(e, frame) && !e.isBosse && !e.isFinalBoss) continue;
         if (e.isFinalBoss) {
           // ── Ghost final boss ──
@@ -1030,6 +1101,18 @@ export default function AprendePage() {
             ctx.fillStyle = "#fff"; ctx.fillRect(e.x + 8, e.y + e.h - 10, e.w - 16, 5);
           }
         }
+        // Neon glow overlay for all enemies
+        if (!e.dead) {
+          const wTh = worldTheme(gRef.current.currentLevel);
+          ctx.save();
+          ctx.globalCompositeOperation = "lighter";
+          ctx.globalAlpha = 0.12 + 0.06 * Math.sin(gRef.current.frame * 0.08 + e.x * 0.01);
+          ctx.fillStyle = wTh.glow;
+          ctx.fillRect(e.x - 2, e.y - 2, e.w + 4, e.h + 4);
+          ctx.globalAlpha = 1;
+          ctx.globalCompositeOperation = "source-over";
+          ctx.restore();
+        }
       }
       ctx.restore();
     }
@@ -1200,12 +1283,7 @@ export default function AprendePage() {
       if (invincible > 0 && Math.floor(invincible / 5) % 2 === 0) return;
       ctx.save();
       const theme = worldTheme(gRef.current.currentLevel);
-      ctx.globalAlpha = 0.32;
-      ctx.fillStyle = "#000";
-      ctx.beginPath();
-      ctx.ellipse(p.x - camX + p.w / 2, p.y + p.h + 6, p.w * 0.52, 7, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
+      drawCastShadow(p.x - camX + p.w / 2, p.y + p.h + 8, p.w * 0.68, 8, 0.34);
       if (sprinting && Math.abs(p.vx) > 3) {
         ctx.globalCompositeOperation = "lighter";
         ctx.globalAlpha = 0.26; ctx.fillStyle = theme.glow;
@@ -1290,78 +1368,129 @@ export default function AprendePage() {
     function drawAtmosphere(frame) {
       const theme = worldTheme(gRef.current.currentLevel);
       ctx.save();
+
+      // Floating tech particles
       ctx.globalCompositeOperation = "lighter";
-      const haze = ctx.createRadialGradient(W * 0.5, H * 0.18, 20, W * 0.5, H * 0.22, W * 0.65);
-      haze.addColorStop(0, theme.glowSoft);
-      haze.addColorStop(0.5, "rgba(255,255,255,0.025)");
-      haze.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = haze;
-      ctx.fillRect(0, 0, W, H);
-      for (let i = 0; i < 34; i++) {
-        const drift = (frame * (0.16 + (i % 5) * 0.028) + i * 113) % (W + 220);
-        const px = drift - 110;
-        const py = 68 + ((i * 71 + Math.sin(frame * 0.015 + i) * 38) % (H - 175));
-        const radius = 1.2 + (i % 4) * 0.9;
-        ctx.globalAlpha = 0.08 + (i % 3) * 0.035;
+      for (let i = 0; i < 30; i++) {
+        const drift = (frame * (0.13 + (i % 5) * 0.025) + i * 117) % (W + 200);
+        const px = drift - 100;
+        const py = 52 + ((i * 73 + Math.sin(frame * 0.013 + i) * 34) % (H - 140));
+        const r = 0.7 + (i % 3) * 0.55;
+        ctx.globalAlpha = 0.055 + (i % 4) * 0.025;
         ctx.fillStyle = i % 5 === 0 ? theme.accent : theme.glow;
         ctx.beginPath();
-        ctx.arc(px, py, radius, 0, Math.PI * 2);
+        ctx.arc(px, py, r, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
-      const floorFog = ctx.createLinearGradient(0, H - 165, 0, H);
+
+      // Floor fog — neon tinted
+      const floorFog = ctx.createLinearGradient(0, H - 120, 0, H);
       floorFog.addColorStop(0, "rgba(0,0,0,0)");
-      floorFog.addColorStop(0.5, theme.fog);
-      floorFog.addColorStop(1, "rgba(0,0,0,0.26)");
+      floorFog.addColorStop(0.45, theme.fog);
+      floorFog.addColorStop(1, "rgba(0,0,0,0.32)");
       ctx.fillStyle = floorFog;
-      ctx.fillRect(0, H - 165, W, 165);
-      const vignette = ctx.createRadialGradient(W / 2, H / 2, W * 0.2, W / 2, H / 2, W * 0.72);
-      vignette.addColorStop(0, "rgba(0,0,0,0)");
-      vignette.addColorStop(0.78, "rgba(0,0,0,0.08)");
-      vignette.addColorStop(1, "rgba(0,0,0,0.48)");
-      ctx.fillStyle = vignette;
+      ctx.fillRect(0, H - 120, W, 120);
+
+      // Subtle scanlines
+      ctx.globalAlpha = 0.035;
+      ctx.fillStyle = "#000";
+      for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
+
+      // Vignette
+      const vig = ctx.createRadialGradient(W / 2, H / 2, W * 0.15, W / 2, H / 2, W * 0.72);
+      vig.addColorStop(0, "rgba(0,0,0,0)");
+      vig.addColorStop(0.72, "rgba(0,0,0,0.06)");
+      vig.addColorStop(1, "rgba(0,0,0,0.55)");
+      ctx.fillStyle = vig;
+      ctx.globalAlpha = 1;
       ctx.fillRect(0, 0, W, H);
-      ctx.globalAlpha = 0.055;
-      ctx.fillStyle = "#ffffff";
-      for (let y = 1; y < H; y += 4) ctx.fillRect(0, y, W, 1);
+
       ctx.restore();
     }
 
     function drawHUD(g) {
       const theme = worldTheme(g.currentLevel);
-      const hud = ctx.createLinearGradient(0, 0, W, 46);
-      hud.addColorStop(0, "rgba(2,6,16,0.88)");
-      hud.addColorStop(0.5, "rgba(7,16,32,0.72)");
-      hud.addColorStop(1, "rgba(2,6,16,0.88)");
-      ctx.fillStyle = hud; ctx.fillRect(0, 0, W, 46);
-      ctx.globalAlpha = 0.75;
+
+      // HUD panel background
+      const hudGrad = ctx.createLinearGradient(0, 0, W, 50);
+      hudGrad.addColorStop(0, "rgba(2,8,2,0.93)");
+      hudGrad.addColorStop(0.5, "rgba(4,12,4,0.88)");
+      hudGrad.addColorStop(1, "rgba(2,8,2,0.93)");
+      ctx.fillStyle = hudGrad;
+      ctx.fillRect(0, 0, W, 50);
+
+      // Bottom border glow
+      ctx.save();
+      ctx.shadowColor = theme.glow;
+      ctx.shadowBlur = 7;
       ctx.strokeStyle = theme.glow;
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(0, 45.5); ctx.lineTo(W, 45.5); ctx.stroke();
+      ctx.lineWidth = 1.2;
+      ctx.globalAlpha = 0.55;
+      ctx.beginPath();
+      ctx.moveTo(0, 49.5);
+      ctx.lineTo(W, 49.5);
+      ctx.stroke();
+      ctx.restore();
+
+      // Scanlines on HUD
+      ctx.globalAlpha = 0.055;
+      ctx.fillStyle = theme.glow;
+      for (let y = 2; y < 50; y += 4) ctx.fillRect(0, y, W, 1);
       ctx.globalAlpha = 1;
-      ctx.font = "bold 13px monospace";
-      ctx.fillStyle = "#ff8500"; ctx.textAlign = "left";
-      ctx.fillText(LEVELS[g.currentLevel].name.toUpperCase(), 14, 28);
-      ctx.fillStyle = "#ffd700"; ctx.textAlign = "center";
-      ctx.fillText(`● ${g.coins}   PTS ${calculateScore(g)}`, 345, 28);
+
+      ctx.font = "bold 12px monospace";
+
+      // Level name — left, neon green
+      ctx.save();
+      ctx.shadowColor = theme.glow;
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = theme.glow;
+      ctx.textAlign = "left";
+      ctx.fillText("▸ " + LEVELS[g.currentLevel].name.toUpperCase(), 14, 30);
+      ctx.restore();
+
+      // Coins + score — center
+      ctx.fillStyle = "#e8ffe8";
+      ctx.textAlign = "center";
+      ctx.fillText(`◈ ${g.coins}   PTS ${calculateScore(g)}`, 345, 30);
+
+      // Power — right center
       if (g.hasPower) {
-        ctx.fillStyle = g.powerCooldown > 0 ? "#888" : "#ffd700";
-        ctx.shadowColor = g.powerCooldown > 0 ? "transparent" : "#ffd700";
-        ctx.shadowBlur = g.powerCooldown > 0 ? 0 : 10;
-        ctx.fillText(g.powerCooldown > 0 ? "⚡ ESPERA..." : "⚡ PODER [X]", 650, 28);
-        ctx.shadowBlur = 0;
+        const ready = g.powerCooldown <= 0;
+        ctx.save();
+        ctx.shadowColor = ready ? theme.glow : "transparent";
+        ctx.shadowBlur = ready ? 8 : 0;
+        ctx.fillStyle = ready ? theme.glow : "rgba(89,255,53,0.3)";
+        ctx.textAlign = "center";
+        ctx.fillText(ready ? "⚡ PODER [X]" : `⚡ ${g.powerCooldown}...`, 650, 30);
+        ctx.restore();
       } else {
-        ctx.fillStyle = "rgba(255,200,0,0.45)";
-        ctx.fillText(`poder: ${g.coins}/10`, 640, 28);
+        ctx.fillStyle = "rgba(89,255,53,0.38)";
+        ctx.textAlign = "center";
+        ctx.fillText(`ENERGIA: ${g.coins}/10`, 640, 30);
       }
-      ctx.fillStyle = "#ff4444"; ctx.textAlign = "right";
-      ctx.fillText(`♥ ${g.lives}`, W - 14, 28);
+
+      // Lives — right, red
+      ctx.save();
+      ctx.shadowColor = "#ff4444";
+      ctx.shadowBlur = 7;
+      ctx.fillStyle = "#ff4444";
+      ctx.textAlign = "right";
+      ctx.fillText(`♥ ${g.lives}`, W - 14, 30);
+      ctx.restore();
+
+      // Auto play indicator
       if (g.autoPlay) {
-        ctx.shadowColor = "#00ff88"; ctx.shadowBlur = 10;
-        ctx.fillStyle = "#00ff88"; ctx.textAlign = "left"; ctx.font = "bold 11px monospace";
-        ctx.fillText("⚡ AUTO", 14, 43);
-        ctx.shadowBlur = 0;
+        ctx.save();
+        ctx.shadowColor = theme.glow;
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = theme.glow;
+        ctx.textAlign = "left";
+        ctx.font = "bold 10px monospace";
+        ctx.fillText("⚡ AUTO", 14, 44);
+        ctx.restore();
       }
     }
 
@@ -1426,8 +1555,8 @@ export default function AprendePage() {
             spawnImpact(p.x + p.w / 2, p.y + p.h / 2, "hit");
           }
 
-          // Cada 50 monedas → +1 vida
-          if (Math.floor(g.coins / 50) > Math.floor(prevCoins / 50)) {
+          // Cada 50 monedas → +1 vida (máx 5)
+          if (Math.floor(g.coins / 50) > Math.floor(prevCoins / 50) && g.lives < 5) {
             g.lives++;
             setHudLives(g.lives);
             g.screenShake = 12;
@@ -1680,8 +1809,8 @@ export default function AprendePage() {
 
       // Progress bar
       const prog = Math.min(1, (p.x + p.w) / lev.width);
-      ctx.fillStyle = "rgba(255,133,0,0.22)"; ctx.fillRect(0, 46, W, 4);
-      ctx.fillStyle = bossAlive ? "#ff2200" : "#ff8500"; ctx.fillRect(0, 46, W * prog, 4);
+      ctx.fillStyle = "rgba(89,255,53,0.15)"; ctx.fillRect(0, 46, W, 4);
+      ctx.fillStyle = bossAlive ? "#ff2200" : "#59ff35"; ctx.fillRect(0, 46, W * prog, 4);
       ctx.fillStyle = "#fff"; ctx.fillRect(W - 6, 44, 4, 8);
 
       // Boss block warning
@@ -1716,9 +1845,12 @@ export default function AprendePage() {
       if (g.levelAnnounce > 0) {
         const alpha = g.levelAnnounce > 15 ? 1 : g.levelAnnounce / 15;
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = "rgba(0,0,0,0.72)"; ctx.fillRect(W / 2 - 155, H - 96, 310, 50);
-        ctx.fillStyle = "#ff8500"; ctx.font = "bold 20px monospace"; ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(2,8,2,0.85)"; ctx.fillRect(W / 2 - 155, H - 96, 310, 50);
+        const laTh = worldTheme(g.currentLevel);
+        ctx.shadowColor = laTh.glow; ctx.shadowBlur = 8;
+        ctx.fillStyle = laTh.glow; ctx.font = "bold 20px monospace"; ctx.textAlign = "center";
         ctx.fillText(LEVELS[g.currentLevel].name.toUpperCase(), W / 2, H - 64);
+        ctx.shadowBlur = 0;
         ctx.globalAlpha = 1;
       }
 
@@ -1801,7 +1933,7 @@ export default function AprendePage() {
           <kbd style={kbdStyle}>Z</kbd> sprint &nbsp;·&nbsp;
           <kbd style={kbdStyle}>X</kbd> poder
         </p>
-        <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", boxShadow: "0 0 80px rgba(132,204,22,0.18), 0 0 0 1px rgba(132,204,22,0.25)" }}>
+        <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", boxShadow: "0 0 60px rgba(89,255,53,0.22), 0 0 0 1px rgba(89,255,53,0.3), 0 0 120px rgba(89,255,53,0.08)" }}>
           <canvas ref={canvasRef} width={W} height={H} style={{ display: "block", maxWidth: "100%" }} />
 
           {screen === "start" && (
