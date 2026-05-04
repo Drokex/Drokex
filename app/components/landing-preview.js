@@ -165,6 +165,8 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
   const productButtonText = store.productCtaText || "Agregar al carrito";
+  const textColor = (field, fallback) => store[field] || fallback;
+  const productTextColor = (product, field, fallback) => product?.[field] || fallback;
 
   function updateProductField(index, field, value) {
     const copy = [...products];
@@ -194,17 +196,17 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           <div>
             <EditableText
               tag="h3" value={store.brand}
-              fontColor={store.textColor}
+              fontColor={textColor("brandColor", store.textColor)}
               onTextChange={v => onUpdate?.("brand", v)}
-              onFontColorChange={v => onUpdate?.("textColor", v)}
+              onFontColorChange={v => onUpdate?.("brandColor", v)}
               isEditable={isEditable}
               className="font-black"
             />
             <EditableText
               tag="p" value={store.country}
-              fontColor={store.mutedTextColor}
+              fontColor={textColor("countryColor", store.mutedTextColor)}
               onTextChange={v => onUpdate?.("country", v)}
-              onFontColorChange={v => onUpdate?.("mutedTextColor", v)}
+              onFontColorChange={v => onUpdate?.("countryColor", v)}
               isEditable={isEditable}
               className="text-xs"
             />
@@ -212,13 +214,13 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         </div>
         <nav className="hidden gap-6 text-sm md:flex" style={{ color: store.mutedTextColor }}>
           <a href="#inicio" style={{ cursor: "pointer" }}>
-            <EditableText tag="span" value={store.nav1 || "Inicio"} fontColor={store.mutedTextColor} onTextChange={v => onUpdate?.("nav1", v)} onFontColorChange={v => onUpdate?.("mutedTextColor", v)} isEditable={isEditable} inline />
+            <EditableText tag="span" value={store.nav1 || "Inicio"} fontColor={textColor("nav1Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav1", v)} onFontColorChange={v => onUpdate?.("nav1Color", v)} isEditable={isEditable} inline />
           </a>
           <a href="#productos" style={{ cursor: "pointer" }}>
-            <EditableText tag="span" value={store.nav2 || "Productos"} fontColor={store.mutedTextColor} onTextChange={v => onUpdate?.("nav2", v)} onFontColorChange={v => onUpdate?.("mutedTextColor", v)} isEditable={isEditable} inline />
+            <EditableText tag="span" value={store.nav2 || "Productos"} fontColor={textColor("nav2Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav2", v)} onFontColorChange={v => onUpdate?.("nav2Color", v)} isEditable={isEditable} inline />
           </a>
           <a href="#marca" style={{ cursor: "pointer" }}>
-            <EditableText tag="span" value={store.nav3 || "Marca"} fontColor={store.mutedTextColor} onTextChange={v => onUpdate?.("nav3", v)} onFontColorChange={v => onUpdate?.("mutedTextColor", v)} isEditable={isEditable} inline />
+            <EditableText tag="span" value={store.nav3 || "Marca"} fontColor={textColor("nav3Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav3", v)} onFontColorChange={v => onUpdate?.("nav3Color", v)} isEditable={isEditable} inline />
           </a>
         </nav>
       </header>
@@ -252,9 +254,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             style={{ backgroundColor: primarySoft, color: store.primaryColor }}>
             <EditableText
               tag="span" value={store.promoText}
-              fontColor={store.primaryColor}
+              fontColor={textColor("promoTextColor", store.primaryColor)}
               onTextChange={v => onUpdate?.("promoText", v)}
-              onFontColorChange={v => onUpdate?.("primaryColor", v)}
+              onFontColorChange={v => onUpdate?.("promoTextColor", v)}
               isEditable={isEditable}
               inline
             />
@@ -281,9 +283,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
             <EditableText
               tag="span" value={store.ctaText}
-              fontColor={store.buttonTextColor}
+              fontColor={textColor("ctaTextColor", store.buttonTextColor)}
               onTextChange={v => onUpdate?.("ctaText", v)}
-              onFontColorChange={v => onUpdate?.("buttonTextColor", v)}
+              onFontColorChange={v => onUpdate?.("ctaTextColor", v)}
               isEditable={isEditable}
               inline
             />
@@ -292,9 +294,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             style={{ color: store.textColor }}>
             <EditableText
               tag="span" value={store.secondaryCtaText}
-              fontColor={store.textColor}
+              fontColor={textColor("secondaryCtaTextColor", store.textColor)}
               onTextChange={v => onUpdate?.("secondaryCtaText", v)}
-              onFontColorChange={v => onUpdate?.("textColor", v)}
+              onFontColorChange={v => onUpdate?.("secondaryCtaTextColor", v)}
               isEditable={isEditable}
               inline
             />
@@ -314,17 +316,17 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             <div className="mb-4 h-10 w-10 rounded-full" style={{ backgroundColor: store.primaryColor }} />
             <EditableText
               tag="h4" value={benefit}
-              fontColor={store.textColor}
+              fontColor={textColor(`benefit${index + 1}Color`, store.textColor)}
               onTextChange={v => onUpdate?.(`benefit${index + 1}`, v)}
-              onFontColorChange={v => onUpdate?.("textColor", v)}
+              onFontColorChange={v => onUpdate?.(`benefit${index + 1}Color`, v)}
               isEditable={isEditable}
               className="font-black"
             />
             <EditableText
               tag="p" value={description}
-              fontColor={store.mutedTextColor}
+              fontColor={textColor(`benefit${index + 1}TextColor`, store.mutedTextColor)}
               onTextChange={v => onUpdate?.(`benefit${index + 1}Text`, v)}
-              onFontColorChange={v => onUpdate?.("mutedTextColor", v)}
+              onFontColorChange={v => onUpdate?.(`benefit${index + 1}TextColor`, v)}
               isEditable={isEditable}
               className="mt-3 text-sm"
             />
@@ -365,7 +367,14 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             <img src={store.bannerSecondary} alt="Banner secundario" className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full min-h-[280px] items-center justify-center" style={{ color: store.mutedTextColor }}>
-              Banner secundario
+              <EditableText
+                tag="span" value={store.bannerSecondaryLabel || "Banner secundario"}
+                fontColor={textColor("bannerSecondaryLabelColor", store.mutedTextColor)}
+                onTextChange={v => onUpdate?.("bannerSecondaryLabel", v)}
+                onFontColorChange={v => onUpdate?.("bannerSecondaryLabelColor", v)}
+                isEditable={isEditable}
+                inline
+              />
             </div>
           )}
         </ClickableImageZone>
@@ -375,25 +384,25 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       <section id="productos" className="p-8" style={{ backgroundColor: store.backgroundColor }}>
         <EditableText
           tag="p" value={store.catalogEyebrow}
-          fontColor={store.primaryColor}
+          fontColor={textColor("catalogEyebrowColor", store.primaryColor)}
           onTextChange={v => onUpdate?.("catalogEyebrow", v)}
-          onFontColorChange={v => onUpdate?.("primaryColor", v)}
+          onFontColorChange={v => onUpdate?.("catalogEyebrowColor", v)}
           isEditable={isEditable}
           className="text-sm font-black uppercase tracking-[0.2em]"
         />
         <EditableText
           tag="h2" value={store.catalogTitle}
-          fontColor={store.textColor}
+          fontColor={textColor("catalogTitleColor", store.textColor)}
           onTextChange={v => onUpdate?.("catalogTitle", v)}
-          onFontColorChange={v => onUpdate?.("textColor", v)}
+          onFontColorChange={v => onUpdate?.("catalogTitleColor", v)}
           isEditable={isEditable}
           className="mt-3 text-4xl font-black"
         />
         <EditableText
           tag="p" value={store.catalogText}
-          fontColor={store.mutedTextColor}
+          fontColor={textColor("catalogTextColor", store.mutedTextColor)}
           onTextChange={v => onUpdate?.("catalogText", v)}
-          onFontColorChange={v => onUpdate?.("mutedTextColor", v)}
+          onFontColorChange={v => onUpdate?.("catalogTextColor", v)}
           isEditable={isEditable}
           className="mt-3 max-w-2xl text-sm"
         />
@@ -416,49 +425,63 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
                   <img src={product.image} alt={product.name || "Producto"} className="h-full w-full object-cover" />
                 ) : (
                   <div className="flex h-56 items-center justify-center" style={{ color: store.mutedTextColor }}>
-                    Imagen producto
+                    <EditableText
+                      tag="span" value={product.imageLabel || "Imagen producto"}
+                      fontColor={productTextColor(product, "imageLabelColor", store.mutedTextColor)}
+                      onTextChange={v => updateProductField(index, "imageLabel", v)}
+                      onFontColorChange={v => updateProductField(index, "imageLabelColor", v)}
+                      isEditable={isEditable}
+                      inline
+                    />
                   </div>
                 )}
               </ClickableImageZone>
               <EditableText
                 tag="p" value={product.category || "Categoria"}
-                fontColor={store.primaryColor}
+                fontColor={productTextColor(product, "categoryColor", store.primaryColor)}
                 onTextChange={v => updateProductField(index, "category", v)}
-                onFontColorChange={v => onUpdate?.("primaryColor", v)}
+                onFontColorChange={v => updateProductField(index, "categoryColor", v)}
                 isEditable={isEditable}
                 className="mt-4 text-xs font-black"
               />
               <EditableText
                 tag="h3" value={product.name || "Nombre producto"}
-                fontColor={store.textColor}
+                fontColor={productTextColor(product, "nameColor", store.textColor)}
                 onTextChange={v => updateProductField(index, "name", v)}
-                onFontColorChange={v => onUpdate?.("textColor", v)}
+                onFontColorChange={v => updateProductField(index, "nameColor", v)}
                 isEditable={isEditable}
                 className="mt-1 text-xl font-black"
               />
               <EditableText
                 tag="p" value={product.description || "Descripcion del producto"}
-                fontColor={store.mutedTextColor}
+                fontColor={productTextColor(product, "descriptionColor", store.mutedTextColor)}
                 onTextChange={v => updateProductField(index, "description", v)}
-                onFontColorChange={v => onUpdate?.("mutedTextColor", v)}
+                onFontColorChange={v => updateProductField(index, "descriptionColor", v)}
                 isEditable={isEditable}
                 className="mt-2 text-sm"
               />
               <EditableText
                 tag="p" value={product.price ? `$${Number(product.price).toLocaleString("es-CO")} COP` : "$0 COP"}
-                fontColor={store.primaryColor}
+                fontColor={productTextColor(product, "priceColor", store.primaryColor)}
                 onTextChange={v => updateProductField(index, "price", v.replace(/[^\d]/g, ""))}
-                onFontColorChange={v => onUpdate?.("primaryColor", v)}
+                onFontColorChange={v => updateProductField(index, "priceColor", v)}
                 isEditable={isEditable}
                 className="mt-4 text-xl font-black"
               />
-              <p className="text-sm" style={{ color: store.mutedTextColor }}>
-                Stock:{" "}
+              <p className="text-sm" style={{ color: productTextColor(product, "stockLabelColor", store.mutedTextColor) }}>
+                <EditableText
+                  tag="span" value={product.stockLabel || "Stock:"}
+                  fontColor={productTextColor(product, "stockLabelColor", store.mutedTextColor)}
+                  onTextChange={v => updateProductField(index, "stockLabel", v)}
+                  onFontColorChange={v => updateProductField(index, "stockLabelColor", v)}
+                  isEditable={isEditable}
+                  inline
+                />{" "}
                 <EditableText
                   tag="span" value={product.stock || "0"}
-                  fontColor={store.mutedTextColor}
+                  fontColor={productTextColor(product, "stockColor", store.mutedTextColor)}
                   onTextChange={v => updateProductField(index, "stock", v)}
-                  onFontColorChange={v => onUpdate?.("mutedTextColor", v)}
+                  onFontColorChange={v => updateProductField(index, "stockColor", v)}
                   isEditable={isEditable}
                   inline
                 />
@@ -467,9 +490,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
                 style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
                 <EditableText
                   tag="span" value={productButtonText}
-                  fontColor={store.buttonTextColor}
+                  fontColor={textColor("productCtaTextColor", store.buttonTextColor)}
                   onTextChange={v => onUpdate?.("productCtaText", v)}
-                  onFontColorChange={v => onUpdate?.("buttonTextColor", v)}
+                  onFontColorChange={v => onUpdate?.("productCtaTextColor", v)}
                   isEditable={isEditable}
                   inline
                 />
@@ -483,17 +506,17 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       <section className="px-8 py-16 text-center" style={{ backgroundColor: store.surfaceColor }}>
         <EditableText
           tag="p" value={store.finalEyebrow}
-          fontColor={store.primaryColor}
+          fontColor={textColor("finalEyebrowColor", store.primaryColor)}
           onTextChange={v => onUpdate?.("finalEyebrow", v)}
-          onFontColorChange={v => onUpdate?.("primaryColor", v)}
+          onFontColorChange={v => onUpdate?.("finalEyebrowColor", v)}
           isEditable={isEditable}
           className="text-sm font-black uppercase tracking-[0.2em]"
         />
         <EditableText
           tag="h2" value={store.finalTitle}
-          fontColor={store.textColor}
+          fontColor={textColor("finalTitleColor", store.textColor)}
           onTextChange={v => onUpdate?.("finalTitle", v)}
-          onFontColorChange={v => onUpdate?.("textColor", v)}
+          onFontColorChange={v => onUpdate?.("finalTitleColor", v)}
           isEditable={isEditable}
           className="mx-auto mt-4 max-w-2xl text-4xl font-black"
         />
@@ -501,9 +524,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
           <EditableText
             tag="span" value={store.finalCtaText}
-            fontColor={store.buttonTextColor}
+            fontColor={textColor("finalCtaTextColor", store.buttonTextColor)}
             onTextChange={v => onUpdate?.("finalCtaText", v)}
-            onFontColorChange={v => onUpdate?.("buttonTextColor", v)}
+            onFontColorChange={v => onUpdate?.("finalCtaTextColor", v)}
             isEditable={isEditable}
             inline
           />
