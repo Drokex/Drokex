@@ -187,11 +187,13 @@ function newState() {
 export default function AprendePage() {
   const canvasRef = useRef(null);
   const gRef = useRef(null);
+  const gameShellRef = useRef(null);
   const keysRef = useRef({ left: false, right: false, jump: false, jumpPressed: false, power: false, sprint: false });
   const rafRef = useRef(null);
   const audioRef = useRef(null);
 
   const [screen, setScreen] = useState("start");
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [hudCoins, setHudCoins] = useState(0);
   const [hudLives, setHudLives] = useState(3);
   const [finalScore, setFinalScore] = useState(0);
@@ -229,6 +231,15 @@ export default function AprendePage() {
 
   useEffect(() => { fetchScores(); }, []);
 
+  useEffect(() => {
+    function syncFullscreen() {
+      setIsFullscreen(document.fullscreenElement === gameShellRef.current);
+    }
+
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
   function calculateScore(game) {
     return game.coins * 25 + game.lives * 150 + (game.currentLevel + 1) * 120 + (game.killScore || 0);
   }
@@ -245,6 +256,18 @@ export default function AprendePage() {
     gRef.current = newState();
     setHudCoins(0); setHudLives(3); setFinalScore(0); setPlayerName("");
     setScreen("playing");
+  }
+
+  async function toggleFullscreen() {
+    const shell = gameShellRef.current;
+    if (!shell || typeof document === "undefined") return;
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await shell.requestFullscreen();
+      }
+    } catch {}
   }
 
   async function saveHighScore(e) {
@@ -291,6 +314,12 @@ export default function AprendePage() {
     enemySheet.src = "/aprende-enemies.png";
     const explosionSheet = new Image();
     explosionSheet.src = "/aprende-explosions.png";
+    const ua = navigator.userAgent || "";
+    const isChrome = /Chrome|CriOS/.test(ua) && !/Edg|OPR|Opera/.test(ua);
+    const constrainedDevice =
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
+      (navigator.deviceMemory && navigator.deviceMemory <= 4);
+    const visualBudget = isChrome || constrainedDevice ? "balanced" : "full";
 
     function playSound(type) {
       const audio = audioRef.current;
@@ -638,19 +667,24 @@ export default function AprendePage() {
       // Distant LATAM-tech skyline, separated in parallax layers.
       ctx.save();
       const skylineOffset = (g.cameraX * 0.04) % 180;
-      for (let i = -1; i < 8; i++) {
+      const skylineCount = visualBudget === "full" ? 8 : 5;
+      for (let i = -1; i < skylineCount; i++) {
         const sx = i * 180 - skylineOffset;
         const baseY = 365 + (i % 2) * 18;
         const scale = 0.78 + (i % 3) * 0.12;
-        drawIsoTower(sx + 34, baseY, scale, theme, frame, 0.13);
-        drawIsoTower(sx + 92, baseY + 18, scale * 0.76, theme, frame + 20, 0.09);
+        drawIsoTower(sx + 34, baseY, scale, theme, frame, visualBudget === "full" ? 0.13 : 0.08);
+        if (visualBudget === "full") {
+          drawIsoTower(sx + 92, baseY + 18, scale * 0.76, theme, frame + 20, 0.09);
+        }
       }
       ctx.restore();
 
       // Volumetric warehouse spotlights.
-      for (let i = 0; i < 4; i++) {
-        const lx = ((i * 271 + 120 - g.cameraX * 0.08) % (W + 160)) - 80;
-        drawLightBeam(lx, 80 + (i % 2) * 24, H, 80 + (i % 3) * 24, theme, 0.08);
+      if (visualBudget === "full") {
+        for (let i = 0; i < 4; i++) {
+          const lx = ((i * 271 + 120 - g.cameraX * 0.08) % (W + 160)) - 80;
+          drawLightBeam(lx, 80 + (i % 2) * 24, H, 80 + (i % 3) * 24, theme, 0.08);
+        }
       }
 
       // Isometric floor grid: diamond tiles fading into the horizon.
@@ -685,7 +719,8 @@ export default function AprendePage() {
       ctx.globalCompositeOperation = "lighter";
       ctx.strokeStyle = theme.glow;
       ctx.lineWidth = 2;
-      for (let r = 0; r < 5; r++) {
+      const routeCount = visualBudget === "full" ? 5 : 3;
+      for (let r = 0; r < routeCount; r++) {
         const y = H - 42 - r * 34;
         const phase = (frame * 2.2 + r * 80 - g.cameraX * 0.22) % 160;
         ctx.globalAlpha = 0.08 + r * 0.018;
@@ -713,7 +748,8 @@ export default function AprendePage() {
 
       // Background holographic distribution hubs and warehouse blocks.
       if (!lev.isBoss) {
-        for (let i = 0; i < 6; i++) {
+        const blockCount = visualBudget === "full" ? 6 : 4;
+        for (let i = 0; i < blockCount; i++) {
           const bx = ((i * 163 + 40) % (W - 60));
           const by = 190 + ((i * 53) % 150);
           const bw = 42 + (i % 3) * 18;
@@ -861,7 +897,7 @@ export default function AprendePage() {
         ctx.globalAlpha = 1;
 
         // Floating guard rail on the back edge.
-        if (p.w > 95) {
+        if (visualBudget === "full" && p.w > 95) {
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           ctx.shadowColor = theme.glow;
@@ -884,7 +920,8 @@ export default function AprendePage() {
 
         // Subtle warehouse crate modules on wider ground segments.
         if (ground && p.w > 320) {
-          for (let bx = p.x + 170; bx < p.x + p.w - 180; bx += 380) {
+          const crateStep = visualBudget === "full" ? 380 : 560;
+          for (let bx = p.x + 170; bx < p.x + p.w - 180; bx += crateStep) {
             drawIsoBox(bx, p.y - 8, 64, 28, 34, theme, 0.42);
           }
         }
@@ -1495,7 +1532,8 @@ export default function AprendePage() {
 
       // Floating tech particles
       ctx.globalCompositeOperation = "lighter";
-      for (let i = 0; i < 30; i++) {
+      const particleCount = visualBudget === "full" ? 30 : 18;
+      for (let i = 0; i < particleCount; i++) {
         const drift = (frame * (0.13 + (i % 5) * 0.025) + i * 117) % (W + 200);
         const px = drift - 100;
         const py = 52 + ((i * 73 + Math.sin(frame * 0.013 + i) * 34) % (H - 140));
@@ -1989,6 +2027,11 @@ export default function AprendePage() {
         if (gRef.current) gRef.current.autoPlay = !gRef.current.autoPlay;
         return;
       }
+      if (e.key.toLowerCase() === "f") {
+        e.preventDefault();
+        toggleFullscreen();
+        return;
+      }
       if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") k.left = true;
       if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") k.right = true;
       if (e.code === "Space" || e.key === "ArrowUp" || e.key.toLowerCase() === "w") {
@@ -2047,18 +2090,67 @@ export default function AprendePage() {
     };
   }
 
+  const gameShellStyle = isFullscreen
+    ? {
+        width: "100vw",
+        height: "100vh",
+        background: "radial-gradient(circle at center, rgba(89,255,53,0.08), transparent 45%), #020402",
+        display: "grid",
+        gridTemplateRows: "auto minmax(0, 1fr) auto",
+        alignItems: "center",
+        justifyItems: "center",
+        gap: 14,
+        padding: "18px clamp(14px, 3vw, 44px)",
+      }
+    : {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "32px 16px 80px",
+      };
+  const gameFrameStyle = {
+    position: "relative",
+    borderRadius: isFullscreen ? 24 : 16,
+    overflow: "hidden",
+    boxShadow: isFullscreen
+      ? "0 0 70px rgba(89,255,53,0.28), 0 0 0 1px rgba(89,255,53,0.42), 0 0 160px rgba(89,255,53,0.12)"
+      : "0 0 60px rgba(89,255,53,0.22), 0 0 0 1px rgba(89,255,53,0.3), 0 0 120px rgba(89,255,53,0.08)",
+    width: isFullscreen ? "min(100%, calc((100vh - 156px) * 16 / 9))" : "min(100%, 960px)",
+    maxWidth: isFullscreen ? "calc(100vw - 56px)" : "960px",
+  };
+  const canvasStyle = {
+    display: "block",
+    width: "100%",
+    height: "auto",
+  };
+  const gameControlsStyle = {
+    display: "flex",
+    gap: isFullscreen ? 14 : 12,
+    marginTop: isFullscreen ? 0 : 20,
+  };
+
   return (
     <main style={{ minHeight: "100vh", background: "#050505" }}>
       <SiteHeader />
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 16px 80px" }}>
-        <p style={{ color: "rgba(255,255,255,0.35)", margin: "0 0 20px", fontSize: "0.82rem", textAlign: "center", letterSpacing: "0.08em" }}>
+      <div ref={gameShellRef} style={gameShellStyle}>
+        <p style={{ color: "rgba(255,255,255,0.35)", margin: isFullscreen ? 0 : "0 0 20px", fontSize: isFullscreen ? "0.9rem" : "0.82rem", textAlign: "center", letterSpacing: "0.08em" }}>
           <kbd style={kbdStyle}>←→</kbd> mover &nbsp;·&nbsp;
           <kbd style={kbdStyle}>↑/W</kbd> saltar &nbsp;·&nbsp;
           <kbd style={kbdStyle}>Z</kbd> sprint &nbsp;·&nbsp;
-          <kbd style={kbdStyle}>X</kbd> poder
+          <kbd style={kbdStyle}>X</kbd> poder &nbsp;·&nbsp;
+          <kbd style={kbdStyle}>F</kbd> pantalla completa
         </p>
-        <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", boxShadow: "0 0 60px rgba(89,255,53,0.22), 0 0 0 1px rgba(89,255,53,0.3), 0 0 120px rgba(89,255,53,0.08)" }}>
-          <canvas ref={canvasRef} width={W} height={H} style={{ display: "block", maxWidth: "100%" }} />
+        <div style={gameFrameStyle}>
+          <canvas ref={canvasRef} width={W} height={H} style={canvasStyle} />
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            aria-label={isFullscreen ? "Salir de pantalla completa" : "Ver en pantalla completa"}
+            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+            style={fullscreenBtnStyle}
+          >
+            {isFullscreen ? "×" : "⛶"}
+          </button>
 
           {screen === "start" && (
             <div style={{
@@ -2191,7 +2283,7 @@ export default function AprendePage() {
             </div>
           )}
         </div>
-        <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
+        <div style={gameControlsStyle}>
           <button style={mobileBtnStyle} {...mobileHandlers("left")}>←</button>
           <button style={mobileBtnStyle} {...mobileJumpHandlers()}>↑↑</button>
           <button style={mobileBtnStyle} {...mobileHandlers("right")}>→</button>
@@ -2213,3 +2305,19 @@ const scoreFormStyle = { display: "flex", flexDirection: "column", gap: 14, widt
 const scoreInputStyle = { width: "100%", border: "1px solid rgba(255,255,255,0.24)", borderRadius: 12, background: "rgba(255,255,255,0.1)", color: "#fff", padding: "14px 16px", fontSize: "1rem", outline: "none" };
 const btnStyle = { background: "#ff8500", color: "#fff", border: "none", borderRadius: 12, padding: "14px 40px", fontSize: "1rem", fontWeight: 800, cursor: "pointer", letterSpacing: "0.05em" };
 const mobileBtnStyle = { width: 60, height: 52, border: "none", borderRadius: 14, background: "#ff8500", fontSize: 20, fontWeight: "bold", cursor: "pointer", color: "#fff", touchAction: "none" };
+const fullscreenBtnStyle = {
+  position: "absolute",
+  top: 12,
+  right: 12,
+  zIndex: 70,
+  width: 38,
+  height: 38,
+  border: "1px solid rgba(89,255,53,0.45)",
+  borderRadius: 10,
+  background: "rgba(2,8,2,0.72)",
+  color: "#59ff35",
+  fontSize: 20,
+  fontWeight: 900,
+  lineHeight: 1,
+  boxShadow: "0 0 18px rgba(89,255,53,0.18)",
+};
