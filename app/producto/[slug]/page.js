@@ -6,6 +6,7 @@ import SiteFooter from "@/app/components/site-footer";
 import QuoteButton from "@/app/components/quote-button";
 import ProductGallery from "@/app/components/product-gallery";
 import ProductAccordion from "@/app/components/product-accordion";
+import ProductThemeToggle from "@/app/components/product-theme-toggle";
 
 export async function generateStaticParams() {
   const products = await getProducts();
@@ -37,6 +38,7 @@ export default async function ProductDetailPage({ params }) {
   return (
     <main className="pd-page">
       <SiteHeader />
+      <ProductThemeToggle />
 
       <section className="shell pd-shell">
         <div className="pd-breadcrumbs">

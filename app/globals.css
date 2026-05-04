@@ -8001,7 +8001,7 @@ button {
   text-decoration: none;
 }
 
-/* ── Modo claro ── */
+/* ── Modo claro catálogo ── */
 .cdk-light { background: #f2f4f7; color: #111; }
 .cdk-light .cdk-sidebar { background: #fff; border-color: rgba(0,0,0,0.08); }
 .cdk-light .cdk-sidebar-header { border-color: rgba(0,0,0,0.07); }
@@ -8030,6 +8030,27 @@ button {
 .cdk-light .cdk-market-price strong { color: #111; }
 .cdk-light .cdk-market-price small { color: rgba(0,0,0,0.4); }
 .cdk-light .cdk-market-price .market-price-note { color: rgba(0,0,0,0.55); }
+
+/* ── Modo claro producto ── */
+.pd-light { background: #f2f4f7; color: #111; }
+.pd-light .pd-breadcrumbs { color: rgba(0,0,0,0.4); }
+.pd-light .pd-breadcrumbs a { color: rgba(0,0,0,0.55); }
+.pd-light .pd-title { color: #111; }
+.pd-light .pd-subline { color: rgba(0,0,0,0.55); }
+.pd-light .pd-market-price small { color: rgba(0,0,0,0.35); }
+.pd-light .pd-market-price .market-price-origin { color: rgba(0,0,0,0.5); }
+.pd-light .pd-tags span { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.75); }
+.pd-light .pd-trust-row { color: rgba(0,0,0,0.45); }
+.pd-light .pd-trust-row span:first-child { color: rgba(0,0,0,0.55); }
+.pd-light .accordion-section { border-color: rgba(0,0,0,0.1); }
+.pd-light .accordion-chevron { color: rgba(0,0,0,0.4); }
+.pd-light .accordion-text { color: rgba(0,0,0,0.6); }
+.pd-light .accordion-tag { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.7); }
+.pd-light .accordion-spec-card { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); }
+.pd-light .accordion-spec-card strong { color: #111; }
+.pd-light .pd-features-bar { background: #e8eaed; border-color: rgba(0,0,0,0.08); }
+.pd-light .pd-feature strong { color: #111; }
+.pd-light .pd-feature p { color: rgba(0,0,0,0.5); }
 
 /* Responsive */
 @media (max-width: 1200px) {
