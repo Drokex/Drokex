@@ -152,8 +152,7 @@ export default function LandingPreview({ store, products, fullWidth = false, isE
             </svg>
           </ClickableImageZone>
         )}
-        <div className="max-w-3xl rounded-[2rem] p-6 backdrop-blur-[2px]"
-          style={{ backgroundColor: hexToRgba(store.surfaceColor, 0.58) }}>
+        <div className="max-w-3xl p-2">
           <span className="rounded-full px-4 py-2 text-sm font-black"
             style={{ backgroundColor: primarySoft, color: store.primaryColor }}>
             {store.promoText}

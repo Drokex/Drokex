@@ -140,22 +140,26 @@ export default function ProveedorProPage() {
     setProducts(copy);
   }
 
-  async function createLanding() {
+  function createLanding() {
     const slug = slugify(store.brand) || "mi-tienda";
     const origin = window.location.origin;
     const link = `${origin}/proveedor-pro/tienda/${slug}`;
 
-    window.localStorage.setItem(
-      `drokex-proveedor-pro:${slug}`,
-      JSON.stringify({
-        store,
-        products,
-        createdAt: new Date().toISOString(),
-      })
-    );
-
-    setLandingLink(link);
-    setCopiedLink(false);
+    try {
+      window.localStorage.setItem(
+        `drokex-proveedor-pro:${slug}`,
+        JSON.stringify({ store, products, createdAt: new Date().toISOString() })
+      );
+      setLandingLink(link);
+      setCopiedLink(false);
+      setError("");
+    } catch (e) {
+      if (e?.name === "QuotaExceededError" || e?.code === 22) {
+        setError("Las imágenes son muy pesadas. Usa URLs externas en lugar de subir archivos.");
+      } else {
+        setError("No se pudo guardar. Intenta de nuevo.");
+      }
+    }
   }
 
   async function copyLandingLink() {
@@ -287,7 +291,9 @@ export default function ProveedorProPage() {
             </div>
 
             {/* Action buttons */}
-            <div style={{ padding: "14px 16px", display: "flex", gap: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+            <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+              {error && <p style={{ margin: 0, fontSize: "0.75rem", color: "#f87171", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 8, padding: "8px 12px" }}>{error}</p>}
+              <div style={{ display: "flex", gap: 8 }}>
               <button type="button" onClick={createLanding}
                 style={{ flex: 1, borderRadius: 12, background: "#59ff35", color: "#050505", fontWeight: 900, fontSize: "0.82rem", padding: "11px 8px", border: "none", cursor: "pointer" }}>
                 Publicar
@@ -296,6 +302,7 @@ export default function ProveedorProPage() {
                 style={{ flex: 1, borderRadius: 12, background: "rgba(255,255,255,0.06)", color: "#fff", fontWeight: 700, fontSize: "0.82rem", padding: "11px 8px", border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer" }}>
                 Previsualizar
               </button>
+              </div>
             </div>
 
             {/* Landing link */}
