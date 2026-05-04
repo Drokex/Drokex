@@ -26,7 +26,11 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
   if (!isEditable) return <Tag className={className} style={computedStyle}>{value}</Tag>;
 
   const btnStyle = { background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, color: "#fff", fontWeight: 900, fontSize: "0.72rem", padding: "3px 8px", cursor: "pointer", lineHeight: 1.4, display: "flex", alignItems: "center", gap: 4 };
-  const colorOptions = ["#191421", "#ffffff", "#59ff35", "#ff9f2e", "#ff7db8", "#b86cff", "#00cfff", "#111827", "#6f6477", "#dc2626"];
+  const colorOptions = [
+    "#191421", "#ffffff", "#59ff35", "#ff9f2e", "#ff7db8", "#b86cff",
+    "#00cfff", "#111827", "#6f6477", "#dc2626", "#facc15", "#14b8a6",
+    "#2563eb", "#7c3aed", "#f97316", "#0f172a",
+  ];
 
   const Wrapper = inline ? "span" : "div";
 
@@ -54,17 +58,17 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
             <div
               style={{
                 position: "absolute",
-                top: 42,
-                right: 8,
-                width: 202,
-                padding: 10,
-                borderRadius: 12,
-                border: "1px solid rgba(89,255,53,0.35)",
-                background: "#071007",
-                boxShadow: "0 12px 34px rgba(0,0,0,0.55)",
+                top: 46,
+                right: 0,
+                width: 292,
+                padding: 14,
+                borderRadius: 16,
+                border: "1px solid rgba(89,255,53,0.42)",
+                background: "linear-gradient(180deg, #071207 0%, #0d1c0d 100%)",
+                boxShadow: "0 18px 46px rgba(0,0,0,0.62), 0 0 28px rgba(89,255,53,0.16)",
                 display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-                gap: 7,
+                gridTemplateColumns: "repeat(8, 1fr)",
+                gap: 9,
               }}
             >
               {colorOptions.map(color => (
@@ -77,12 +81,15 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
                     onFontColorChange?.(color);
                   }}
                   style={{
-                    width: 28,
-                    height: 28,
+                    width: 25,
+                    height: 25,
                     borderRadius: 8,
-                    border: color.toLowerCase() === (fontColor || "").toLowerCase() ? "2px solid #59ff35" : "1px solid rgba(255,255,255,0.22)",
+                    border: color.toLowerCase() === (fontColor || "").toLowerCase() ? "2px solid #59ff35" : "1px solid rgba(255,255,255,0.28)",
                     background: color,
-                    boxShadow: "0 0 0 1px rgba(0,0,0,0.28)",
+                    boxShadow: color.toLowerCase() === (fontColor || "").toLowerCase()
+                      ? "0 0 0 2px rgba(89,255,53,0.18), 0 0 16px rgba(89,255,53,0.28)"
+                      : "0 0 0 1px rgba(0,0,0,0.32)",
+                    cursor: "pointer",
                   }}
                 />
               ))}
@@ -98,13 +105,14 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
                 style={{
                   gridColumn: "1 / -1",
                   width: "100%",
-                  marginTop: 4,
-                  border: "1px solid rgba(255,255,255,0.16)",
-                  borderRadius: 8,
-                  background: "rgba(255,255,255,0.06)",
+                  marginTop: 6,
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  borderRadius: 10,
+                  background: "rgba(255,255,255,0.08)",
                   color: "#fff",
-                  padding: "7px 9px",
-                  fontSize: "0.75rem",
+                  padding: "10px 12px",
+                  fontSize: "0.82rem",
+                  fontWeight: 800,
                   outline: "none",
                 }}
               />
