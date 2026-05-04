@@ -1907,15 +1907,18 @@ export default function AprendePage() {
           {screen === "win" && (
             <div style={overlayStyle}>
               <p style={{ ...tagStyle, color: "#84cc16" }}>¡Completado!</p>
-              <h2 style={titleStyle}>¡Ganaste!</h2>
-              <p style={subStyle}>Derrotaste al Jefe Final con {finalScore} puntos.</p>
-              <form onSubmit={saveHighScore} style={scoreFormStyle}>
+              <h2 style={titleStyle}>🏆 ¡Ganaste!</h2>
+              <p style={subStyle}>Derrotaste al Jefe Final · {finalScore} pts · {hudCoins} monedas</p>
+              <form onSubmit={saveHighScore} style={{ ...scoreFormStyle, marginBottom: 14 }}>
                 <input value={playerName} onChange={(e) => setPlayerName(e.target.value)}
-                  placeholder="Tu nombre" maxLength={18} style={scoreInputStyle} autoFocus disabled={savingScore} />
-                <button type="submit" style={{ ...btnStyle, opacity: savingScore ? 0.6 : 1 }} disabled={savingScore}>
+                  placeholder="Tu nombre (opcional)" maxLength={18} style={scoreInputStyle} autoFocus disabled={savingScore} />
+                <button type="submit" style={{ ...btnStyle, background: "#84cc16", color: "#050505", opacity: savingScore ? 0.6 : 1 }} disabled={savingScore}>
                   {savingScore ? "Guardando..." : "Guardar puntaje"}
                 </button>
               </form>
+              <button onClick={startGame} style={{ ...btnStyle, background: "rgba(255,255,255,0.1)", fontSize: "0.85rem", padding: "10px 28px" }}>
+                Jugar de nuevo
+              </button>
             </div>
           )}
           {screen === "scores" && (
