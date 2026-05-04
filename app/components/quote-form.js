@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const COUNTRIES = [
@@ -8,6 +8,93 @@ const COUNTRIES = [
   "Costa Rica", "Panamá", "Ecuador", "Perú", "Chile", "Argentina",
   "Brasil", "Venezuela", "Cuba", "República Dominicana", "Otro",
 ];
+
+function CountrySelect({ value, onChange }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (!ref.current?.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0.75rem 1rem",
+          border: open ? "1.5px solid #9be02f" : "1.5px solid #e5e7eb",
+          borderRadius: 10,
+          fontSize: "0.97rem",
+          fontFamily: "inherit",
+          color: value ? "#1a1a1a" : "#9ca3af",
+          background: open ? "#fff" : "#fafafa",
+          cursor: "pointer",
+          outline: "none",
+          transition: "border-color 0.15s",
+          textAlign: "left",
+        }}
+      >
+        <span>{value || "Selecciona un país"}</span>
+        <svg
+          width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0, transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "none" }}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {open && (
+        <ul style={{
+          position: "absolute",
+          top: "calc(100% + 6px)",
+          left: 0,
+          right: 0,
+          zIndex: 50,
+          background: "#fff",
+          border: "1.5px solid #e5e7eb",
+          borderRadius: 10,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+          maxHeight: 220,
+          overflowY: "auto",
+          margin: 0,
+          padding: "6px 0",
+          listStyle: "none",
+        }}>
+          {COUNTRIES.map((c) => (
+            <li
+              key={c}
+              onMouseDown={() => { onChange(c); setOpen(false); }}
+              style={{
+                padding: "10px 16px",
+                fontSize: "0.95rem",
+                cursor: "pointer",
+                color: c === value ? "#5aab00" : "#1a1a1a",
+                fontWeight: c === value ? 700 : 400,
+                background: c === value ? "#f4ffe8" : "transparent",
+                transition: "background 0.1s",
+              }}
+              onMouseEnter={e => { if (c !== value) e.currentTarget.style.background = "#f9fafb"; }}
+              onMouseLeave={e => { if (c !== value) e.currentTarget.style.background = "transparent"; }}
+            >
+              {c}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 export default function QuoteForm({ productId, productName, onClose }) {
   const router = useRouter();
@@ -71,14 +158,10 @@ export default function QuoteForm({ productId, productName, onClose }) {
 
       <div className="qf-field">
         <label>País de destino</label>
-        <select
+        <CountrySelect
           value={form.destinationCountry}
-          onChange={(e) => set("destinationCountry", e.target.value)}
-          required
-        >
-          <option value="" disabled>Selecciona un país</option>
-          {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
+          onChange={(v) => set("destinationCountry", v)}
+        />
       </div>
 
       <div className="qf-field">
