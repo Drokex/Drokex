@@ -14,6 +14,7 @@ export function hexToRgba(hex, alpha) {
 
 function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange, onFontSizeChange, onFontColorChange, isEditable, className, style }) {
   const ref = useRef(null);
+  const colorRef = useRef(null);
   const [focused, setFocused] = useState(false);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
 
   if (!isEditable) return <Tag className={className} style={computedStyle}>{value}</Tag>;
 
-  const btnStyle = { background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, color: "#fff", fontWeight: 900, fontSize: "0.72rem", padding: "3px 8px", cursor: "pointer", lineHeight: 1.4 };
+  const btnStyle = { background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, color: "#fff", fontWeight: 900, fontSize: "0.72rem", padding: "3px 8px", cursor: "pointer", lineHeight: 1.4, display: "flex", alignItems: "center", gap: 4 };
 
   return (
     <div style={{ position: "relative" }}>
@@ -35,14 +36,20 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
           <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.45)", minWidth: 34, textAlign: "center" }}>{fontSize || "auto"}px</span>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.((fontSize || 16) + 2); }}>A+</button>
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.12)", margin: "0 2px" }} />
-          <label style={{ display: "flex", alignItems: "center", gap: 5, cursor: "pointer" }} onMouseDown={e => e.stopPropagation()}>
-            <div style={{ width: 20, height: 20, borderRadius: 5, background: fontColor || "#fff", border: "1px solid rgba(255,255,255,0.25)", flexShrink: 0 }} />
-            <span style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.4)" }}>Color</span>
-            <input type="color" value={fontColor || "#ffffff"} onChange={e => onFontColorChange?.(e.target.value)}
-              style={{ width: 0, height: 0, opacity: 0, position: "absolute", pointerEvents: "none" }}
-              ref={el => { if (el) el.style.pointerEvents = "auto"; }}
-            />
-          </label>
+          <button
+            style={btnStyle}
+            onMouseDown={e => { e.preventDefault(); colorRef.current?.click(); }}
+          >
+            <span style={{ width: 14, height: 14, borderRadius: 4, background: fontColor || "#ffffff", border: "1px solid rgba(255,255,255,0.4)", display: "inline-block", flexShrink: 0 }} />
+            Color
+          </button>
+          <input
+            ref={colorRef}
+            type="color"
+            value={fontColor || "#ffffff"}
+            onChange={e => onFontColorChange?.(e.target.value)}
+            style={{ display: "none" }}
+          />
         </div>
       )}
       <Tag
