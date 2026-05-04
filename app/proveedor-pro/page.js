@@ -75,6 +75,9 @@ export default function ProveedorProPage() {
     buttonTextColor: "#ffffff",
     gradientFromColor: "#b86cff",
     gradientToColor: "#ff7db8",
+    nav1: "Inicio",
+    nav2: "Productos",
+    nav3: "Marca",
     heroTitleSize: 60,
     heroTitleColor: "",
     heroSubtitleSize: 18,
@@ -322,6 +325,9 @@ export default function ProveedorProPage() {
               <p style={{ margin: "0 0 8px", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)" }}>Secciones de tu landing</p>
 
               <SectionCard id="hero" label="Portada" icon={<HeroIcon />} open={openSection === "hero"} onToggle={() => setOpenSection(s => s === "hero" ? null : "hero")}>
+                <Input label="Link nav 1" value={store.nav1} onChange={v => updateStore("nav1", v)} />
+                <Input label="Link nav 2" value={store.nav2} onChange={v => updateStore("nav2", v)} />
+                <Input label="Link nav 3" value={store.nav3} onChange={v => updateStore("nav3", v)} />
                 <Input label="Titulo principal" value={store.heroTitle} onChange={v => updateStore("heroTitle", v)} />
                 <Textarea label="Subtitulo" value={store.heroSubtitle} onChange={v => updateStore("heroSubtitle", v)} />
                 <Input label="Texto del boton" value={store.ctaText} onChange={v => updateStore("ctaText", v)} />

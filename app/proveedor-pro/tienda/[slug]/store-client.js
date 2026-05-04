@@ -42,6 +42,7 @@ const fallbackStore = {
   buttonTextColor: "#ffffff",
   gradientFromColor: "#b86cff",
   gradientToColor: "#ff7db8",
+  nav1: "Inicio", nav2: "Productos", nav3: "Marca",
   heroTitleSize: 60, heroTitleColor: "",
   heroSubtitleSize: 18, heroSubtitleColor: "",
   aboutTitleSize: 36, aboutTitleColor: "",

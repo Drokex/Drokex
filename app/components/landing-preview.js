@@ -130,15 +130,15 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           </div>
         </div>
         <nav className="hidden gap-6 text-sm md:flex" style={{ color: store.mutedTextColor }}>
-          <a>Inicio</a>
-          <a>Productos</a>
-          <a>Marca</a>
-          <a>Contacto</a>
+          <a href="#inicio" style={{ cursor: "pointer" }}>{store.nav1 || "Inicio"}</a>
+          <a href="#productos" style={{ cursor: "pointer" }}>{store.nav2 || "Productos"}</a>
+          <a href="#marca" style={{ cursor: "pointer" }}>{store.nav3 || "Marca"}</a>
         </nav>
       </header>
 
       {/* Hero */}
       <section
+        id="inicio"
         className="relative min-h-[520px] bg-cover bg-center px-8 py-16"
         style={{
           backgroundColor: store.backgroundColor,
@@ -211,7 +211,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       </section>
 
       {/* About */}
-      <section className="grid gap-8 p-8 md:grid-cols-2">
+      <section id="marca" className="grid gap-8 p-8 md:grid-cols-2">
         <div>
           <EditableText
             tag="h2" value={store.aboutTitle}
@@ -250,7 +250,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       </section>
 
       {/* Catalog */}
-      <section className="p-8" style={{ backgroundColor: store.backgroundColor }}>
+      <section id="productos" className="p-8" style={{ backgroundColor: store.backgroundColor }}>
         <p className="text-sm font-black uppercase tracking-[0.2em]" style={{ color: store.primaryColor }}>
           {store.catalogEyebrow}
         </p>
