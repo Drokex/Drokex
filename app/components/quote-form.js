@@ -4,9 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const COUNTRIES = [
-  "Colombia", "México", "Guatemala", "Honduras", "El Salvador",
-  "Costa Rica", "Panamá", "Ecuador", "Perú", "Chile", "Argentina",
-  "Brasil", "Venezuela", "Cuba", "República Dominicana", "Otro",
+  "Nicaragua", "Honduras", "Guatemala", "El Salvador",
+  "República Dominicana", "Colombia", "Perú", "México", "Otro",
 ];
 
 function CountrySelect({ value, onChange }) {

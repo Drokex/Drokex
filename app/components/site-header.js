@@ -7,18 +7,24 @@ import LogoutButton from "@/app/components/logout-button";
 
 const COUNTRY_PREFERENCE_STORAGE_KEY = "drokex-selected-country";
 const marketFlags = {
-  mx: "🇲🇽",
-  co: "🇨🇴",
-  gt: "🇬🇹",
-  cu: "🇨🇺",
+  ni: "🇳🇮",
   hn: "🇭🇳",
+  gt: "🇬🇹",
+  sv: "🇸🇻",
+  do: "🇩🇴",
+  co: "🇨🇴",
+  pe: "🇵🇪",
+  mx: "🇲🇽",
 };
 const marketLabels = {
-  mx: "Mexico",
-  co: "Colombia",
-  gt: "Guatemala",
-  cu: "Cuba",
+  ni: "Nicaragua",
   hn: "Honduras",
+  gt: "Guatemala",
+  sv: "El Salvador",
+  do: "República Dominicana",
+  co: "Colombia",
+  pe: "Perú",
+  mx: "México",
 };
 
 const menuItems = [

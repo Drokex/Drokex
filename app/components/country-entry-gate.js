@@ -6,11 +6,14 @@ import Image from "next/image";
 const COUNTRY_PREFERENCE_STORAGE_KEY = "drokex-selected-country";
 
 const globalMarkets = [
-  { id: "mx", label: "Mexico", flag: "🇲🇽" },
-  { id: "co", label: "Colombia", flag: "🇨🇴" },
-  { id: "gt", label: "Guatemala", flag: "🇬🇹" },
-  { id: "cu", label: "Cuba", flag: "🇨🇺" },
+  { id: "ni", label: "Nicaragua", flag: "🇳🇮" },
   { id: "hn", label: "Honduras", flag: "🇭🇳" },
+  { id: "gt", label: "Guatemala", flag: "🇬🇹" },
+  { id: "sv", label: "El Salvador", flag: "🇸🇻" },
+  { id: "do", label: "República Dominicana", flag: "🇩🇴" },
+  { id: "co", label: "Colombia", flag: "🇨🇴" },
+  { id: "pe", label: "Perú", flag: "🇵🇪" },
+  { id: "mx", label: "México", flag: "🇲🇽" },
 ];
 
 export default function CountryEntryGate({ children }) {

@@ -15,12 +15,14 @@ const services = [
 ];
 
 const countries = [
-  { flag: "🇲🇽", label: "México",     count: "800+" },
-  { flag: "🇨🇺", label: "Cuba",       count: "800+" },
-  { flag: "🇬🇹", label: "Guatemala",  count: "800+" },
+  { flag: "🇳🇮", label: "Nicaragua",  count: "800+" },
   { flag: "🇭🇳", label: "Honduras",   count: "800+" },
+  { flag: "🇬🇹", label: "Guatemala",  count: "800+" },
+  { flag: "🇸🇻", label: "El Salvador", count: "800+" },
+  { flag: "🇩🇴", label: "República Dominicana", count: "800+" },
   { flag: "🇨🇴", label: "Colombia",   count: "800+" },
-  { flag: "🌎",  label: "+ Más países", count: "Seguimos expandiendo nuestra cobertura" },
+  { flag: "🇵🇪", label: "Perú",       count: "800+" },
+  { flag: "🇲🇽", label: "México",     count: "800+" },
 ];
 
 const steps = [
@@ -92,7 +94,7 @@ const partnerLogos = [
 
 const faqs = [
   { q: "¿Cuánto cuesta vender en Drokex?",              a: "Tenemos planes adaptados a cada tipo de proveedor. Puedes comenzar sin costo inicial y escalar según tu volumen de ventas." },
-  { q: "¿En qué países puedo vender mis productos?",    a: "Operamos en México, Cuba, Guatemala, Honduras, Colombia y seguimos expandiendo nuestra cobertura en LATAM." },
+  { q: "¿En qué países puedo vender mis productos?",    a: "Operamos en Nicaragua, Honduras, Guatemala, El Salvador, República Dominicana, Colombia, Perú y México." },
   { q: "¿Cómo funcionan los pagos?",                    a: "Recibes tus pagos de forma segura a través de nuestra plataforma, con conversión automática y transferencias directas a tu cuenta." },
   { q: "¿Quién se encarga de la logística y entrega?",  a: "Drokex gestiona la logística con aliados como DHL, FedEx, UPS y más, para garantizar entregas confiables en cada mercado." },
   { q: "¿Necesito tener empresa para vender?",          a: "Puedes empezar como persona natural o empresa. Nuestro equipo te guía en el proceso de verificación según tu caso." },
