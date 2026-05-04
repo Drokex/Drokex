@@ -563,6 +563,49 @@ export default function AprendePage() {
       ctx.restore();
     }
 
+    function drawLightBeam(x, topY, bottomY, width, theme, alpha = 0.22) {
+      ctx.save();
+      const beam = ctx.createLinearGradient(x, topY, x, bottomY);
+      beam.addColorStop(0, theme.glowSoft);
+      beam.addColorStop(0.45, `rgba(255,255,255,${alpha * 0.12})`);
+      beam.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.globalCompositeOperation = "lighter";
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = beam;
+      ctx.beginPath();
+      ctx.moveTo(x - width * 0.2, topY);
+      ctx.lineTo(x + width * 0.2, topY);
+      ctx.lineTo(x + width, bottomY);
+      ctx.lineTo(x - width, bottomY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawIsoTower(x, y, scale, theme, frame, alpha = 1) {
+      const w = 42 * scale;
+      const d = 24 * scale;
+      const h = 70 * scale;
+      drawIsoBox(x, y, w, d, h, theme, alpha);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.globalCompositeOperation = "lighter";
+      ctx.shadowColor = theme.glow;
+      ctx.shadowBlur = 18;
+      ctx.strokeStyle = theme.glow;
+      ctx.lineWidth = 1.2;
+      const pulse = 0.65 + 0.35 * Math.sin(frame * 0.04 + x * 0.02);
+      ctx.globalAlpha *= 0.38 * pulse;
+      isoDiamond(x + w * 0.5 + d * 0.36, y - h - d - 10 * scale, 46 * scale, 20 * scale);
+      ctx.stroke();
+      ctx.globalAlpha *= 0.7;
+      ctx.fillStyle = theme.glow;
+      ctx.beginPath();
+      ctx.arc(x + w * 0.5 + d * 0.36, y - h - d - 10 * scale, 2.6 * scale, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     // ─── Draw helpers ──────────────────────────────────────────────
     function drawBg(frame) {
       const g = gRef.current;
@@ -592,6 +635,24 @@ export default function AprendePage() {
       }
       ctx.globalAlpha = 1;
 
+      // Distant LATAM-tech skyline, separated in parallax layers.
+      ctx.save();
+      const skylineOffset = (g.cameraX * 0.04) % 180;
+      for (let i = -1; i < 8; i++) {
+        const sx = i * 180 - skylineOffset;
+        const baseY = 365 + (i % 2) * 18;
+        const scale = 0.78 + (i % 3) * 0.12;
+        drawIsoTower(sx + 34, baseY, scale, theme, frame, 0.13);
+        drawIsoTower(sx + 92, baseY + 18, scale * 0.76, theme, frame + 20, 0.09);
+      }
+      ctx.restore();
+
+      // Volumetric warehouse spotlights.
+      for (let i = 0; i < 4; i++) {
+        const lx = ((i * 271 + 120 - g.cameraX * 0.08) % (W + 160)) - 80;
+        drawLightBeam(lx, 80 + (i % 2) * 24, H, 80 + (i % 3) * 24, theme, 0.08);
+      }
+
       // Isometric floor grid: diamond tiles fading into the horizon.
       const horizon = H * 0.82;
       ctx.save();
@@ -616,6 +677,28 @@ export default function AprendePage() {
         ctx.moveTo(0, y);
         ctx.lineTo(W, y);
         ctx.stroke();
+      }
+      ctx.restore();
+
+      // Animated holographic logistics routes over the floor.
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.strokeStyle = theme.glow;
+      ctx.lineWidth = 2;
+      for (let r = 0; r < 5; r++) {
+        const y = H - 42 - r * 34;
+        const phase = (frame * 2.2 + r * 80 - g.cameraX * 0.22) % 160;
+        ctx.globalAlpha = 0.08 + r * 0.018;
+        ctx.beginPath();
+        ctx.moveTo(-40 + phase, y);
+        ctx.lineTo(150 + phase, y - 34);
+        ctx.lineTo(360 + phase, y - 34);
+        ctx.lineTo(520 + phase, y - 62);
+        ctx.stroke();
+        ctx.globalAlpha *= 1.8;
+        ctx.fillStyle = theme.accent;
+        isoDiamond(150 + phase, y - 34, 16, 7);
+        ctx.fill();
       }
       ctx.restore();
 
@@ -720,6 +803,25 @@ export default function AprendePage() {
         ctx.closePath();
         ctx.fill();
 
+        // Front panel details: recessed logistics modules and vertical depth ribs.
+        ctx.save();
+        ctx.globalAlpha = ground ? 0.16 : 0.24;
+        ctx.strokeStyle = theme.glow;
+        ctx.lineWidth = 1;
+        for (let rx = p.x + 22; rx < p.x + p.w - 18; rx += 54) {
+          ctx.beginPath();
+          ctx.moveTo(rx, p.y + 8);
+          ctx.lineTo(rx, p.y + slabDepth - 9);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = ground ? 0.11 : 0.18;
+        ctx.fillStyle = theme.glow;
+        for (let px = p.x + 42; px < p.x + p.w - 42; px += 118) {
+          roundRect(px, p.y + slabDepth * 0.34, 34, 8, 4);
+          ctx.fill();
+        }
+        ctx.restore();
+
         // Neon bevel and tile grid.
         ctx.save();
         ctx.shadowColor = theme.glow;
@@ -757,6 +859,28 @@ export default function AprendePage() {
           ctx.fill();
         }
         ctx.globalAlpha = 1;
+
+        // Floating guard rail on the back edge.
+        if (p.w > 95) {
+          ctx.save();
+          ctx.globalCompositeOperation = "lighter";
+          ctx.shadowColor = theme.glow;
+          ctx.shadowBlur = 10;
+          ctx.strokeStyle = theme.accent;
+          ctx.lineWidth = 1.3;
+          ctx.globalAlpha = ground ? 0.28 : 0.5;
+          ctx.beginPath();
+          ctx.moveTo(p.x + skew + 8, p.y - isoDepth - 5);
+          ctx.lineTo(p.x + p.w + skew - 8, p.y - isoDepth - 5);
+          ctx.stroke();
+          for (let post = p.x + skew + 18; post < p.x + p.w + skew - 12; post += 58) {
+            ctx.beginPath();
+            ctx.moveTo(post, p.y - isoDepth - 5);
+            ctx.lineTo(post - skew * 0.16, p.y - isoDepth + 9);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
 
         // Subtle warehouse crate modules on wider ground segments.
         if (ground && p.w > 320) {

@@ -30,26 +30,30 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
   return (
     <div style={{ position: "relative" }}>
       {focused && (
-        <div onMouseDown={e => e.preventDefault()}
+        <div onMouseDown={e => {
+          if (e.target?.dataset?.colorPicker === "true") return;
+          e.preventDefault();
+        }}
           style={{ position: "absolute", top: -50, left: 0, zIndex: 400, background: "#0c140c", border: "1px solid rgba(89,255,53,0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.(Math.max(10, (fontSize || 16) - 2)); }}>A−</button>
           <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.45)", minWidth: 34, textAlign: "center" }}>{fontSize || "auto"}px</span>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.((fontSize || 16) + 2); }}>A+</button>
           <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.12)", margin: "0 2px" }} />
-          <button
-            style={btnStyle}
-            onMouseDown={e => { e.preventDefault(); colorRef.current?.click(); }}
+          <label
+            style={{ ...btnStyle, position: "relative", overflow: "hidden" }}
           >
             <span style={{ width: 14, height: 14, borderRadius: 4, background: fontColor || "#ffffff", border: "1px solid rgba(255,255,255,0.4)", display: "inline-block", flexShrink: 0 }} />
             Color
-          </button>
-          <input
-            ref={colorRef}
-            type="color"
-            value={fontColor || "#ffffff"}
-            onChange={e => onFontColorChange?.(e.target.value)}
-            style={{ display: "none" }}
-          />
+            <input
+              ref={colorRef}
+              data-color-picker="true"
+              type="color"
+              value={fontColor || "#ffffff"}
+              onInput={e => onFontColorChange?.(e.target.value)}
+              onChange={e => onFontColorChange?.(e.target.value)}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer" }}
+            />
+          </label>
         </div>
       )}
       <Tag
