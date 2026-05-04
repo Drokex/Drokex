@@ -249,7 +249,7 @@ export default function AprendePage() {
 
   async function saveHighScore(e) {
     e.preventDefault();
-    if (finalScore <= 0) { setScreen("scores"); return; }
+    if (finalScore < 0) { setScreen("scores"); return; }
     const name = playerName.trim() || "Jugador";
     setSavingScore(true);
 
@@ -389,7 +389,7 @@ export default function AprendePage() {
       const g = gRef.current;
       g.hasPower = false;
       g.lives--;
-      if (g.lives <= 0) { g.stopped = true; setHudLives(0); setScreen("dead"); }
+      if (g.lives <= 0) { g.stopped = true; setHudLives(0); setFinalScore(calculateScore(g)); setScreen("dead"); }
       else {
         setHudLives(g.lives);
         g.projectiles = [];
@@ -1832,8 +1832,17 @@ export default function AprendePage() {
             <div style={overlayStyle}>
               <p style={{ ...tagStyle, color: "#ff4500" }}>Game Over</p>
               <h2 style={titleStyle}>¡Sin vidas!</h2>
-              <p style={subStyle}>Monedas recolectadas: {hudCoins}</p>
-              <button onClick={startGame} style={btnStyle}>Intentar de nuevo</button>
+              <p style={subStyle}>Puntaje: {finalScore} pts · Monedas: {hudCoins}</p>
+              <form onSubmit={saveHighScore} style={{ ...scoreFormStyle, marginBottom: 14 }}>
+                <input value={playerName} onChange={(e) => setPlayerName(e.target.value)}
+                  placeholder="Tu nombre (opcional)" maxLength={18} style={scoreInputStyle} autoFocus disabled={savingScore} />
+                <button type="submit" style={{ ...btnStyle, opacity: savingScore ? 0.6 : 1 }} disabled={savingScore}>
+                  {savingScore ? "Guardando..." : "Guardar puntaje"}
+                </button>
+              </form>
+              <button onClick={startGame} style={{ ...btnStyle, background: "rgba(255,255,255,0.1)", fontSize: "0.85rem", padding: "10px 28px" }}>
+                Intentar de nuevo
+              </button>
             </div>
           )}
           {screen === "win" && (
