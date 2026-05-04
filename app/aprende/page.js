@@ -1755,11 +1755,17 @@ export default function AprendePage() {
           {screen === "start" && (
             <div style={{
               position: "absolute", inset: 0,
-              background: "linear-gradient(160deg, rgba(5,5,5,0.97) 0%, rgba(5,20,5,0.95) 100%)",
-              backdropFilter: "blur(2px)",
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              padding: "32px 40px", gap: 0,
+              padding: "32px 40px", gap: 0, overflow: "hidden",
             }}>
+              {/* GIF background */}
+              <img src="/portal-gateway.gif" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.45 }} />
+              {/* Dark overlay */}
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, rgba(2,8,2,0.88) 0%, rgba(3,18,3,0.82) 100%)" }} />
+              {/* Green radial glow */}
+              <div style={{ position: "absolute", top: "30%", left: "50%", transform: "translate(-50%,-50%)", width: 500, height: 300, background: "radial-gradient(ellipse, rgba(132,204,22,0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
+              {/* Content on top */}
+              <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
               {/* Portal header */}
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#84cc16", boxShadow: "0 0 8px #84cc16", display: "inline-block" }} />
@@ -1826,6 +1832,7 @@ export default function AprendePage() {
               <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.68rem", marginTop: 14, letterSpacing: "0.08em" }}>
                 15 niveles · jefe final · doble salto · sprint
               </p>
+              </div>{/* end content wrapper */}
             </div>
           )}
           {screen === "dead" && (
