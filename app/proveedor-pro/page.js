@@ -64,6 +64,7 @@ export default function ProveedorProPage() {
     catalogTitle: "Productos destacados",
     catalogText:
       "Selecciona, cotiza o compra productos directamente desde la vitrina del proveedor.",
+    productCtaText: "Agregar al carrito",
     finalEyebrow: "Listo para comprar",
     finalTitle: "Descubre la colección de Muebles del Sur",
     finalCtaText: "Ver catálogo",
@@ -370,6 +371,7 @@ export default function ProveedorProPage() {
                 <Input label="Etiqueta de catalogo" value={store.catalogEyebrow} onChange={v => updateStore("catalogEyebrow", v)} />
                 <Input label="Titulo de catalogo" value={store.catalogTitle} onChange={v => updateStore("catalogTitle", v)} />
                 <Textarea label="Texto de catalogo" value={store.catalogText} onChange={v => updateStore("catalogText", v)} />
+                <Input label="Boton de producto" value={store.productCtaText} onChange={v => updateStore("productCtaText", v)} />
                 {products.map((product, index) => (
                   <div key={index} style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.3)", padding: "14px", display: "flex", flexDirection: "column", gap: 12 }}>
                     <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 900, color: "#59ff35" }}>Producto {index + 1}</p>

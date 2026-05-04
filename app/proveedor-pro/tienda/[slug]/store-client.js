@@ -31,6 +31,7 @@ const fallbackStore = {
   catalogEyebrow: "Catalogo",
   catalogTitle: "Productos destacados",
   catalogText: "Selecciona, cotiza o compra productos directamente desde la vitrina del proveedor.",
+  productCtaText: "Agregar al carrito",
   finalEyebrow: "Listo para comprar",
   finalTitle: "Descubre la coleccion de Mi Tienda",
   finalCtaText: "Ver catalogo",
