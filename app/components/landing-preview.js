@@ -94,15 +94,16 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
   );
 }
 
-export default function LandingPreview({ store, products, fullWidth = false, isEditable = false, onUpdate }) {
+export default function LandingPreview({ store, products, fullWidth = false, standalone = false, isEditable = false, onUpdate }) {
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
 
   return (
     <div
-      className={`mx-auto overflow-hidden border border-white/10 ${
-        fullWidth ? "max-w-7xl rounded-[2rem]" : "max-w-6xl rounded-[2rem]"
-      }`}
+      className={standalone
+        ? "w-full"
+        : `mx-auto overflow-hidden border border-white/10 ${fullWidth ? "max-w-7xl rounded-[2rem]" : "max-w-6xl rounded-[2rem]"}`
+      }
       style={{ backgroundColor: store.surfaceColor, color: store.textColor }}
     >
       {/* Header */}
