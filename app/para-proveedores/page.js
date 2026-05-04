@@ -128,7 +128,7 @@ export default function ParaProveedoresPage() {
           }}>
             Para proveedores
           </span>
-          <h1 style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 20px", maxWidth: 560 }}>
+          <h1 style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 20px", maxWidth: 560, color: "#fff" }}>
             Lleva tu marca<br />
             <span style={{ color: "#84cc16" }}>a nuevos mercados</span><br />
             sin fronteras
