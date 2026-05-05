@@ -72,7 +72,7 @@ export default function ParaProveedoresPage() {
   ];
 
   return (
-    <main style={{ background: bg, minHeight: "100vh", color: txt }}>
+    <main className="provider-page-animated" style={{ background: bg, minHeight: "100vh", color: txt }}>
       <SiteHeader />
 
       {/* Toggle button */}
@@ -111,8 +111,9 @@ export default function ParaProveedoresPage() {
       </button>
 
       {/* ── HERO ────────────────────────────────────────── */}
-      <section style={{ position: "relative", minHeight: 480, display: "flex", alignItems: "center", borderBottom: `1px solid ${w(0.06)}`, overflow: "hidden" }}>
+      <section className="provider-hero-animated" style={{ position: "relative", minHeight: 480, display: "flex", alignItems: "center", borderBottom: `1px solid ${w(0.06)}`, overflow: "hidden" }}>
         <img
+          className="provider-hero-bg"
           src="/Banner mapa casas.jpg"
           alt="Red Drokex en LATAM"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
@@ -124,8 +125,8 @@ export default function ParaProveedoresPage() {
             ? "linear-gradient(90deg, rgba(5,12,8,0.78) 0%, rgba(5,12,8,0.42) 44%, rgba(5,12,8,0.04) 100%)"
             : "linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.75) 50%, rgba(5,5,5,0.2) 100%)",
         }} />
-        <div className="shell" style={{ position: "relative", zIndex: 1, padding: "80px 0" }}>
-          <span style={{
+        <div className="shell provider-hero-copy" style={{ position: "relative", zIndex: 1, padding: "80px 0" }}>
+          <span className="provider-reveal provider-delay-1" style={{
             display: "inline-block", background: "rgba(132,204,22,0.15)",
             color: "#84cc16", fontSize: "0.72rem", fontWeight: 700,
             letterSpacing: "0.14em", textTransform: "uppercase",
@@ -134,16 +135,16 @@ export default function ParaProveedoresPage() {
           }}>
             Para proveedores
           </span>
-          <h1 style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 20px", maxWidth: 560, color: "#fff" }}>
+          <h1 className="provider-reveal provider-delay-2" style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 800, lineHeight: 1.15, margin: "0 0 20px", maxWidth: 560, color: "#fff" }}>
             Lleva tu marca<br />
             <span style={{ color: "#84cc16" }}>a nuevos mercados</span><br />
             sin fronteras
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "1rem", lineHeight: 1.7, margin: "0 0 36px", maxWidth: 440 }}>
+          <p className="provider-reveal provider-delay-3" style={{ color: "rgba(255,255,255,0.65)", fontSize: "1rem", lineHeight: 1.7, margin: "0 0 36px", maxWidth: 440 }}>
             Drokex te ofrece dos caminos para expandir tu negocio en Latinoamérica. Tú eliges cómo empezar.
           </p>
-          <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <Link href="/registro" style={{
+          <div className="provider-reveal provider-delay-4" style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+            <Link className="provider-cta-pulse provider-hover-lift" href="/registro" style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               background: "#84cc16", color: "#050505", fontWeight: 700,
               padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
@@ -151,7 +152,7 @@ export default function ParaProveedoresPage() {
             }}>
               Quiero ser proveedor <span>→</span>
             </Link>
-            <Link href="/servicios/proveedor" style={{
+            <Link className="provider-hover-lift" href="/servicios/proveedor" style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               background: "rgba(255,255,255,0.07)", color: "#fff", fontWeight: 600,
               padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
@@ -164,7 +165,7 @@ export default function ParaProveedoresPage() {
       </section>
 
       {/* ── DOS CAMINOS ─────────────────────────────────── */}
-      <section style={{ padding: "80px 0" }}>
+      <section className="provider-section-rise" style={{ padding: "80px 0" }}>
         <div className="shell">
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <h2 style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 800, margin: "0 0 8px" }}>
@@ -176,7 +177,7 @@ export default function ParaProveedoresPage() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
 
             {/* EXPLORER */}
-            <div style={{
+            <div className="provider-card-animated" style={{
               background: card, border: `1px solid ${w(0.1)}`,
               borderRadius: 20, overflow: "hidden",
               display: "grid", gridTemplateColumns: "180px 1fr",
@@ -211,7 +212,7 @@ export default function ParaProveedoresPage() {
                     </div>
                   ))}
                 </div>
-                <Link href="/registro" style={{
+                <Link className="provider-hover-lift" href="/registro" style={{
                   display: "inline-flex", alignItems: "center", gap: 8,
                   background: "transparent", color: txt, fontWeight: 600,
                   padding: "11px 22px", borderRadius: 10, fontSize: "0.88rem",
@@ -223,13 +224,13 @@ export default function ParaProveedoresPage() {
             </div>
 
             {/* PRO */}
-            <div style={{
+            <div className="provider-card-animated provider-card-pro" style={{
               background: "rgba(132,204,22,0.06)", border: "1px solid rgba(132,204,22,0.25)",
               borderRadius: 20, overflow: "hidden", position: "relative",
               display: "grid", gridTemplateColumns: "1fr 1fr",
             }}>
               <div style={{ padding: "24px 20px 24px 24px" }}>
-                <div style={{
+                <div className="provider-pro-badge" style={{
                   position: "absolute", top: 16, right: 16,
                   background: "#84cc16", color: "#050505",
                   fontSize: "0.68rem", fontWeight: 800, padding: "3px 10px", borderRadius: 20,
@@ -257,7 +258,7 @@ export default function ParaProveedoresPage() {
                     </div>
                   ))}
                 </div>
-                <Link href="/proveedor-pro" style={{
+                <Link className="provider-cta-pulse provider-hover-lift" href="/proveedor-pro" style={{
                   display: "inline-flex", alignItems: "center", gap: 8,
                   background: "#84cc16", color: "#050505", fontWeight: 700,
                   padding: "11px 22px", borderRadius: 10, fontSize: "0.88rem",
@@ -280,13 +281,13 @@ export default function ParaProveedoresPage() {
       </section>
 
       {/* ── TABLA COMPARATIVA ───────────────────────────── */}
-      <section style={{ padding: "0 0 80px" }}>
+      <section className="provider-section-rise provider-delay-2" style={{ padding: "0 0 80px" }}>
         <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, alignItems: "start" }}>
           <div>
             <h2 style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.7rem)", fontWeight: 800, margin: "0 0 28px" }}>
               ¿Qué incluye <span style={{ color: "#84cc16" }}>cada opción</span>?
             </h2>
-            <div style={{
+            <div className="provider-table-animated" style={{
               background: card, border: `1px solid ${w(0.08)}`,
               borderRadius: 16, overflow: "hidden",
             }}>
@@ -329,7 +330,7 @@ export default function ParaProveedoresPage() {
           </div>
 
           {/* Side card */}
-          <div style={{
+          <div className="provider-side-card-animated" style={{
             background: card, border: `1px solid ${w(0.1)}`,
             borderRadius: 16, padding: 28, maxWidth: 230, marginTop: 52,
           }}>
@@ -347,7 +348,7 @@ export default function ParaProveedoresPage() {
             <p style={{ color: w(0.85), fontSize: "1rem", lineHeight: 1.6, margin: "0 0 22px", fontWeight: 600 }}>
               Empieza como Explorer y escala a Pro cuando estés listo.
             </p>
-            <Link href="/registro" style={{
+            <Link className="provider-hover-lift" href="/registro" style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
               background: "transparent", color: txt, fontWeight: 700,
               padding: "12px 18px", borderRadius: 10, fontSize: "0.92rem",
@@ -360,12 +361,13 @@ export default function ParaProveedoresPage() {
       </section>
 
       {/* ── EXPERIENCIA ─────────────────────────────────── */}
-      <section style={{ padding: "40px 0 80px" }}>
+      <section className="provider-section-rise provider-delay-3" style={{ padding: "40px 0 80px" }}>
         <div className="shell">
-          <div style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(132,204,22,0.15)", minHeight: 320 }}>
+          <div className="provider-experience-banner" style={{ position: "relative", borderRadius: 20, overflow: "hidden", border: "1px solid rgba(132,204,22,0.15)", minHeight: 320 }}>
             <img
               src="/banner tiendas drokex virtual .jpg"
               alt="Drokex mundo virtual"
+              className="provider-experience-image"
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "70% center" }}
             />
             <div style={{
@@ -390,7 +392,7 @@ export default function ParaProveedoresPage() {
                   { label: "Comprar", icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#84cc16" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> },
                 ].map(step => (
                   <div key={step.label} style={{ textAlign: "center" }}>
-                    <div style={{
+                    <div className="provider-step-icon" style={{
                       width: 48, height: 48, borderRadius: 12, marginBottom: 8,
                       background: "rgba(132,204,22,0.12)", border: "1px solid rgba(132,204,22,0.2)",
                       display: "flex", alignItems: "center", justifyContent: "center",
@@ -401,15 +403,15 @@ export default function ParaProveedoresPage() {
               </div>
             </div>
 
-            <div style={{ position: "absolute", bottom: "22%", left: "34%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+            <div className="provider-floating-tag provider-float-a" style={{ position: "absolute", bottom: "22%", left: "34%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
               <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
               <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
             </div>
-            <div style={{ position: "absolute", top: "12%", right: "4%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+            <div className="provider-floating-tag provider-float-b" style={{ position: "absolute", top: "12%", right: "4%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
               <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏬 Design Future</div>
               <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇲🇽 México</div>
             </div>
-            <div style={{ position: "absolute", bottom: "18%", right: "2%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+            <div className="provider-floating-tag provider-float-c" style={{ position: "absolute", bottom: "18%", right: "2%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
               <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏡 Home & Deco</div>
               <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇱 Chile</div>
             </div>
@@ -418,10 +420,10 @@ export default function ParaProveedoresPage() {
       </section>
 
       {/* ── DROKEX STUDIO ───────────────────────────────── */}
-      <section style={{ padding: "80px 0" }}>
+      <section className="provider-section-rise provider-delay-4" style={{ padding: "80px 0" }}>
         <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center" }}>
 
-          <div style={{
+          <div className="provider-studio-panel" style={{
             background: cardDark, border: `1px solid ${w(0.1)}`,
             borderRadius: 20, overflow: "hidden",
             display: "grid", gridTemplateColumns: "140px 1fr 160px",
@@ -455,7 +457,7 @@ export default function ParaProveedoresPage() {
               }}>
                 Banner moderno para promocionar sofás de lujo en Colombia
               </div>
-              <button style={{
+              <button className="provider-cta-pulse provider-hover-lift" style={{
                 background: "#84cc16", color: "#050505", fontWeight: 700,
                 padding: "10px 18px", borderRadius: 8, border: "none",
                 fontSize: "0.82rem", cursor: "pointer", textAlign: "center",
@@ -501,7 +503,7 @@ export default function ParaProveedoresPage() {
                 </div>
               ))}
             </div>
-            <Link href="/registro" style={{
+            <Link className="provider-cta-pulse provider-hover-lift" href="/registro" style={{
               display: "inline-flex", alignItems: "center", gap: 10,
               background: "#84cc16", color: "#050505", fontWeight: 700,
               padding: "13px 26px", borderRadius: 10, fontSize: "0.92rem",
@@ -514,9 +516,9 @@ export default function ParaProveedoresPage() {
       </section>
 
       {/* ── CTA FINAL ───────────────────────────────────── */}
-      <section style={{ padding: "40px 0 48px" }}>
+      <section className="provider-section-rise provider-delay-4" style={{ padding: "40px 0 48px" }}>
         <div className="shell">
-          <div style={{
+          <div className="provider-final-cta" style={{
             background: lightMode ? "#e8f5e3" : "linear-gradient(135deg, #0a1a0a 0%, #0d2010 100%)",
             border: "1px solid rgba(132,204,22,0.3)",
             borderRadius: 20, padding: "52px 56px",
@@ -528,7 +530,7 @@ export default function ParaProveedoresPage() {
               Empieza hoy en <span style={{ color: "#84cc16" }}>Drokex</span><br />
               y lleva tu marca a nuevos países.
             </h2>
-            <Link href="/registro" style={{
+            <Link className="provider-cta-pulse provider-hover-lift" href="/registro" style={{
               display: "inline-flex", alignItems: "center", gap: 10,
               background: "#84cc16", color: "#050505", fontWeight: 800,
               padding: "16px 36px", borderRadius: 12, fontSize: "1rem",
@@ -542,14 +544,14 @@ export default function ParaProveedoresPage() {
       </section>
 
       {/* ── STATS BAR ───────────────────────────────────── */}
-      <div style={{
+      <div className="provider-stats-bar" style={{
         background: lightMode ? "#ebebeb" : "#050505",
         borderBottom: `1px solid ${w(0.06)}`,
         padding: "28px 0",
       }}>
         <div className="shell" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
           {footerStats.map(s => (
-            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div className="provider-stat-item" key={s.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{
                 width: 48, height: 48, borderRadius: 12, flexShrink: 0,
                 background: "rgba(132,204,22,0.1)", border: "1px solid rgba(132,204,22,0.2)",

@@ -66,6 +66,19 @@ const tabs = [
   },
 ];
 
+const platformHighlights = {
+  marcas: [
+    "Explora catalogos listos para vender en nuevos mercados.",
+    "Conecta con proveedores verificados y gestiona oportunidades desde un solo lugar.",
+    "Acelera compras, cotizaciones y rutas sin depender de mensajes dispersos.",
+  ],
+  proveedores: [
+    "Convierte tu inventario en una vitrina comercial para compradores de Latinoamerica.",
+    "Muestra productos, capacidad y condiciones con una experiencia mas clara.",
+    "Recibe contactos, cotizaciones y pedidos con trazabilidad dentro de Drokex.",
+  ],
+};
+
 const videos = [
   {
     src: "/mauren-blandon.jpeg",
@@ -310,48 +323,54 @@ function getWrappedOffset(index, activeIndex, total) {
 }
 
 const gifItems = [
-  { src: "/portal-gateway.gif", label: "Descubre productos" },
-  { src: "/portal-gateway.gif", label: "Conecta con marcas" },
-  { src: "/portal-gateway.gif", label: "Vende sin fronteras" },
-  { src: "/portal-gateway.gif", label: "Escala tu negocio" },
+  { src: "/home-feature-globe.mp4", label: "Expande a nuevos mercados" },
+  { src: "/home-feature-delivery.mp4", label: "Activa rutas logisticas" },
+  { src: "/home-feature-laptop.mp4", label: "Crea tu tienda digital" },
+  { src: "/home-feature-products.mp4", label: "Gestiona tus productos" },
+  { src: "/home-feature-warehouse-mobile.mp4", label: "Controla inventario" },
+  { src: "/home-feature-warehouse-workflow.mp4", label: "Opera pedidos en equipo" },
 ];
 
-function GifScrollSection() {
-  const [active, setActive] = useState(0);
-  const activeRef = useRef(0);
-  const sectionRef = useRef(null);
+function FeatureVideoCarousel() {
+  const [active, setActive] = useState(2);
+  const activeRef = useRef(2);
+  const carouselRef = useRef(null);
   const cooldown = useRef(false);
+  const activeVideo = gifItems[active];
 
   const goTo = (index) => {
-    const clamped = Math.max(0, Math.min(index, gifItems.length - 1));
-    activeRef.current = clamped;
-    setActive(clamped);
+    const total = gifItems.length;
+    const nextIndex = (index + total) % total;
+    activeRef.current = nextIndex;
+    setActive(nextIndex);
   };
 
-  const isCentered = useRef(false);
-
   useEffect(() => {
-    const el = sectionRef.current;
+    const el = carouselRef.current;
     if (!el) return;
 
+    let isCentered = false;
     const observer = new IntersectionObserver(
-      ([entry]) => { isCentered.current = entry.intersectionRatio >= 0.85; },
-      { threshold: [0, 0.85, 1] }
+      ([entry]) => {
+        isCentered = entry.intersectionRatio >= 0.72;
+      },
+      { threshold: [0, 0.72, 1] },
     );
     observer.observe(el);
 
-    const onWheel = (e) => {
-      if (!isCentered.current) return;
-      const goingNext = e.deltaY > 0 || e.deltaX > 0;
-      const atEnd = goingNext && activeRef.current === gifItems.length - 1;
-      const atStart = !goingNext && activeRef.current === 0;
-      if (atEnd || atStart) return;
-      e.preventDefault();
+    const onWheel = (event) => {
+      if (!isCentered) return;
+      if (Math.abs(event.deltaY) < 10 && Math.abs(event.deltaX) < 10) return;
+
+      event.preventDefault();
       if (cooldown.current) return;
       cooldown.current = true;
-      setTimeout(() => { cooldown.current = false; }, 650);
-      if (goingNext) goTo(activeRef.current + 1);
-      else goTo(activeRef.current - 1);
+      setTimeout(() => {
+        cooldown.current = false;
+      }, 560);
+
+      const goingNext = event.deltaY > 0 || event.deltaX > 0;
+      goTo(activeRef.current + (goingNext ? 1 : -1));
     };
 
     el.addEventListener("wheel", onWheel, { passive: false });
@@ -362,42 +381,35 @@ function GifScrollSection() {
   }, []);
 
   return (
-    <section className="gif-scroll-section" ref={sectionRef}>
-      <div className="shell gif-scroll-header">
-        <p className="section-tag">Explora Drokex</p>
-        <h2>Todo lo que puedes hacer</h2>
-      </div>
-
-      <div className="gif-scroll-stage">
-        <button className="gif-scroll-arrow" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="Anterior">◀</button>
-
-        <div className="gif-scroll-viewport">
-          <div
-            className="gif-scroll-belt"
-            style={{ transform: `translateX(calc(-${active * 100}%))` }}
-          >
-            {gifItems.map((gif, i) => (
-              <div key={i} className="gif-card">
-                <div className="gif-card-media">
-                  <img src={gif.src} alt={gif.label} draggable={false} />
-                </div>
-                <div className="gif-card-label">
-                  <p>{gif.label}</p>
-                </div>
-              </div>
-            ))}
+    <div className="feature-video-carousel" ref={carouselRef}>
+      <button className="gif-scroll-arrow" onClick={() => goTo(active - 1)} aria-label="Video anterior">◀</button>
+      <div className="feature-video-frame">
+        <div className="gif-card gif-card-single" key={activeVideo.src}>
+          <div className="gif-card-media">
+            <video
+              src={activeVideo.src}
+              aria-label={activeVideo.label}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+            />
+          </div>
+          <div className="gif-card-label">
+            <p>{activeVideo.label}</p>
           </div>
         </div>
-
-        <button className="gif-scroll-arrow" onClick={() => goTo(active + 1)} disabled={active === gifItems.length - 1} aria-label="Siguiente">▶</button>
       </div>
+
+      <button className="gif-scroll-arrow" onClick={() => goTo(active + 1)} aria-label="Siguiente video">▶</button>
 
       <div className="gif-scroll-dots">
         {gifItems.map((_, i) => (
-          <button key={i} className={i === active ? "gif-dot is-active" : "gif-dot"} onClick={() => goTo(i)} aria-label={`Ir al ${i + 1}`} />
+          <button key={i} className={i === active ? "gif-dot is-active" : "gif-dot"} onClick={() => goTo(i)} aria-label={`Ir al video ${i + 1}`} />
         ))}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -410,6 +422,9 @@ export default function Home() {
 
   const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [contactStatus, setContactStatus] = useState(null); // null | "sending" | "sent" | "error"
+
+  const activeAudience = useMemo(() => tabs[activeTab], [activeTab]);
+  const activePlatformHighlights = platformHighlights[activeAudience.id] || platformHighlights.marcas;
 
   async function handleContactSubmit(e) {
     e.preventDefault();
@@ -431,7 +446,6 @@ export default function Home() {
     }
   }
 
-  const activeAudience = useMemo(() => tabs[activeTab], [activeTab]);
   const activeHeroTheme = useMemo(
     () => heroThemes.find((theme) => theme.id === heroTheme) || heroThemes[0],
     [heroTheme],
@@ -754,50 +768,51 @@ export default function Home() {
 
       <section className="platform-section" id="plataforma">
         <div className="shell">
-          <motion.div className="platform-header" {...fadeUp(0)}>
-            <p className="section-tag section-tag-dark">Plataforma</p>
-            <h2>Conoce a Drokex</h2>
-          </motion.div>
+          <div className="platform-layout">
+            <motion.div className="platform-copy" {...fadeLeft(0)}>
+              <div className="platform-header">
+                <p className="section-tag section-tag-dark">Plataforma</p>
+                <h2>Conoce a Drokex</h2>
+              </div>
 
-          <div className="platform-tabs" role="tablist" aria-label="Audiencias">
-            <button
-              type="button"
-              className={activeTab === 2 ? "platform-tab is-active" : "platform-tab"}
-              onClick={() => setActiveTab(2)}
-              aria-selected={activeTab === 2}
-              role="tab"
-            >
-              Proveedor
-            </button>
-            <button
-              type="button"
-              className={activeTab === 1 ? "platform-tab is-active" : "platform-tab"}
-              onClick={() => setActiveTab(1)}
-              aria-selected={activeTab === 1}
-              role="tab"
-            >
-              Cliente
-            </button>
-          </div>
+              <div className="platform-tabs" role="tablist" aria-label="Audiencias">
+                <button
+                  type="button"
+                  className={activeTab === 2 ? "platform-tab is-active" : "platform-tab"}
+                  onClick={() => setActiveTab(2)}
+                  aria-selected={activeTab === 2}
+                  role="tab"
+                >
+                  Proveedor
+                </button>
+                <button
+                  type="button"
+                  className={activeTab === 1 ? "platform-tab is-active" : "platform-tab"}
+                  onClick={() => setActiveTab(1)}
+                  aria-selected={activeTab === 1}
+                  role="tab"
+                >
+                  Cliente
+                </button>
+              </div>
 
-          <div className="platform-panel">
-            <div className={activeAudience.id === "proveedores" ? "platform-panel-screen is-provider" : "platform-panel-screen"}>
-              <Image
-                src={activeAudience.image}
-                alt={activeAudience.alt}
-                width={1600}
-                height={1000}
-                sizes="(max-width: 900px) 100vw, 60vw"
-                className={activeAudience.id === "proveedores" ? "platform-screen is-provider" : "platform-screen"}
-                style={{ height: "auto" }}
-                unoptimized={activeAudience.image.endsWith(".gif")}
-              />
-            </div>
+              <div className="platform-copy-body">
+                <h3>{activeAudience.title}</h3>
+                <p>{activeAudience.description}</p>
+                <ul>
+                  {activePlatformHighlights.map((highlight) => (
+                    <li key={highlight}>{highlight}</li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+
+            <motion.div className="platform-panel" {...fadeRight(0.08)}>
+              <FeatureVideoCarousel />
+            </motion.div>
           </div>
         </div>
       </section>
-
-      <GifScrollSection />
 
       <section className="testimonials-section">
         <div className="shell">
