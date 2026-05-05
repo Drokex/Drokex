@@ -7,6 +7,8 @@ import LandingPreview, { hexToRgba as _hexToRgba } from "@/app/components/landin
 const VALID_CODE = "15472007";
 
 const hexToRgba = _hexToRgba;
+const PRO_FRAME_COUNT = 72;
+const PRO_FRAME_BASE = "/proveedor-pro-frames";
 
 function slugify(value) {
   return value
@@ -15,6 +17,72 @@ function slugify(value) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function ScrollFrameSequence({ alt, children }) {
+  const [frameIndex, setFrameIndex] = useState(0);
+  const frameRef = useRef(null);
+  const targetRef = useRef(0);
+  const visibleRef = useRef(0);
+
+  const getFrameSrc = (index) => `${PRO_FRAME_BASE}/frame-${String(index).padStart(3, "0")}.jpg`;
+
+  useEffect(() => {
+    const preloadFrames = [];
+    for (let index = 0; index < PRO_FRAME_COUNT; index += 1) {
+      const img = new Image();
+      img.src = getFrameSrc(index);
+      preloadFrames.push(img);
+    }
+  }, []);
+
+  const animateTowardTarget = () => {
+    const diff = targetRef.current - visibleRef.current;
+    visibleRef.current += diff * 0.24;
+
+    const nextFrame = Math.round(visibleRef.current);
+    setFrameIndex((current) => (current === nextFrame ? current : nextFrame));
+
+    if (Math.abs(diff) > 0.04) {
+      frameRef.current = requestAnimationFrame(animateTowardTarget);
+    } else {
+      visibleRef.current = targetRef.current;
+      setFrameIndex(Math.round(targetRef.current));
+      frameRef.current = null;
+    }
+  };
+
+  const handleWheel = (event) => {
+    event.preventDefault();
+
+    targetRef.current = Math.min(
+      PRO_FRAME_COUNT - 1,
+      Math.max(0, targetRef.current + event.deltaY * 0.075),
+    );
+
+    if (!frameRef.current) {
+      frameRef.current = requestAnimationFrame(animateTowardTarget);
+    }
+  };
+
+  useEffect(() => () => {
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+  }, []);
+
+  return (
+    <div
+      onWheel={handleWheel}
+      style={{ position: "relative", overflow: "hidden" }}
+    >
+      <img
+        src={getFrameSrc(frameIndex)}
+        alt={alt}
+        draggable={false}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", userSelect: "none" }}
+      />
+      {children}
+    </div>
+  );
 }
 
 export default function ProveedorProPage() {
@@ -221,13 +289,8 @@ export default function ProveedorProPage() {
             </div>
           </div>
 
-          {/* Right: pago image */}
-          <div style={{ position: "relative", overflow: "hidden" }}>
-            <img
-              src="/pago.png"
-              alt="Drokex Proveedor Pro"
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
-            />
+          {/* Right: scroll-controlled frame sequence */}
+          <ScrollFrameSequence alt="Drokex Proveedor Pro">
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(3,5,3,0.75) 0%, rgba(3,5,3,0.1) 50%)" }} />
 
             {/* Benefits overlay */}
@@ -250,7 +313,7 @@ export default function ProveedorProPage() {
                 ))}
               </ul>
             </div>
-          </div>
+          </ScrollFrameSequence>
         </section>
       ) : isPreviewMode ? (
         <section className="bg-[#050705] px-4 py-6 sm:px-6 lg:px-10">
