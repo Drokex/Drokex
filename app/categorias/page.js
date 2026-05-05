@@ -121,7 +121,7 @@ export default async function CategoriasPage() {
   const products = await getProducts();
 
   return (
-    <main className="cdk-page">
+    <main className="cdk-page cdk-light">
       <SiteHeader />
       <CatalogThemeToggle />
 

@@ -36,7 +36,7 @@ export default async function ProductDetailPage({ params }) {
   const gallery = [product.image, ...product.galleryImages].filter(Boolean);
 
   return (
-    <main className="pd-page">
+    <main className="pd-page pd-light">
       <SiteHeader />
       <ProductThemeToggle />
 

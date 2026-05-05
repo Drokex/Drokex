@@ -3,17 +3,15 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function ProductThemeToggle() {
-  const [light, setLight] = useState(false);
+  const [light, setLight] = useState(true);
   const pageRef = useRef(null);
 
   useEffect(() => {
     const page = document.querySelector(".pd-page");
     pageRef.current = page;
-    const stored = localStorage.getItem("pd-theme") === "light";
-    if (stored) {
-      setLight(true);
-      page?.classList.add("pd-light");
-    }
+    const shouldUseLight = localStorage.getItem("pd-theme") !== "dark";
+    setLight(shouldUseLight);
+    page?.classList.toggle("pd-light", shouldUseLight);
   }, []);
 
   function toggle() {

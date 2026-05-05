@@ -1518,7 +1518,8 @@ button {
   height: 4px;
   margin: 26px auto 0;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--orange), #ffb16f);
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+  animation: system-accent-sweep 2.4s ease-in-out infinite alternate;
 }
 
 .system-header p:last-child {
@@ -1537,26 +1538,7 @@ button {
 }
 
 .system-timeline-line {
-  position: absolute;
-  left: 40px;
-  right: 40px;
-  top: 78px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(17, 17, 17, 0.28), rgba(17, 17, 17, 0.7) 20%, rgba(17, 17, 17, 0.3) 84%, var(--orange) 100%);
-}
-
-.system-timeline-line::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: -24%;
-  width: 24%;
-  height: 16px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(240, 122, 30, 1), rgba(255, 177, 111, 0.88), rgba(255, 255, 255, 0));
-  filter: blur(8px);
-  transform: translateY(-50%);
-  animation: system-line-scan 3.2s ease-in-out infinite;
+  display: none;
 }
 
 .system-steps {
@@ -1598,63 +1580,62 @@ button {
   min-height: 38px;
   margin: 0 auto 18px;
   border-radius: 14px 14px 0 0;
-  border: 1px solid rgba(240, 122, 30, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.35);
   border-bottom: 0;
   display: grid;
   place-items: center;
-  color: var(--orange);
   font-size: 1.4rem;
   font-weight: 800;
+  background: linear-gradient(90deg, #16a34a, #4ade80, #16a34a);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: system-number-shimmer 3s linear infinite;
 }
 
 .system-step-orb {
   position: relative;
-  width: 112px;
-  height: 112px;
+  width: 150px;
+  height: 150px;
   margin: 0 auto;
-  border-radius: 50%;
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 246, 241, 0.98));
   display: grid;
   place-items: center;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.08);
+  background: none;
+  border: none;
+  box-shadow: none;
   animation: system-orb-float 3.6s ease-in-out infinite;
 }
 
 .system-step-orb-glow {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(240, 122, 30, 0.22), rgba(255, 177, 111, 0.08) 42%, transparent 68%);
-  animation: system-orb-glow 2.8s ease-in-out infinite;
+  display: none;
 }
 
 .system-step-icon {
   position: relative;
   z-index: 1;
-  color: #111;
+}
+
+.system-step-hologram {
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  transition: transform 0.3s ease;
+}
+
+.system-step-hologram:hover {
+  transform: scale(1.06);
+}
+
+.system-highlight-hologram {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 .system-step-marker {
-  position: relative;
-  width: 1px;
-  height: 44px;
-  margin: 0 auto 22px;
-  background: rgba(17, 17, 17, 0.16);
-}
-
-.system-step-marker span {
-  position: absolute;
-  left: 50%;
-  top: -8px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 2px solid var(--orange);
-  background: #fff;
-  box-shadow: 0 0 0 8px rgba(240, 122, 30, 0.14);
-  transform: translateX(-50%);
-  animation: system-marker-pulse 2s ease-in-out infinite;
+  display: none;
 }
 
 .system-step h3 {
@@ -1669,7 +1650,8 @@ button {
   height: 4px;
   margin: 16px auto 0;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--orange), #ffb16f);
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+  animation: system-accent-sweep 2.4s ease-in-out infinite alternate;
 }
 
 .system-step p {
@@ -1724,9 +1706,10 @@ button {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  color: var(--orange);
-  border: 1px solid rgba(240, 122, 30, 0.18);
-  background: rgba(240, 122, 30, 0.06);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  background: rgba(34, 197, 94, 0.07);
+  animation: system-icon-pulse 2.8s ease-in-out infinite;
 }
 
 .system-highlight h4 {
@@ -1774,14 +1757,24 @@ button {
 }
 
 @keyframes system-orb-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(1deg); }
+  75% { transform: translateY(-4px) rotate(-1deg); }
+}
 
-  50% {
-    transform: translateY(-5px);
-  }
+@keyframes system-number-shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes system-accent-sweep {
+  0% { width: 24px; opacity: 0.7; }
+  100% { width: 48px; opacity: 1; }
+}
+
+@keyframes system-icon-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.15); }
+  50% { box-shadow: 0 0 0 8px rgba(34,197,94,0.06); }
 }
 
 @keyframes system-orb-glow {

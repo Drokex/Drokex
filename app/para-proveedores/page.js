@@ -117,7 +117,13 @@ export default function ParaProveedoresPage() {
           alt="Red Drokex en LATAM"
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
         />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.75) 50%, rgba(5,5,5,0.2) 100%)" }} />
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: lightMode
+            ? "linear-gradient(90deg, rgba(5,12,8,0.78) 0%, rgba(5,12,8,0.42) 44%, rgba(5,12,8,0.04) 100%)"
+            : "linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.75) 50%, rgba(5,5,5,0.2) 100%)",
+        }} />
         <div className="shell" style={{ position: "relative", zIndex: 1, padding: "80px 0" }}>
           <span style={{
             display: "inline-block", background: "rgba(132,204,22,0.15)",
@@ -360,12 +366,16 @@ export default function ParaProveedoresPage() {
             <img
               src="/banner tiendas drokex virtual .jpg"
               alt="Drokex mundo virtual"
-              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "70% center" }}
             />
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.7) 40%, rgba(5,5,5,0.1) 100%)" }} />
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.7) 40%, rgba(5,5,5,0.1) 100%)",
+            }} />
 
             <div style={{ position: "relative", zIndex: 2, padding: "44px 40px", maxWidth: 420 }}>
-              <h2 style={{ fontSize: "clamp(1.4rem, 2.5vw, 1.9rem)", fontWeight: 800, margin: "0 0 14px", lineHeight: 1.15 }}>
+              <h2 style={{ fontSize: "clamp(1.4rem, 2.5vw, 1.9rem)", fontWeight: 800, margin: "0 0 14px", lineHeight: 1.15, color: "#fff" }}>
                 Una experiencia de <span style={{ color: "#84cc16" }}>otro nivel</span>
               </h2>
               <p style={{ color: "rgba(255,255,255,0.6)", lineHeight: 1.7, margin: "0 0 32px", fontSize: "0.92rem" }}>
@@ -391,7 +401,7 @@ export default function ParaProveedoresPage() {
               </div>
             </div>
 
-            <div style={{ position: "absolute", top: "14%", left: "22%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+            <div style={{ position: "absolute", bottom: "22%", left: "34%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(132,204,22,0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
               <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
               <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
             </div>

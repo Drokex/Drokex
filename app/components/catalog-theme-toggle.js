@@ -3,17 +3,15 @@
 import { useState, useEffect, useRef } from "react";
 
 export default function CatalogThemeToggle() {
-  const [light, setLight] = useState(false);
+  const [light, setLight] = useState(true);
   const pageRef = useRef(null);
 
   useEffect(() => {
     const page = document.querySelector(".cdk-page");
     pageRef.current = page;
-    const stored = localStorage.getItem("cdk-theme") === "light";
-    if (stored) {
-      setLight(true);
-      page?.classList.add("cdk-light");
-    }
+    const shouldUseLight = localStorage.getItem("cdk-theme") !== "dark";
+    setLight(shouldUseLight);
+    page?.classList.toggle("cdk-light", shouldUseLight);
   }, []);
 
   function toggle() {

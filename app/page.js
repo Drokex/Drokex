@@ -244,35 +244,35 @@ const operatingSteps = [
     title: "Conexion activa",
     description:
       "Detectamos oportunidades de compra y venta en tiempo real para empresas que quieren moverse mejor en LATAM.",
-    icon: <SystemGlobeIcon />,
+    iconSrc: "/conexion activa.png",
   },
   {
     number: "02",
     title: "Cotizacion inteligente",
     description:
       "La plataforma conecta oferta y demanda para ayudarte a responder con mas contexto y mejor timing comercial.",
-    icon: <SystemQuoteIcon />,
+    iconSrc: "/cotizacion inteligente.png",
   },
   {
     number: "03",
     title: "Operacion segura",
     description:
       "Validamos pagos, contactos y señales de confianza para cuidar cada proceso de principio a fin.",
-    icon: <SystemShieldIcon />,
+    iconSrc: "/operacion segura.png",
   },
   {
     number: "04",
     title: "Ruta optimizada",
     description:
       "Aterrizamos la operacion con rutas logisticas y decisiones mas claras segun el destino y el tipo de pedido.",
-    icon: <SystemTruckIcon />,
+    iconSrc: "/ruta optimizada.png",
   },
   {
     number: "05",
     title: "Expansion lograda",
     description:
       "Tu negocio gana alcance real: nuevos mercados, mejores conexiones y mas oportunidades para crecer.",
-    icon: <SystemGrowthIcon />,
+    iconSrc: "/expansion lograda.png",
   },
 ];
 
@@ -545,7 +545,7 @@ export default function Home() {
 
         <div className="shell">
           <motion.div className="system-header" {...fadeUp(0)}>
-            <p className="section-tag section-tag-dark">Sistema operativo Drokex</p>
+            <p className="section-tag section-tag-green">Sistema operativo Drokex</p>
             <h2>
               <span>Un sistema disenado para</span>
               <span>mover tu negocio sin limites</span>
@@ -570,20 +570,16 @@ export default function Home() {
                   transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <div className="system-step-number">{step.number}</div>
-                  <motion.div
-                    className="system-step-orb"
-                    animate={{ boxShadow: ["0 0 12px rgba(240,122,30,0.3)", "0 0 28px rgba(240,122,30,0.7)", "0 0 12px rgba(240,122,30,0.3)"] }}
-                    transition={{ duration: 2.5, repeat: Infinity, delay: i * 0.3 }}
-                  >
+                  <div className="system-step-orb">
                     <div className="system-step-orb-glow" aria-hidden="true" />
                     <motion.div
                       className="system-step-icon"
-                      whileHover={{ rotate: 15, scale: 1.2 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                      whileHover={{ scale: 1.08 }}
+                      transition={{ type: "spring", stiffness: 260, damping: 18 }}
                     >
-                      {step.icon}
+                      <img src={step.iconSrc} alt={step.title} className="system-step-hologram" />
                     </motion.div>
-                  </motion.div>
+                  </div>
                   <div className="system-step-marker" aria-hidden="true"><span /></div>
                   <h3>{step.title}</h3>
                   <div className="system-step-accent" aria-hidden="true" />
@@ -1004,78 +1000,15 @@ function BackgroundMap({ side }) {
   );
 }
 
-function SystemGlobeIcon() {
-  return (
-    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18" />
-      <path d="M12 3a15 15 0 0 1 0 18" />
-      <path d="M12 3a15 15 0 0 0 0 18" />
-      <path d="M16.8 16.8 20 20" stroke="#f07a1e" />
-    </svg>
-  );
-}
-
-function SystemQuoteIcon() {
-  return (
-    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 2H7a2 2 0 0 0-2 2v16l4-3h9a2 2 0 0 0 2-2V8z" />
-      <path d="M14 2v6h6" />
-      <path d="M8 11h4" />
-      <path d="M8 14h3" />
-      <path d="M17 18c1.3 0 2.5-1 2.5-2.3 0-1.4-1-2-2.1-2.4-.8-.3-1.4-.5-1.4-1.1 0-.5.5-.9 1.1-.9.6 0 1 .3 1.3.8" stroke="#f07a1e" />
-    </svg>
-  );
-}
-
-function SystemShieldIcon() {
-  return (
-    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z" />
-      <path d="m9.5 12 1.8 1.8L15 10" stroke="#f07a1e" />
-    </svg>
-  );
-}
-
-function SystemTruckIcon() {
-  return (
-    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 17h4V5H2v12h3" />
-      <path d="M14 8h4l4 4v5h-2" />
-      <circle cx="7.5" cy="17.5" r="2.5" />
-      <circle cx="17.5" cy="17.5" r="2.5" />
-      <path d="M2 9h6" stroke="#f07a1e" />
-      <path d="M2 12h4" stroke="#f07a1e" />
-    </svg>
-  );
-}
-
-function SystemGrowthIcon() {
-  return (
-    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 19V9" />
-      <path d="M10 19V5" />
-      <path d="M16 19v-7" />
-      <path d="M4 19h14" />
-      <path d="m14 8 4-4 2 2" stroke="#f07a1e" />
-      <path d="M18 4v6h-6" stroke="#f07a1e" />
-    </svg>
-  );
-}
-
 function SystemTargetIcon() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="8" />
       <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v3" />
-      <path d="M12 19v3" />
-      <path d="M2 12h3" />
-      <path d="M19 12h3" />
+      <path d="M12 2v3" /><path d="M12 19v3" /><path d="M2 12h3" /><path d="M19 12h3" />
     </svg>
   );
 }
-
 function SystemLockIcon() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -1084,19 +1017,14 @@ function SystemLockIcon() {
     </svg>
   );
 }
-
 function SystemNodesIcon() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="5" cy="12" r="2" />
-      <circle cx="19" cy="5" r="2" />
-      <circle cx="19" cy="19" r="2" />
-      <path d="M7 12h4l4-5" />
-      <path d="M11 12h4l2 5" />
+      <circle cx="5" cy="12" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="19" cy="19" r="2" />
+      <path d="M7 12h4l4-5" /><path d="M11 12h4l2 5" />
     </svg>
   );
 }
-
 function SystemHeadsetIcon() {
   return (
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
