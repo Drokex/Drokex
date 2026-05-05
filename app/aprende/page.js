@@ -313,7 +313,13 @@ export default function AprendePage() {
     const ctx = canvas.getContext("2d");
     const sprite = new Image();
     sprite.src = "/game-sprite.png";
-    const bgImages = ["/aprende-bg-city.png", "/aprende-bg-volcano.png", "/aprende-bg-forest.png", "/aprende-bg-ghost.png", "/aprende-bg-ghost.png"].map((src) => {
+    const bgImages = [
+      "/aprende-bg-colombia.png",
+      "/aprende-bg-mexico.png",
+      "/aprende-bg-chile.png",
+      "/aprende-bg-peru.png",
+      "/aprende-bg-argentina.png",
+    ].map((src) => {
       const img = new Image();
       img.src = src;
       return img;
@@ -489,6 +495,14 @@ export default function AprendePage() {
       if (w === 4) return { glow: "#cc44ff", glowSoft: "rgba(204,68,255,0.22)", edge: "#aa00ff", accent: "#ee88ff", fog: "rgba(100,0,200,0.15)", bg1: "#060008", bg2: "#0f0020", country: "Argentina", flag: "🇦🇷" };
       return { glow: "#59ff35", glowSoft: "rgba(89,255,53,0.23)", edge: "#2ea600", accent: "#ccffaa", fog: "rgba(89,255,53,0.1)", bg1: "#020805", bg2: "#050f05", country: "Colombia", flag: "🇨🇴" };
     }
+    function platformSkin(idx, theme) {
+      const w = worldOf(idx);
+      if (w === 1) return { topA: "rgba(132,74,19,0.98)", topB: "rgba(69,31,9,0.98)", faceA: "rgba(102,55,18,0.98)", faceB: "rgba(25,9,3,0.96)", sideA: "rgba(154,88,28,0.72)", detail: "#d6a34a" };
+      if (w === 2) return { topA: "rgba(48,42,36,0.98)", topB: "rgba(24,18,14,0.98)", faceA: "rgba(59,33,17,0.98)", faceB: "rgba(10,8,8,0.96)", sideA: "rgba(111,75,42,0.72)", detail: "#a68f72" };
+      if (w === 3) return { topA: "rgba(83,102,76,0.98)", topB: "rgba(28,43,34,0.98)", faceA: "rgba(58,73,48,0.98)", faceB: "rgba(8,16,12,0.96)", sideA: "rgba(94,120,82,0.72)", detail: "#d2b875" };
+      if (w === 4) return { topA: "rgba(37,38,48,0.98)", topB: "rgba(13,15,21,0.98)", faceA: "rgba(30,32,42,0.98)", faceB: "rgba(5,6,10,0.96)", sideA: "rgba(76,82,100,0.72)", detail: "#8fd3ff" };
+      return { topA: "rgba(25,71,34,0.98)", topB: "rgba(8,31,14,0.98)", faceA: "rgba(13,48,22,0.98)", faceB: "rgba(2,12,6,0.96)", sideA: "rgba(38,105,46,0.72)", detail: "#9de86a" };
+    }
     function roundRect(x, y, w, h, r) {
       const rr = Math.min(r, w / 2, h / 2);
       ctx.beginPath();
@@ -649,6 +663,8 @@ export default function AprendePage() {
       const lev = LEVELS[g.currentLevel];
       const w = worldOf(g.currentLevel);
       const theme = worldTheme(g.currentLevel);
+      const scenicBg = bgImages[w];
+      const hasScenicBg = scenicBg?.complete && scenicBg.naturalWidth > 0;
 
       // Base gradient sky
       const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
@@ -657,6 +673,17 @@ export default function AprendePage() {
       bgGrad.addColorStop(1, theme.bg1);
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, W, H);
+
+      if (hasScenicBg) {
+        const offset = -(g.cameraX * 0.035) % 80;
+        ctx.drawImage(scenicBg, offset - 80, 0, W + 160, H);
+        const scenicShade = ctx.createLinearGradient(0, 0, 0, H);
+        scenicShade.addColorStop(0, "rgba(0,0,0,0.12)");
+        scenicShade.addColorStop(0.58, "rgba(0,0,0,0.18)");
+        scenicShade.addColorStop(1, "rgba(0,0,0,0.42)");
+        ctx.fillStyle = scenicShade;
+        ctx.fillRect(0, 0, W, H);
+      }
 
       // Stars / data points
       const stars = [
@@ -672,23 +699,25 @@ export default function AprendePage() {
       }
       ctx.globalAlpha = 1;
 
-      // Distant LATAM-tech skyline, separated in parallax layers.
-      ctx.save();
-      const skylineOffset = (g.cameraX * 0.04) % 180;
-      const skylineCount = visualBudget === "full" ? 8 : 5;
-      for (let i = -1; i < skylineCount; i++) {
-        const sx = i * 180 - skylineOffset;
-        const baseY = 365 + (i % 2) * 18;
-        const scale = 0.78 + (i % 3) * 0.12;
-        drawIsoTower(sx + 34, baseY, scale, theme, frame, visualBudget === "full" ? 0.13 : 0.08);
-        if (visualBudget === "full") {
-          drawIsoTower(sx + 92, baseY + 18, scale * 0.76, theme, frame + 20, 0.09);
+      if (!hasScenicBg) {
+        // Distant LATAM-tech skyline, separated in parallax layers.
+        ctx.save();
+        const skylineOffset = (g.cameraX * 0.04) % 180;
+        const skylineCount = visualBudget === "full" ? 8 : 5;
+        for (let i = -1; i < skylineCount; i++) {
+          const sx = i * 180 - skylineOffset;
+          const baseY = 365 + (i % 2) * 18;
+          const scale = 0.78 + (i % 3) * 0.12;
+          drawIsoTower(sx + 34, baseY, scale, theme, frame, visualBudget === "full" ? 0.13 : 0.08);
+          if (visualBudget === "full") {
+            drawIsoTower(sx + 92, baseY + 18, scale * 0.76, theme, frame + 20, 0.09);
+          }
         }
+        ctx.restore();
       }
-      ctx.restore();
 
       // Volumetric warehouse spotlights.
-      if (visualBudget === "full") {
+      if (visualBudget === "full" && !hasScenicBg) {
         for (let i = 0; i < 4; i++) {
           const lx = ((i * 271 + 120 - g.cameraX * 0.08) % (W + 160)) - 80;
           drawLightBeam(lx, 80 + (i % 2) * 24, H, 80 + (i % 3) * 24, theme, 0.08);
@@ -696,54 +725,58 @@ export default function AprendePage() {
       }
 
       // Isometric floor grid: diamond tiles fading into the horizon.
-      const horizon = H * 0.82;
-      ctx.save();
-      ctx.globalAlpha = 0.1;
-      ctx.strokeStyle = theme.glow;
-      ctx.lineWidth = 0.8;
-      const gridOffset = (g.cameraX * 0.18) % 64;
-      for (let i = -10; i < 26; i++) {
-        const x = i * 64 - gridOffset;
-        ctx.beginPath();
-        ctx.moveTo(x - W * 0.25, H);
-        ctx.lineTo(x + W * 0.58, horizon);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x + W * 0.25, H);
-        ctx.lineTo(x - W * 0.58, horizon);
-        ctx.stroke();
+      if (!hasScenicBg) {
+        const horizon = H * 0.82;
+        ctx.save();
+        ctx.globalAlpha = 0.1;
+        ctx.strokeStyle = theme.glow;
+        ctx.lineWidth = 0.8;
+        const gridOffset = (g.cameraX * 0.18) % 64;
+        for (let i = -10; i < 26; i++) {
+          const x = i * 64 - gridOffset;
+          ctx.beginPath();
+          ctx.moveTo(x - W * 0.25, H);
+          ctx.lineTo(x + W * 0.58, horizon);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(x + W * 0.25, H);
+          ctx.lineTo(x - W * 0.58, horizon);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 0.055;
+        for (let y = horizon; y < H + 80; y += 28) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+        }
+        ctx.restore();
       }
-      ctx.globalAlpha = 0.055;
-      for (let y = horizon; y < H + 80; y += 28) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
-      }
-      ctx.restore();
 
       // Animated holographic logistics routes over the floor.
-      ctx.save();
-      ctx.globalCompositeOperation = "lighter";
-      ctx.strokeStyle = theme.glow;
-      ctx.lineWidth = 2;
-      const routeCount = visualBudget === "full" ? 5 : 3;
-      for (let r = 0; r < routeCount; r++) {
-        const y = H - 42 - r * 34;
-        const phase = (frame * 2.2 + r * 80 - g.cameraX * 0.22) % 160;
-        ctx.globalAlpha = 0.08 + r * 0.018;
-        ctx.beginPath();
-        ctx.moveTo(-40 + phase, y);
-        ctx.lineTo(150 + phase, y - 34);
-        ctx.lineTo(360 + phase, y - 34);
-        ctx.lineTo(520 + phase, y - 62);
-        ctx.stroke();
-        ctx.globalAlpha *= 1.8;
-        ctx.fillStyle = theme.accent;
-        isoDiamond(150 + phase, y - 34, 16, 7);
-        ctx.fill();
+      if (!hasScenicBg) {
+        ctx.save();
+        ctx.globalCompositeOperation = "lighter";
+        ctx.strokeStyle = theme.glow;
+        ctx.lineWidth = 2;
+        const routeCount = visualBudget === "full" ? 5 : 3;
+        for (let r = 0; r < routeCount; r++) {
+          const y = H - 42 - r * 34;
+          const phase = (frame * 2.2 + r * 80 - g.cameraX * 0.22) % 160;
+          ctx.globalAlpha = 0.08 + r * 0.018;
+          ctx.beginPath();
+          ctx.moveTo(-40 + phase, y);
+          ctx.lineTo(150 + phase, y - 34);
+          ctx.lineTo(360 + phase, y - 34);
+          ctx.lineTo(520 + phase, y - 62);
+          ctx.stroke();
+          ctx.globalAlpha *= 1.8;
+          ctx.fillStyle = theme.accent;
+          isoDiamond(150 + phase, y - 34, 16, 7);
+          ctx.fill();
+        }
+        ctx.restore();
       }
-      ctx.restore();
 
       // Holographic scan line (slow sweep)
       const scanY = ((frame * 0.55) % (H + 80)) - 40;
@@ -755,7 +788,7 @@ export default function AprendePage() {
       ctx.fillRect(0, scanY - 18, W, 36);
 
       // Background holographic distribution hubs and warehouse blocks.
-      if (!lev.isBoss) {
+      if (!lev.isBoss && !hasScenicBg) {
         const blockCount = visualBudget === "full" ? 6 : 4;
         for (let i = 0; i < blockCount; i++) {
           const bx = ((i * 163 + 40) % (W - 60));
@@ -791,6 +824,7 @@ export default function AprendePage() {
       ctx.translate(-camX, 0);
       const lev = LEVELS[gRef.current.currentLevel];
       const theme = worldTheme(gRef.current.currentLevel);
+      const skin = platformSkin(gRef.current.currentLevel, theme);
 
       for (const p of lev.platforms) {
         const ground = p.y >= 455;
@@ -807,8 +841,8 @@ export default function AprendePage() {
         ctx.shadowBlur = ground ? 18 : 24;
         const topGrad = ctx.createLinearGradient(p.x, p.y - isoDepth, p.x + p.w + skew, p.y);
         topGrad.addColorStop(0, theme.glowSoft);
-        topGrad.addColorStop(0.28, "rgba(12,32,14,0.98)");
-        topGrad.addColorStop(0.68, "rgba(4,14,5,0.98)");
+        topGrad.addColorStop(0.28, skin.topA);
+        topGrad.addColorStop(0.68, skin.topB);
         topGrad.addColorStop(1, theme.edge + "44");
         ctx.fillStyle = topGrad;
         ctx.beginPath();
@@ -823,8 +857,8 @@ export default function AprendePage() {
         // Front face.
         const faceGrad = ctx.createLinearGradient(p.x, p.y, p.x, p.y + slabDepth);
         faceGrad.addColorStop(0, theme.edge + "4d");
-        faceGrad.addColorStop(0.24, "rgba(5,18,7,0.98)");
-        faceGrad.addColorStop(1, "rgba(0,0,0,0.96)");
+        faceGrad.addColorStop(0.24, skin.faceA);
+        faceGrad.addColorStop(1, skin.faceB);
         ctx.fillStyle = faceGrad;
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
@@ -836,7 +870,7 @@ export default function AprendePage() {
 
         // Right side face sells the 3D angle.
         const sideGrad = ctx.createLinearGradient(p.x + p.w, p.y - isoDepth, p.x + p.w + skew, p.y + slabDepth);
-        sideGrad.addColorStop(0, theme.glowSoft);
+        sideGrad.addColorStop(0, skin.sideA);
         sideGrad.addColorStop(1, "rgba(0,0,0,0.8)");
         ctx.fillStyle = sideGrad;
         ctx.beginPath();
@@ -897,7 +931,7 @@ export default function AprendePage() {
           ctx.stroke();
         }
         ctx.globalAlpha = 0.12;
-        ctx.fillStyle = theme.accent;
+        ctx.fillStyle = skin.detail;
         for (let sx = p.x + 28; sx < p.x + p.w - 14; sx += 74) {
           isoDiamond(sx + skew * 0.5, p.y - isoDepth * 0.5, 20, 9);
           ctx.fill();

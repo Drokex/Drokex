@@ -45,90 +45,119 @@ function skyline(color, glow, offset = 0) {
 }
 
 async function backgrounds() {
-  await writePng("aprende-bg-city.png", 1280, 720, `
+  await writePng("aprende-bg-colombia.png", 1280, 720, `
     <rect width="1280" height="720" fill="url(#sky)"/>
-    <circle cx="1000" cy="108" r="74" fill="#ff9b21" opacity="0.11"/>
-    <circle cx="1000" cy="108" r="112" fill="#ff9b21" opacity="0.05"/>
-    ${stars("#ffffff", 120)}
-    ${skyline("#07152a", "#ff9b21", 20)}
-    ${skyline("#030914", "#ff7a00", -24)}
-    <rect y="606" width="1280" height="114" fill="url(#floor)"/>
-    <path d="M0 560 C210 530 320 595 490 562 C690 520 800 598 1000 558 C1120 532 1210 552 1280 540 L1280 720 L0 720 Z" fill="#020712" opacity="0.72"/>
-  `, `
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#050b17"/><stop offset="0.52" stop-color="#08182d"/><stop offset="1" stop-color="#03101f"/>
-    </linearGradient>
-    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#12213a" stop-opacity="0"/><stop offset="1" stop-color="#01050b"/>
-    </linearGradient>
-  `);
-
-  await writePng("aprende-bg-volcano.png", 1280, 720, `
-    <rect width="1280" height="720" fill="url(#sky)"/>
-    ${stars("#ffb070", 80)}
-    <path d="M0 615 L190 310 L285 615 Z" fill="#170501"/>
-    <path d="M118 424 L188 310 L248 424 Z" fill="#ff4d00" opacity="0.22"/>
-    <path d="M330 620 L620 235 L905 620 Z" fill="#210800"/>
-    <path d="M520 362 L620 235 L728 362 Z" fill="#ff3c00" opacity="0.28"/>
-    <path d="M830 620 L1110 278 L1280 620 Z" fill="#160402"/>
-    <path d="M1018 390 L1110 278 L1190 390 Z" fill="#ff6a00" opacity="0.22"/>
-    <path d="M0 602 C130 574 230 640 360 602 C540 548 700 652 870 596 C1030 548 1150 620 1280 584 L1280 720 L0 720 Z" fill="#170201"/>
-    <path d="M0 646 C190 620 280 686 460 644 C610 610 740 680 900 640 C1060 596 1165 656 1280 626 L1280 720 L0 720 Z" fill="url(#lava)"/>
-    <g opacity="0.5">
-      <path d="M120 640 L210 684 L330 650" stroke="#ff6a00" stroke-width="3" fill="none"/>
-      <path d="M590 626 L682 674 L760 640" stroke="#ff9a00" stroke-width="3" fill="none"/>
-      <path d="M990 612 L1075 676 L1210 630" stroke="#ff6a00" stroke-width="3" fill="none"/>
-    </g>
-  `, `
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#170000"/><stop offset="0.58" stop-color="#330800"/><stop offset="1" stop-color="#160200"/>
-    </linearGradient>
-    <linearGradient id="lava" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#ff6a00" stop-opacity="0.65"/><stop offset="0.42" stop-color="#441000"/><stop offset="1" stop-color="#080000"/>
-    </linearGradient>
-  `);
-
-  await writePng("aprende-bg-forest.png", 1280, 720, `
-    <rect width="1280" height="720" fill="url(#sky)"/>
-    <circle cx="990" cy="98" r="72" fill="#5dff7a" opacity="0.17"/>
-    <circle cx="990" cy="98" r="120" fill="#5dff7a" opacity="0.06"/>
-    ${stars("#9dffb7", 80)}
-    ${Array.from({ length: 22 }, (_, i) => {
-      const x = i * 62 - 16;
-      const h = 300 + (i % 5) * 46;
-      const y = 720 - h;
-      return `<path d="M${x + 22} 720 L${x + 28} ${y} Q${x - 18} ${y + 62} ${x + 8} ${y + 122} Q${x + 74} ${y + 60} ${x + 52} ${y + 168} L${x + 58} 720 Z" fill="#010d05" opacity="${0.8 - (i % 3) * 0.08}"/>`;
+    <circle cx="1010" cy="118" r="70" fill="#fff7a8" opacity="0.16"/>
+    <path d="M0 370 C160 250 270 340 400 235 C560 105 700 300 850 185 C1010 60 1130 230 1280 145 L1280 720 L0 720 Z" fill="#123f20" opacity="0.58"/>
+    <path d="M0 430 C165 315 310 410 480 282 C650 155 790 390 970 245 C1110 135 1200 260 1280 210 L1280 720 L0 720 Z" fill="#082511" opacity="0.78"/>
+    ${Array.from({ length: 34 }, (_, i) => {
+      const x = (i * 73) % 1320 - 30;
+      const y = 286 + (i % 6) * 42;
+      const h = 190 + (i % 5) * 34;
+      return `<path d="M${x} ${y + h} C${x + 14} ${y + 90} ${x - 28} ${y + 38} ${x + 18} ${y} C${x + 72} ${y + 52} ${x + 22} ${y + 112} ${x + 44} ${y + h} Z" fill="#031408" opacity="${0.48 + (i % 4) * 0.08}"/>`;
     }).join("")}
-    <path d="M0 612 C170 565 310 650 490 605 C650 566 780 654 970 600 C1110 560 1210 615 1280 592 L1280 720 L0 720 Z" fill="#001208"/>
-    <g opacity="0.17">
-      <circle cx="190" cy="430" r="95" fill="#00ff66"/>
-      <circle cx="730" cy="455" r="135" fill="#00ff66"/>
-      <circle cx="1090" cy="415" r="100" fill="#00ff66"/>
+    <path d="M0 612 C170 565 310 650 490 605 C650 566 780 654 970 600 C1110 560 1210 615 1280 592 L1280 720 L0 720 Z" fill="#021208"/>
+    <path d="M70 640 C240 590 405 690 555 630 C730 560 885 690 1080 620 C1190 580 1250 610 1280 598" stroke="#1f8f48" stroke-width="18" opacity="0.35" fill="none"/>
+    <g opacity="0.32">
+      <circle cx="220" cy="445" r="86" fill="#31ff6d"/>
+      <circle cx="790" cy="470" r="115" fill="#3dff7d"/>
+      <circle cx="1100" cy="430" r="82" fill="#28e067"/>
     </g>
   `, `
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#000904"/><stop offset="0.55" stop-color="#001b0a"/><stop offset="1" stop-color="#000a04"/>
+      <stop stop-color="#031306"/><stop offset="0.45" stop-color="#073116"/><stop offset="1" stop-color="#010905"/>
     </linearGradient>
   `);
 
-  await writePng("aprende-bg-ghost.png", 1280, 720, `
+  await writePng("aprende-bg-mexico.png", 1280, 720, `
     <rect width="1280" height="720" fill="url(#sky)"/>
-    ${stars("#bdeaff", 120)}
-    <circle cx="1050" cy="128" r="84" fill="#84d8ff" opacity="0.13"/>
-    <circle cx="1050" cy="128" r="132" fill="#84d8ff" opacity="0.05"/>
-    ${Array.from({ length: 15 }, (_, i) => {
-      const x = i * 95 - 30;
-      const y = 300 + (i % 4) * 36;
-      return `<path d="M${x} 720 L${x + 26} ${y} Q${x + 48} ${y - 38} ${x + 72} ${y} L${x + 110} 720 Z" fill="#04091f" opacity="${0.52 - (i % 3) * 0.08}"/>`;
-    }).join("")}
-    <g opacity="0.18">
-      <path d="M180 210 C240 150 320 240 380 180 C450 108 520 210 600 155" stroke="#84d8ff" stroke-width="2" fill="none"/>
-      <path d="M720 250 C780 190 860 275 920 210 C1000 130 1080 245 1160 170" stroke="#84d8ff" stroke-width="2" fill="none"/>
+    <circle cx="1030" cy="110" r="84" fill="#ffcc55" opacity="0.18"/>
+    <path d="M0 565 C150 510 270 570 410 525 C610 460 720 585 930 510 C1100 455 1190 500 1280 478 L1280 720 L0 720 Z" fill="#3a1807"/>
+    <path d="M0 624 C180 590 300 665 470 620 C650 565 780 670 980 610 C1135 570 1210 625 1280 600 L1280 720 L0 720 Z" fill="#1f0d04"/>
+    <g opacity="0.9">
+      <rect x="525" y="424" width="230" height="42" fill="#a86622"/>
+      <rect x="555" y="382" width="170" height="42" fill="#bd7b2d"/>
+      <rect x="585" y="342" width="110" height="40" fill="#d09038"/>
+      <rect x="622" y="400" width="38" height="66" fill="#2b1306"/>
+      <rect x="510" y="466" width="260" height="20" fill="#6f3f18"/>
     </g>
-    <path d="M0 610 C160 575 320 650 480 612 C680 562 820 650 1000 606 C1160 570 1225 610 1280 594 L1280 720 L0 720 Z" fill="#020416"/>
+    ${Array.from({ length: 12 }, (_, i) => {
+      const x = 55 + i * 108;
+      const y = 470 + (i % 3) * 38;
+      return `<g opacity="${0.28 + (i % 3) * 0.09}"><rect x="${x}" y="${y}" width="15" height="90" fill="#50851f"/><rect x="${x - 24}" y="${y + 28}" width="24" height="13" fill="#50851f"/><rect x="${x + 15}" y="${y + 18}" width="26" height="13" fill="#50851f"/></g>`;
+    }).join("")}
+    ${stars("#ffd36a", 70)}
   `, `
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#00000c"/><stop offset="0.54" stop-color="#06001c"/><stop offset="1" stop-color="#010413"/>
+      <stop stop-color="#251003"/><stop offset="0.55" stop-color="#5c2508"/><stop offset="1" stop-color="#160802"/>
+    </linearGradient>
+  `);
+
+  await writePng("aprende-bg-chile.png", 1280, 720, `
+    <rect width="1280" height="720" fill="url(#sky)"/>
+    <circle cx="1010" cy="122" r="78" fill="#ffd980" opacity="0.12"/>
+    <path d="M0 515 L170 300 L300 520 L450 248 L650 530 L810 260 L1030 515 L1180 315 L1280 495 L1280 720 L0 720 Z" fill="#21120d" opacity="0.82"/>
+    <path d="M120 370 L170 300 L215 374 ZM400 328 L450 248 L505 332 ZM756 338 L810 260 L880 340 ZM1138 380 L1180 315 L1220 382 Z" fill="#efe7d0" opacity="0.68"/>
+    <path d="M0 610 C175 560 325 630 470 590 C625 548 740 635 900 590 C1070 542 1170 600 1280 565 L1280 720 L0 720 Z" fill="#3a1b0c"/>
+    <path d="M0 650 C180 625 300 675 470 642 C630 612 760 675 940 635 C1090 602 1190 650 1280 622 L1280 720 L0 720 Z" fill="#0a1420" opacity="0.7"/>
+    <g opacity="0.75">
+      <rect x="780" y="432" width="48" height="116" fill="#545454"/>
+      <rect x="765" y="470" width="72" height="58" fill="#6e6e6e"/>
+      <rect x="790" y="452" width="12" height="9" fill="#151515"/><rect x="812" y="452" width="12" height="9" fill="#151515"/>
+      <rect x="798" y="496" width="24" height="6" fill="#242424"/>
+    </g>
+    ${stars("#d9f5ff", 80)}
+  `, `
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#04121b"/><stop offset="0.54" stop-color="#201006"/><stop offset="1" stop-color="#050709"/>
+    </linearGradient>
+  `);
+
+  await writePng("aprende-bg-peru.png", 1280, 720, `
+    <rect width="1280" height="720" fill="url(#sky)"/>
+    <circle cx="990" cy="110" r="70" fill="#f8e8b8" opacity="0.12"/>
+    <path d="M0 535 L180 280 L330 535 L535 190 L790 535 L980 250 L1280 520 L1280 720 L0 720 Z" fill="#183325" opacity="0.72"/>
+    <path d="M0 585 C150 535 270 610 430 555 C600 495 725 615 900 550 C1065 492 1180 565 1280 520 L1280 720 L0 720 Z" fill="#0c2118"/>
+    ${Array.from({ length: 9 }, (_, i) => {
+      const x = 80 + i * 135;
+      const y = 455 + (i % 3) * 30;
+      return `<g opacity="${0.42 + (i % 3) * 0.08}"><rect x="${x}" y="${y}" width="110" height="15" fill="#8a6b38"/><rect x="${x + 12}" y="${y - 16}" width="86" height="15" fill="#9b7a42"/><rect x="${x + 25}" y="${y - 31}" width="60" height="15" fill="#ad8c50"/></g>`;
+    }).join("")}
+    <g opacity="0.9">
+      <rect x="602" y="384" width="80" height="110" fill="#967044"/>
+      <rect x="565" y="466" width="154" height="35" fill="#6f5130"/>
+      <rect x="626" y="442" width="32" height="52" fill="#251509"/>
+      <rect x="584" y="420" width="34" height="24" fill="#4d351f"/><rect x="666" y="420" width="34" height="24" fill="#4d351f"/>
+    </g>
+    <path d="M0 635 C180 600 330 660 520 622 C690 588 840 670 1030 620 C1150 588 1220 625 1280 605 L1280 720 L0 720 Z" fill="#07120d"/>
+    ${stars("#d9f6ff", 65)}
+  `, `
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#031322"/><stop offset="0.5" stop-color="#163025"/><stop offset="1" stop-color="#050b08"/>
+    </linearGradient>
+  `);
+
+  await writePng("aprende-bg-argentina.png", 1280, 720, `
+    <rect width="1280" height="720" fill="url(#sky)"/>
+    <circle cx="1010" cy="122" r="82" fill="#9fd6ff" opacity="0.11"/>
+    <path d="M0 548 C190 500 310 570 480 530 C665 485 805 580 980 525 C1130 478 1210 520 1280 505 L1280 720 L0 720 Z" fill="#112b19"/>
+    <path d="M0 626 C210 590 355 650 520 615 C690 580 850 655 1010 612 C1145 575 1210 610 1280 592 L1280 720 L0 720 Z" fill="#07150d"/>
+    <g opacity="0.86">
+      <rect x="615" y="304" width="36" height="205" fill="#d6d6d6"/>
+      <rect x="606" y="494" width="54" height="18" fill="#a8a8a8"/>
+      <polygon points="615,304 633,250 651,304" fill="#f3f3f3"/>
+      <rect x="623" y="340" width="8" height="130" fill="#f5f5f5" opacity="0.55"/>
+      <rect x="645" y="335" width="6" height="140" fill="#8f8f8f" opacity="0.45"/>
+    </g>
+    ${Array.from({ length: 18 }, (_, i) => {
+      const x = (i * 86) % 1280;
+      const y = 530 + (i % 4) * 28;
+      return `<path d="M${x} ${y} C${x + 42} ${y - 16} ${x + 78} ${y + 12} ${x + 128} ${y - 8}" stroke="#5cb75f" stroke-width="3" opacity="${0.22 + (i % 3) * 0.06}" fill="none"/>`;
+    }).join("")}
+    ${stars("#bdeaff", 100)}
+  `, `
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#010712"/><stop offset="0.52" stop-color="#06182a"/><stop offset="1" stop-color="#030707"/>
     </linearGradient>
   `);
 }
