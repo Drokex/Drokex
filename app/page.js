@@ -67,11 +67,36 @@ const tabs = [
 ];
 
 const videos = [
-  { src: "/mauren-blandon.jpeg", name: "Mauren Blandon", role: "Empresaria" },
-  { src: "/market-person-2.jpg", name: "Carlos Rojas", role: "Dropshipper" },
-  { src: "/andres-carrillo.jpeg", name: "Andres", role: "Marca" },
-  { src: "/javier-hurtado.jpeg", name: "Andres Perez", role: "Proveedor" },
-  { src: "/market-person-1.jpg", name: "Sofia Torres", role: "E-commerce" },
+  {
+    src: "/mauren-blandon.jpeg",
+    name: "Mauren Blandon",
+    role: "Empresaria",
+    embedUrl: "https://drive.google.com/file/d/1Piu2tC1qIiWiUtDpOwJ2Y9p5TzLZM7xK/preview",
+  },
+  {
+    src: "/market-person-2.jpg",
+    name: "Carlos Rojas",
+    role: "Dropshipper",
+    embedUrl: "https://drive.google.com/file/d/1j24Dzx4kzy9itXC7CvLNOcr83Be-JT3E/preview",
+  },
+  {
+    src: "/andres-carrillo.jpeg",
+    name: "Andres",
+    role: "Marca",
+    embedUrl: "https://drive.google.com/file/d/1teHl1mOAA7BXlawO8rZWOC8gaq1KEli3/preview",
+  },
+  {
+    src: "/javier-hurtado.jpeg",
+    name: "Andres Perez",
+    role: "Proveedor",
+    embedUrl: "https://drive.google.com/file/d/11kT2qn8KyjXVOuEEIxa8vNML0_eD5iql/preview",
+  },
+  {
+    src: "/market-person-1.jpg",
+    name: "Sofia Torres",
+    role: "E-commerce",
+    embedUrl: "https://drive.google.com/file/d/12QheSMJssohHWDCq-VkW0HGMAA1Lhr3a/preview",
+  },
 ];
 
 const heroThemes = [
@@ -379,6 +404,7 @@ function GifScrollSection() {
 export default function Home() {
   const [activeTab, setActiveTab] = useState(2);
   const [currentVideo, setCurrentVideo] = useState(2);
+  const [openVideo, setOpenVideo] = useState(null);
   const [heroTheme, setHeroTheme] = useState("dark");
   const [activeMarket, setActiveMarket] = useState(0);
 
@@ -423,6 +449,22 @@ export default function Home() {
 
     setActiveMarket(savedIndex);
   }, []);
+
+  useEffect(() => {
+    if (!openVideo) return;
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setOpenVideo(null);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [openVideo]);
 
   const previousVideo = () => {
     setCurrentVideo((value) => (value === 0 ? videos.length - 1 : value - 1));
@@ -785,11 +827,19 @@ export default function Home() {
 
                 return (
                   <article key={video.src} className={isActive ? "video-card is-active" : "video-card"}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenVideo(video)}
+                      className="video-link"
+                      aria-label={`Reproducir historia de ${video.name}`}
+                    >
                     <img
                       src={video.src}
                       alt={`${video.name}, ${video.role}`}
                       className="video-frame"
                     />
+                      <span className="video-play-indicator" aria-hidden="true">▶</span>
+                    </button>
 
                     {isActive ? (
                       <div className="video-meta">
@@ -808,6 +858,30 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {openVideo ? (
+        <div className="video-modal" role="dialog" aria-modal="true" aria-label={`Historia de ${openVideo.name}`}>
+          <button type="button" className="video-modal-backdrop" onClick={() => setOpenVideo(null)} aria-label="Cerrar video" />
+          <div className="video-modal-panel">
+            <div className="video-modal-header">
+              <div>
+                <p>{openVideo.name}</p>
+                <span>{openVideo.role}</span>
+              </div>
+              <button type="button" className="video-modal-close" onClick={() => setOpenVideo(null)} aria-label="Cerrar video">
+                X
+              </button>
+            </div>
+            <iframe
+              className="video-modal-player"
+              src={openVideo.embedUrl}
+              title={`Video de ${openVideo.name}`}
+              allow="autoplay; fullscreen"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      ) : null}
 
       <section className="contact-section" id="contacto">
         <div className="shell contact-grid">
