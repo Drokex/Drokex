@@ -509,18 +509,15 @@ function StorePanel({ country, onClose, proLandings = [] }) {
                       style={{ textDecoration: "none" }}
                       className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-3 transition hover:border-lime-300/40"
                     >
-                      {/* Logo */}
                       <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: primary, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "1rem", color: "#fff" }}>
                         {s.logo
                           ? <img src={s.logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                           : (s.brand || "?").charAt(0)}
                       </div>
-                      {/* Info */}
                       <div style={{ minWidth: 0, flex: 1 }}>
                         <p style={{ margin: 0, fontWeight: 800, fontSize: "0.9rem", color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.brand || "Tienda"}</p>
                         <p style={{ margin: 0, fontSize: "0.72rem", color: "#888" }}>{l.products?.length || 0} producto{l.products?.length !== 1 ? "s" : ""}</p>
                       </div>
-                      {/* Product thumb */}
                       {firstProduct && (
                         <div style={{ width: 40, height: 40, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
                           <img src={firstProduct.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -532,44 +529,6 @@ function StorePanel({ country, onClose, proLandings = [] }) {
                 })}
               </div>
             )}
-
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
-                <p className="text-xs text-zinc-500">Estado</p>
-                <p className="mt-1 text-sm font-bold text-lime-200">{country.status}</p>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
-                <p className="text-xs text-zinc-500">Zona</p>
-                <p className="mt-1 text-sm font-bold text-white">LATAM Hub</p>
-              </div>
-            </div>
-
-            <div className="mt-5 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
-              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200 mb-3">
-                <ShoppingBag size={17} /> Productos destacados
-              </div>
-              <div className="space-y-3">
-                {country.products?.map((product) => (
-                  <motion.div
-                    key={product.name}
-                    whileHover={{ x: 4 }}
-                    className="rounded-2xl border border-white/10 bg-black/35 p-3 transition hover:border-lime-300/40"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <h3 className="font-semibold">{product.name}</h3>
-                        <p className="text-xs text-zinc-500">{product.type} · {product.tag}</p>
-                      </div>
-                      <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-black">Ver</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            <button type="button" className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-lime-300 px-5 py-4 font-black text-black transition hover:bg-lime-200">
-              <Send size={18} /> Solicitar cotización
-            </button>
           </div>
         </motion.aside>
       )}
@@ -679,8 +638,8 @@ export default function DrokexWorldPage() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#030403] text-white">
-      <section className="relative min-h-screen p-4 md:p-8">
+    <main className="h-screen overflow-hidden bg-[#030403] text-white">
+      <section className="relative h-screen flex flex-col p-4 md:p-6">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(163,230,53,0.17),transparent_28%),radial-gradient(circle_at_70%_10%,rgba(255,255,255,0.08),transparent_30%),radial-gradient(circle_at_60%_70%,rgba(163,230,53,0.08),transparent_34%),linear-gradient(180deg,#090a09,#000)]" />
         <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,.5)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.5)_1px,transparent_1px)] [background-size:48px_48px]" />
 
@@ -709,10 +668,10 @@ export default function DrokexWorldPage() {
           </div>
         </header>
 
-        <div className="relative z-10 pt-6">
+        <div className="relative z-10 pt-4 flex-1 min-h-0">
           <div
             onClick={handleMapClick}
-            className="relative min-h-[880px] cursor-crosshair overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.035] shadow-2xl shadow-black/50 backdrop-blur-sm max-lg:min-h-[760px]"
+            className="relative h-full cursor-crosshair overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.035] shadow-2xl shadow-black/50 backdrop-blur-sm"
           >
             <ParticleField />
             <LatamMap />
