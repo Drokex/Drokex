@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -453,7 +453,17 @@ function CountryPreview({ country, onEnter }) {
   );
 }
 
-function StorePanel({ country, onClose }) {
+function StorePanel({ country, onClose, proLandings = [] }) {
+  const countryLandings = useMemo(() => {
+    if (!country) return [];
+    const name = country.country;
+    return proLandings.filter(l => {
+      const s = l.store || {};
+      const cs = s.countries?.length ? s.countries : s.country ? [s.country] : [];
+      return cs.some(c => c.toLowerCase() === name.toLowerCase());
+    });
+  }, [country, proLandings]);
+
   return (
     <AnimatePresence>
       {country && (
@@ -462,7 +472,7 @@ function StorePanel({ country, onClose }) {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 42 }}
           transition={{ duration: 0.28 }}
-          className="absolute right-5 top-5 z-[70] h-[calc(100%-2.5rem)] w-[390px] overflow-hidden rounded-[2.2rem] border border-white/10 bg-zinc-950/90 p-5 text-white shadow-2xl shadow-black/60 backdrop-blur-2xl max-lg:bottom-5 max-lg:left-5 max-lg:right-5 max-lg:top-auto max-lg:h-auto max-lg:w-auto"
+          className="absolute right-5 top-5 z-[70] h-[calc(100%-2.5rem)] w-[390px] overflow-y-auto overflow-hidden rounded-[2.2rem] border border-white/10 bg-zinc-950/90 p-5 text-white shadow-2xl shadow-black/60 backdrop-blur-2xl max-lg:bottom-5 max-lg:left-5 max-lg:right-5 max-lg:top-auto max-lg:h-auto max-lg:w-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className={`absolute -right-20 -top-20 h-52 w-52 rounded-full ${country.glow} blur-3xl`} />
@@ -470,15 +480,58 @@ function StorePanel({ country, onClose }) {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-lime-300/20 bg-lime-300/10 px-3 py-1 text-xs text-lime-200">
-                  <MapPin size={14} /> {country.city}, {country.country}
+                  <MapPin size={14} /> {country.country}
                 </div>
-                <h2 className="text-2xl font-black leading-tight">{country.name}</h2>
-                <p className="mt-1 text-sm text-zinc-400">{country.category} · {country.shops} tiendas conectadas</p>
+                <h2 className="text-2xl font-black leading-tight">{country.country}</h2>
+                <p className="mt-1 text-sm text-zinc-400">{countryLandings.length} tienda{countryLandings.length !== 1 ? "s" : ""} Pro disponible{countryLandings.length !== 1 ? "s" : ""}</p>
               </div>
               <button type="button" onClick={onClose} className="rounded-full border border-white/10 p-2 text-zinc-300 hover:bg-white/10">
                 <X size={18} />
               </button>
             </div>
+
+            {countryLandings.length === 0 ? (
+              <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6 text-center">
+                <p className="text-sm text-zinc-500">Aún no hay tiendas Pro en {country.country}.</p>
+                <p className="mt-1 text-xs text-zinc-600">Sé el primero en publicar aquí.</p>
+              </div>
+            ) : (
+              <div className="mt-5 space-y-3">
+                {countryLandings.map((l) => {
+                  const s = l.store || {};
+                  const primary = s.primaryColor || "#22c400";
+                  const firstProduct = l.products?.find(p => p.image);
+                  return (
+                    <motion.a
+                      key={l.slug}
+                      href={`/proveedor-pro/tienda/${l.slug}`}
+                      whileHover={{ x: 4 }}
+                      style={{ textDecoration: "none" }}
+                      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-3 transition hover:border-lime-300/40"
+                    >
+                      {/* Logo */}
+                      <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: primary, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "1rem", color: "#fff" }}>
+                        {s.logo
+                          ? <img src={s.logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                          : (s.brand || "?").charAt(0)}
+                      </div>
+                      {/* Info */}
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <p style={{ margin: 0, fontWeight: 800, fontSize: "0.9rem", color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.brand || "Tienda"}</p>
+                        <p style={{ margin: 0, fontSize: "0.72rem", color: "#888" }}>{l.products?.length || 0} producto{l.products?.length !== 1 ? "s" : ""}</p>
+                      </div>
+                      {/* Product thumb */}
+                      {firstProduct && (
+                        <div style={{ width: 40, height: 40, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
+                          <img src={firstProduct.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        </div>
+                      )}
+                      <span style={{ fontSize: "0.8rem", color: "#bef264", fontWeight: 900 }}>→</span>
+                    </motion.a>
+                  );
+                })}
+              </div>
+            )}
 
             <div className="mt-5 grid grid-cols-2 gap-3">
               <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-4">
@@ -492,14 +545,11 @@ function StorePanel({ country, onClose }) {
             </div>
 
             <div className="mt-5 rounded-3xl border border-white/10 bg-white/[0.04] p-4">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200">
-                  <ShoppingBag size={17} /> Productos destacados
-                </div>
-                <span className="rounded-full bg-lime-300/10 px-3 py-1 text-[11px] font-bold text-lime-200">Cotizable</span>
+              <div className="flex items-center gap-2 text-sm font-semibold text-zinc-200 mb-3">
+                <ShoppingBag size={17} /> Productos destacados
               </div>
-              <div className="mt-4 space-y-3">
-                {country.products.map((product) => (
+              <div className="space-y-3">
+                {country.products?.map((product) => (
                   <motion.div
                     key={product.name}
                     whileHover={{ x: 4 }}
@@ -566,6 +616,14 @@ export default function DrokexWorldPage() {
   const [player, setPlayer] = useState({ x: 44, y: 45 });
   const [destination, setDestination] = useState(null);
   const [moving, setMoving] = useState(false);
+  const [proLandings, setProLandings] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/proveedor-pro")
+      .then(r => r.ok ? r.json() : { landings: [] })
+      .then(d => setProLandings(d.landings || []))
+      .catch(() => {});
+  }, []);
 
   const filteredCountries = useMemo(() => {
     const text = query.trim().toLowerCase();
@@ -716,7 +774,7 @@ export default function DrokexWorldPage() {
             </div>
 
             <CountryPreview country={!selectedCountry ? nearbyCountry : null} onEnter={enterCountry} />
-            <StorePanel country={selectedCountry} onClose={() => setSelectedCountry(null)} />
+            <StorePanel country={selectedCountry} onClose={() => setSelectedCountry(null)} proLandings={proLandings} />
           </div>
         </div>
       </section>
