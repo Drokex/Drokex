@@ -26,8 +26,8 @@ const countries = [
     label: "MX",
     name: "Tech Norte MX",
     category: "Tecnología",
-    x: 31,
-    y: 24,
+    x: 26,
+    y: 21,
     color: "from-orange-300 to-orange-500",
     glow: "bg-orange-400/25",
     shops: 18,
@@ -45,8 +45,8 @@ const countries = [
     label: "GT",
     name: "Agro GT Market",
     category: "Agroindustria",
-    x: 35,
-    y: 29,
+    x: 32,
+    y: 31,
     color: "from-yellow-300 to-yellow-500",
     glow: "bg-yellow-400/25",
     shops: 11,
@@ -58,33 +58,14 @@ const countries = [
     ],
   },
   {
-    id: "honduras",
-    country: "Honduras",
-    city: "Tegucigalpa",
-    label: "HN",
-    name: "Maquila HN",
-    category: "Manufactura",
-    x: 39,
-    y: 29,
-    color: "from-cyan-300 to-cyan-500",
-    glow: "bg-cyan-400/25",
-    shops: 13,
-    status: "Maquila activa",
-    products: [
-      { name: "Ropa deportiva", tag: "B2B", type: "Textiles" },
-      { name: "Palma de aceite", tag: "Mayorista", type: "Agroindustria" },
-      { name: "Camarones frescos", tag: "Exportación", type: "Alimentos" },
-    ],
-  },
-  {
     id: "elsalvador",
     country: "El Salvador",
     city: "San Salvador",
     label: "SV",
     name: "Textil SV Hub",
     category: "Textiles",
-    x: 37,
-    y: 32,
+    x: 33,
+    y: 34,
     color: "from-blue-300 to-blue-500",
     glow: "bg-blue-400/25",
     shops: 8,
@@ -96,14 +77,33 @@ const countries = [
     ],
   },
   {
+    id: "honduras",
+    country: "Honduras",
+    city: "Tegucigalpa",
+    label: "HN",
+    name: "Maquila HN",
+    category: "Manufactura",
+    x: 36,
+    y: 31,
+    color: "from-cyan-300 to-cyan-500",
+    glow: "bg-cyan-400/25",
+    shops: 13,
+    status: "Maquila activa",
+    products: [
+      { name: "Ropa deportiva", tag: "B2B", type: "Textiles" },
+      { name: "Palma de aceite", tag: "Mayorista", type: "Agroindustria" },
+      { name: "Camarones frescos", tag: "Exportación", type: "Alimentos" },
+    ],
+  },
+  {
     id: "nicaragua",
     country: "Nicaragua",
     city: "Managua",
     label: "NI",
     name: "Agro Nica Market",
     category: "Agropecuario",
-    x: 40,
-    y: 33,
+    x: 37,
+    y: 36,
     color: "from-red-300 to-red-500",
     glow: "bg-red-400/25",
     shops: 7,
@@ -121,8 +121,8 @@ const countries = [
     label: "DO",
     name: "Caribe Trade DO",
     category: "Comercio",
-    x: 57,
-    y: 25,
+    x: 51,
+    y: 24,
     color: "from-rose-300 to-rose-500",
     glow: "bg-rose-400/25",
     shops: 16,
@@ -140,8 +140,8 @@ const countries = [
     label: "CO",
     name: "MotorPartes Andina",
     category: "Repuestos",
-    x: 44,
-    y: 41,
+    x: 40,
+    y: 44,
     color: "from-lime-300 to-lime-500",
     glow: "bg-lime-400/25",
     shops: 32,
@@ -159,8 +159,8 @@ const countries = [
     label: "PE",
     name: "Casa Perú Market",
     category: "Hogar",
-    x: 42,
-    y: 58,
+    x: 38,
+    y: 60,
     color: "from-sky-300 to-sky-500",
     glow: "bg-sky-400/25",
     shops: 14,
@@ -174,11 +174,11 @@ const countries = [
 ];
 
 const routePairs = [
-  ["mexico", "colombia"],
-  ["colombia", "peru"],
   ["mexico", "guatemala"],
   ["guatemala", "honduras"],
-  ["colombia", "dominicana"],
+  ["honduras", "nicaragua"],
+  ["nicaragua", "colombia"],
+  ["colombia", "peru"],
 ];
 
 const particles = Array.from({ length: 34 }).map((_, index) => ({
@@ -558,7 +558,7 @@ function Controls({ nearbyCountry, move, onEnter }) {
 export default function DrokexWorldPage() {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [query, setQuery] = useState("");
-  const [player, setPlayer] = useState({ x: 44, y: 45 });
+  const [player, setPlayer] = useState({ x: 35, y: 38 });
   const [destination, setDestination] = useState(null);
   const [moving, setMoving] = useState(false);
   const [proLandings, setProLandings] = useState([]);
@@ -681,9 +681,9 @@ export default function DrokexWorldPage() {
                 <Sparkles size={16} className="text-lime-300" /> Rutas comerciales
               </div>
               <div className="space-y-2 text-xs text-zinc-400">
-                <div className="flex items-center justify-between gap-8"><span>México → Colombia</span><span className="text-lime-200">Activo</span></div>
-                <div className="flex items-center justify-between gap-8"><span>Colombia → Perú</span><span className="text-lime-200">Activo</span></div>
-                <div className="flex items-center justify-between gap-8"><span>Guatemala → Honduras</span><span className="text-lime-200">Nuevo</span></div>
+                <div className="flex items-center justify-between gap-8"><span>México → Guatemala</span><span className="text-lime-200">Activo</span></div>
+                <div className="flex items-center justify-between gap-8"><span>Nicaragua → Colombia</span><span className="text-lime-200">Activo</span></div>
+                <div className="flex items-center justify-between gap-8"><span>Colombia → Perú</span><span className="text-lime-200">Nuevo</span></div>
               </div>
             </div>
 
