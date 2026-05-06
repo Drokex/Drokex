@@ -81,7 +81,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         /* ── Globe surface ── */
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
         backgroundColor="rgba(0,0,0,0)"
-        showGraticules={false}
+        showGraticules={true}
 
         /* ── Atmosphere ── */
         atmosphereColor={LIME}
