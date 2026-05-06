@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/app/components/site-header";
 import LandingPreview, { hexToRgba as _hexToRgba } from "@/app/components/landing-preview";
@@ -99,15 +100,22 @@ export default function ProveedorProPage({
   const [authStatus, setAuthStatus] = useState(accountMode ? "ready" : "checking");
   const [openSection, setOpenSection] = useState("hero");
   const [showProductsDrawer, setShowProductsDrawer] = useState(false);
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const countryDropdownRef = useRef(null);
+  const countryBtnRef = useRef(null);
+  const logoInputRef = useRef(null);
+  const [countryDropdownPos, setCountryDropdownPos] = useState({ top: 0, right: 0 });
   const [previewPage, setPreviewPage] = useState("home");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [landingLink, setLandingLink] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
   const [error, setError] = useState("");
+  const [publishSuccess, setPublishSuccess] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const [store, setStore] = useState({
     brand: "Muebles del Sur",
-    country: "Colombia",
+    countries: [],
     logo: "",
     heroTitle: "Diseño premium para hogares modernos",
     heroSubtitle:
@@ -221,6 +229,17 @@ export default function ProveedorProPage({
     };
   }, [accountMode, router]);
 
+  useEffect(() => {
+    if (!showCountryDropdown) return;
+    const close = (e) => {
+      if (countryDropdownRef.current && !countryDropdownRef.current.contains(e.target)) {
+        setShowCountryDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [showCountryDropdown]);
+
   function activatePro() {
     if (authStatus !== "ready") return;
 
@@ -269,8 +288,14 @@ export default function ProveedorProPage({
 
   async function createLanding() {
     const slug = slugify(store.brand) || "mi-tienda";
-    const origin = window.location.origin;
-    const link = `${origin}/proveedor-pro/tienda/${slug}`;
+    const link = `/proveedor-pro/tienda/${slug}`;
+
+    if (!store.countries?.length) {
+      setError("Selecciona al menos un país antes de publicar.");
+      return;
+    }
+    setIsPublishing(true);
+    setError("");
 
     try {
       const res = await fetch("/api/proveedor-pro", {
@@ -278,14 +303,20 @@ export default function ProveedorProPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, store, products }),
       });
-      if (!res.ok) throw new Error("api");
-      // también guardar en localStorage como caché local
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "api");
+      }
       try { window.localStorage.setItem(`drokex-proveedor-pro:${slug}`, JSON.stringify({ store, products })); } catch {}
-      setLandingLink(link);
+      setLandingLink(`${window.location.origin}${link}`);
       setCopiedLink(false);
       setError("");
-    } catch {
-      setError("No se pudo guardar. Verifica tu conexión e intenta de nuevo.");
+      setIsPublishing(false);
+      setPublishSuccess(true);
+      setTimeout(() => { setPublishSuccess(false); router.push(link); }, 1800);
+    } catch (err) {
+      setIsPublishing(false);
+      setError(err.message === "api" ? "No se pudo guardar. Verifica tu conexión e intenta de nuevo." : (err.message || "No se pudo guardar."));
     }
   }
 
@@ -298,7 +329,7 @@ export default function ProveedorProPage({
 
   return (
     <main className="min-h-screen bg-white text-[#111]">
-      <SiteHeader />
+      <SiteHeader hideCountry={isPro} />
 
       {authStatus === "checking" ? (
         <section className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-white px-6 text-center">
@@ -407,14 +438,39 @@ export default function ProveedorProPage({
                 background: "rgba(255,255,255,0.88)",
                 boxShadow: "0 18px 48px rgba(0,0,0,0.16)",
                 backdropFilter: "blur(18px)",
-                padding: "10px 12px",
+                padding: "8px 10px",
                 pointerEvents: "auto",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-                <div style={{ width: 38, height: 38, borderRadius: "50%", background: store.primaryColor, color: store.buttonTextColor, display: "grid", placeItems: "center", fontWeight: 950, flexShrink: 0 }}>
-                  {store.logo ? <img src={store.logo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : store.brand.charAt(0)}
-                </div>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = ev => updateStore("logo", ev.target.result);
+                    reader.readAsDataURL(file);
+                  }}
+                />
+                <button
+                  type="button"
+                  title={store.logo ? "Cambiar logo" : "Subir logo"}
+                  onClick={() => logoInputRef.current?.click()}
+                  style={{ width: 72, height: 72, borderRadius: 16, background: store.logo ? "transparent" : store.primaryColor, color: store.buttonTextColor, display: "grid", placeItems: "center", fontWeight: 950, flexShrink: 0, border: store.logo ? "1.5px solid rgba(0,0,0,0.08)" : "none", boxShadow: store.logo ? "none" : `0 4px 12px ${store.primaryColor}55`, cursor: "pointer", overflow: "hidden", position: "relative" }}
+                  onMouseEnter={e => { e.currentTarget.lastChild.style.opacity = "1"; }}
+                  onMouseLeave={e => { e.currentTarget.lastChild.style.opacity = "0"; }}
+                >
+                  {store.logo
+                    ? <img src={store.logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                    : <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>}
+                  <span style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)", display: "grid", placeItems: "center", opacity: 0, transition: "opacity 0.15s" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  </span>
+                </button>
                 <div style={{ minWidth: 0 }}>
                   <p style={{ margin: 0, color: "#111", fontSize: "0.86rem", fontWeight: 950, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{store.brand}</p>
                   <p style={{ margin: 0, color: "#777", fontSize: "0.72rem" }}>Editando landing Pro</p>
@@ -423,6 +479,79 @@ export default function ProveedorProPage({
 
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
                 {error && <span style={{ color: "#b91c1c", fontSize: "0.74rem", fontWeight: 800 }}>{error}</span>}
+                {(() => {
+                  const COUNTRIES = [
+                    { label: "Nicaragua", flag: "🇳🇮" },
+                    { label: "Honduras", flag: "🇭🇳" },
+                    { label: "Guatemala", flag: "🇬🇹" },
+                    { label: "El Salvador", flag: "🇸🇻" },
+                    { label: "República Dominicana", flag: "🇩🇴" },
+                    { label: "Colombia", flag: "🇨🇴" },
+                    { label: "Perú", flag: "🇵🇪" },
+                    { label: "México", flag: "🇲🇽" },
+                  ];
+                  const selected = store.countries || [];
+                  const toggle = (label) => {
+                    const next = selected.includes(label)
+                      ? selected.filter(l => l !== label)
+                      : [...selected, label];
+                    updateStore("countries", next);
+                  };
+                  const label = selected.length === 0
+                    ? "🌎 Países"
+                    : selected.length === 1
+                      ? `${COUNTRIES.find(c => c.label === selected[0])?.flag} ${selected[0]}`
+                      : `🌎 ${selected.length} países`;
+                  return (
+                    <div ref={countryDropdownRef} style={{ position: "relative" }}>
+                      <button
+                        ref={countryBtnRef}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!showCountryDropdown && countryBtnRef.current) {
+                            const r = countryBtnRef.current.getBoundingClientRect();
+                            setCountryDropdownPos({ top: r.bottom + 6, right: window.innerWidth - r.right });
+                          }
+                          setShowCountryDropdown(v => !v);
+                        }}
+                        style={{ borderRadius: 13, border: `1px solid ${selected.length ? "rgba(0,0,0,0.1)" : "rgba(34,196,0,0.5)"}`, background: selected.length ? "#fff" : "rgba(34,196,0,0.06)", color: "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", whiteSpace: "nowrap" }}
+                      >
+                        <span>{label}</span>
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ opacity: 0.4, flexShrink: 0 }}>
+                          <path d="M2 3.5L5 6.5L8 3.5" stroke="#111" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                      {showCountryDropdown && typeof document !== "undefined" && createPortal(
+                        <div
+                          onMouseDown={e => e.stopPropagation()}
+                          onClick={e => e.stopPropagation()}
+                          style={{ position: "fixed", top: countryDropdownPos.top, right: countryDropdownPos.right, zIndex: 99999, background: "#fff", borderRadius: 14, boxShadow: "0 12px 36px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.08)", overflow: "hidden", minWidth: 210 }}
+                        >
+                          <p style={{ margin: 0, padding: "10px 14px 6px", fontSize: "0.7rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.12em", color: "#aaa" }}>Selecciona los países</p>
+                          {COUNTRIES.map(c => {
+                            const active = selected.includes(c.label);
+                            return (
+                              <button
+                                key={c.label}
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); toggle(c.label); }}
+                                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", background: active ? "rgba(34,196,0,0.07)" : "transparent", border: "none", cursor: "pointer", fontSize: "0.88rem", fontWeight: active ? 900 : 600, color: "#111", textAlign: "left" }}
+                              >
+                                <span style={{ fontSize: "1.1rem" }}>{c.flag}</span>
+                                <span style={{ flex: 1 }}>{c.label}</span>
+                                <span style={{ width: 18, height: 18, borderRadius: 6, border: `2px solid ${active ? "#22c400" : "rgba(0,0,0,0.15)"}`, background: active ? "#22c400" : "transparent", display: "grid", placeItems: "center", flexShrink: 0 }}>
+                                  {active && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>,
+                        document.body
+                      )}
+                    </div>
+                  );
+                })()}
                 <button type="button" onClick={() => { setShowProductsDrawer((open) => !open); setOpenSection(null); }}
                   style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.1)", background: showProductsDrawer ? "#111" : "#fff", color: showProductsDrawer ? "#fff" : "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer" }}>
                   Productos · {products.length}
@@ -431,13 +560,9 @@ export default function ProveedorProPage({
                   style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.1)", background: openSection === "style" ? "#111" : "#fff", color: openSection === "style" ? "#fff" : "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer" }}>
                   Colores
                 </button>
-                <button type="button" onClick={() => setIsPreviewMode(true)}
-                  style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.1)", background: "#fff", color: "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer" }}>
-                  Previsualizar
-                </button>
-                <button type="button" onClick={createLanding}
-                  style={{ borderRadius: 13, border: "none", background: "#22c400", color: "#fff", fontWeight: 950, padding: "10px 16px", boxShadow: "0 12px 28px rgba(34,196,0,0.28)", cursor: "pointer" }}>
-                  Publicar
+                <button type="button" onClick={createLanding} disabled={isPublishing}
+                  style={{ borderRadius: 13, border: "none", background: isPublishing ? "#aaa" : "#22c400", color: "#fff", fontWeight: 950, padding: "10px 16px", boxShadow: isPublishing ? "none" : "0 12px 28px rgba(34,196,0,0.28)", cursor: isPublishing ? "not-allowed" : "pointer", transition: "background 0.2s" }}>
+                  {isPublishing ? "Publicando..." : "Publicar"}
                 </button>
               </div>
             </div>
@@ -508,6 +633,30 @@ export default function ProveedorProPage({
           />
         </section>
       )}
+
+      {isPublishing && (
+        <>
+          <style>{`@keyframes drokex-spin { to { transform: rotate(360deg); } }`}</style>
+          <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.18)", backdropFilter: "blur(4px)" }}>
+            <div style={{ background: "#fff", borderRadius: 22, padding: "36px 48px", textAlign: "center", boxShadow: "0 24px 60px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 48, height: 48, borderRadius: "50%", border: "4px solid #e5e5e5", borderTopColor: "#22c400", animation: "drokex-spin 0.8s linear infinite" }} />
+              <p style={{ margin: 0, fontSize: "1.15rem", fontWeight: 900, color: "#111" }}>Publicando tu página...</p>
+              <p style={{ margin: 0, fontSize: "0.85rem", color: "#888" }}>Esto solo tomará un momento</p>
+            </div>
+          </div>
+        </>
+      )}
+      {publishSuccess && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.18)", backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#fff", borderRadius: 22, padding: "36px 48px", textAlign: "center", boxShadow: "0 24px 60px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#22c400", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <p style={{ margin: 0, fontSize: "1.25rem", fontWeight: 900, color: "#111" }}>¡Publicada con éxito!</p>
+            <p style={{ margin: 0, fontSize: "0.88rem", color: "#666" }}>Redirigiendo a tu tienda...</p>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
@@ -549,7 +698,7 @@ function _LandingPreview_UNUSED({ store, products, fullWidth = false, isEditable
           <div>
             <h3 className="font-black">{store.brand}</h3>
             <p className="text-xs" style={{ color: store.mutedTextColor }}>
-              {store.country}
+              {(store.countries?.length ? store.countries : store.country ? [store.country] : []).join(" · ")}
             </p>
           </div>
         </div>

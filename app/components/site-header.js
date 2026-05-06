@@ -76,7 +76,7 @@ function NavDropdown({ item }) {
   );
 }
 
-export default function SiteHeader() {
+export default function SiteHeader({ hideCountry = false }) {
   const [user, setUser] = useState(null);
   const [accountLink, setAccountLink] = useState("/mi-cuenta");
   const [countryFlag, setCountryFlag] = useState("");
@@ -189,7 +189,7 @@ export default function SiteHeader() {
         </nav>
 
         <div className="header-actions">
-          {countryFlag ? (
+          {countryFlag && !hideCountry ? (
             <button
               type="button"
               className="header-country-trigger"

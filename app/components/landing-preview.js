@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { buildMarketPrice, inferCurrencyFromOriginCountry, COUNTRY_PREFERENCE_STORAGE_KEY } from "@/lib/market-pricing";
 
 export function hexToRgba(hex, alpha) {
   const normalized = (hex || "#000000").replace("#", "");
@@ -221,6 +222,28 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
 }
 
 export default function LandingPreview({ store, products, fullWidth = false, standalone = false, basePath = "", productsOnly = false, marcaOnly = false, isEditable = false, onUpdate }) {
+  const [visitorCountryId, setVisitorCountryId] = useState("");
+  useEffect(() => {
+    try { setVisitorCountryId(localStorage.getItem(COUNTRY_PREFERENCE_STORAGE_KEY) || ""); } catch {}
+    const sync = () => { try { setVisitorCountryId(localStorage.getItem(COUNTRY_PREFERENCE_STORAGE_KEY) || ""); } catch {} };
+    window.addEventListener("drokex-country-change", sync);
+    return () => window.removeEventListener("drokex-country-change", sync);
+  }, []);
+
+  const originCountry = (store.countries?.length ? store.countries[0] : store.country) || "";
+  const baseCurrency = inferCurrencyFromOriginCountry(originCountry);
+
+  function formatProductPrice(rawPrice) {
+    if (!rawPrice) return "$0";
+    const { displayPrice } = buildMarketPrice({
+      amount: Number(rawPrice),
+      baseCurrency,
+      selectedCountryId: visitorCountryId,
+      originCountry,
+    });
+    return displayPrice;
+  }
+
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
   const productButtonText = store.productCtaText || "Agregar al carrito";
@@ -251,58 +274,73 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       style={{ backgroundColor: store.surfaceColor, color: store.textColor }}
     >
       {/* Header */}
-      <header className={`${standalone ? "mx-auto max-w-6xl" : ""} flex items-center justify-between border-b border-white/10 px-5 py-4 md:px-7`}>
-        <div className="flex items-center gap-3">
-          {store.logo ? (
-            <img src={store.logo} alt={`${store.brand} logo`} className="h-10 w-10 rounded-full object-cover" />
-          ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full font-black"
-              style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
-              {store.brand.charAt(0)}
+      <header style={{
+        position: standalone ? "sticky" : "relative",
+        top: 0,
+        zIndex: 50,
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        backgroundColor: hexToRgba(store.surfaceColor || "#ffffff", 0.82),
+        borderBottom: `1px solid ${hexToRgba(store.textColor || "#000", 0.07)}`,
+        boxShadow: "0 2px 24px rgba(0,0,0,0.06)",
+      }}>
+        <div className={`${standalone ? "mx-auto max-w-6xl" : ""} flex items-center justify-between px-5 py-3 md:px-8`}>
+          {/* Brand */}
+          <div className="flex items-center gap-3">
+            <div style={{
+              width: 64, height: 64, borderRadius: 16, overflow: "hidden", flexShrink: 0,
+              background: store.logo ? "transparent" : store.primaryColor,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontWeight: 900, fontSize: "1.1rem", color: store.buttonTextColor,
+              boxShadow: store.logo ? "none" : `0 4px 14px ${hexToRgba(store.primaryColor || "#000", 0.3)}`,
+            }}>
+              {store.logo
+                ? <img src={store.logo} alt={store.brand} style={{ width: 64, height: 64, objectFit: "contain" }} />
+                : store.brand?.charAt(0)}
             </div>
-          )}
-          <div>
-            <EditableText
-              tag="h3" value={store.brand}
-              fontColor={textColor("brandColor", store.textColor)}
-              onTextChange={v => onUpdate?.("brand", v)}
-              onFontColorChange={v => onUpdate?.("brandColor", v)}
-              isEditable={isEditable}
-              className="font-black"
-            />
-            <EditableText
-              tag="p" value={store.country}
-              fontColor={textColor("countryColor", store.mutedTextColor)}
-              onTextChange={v => onUpdate?.("country", v)}
-              onFontColorChange={v => onUpdate?.("countryColor", v)}
-              isEditable={isEditable}
-              className="text-xs"
-            />
+            <div>
+              <EditableText
+                tag="p" value={store.brand}
+                fontColor={textColor("brandColor", store.textColor)}
+                onTextChange={v => onUpdate?.("brand", v)}
+                onFontColorChange={v => onUpdate?.("brandColor", v)}
+                isEditable={isEditable}
+                style={{ margin: 0, fontWeight: 900, fontSize: "0.95rem", lineHeight: 1.2 }}
+              />
+              {(store.countries?.length || store.country) ? (
+                <p style={{ margin: 0, fontSize: "0.7rem", fontWeight: 600, color: store.mutedTextColor, lineHeight: 1.2, marginTop: 1 }}>
+                  {(store.countries?.length ? store.countries : [store.country]).join(" · ")}
+                </p>
+              ) : null}
+            </div>
           </div>
+
+          {/* Nav */}
+          <nav className="hidden gap-1 text-sm md:flex items-center">
+            {[
+              { label: store.nav1 || "Inicio", key: "nav1", active: !productsOnly && !marcaOnly, nav: "home", anchor: "#inicio" },
+              { label: store.nav2 || "Productos", key: "nav2", active: productsOnly, nav: "products", anchor: "#productos" },
+              { label: store.nav3 || "Marca", key: "nav3", active: marcaOnly, nav: "marca", anchor: "#marca" },
+            ].map(({ label, key, active, nav, anchor }) => (
+              <a
+                key={key}
+                href={isEditable ? undefined : standalonePath ? `${standalonePath}${anchor}` : anchor}
+                onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", nav); } : undefined}
+                style={{
+                  cursor: "pointer", textDecoration: "none",
+                  padding: "6px 14px", borderRadius: 10,
+                  fontWeight: active ? 800 : 500,
+                  fontSize: "0.85rem",
+                  color: active ? store.primaryColor : store.mutedTextColor,
+                  background: active ? hexToRgba(store.primaryColor || "#000", 0.08) : "transparent",
+                  transition: "background 0.15s, color 0.15s",
+                }}
+              >
+                <EditableText tag="span" value={label} fontColor={active ? store.primaryColor : textColor(`${key}Color`, store.mutedTextColor)} onTextChange={v => onUpdate?.(key, v)} onFontColorChange={v => onUpdate?.(`${key}Color`, v)} isEditable={isEditable} inline />
+              </a>
+            ))}
+          </nav>
         </div>
-        <nav className="hidden gap-6 text-sm md:flex" style={{ color: store.mutedTextColor }}>
-          <a
-            href={isEditable ? undefined : standalonePath ? `${standalonePath}#inicio` : "#inicio"}
-            onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "home"); } : undefined}
-            style={{ cursor: "pointer", fontWeight: productsOnly ? 400 : 700 }}
-          >
-            <EditableText tag="span" value={store.nav1 || "Inicio"} fontColor={textColor("nav1Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav1", v)} onFontColorChange={v => onUpdate?.("nav1Color", v)} isEditable={isEditable} inline />
-          </a>
-          <a
-            href={isEditable ? undefined : standalonePath ? `${standalonePath}#productos` : "#productos"}
-            onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "products"); } : undefined}
-            style={{ cursor: "pointer", fontWeight: productsOnly ? 700 : 400, borderBottom: productsOnly ? `2px solid ${store.primaryColor}` : "none", paddingBottom: 2 }}
-          >
-            <EditableText tag="span" value={store.nav2 || "Productos"} fontColor={textColor("nav2Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav2", v)} onFontColorChange={v => onUpdate?.("nav2Color", v)} isEditable={isEditable} inline />
-          </a>
-          <a
-            href={isEditable ? undefined : standalonePath ? `${standalonePath}#marca` : "#marca"}
-            onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "marca"); } : undefined}
-            style={{ cursor: "pointer", fontWeight: marcaOnly ? 700 : 400, borderBottom: marcaOnly ? `2px solid ${store.primaryColor}` : "none", paddingBottom: 2 }}
-          >
-            <EditableText tag="span" value={store.nav3 || "Marca"} fontColor={textColor("nav3Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav3", v)} onFontColorChange={v => onUpdate?.("nav3Color", v)} isEditable={isEditable} inline />
-          </a>
-        </nav>
       </header>
 
       {/* Hero */}
@@ -544,7 +582,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
                 className="mt-2 text-sm"
               />
               <EditableText
-                tag="p" value={product.price ? `$${Number(product.price).toLocaleString("es-CO")} COP` : "$0 COP"}
+                tag="p" value={product.price ? formatProductPrice(product.price) : "$0"}
                 fontColor={productTextColor(product, "priceColor", store.primaryColor)}
                 onTextChange={v => updateProductField(index, "price", v.replace(/[^\d]/g, ""))}
                 onFontColorChange={v => updateProductField(index, "priceColor", v)}

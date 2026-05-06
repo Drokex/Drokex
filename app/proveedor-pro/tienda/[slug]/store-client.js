@@ -62,15 +62,22 @@ const fallbackProducts = [
   },
 ];
 
-export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
-  const [store, setStore] = useState({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand });
-  const [products, setProducts] = useState(fallbackProducts);
+export default function ProveedorProStoreClient({ slug, fallbackBrand, initialStore, initialProducts }) {
+  const [store, setStore] = useState(() => ({
+    ...fallbackStore,
+    brand: fallbackBrand || fallbackStore.brand,
+    ...(initialStore || {}),
+  }));
+  const [products, setProducts] = useState(() =>
+    initialProducts?.length ? initialProducts : fallbackProducts
+  );
   const [notFound, setNotFound] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(!!initialStore);
 
   useEffect(() => {
+    if (initialStore) return;
+
     async function load() {
-      // 1. intentar desde la BD
       try {
         const res = await fetch(`/api/proveedor-pro?slug=${encodeURIComponent(slug)}`);
         if (res.ok) {
@@ -81,7 +88,6 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
           return;
         }
       } catch {}
-      // 2. fallback a localStorage
       try {
         const saved = window.localStorage.getItem(`drokex-proveedor-pro:${slug}`);
         if (saved) {
@@ -97,7 +103,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
       setHasLoaded(true);
     }
     load();
-  }, [slug, fallbackBrand]);
+  }, [slug, fallbackBrand, initialStore]);
 
   const bg = store.backgroundColor || "#fff";
   const primary = store.primaryColor || "#ff9f2e";

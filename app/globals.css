@@ -9004,3 +9004,7 @@ button {
     transition-duration: 1ms !important;
   }
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
