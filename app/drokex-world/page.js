@@ -234,11 +234,7 @@ export default function DrokexWorldPage() {
       </AnimatePresence>
 
       {/* Store panel */}
-      <div className="absolute inset-0 pointer-events-none z-[60]">
-        <div className="relative h-full w-full pointer-events-auto">
-          <StorePanel country={selectedCountry} onClose={() => setSelectedCountry(null)} proLandings={proLandings} />
-        </div>
-      </div>
+      <StorePanel country={selectedCountry} onClose={() => setSelectedCountry(null)} proLandings={proLandings} />
     </main>
   );
 }
