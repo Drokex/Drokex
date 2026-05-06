@@ -51,19 +51,12 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
     } catch (_) {}
 
     const ctrl = globeRef.current.controls();
-    ctrl.autoRotate = true;
-    ctrl.autoRotateSpeed = 0.35;
+    ctrl.autoRotate = false;
     ctrl.enableZoom = true;
     ctrl.minDistance = 280;
     ctrl.maxDistance = 700;
     globeRef.current.pointOfView({ lat: 12, lng: -78, altitude: 2.6 });
   }, [ready]);
-
-  /* Pause / resume rotation based on selection */
-  useEffect(() => {
-    if (!ready || !globeRef.current) return;
-    globeRef.current.controls().autoRotate = !selectedCountry;
-  }, [ready, selectedCountry]);
 
   return (
     <div ref={containerRef} style={{ width: "100%", height: "100%", background: "radial-gradient(ellipse at 50% 50%, #001a08 0%, #000 70%)" }}>
@@ -111,7 +104,6 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         }}
         onPointHover={(point) => {
           setHoveredId(point?.id || null);
-          if (globeRef.current) globeRef.current.controls().autoRotate = !point && !selectedCountry;
           if (containerRef.current) containerRef.current.style.cursor = point ? "pointer" : "grab";
         }}
 
