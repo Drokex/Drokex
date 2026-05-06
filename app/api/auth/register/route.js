@@ -10,6 +10,7 @@ export async function POST(request) {
       userId: user.id,
       email: user.email,
       role: user.role,
+      audience: body.audience === "proveedor" ? "proveedor" : "cliente",
     });
 
     return Response.json({ user, message: "Cuenta creada correctamente." }, { status: 201 });
