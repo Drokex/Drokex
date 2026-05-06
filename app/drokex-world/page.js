@@ -6,7 +6,6 @@ import {
   Search,
   MapPin,
   ShoppingBag,
-  Globe2,
   X,
   Send,
   Sparkles,
@@ -15,8 +14,6 @@ import {
   Navigation,
   Plane,
   Radar,
-  Zap,
-  Store,
   ArrowRight,
   MousePointer2,
 } from "lucide-react";
@@ -281,48 +278,75 @@ function ParticleField() {
   );
 }
 
+const PIN_COLORS = {
+  "from-orange-300 to-orange-500": "#fb923c",
+  "from-yellow-300 to-yellow-500": "#facc15",
+  "from-cyan-300 to-cyan-500": "#22d3ee",
+  "from-blue-300 to-blue-500": "#60a5fa",
+  "from-red-300 to-red-500": "#f87171",
+  "from-rose-300 to-rose-500": "#fb7185",
+  "from-lime-300 to-lime-500": "#a3e635",
+  "from-sky-300 to-sky-500": "#38bdf8",
+};
+
 function CountryNode({ country, nearby, active, onEnter, onTravel }) {
+  const pinColor = PIN_COLORS[country.color] || "#a3e635";
+  const dotColor = active ? "#bef264" : pinColor;
+
   return (
-    <motion.div
-      className="absolute z-30 -translate-x-1/2 -translate-y-1/2"
+    <div
+      className="absolute z-30 -translate-x-1/2 -translate-y-1/2 group"
       style={{ left: `${country.x}%`, top: `${country.y}%` }}
-      animate={{ y: nearby ? [-2, -8, -2] : [0, -4, 0] }}
-      transition={{ repeat: Infinity, duration: nearby ? 1.6 : 3.4, ease: "easeInOut" }}
     >
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); nearby ? onEnter(country) : onTravel(country); }}
-        className="group relative outline-none"
+        className="relative outline-none flex items-center justify-center"
       >
+        {/* Tooltip on hover */}
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded-full border border-white/10 bg-black/85 px-3 py-1 text-[11px] font-semibold text-white opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg backdrop-blur-md">
+          {nearby ? `Entrar · ${country.country}` : country.country}
+        </div>
+
         <motion.div
-          animate={{ scale: active ? 1.55 : 1 }}
+          className="relative flex items-center justify-center"
+          animate={{ scale: active ? 1.6 : nearby ? 1.3 : 1 }}
           transition={{ type: "spring", stiffness: 320, damping: 22 }}
         >
-          <div className={`absolute -inset-5 rounded-full blur-3xl transition ${nearby || active ? country.glow : "bg-white/5"}`} />
-          <div className="absolute left-1/2 top-[30px] h-9 w-11 -translate-x-1/2 rotate-45 rounded-xl bg-black/50 blur-lg" />
-          <div className="relative h-[55px] w-[52px]">
-            <div className="absolute left-1/2 top-5 h-9 w-9 -translate-x-1/2 rotate-45 rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.015] shadow-[0_10px_24px_rgba(0,0,0,0.6)]" />
-            <div className="absolute left-[15px] top-[17px] h-7 w-6 skew-y-[-22deg] rounded-md border border-white/10 bg-zinc-800" />
-            <div className="absolute left-[27px] top-[18px] h-7 w-5 skew-y-[28deg] rounded-md border border-white/10 bg-zinc-950" />
-            <div className={`absolute left-1/2 top-1.5 h-7 w-7 -translate-x-1/2 rotate-45 rounded-xl bg-gradient-to-br ${country.color} shadow-md`} />
-            <div className="absolute left-1/2 top-5 grid h-[18px] w-[18px] -translate-x-1/2 place-items-center rounded-md border border-white/20 bg-black/75">
-              <Store size={9} className="text-white/80" />
-            </div>
+          {/* Pulse ring when nearby */}
+          {nearby && (
             <motion.div
-              className={`absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 rounded-full ${nearby ? "bg-lime-100" : "bg-white/70"}`}
-              animate={{ scale: nearby ? [1, 1.65, 1] : [1, 1.2, 1] }}
-              transition={{ repeat: Infinity, duration: nearby ? 1.1 : 2.4 }}
+              className="absolute rounded-full"
+              style={{ inset: -8, backgroundColor: `${pinColor}25` }}
+              animate={{ scale: [1, 2.2, 1], opacity: [0.6, 0, 0.6] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeOut" }}
             />
-            <div className="absolute left-1/2 top-[41px] -translate-x-1/2 whitespace-nowrap rounded-full border border-white/10 bg-black/70 px-1.5 py-px text-[8px] font-semibold text-white/80 backdrop-blur-md">
-              {nearby ? `Entrar · ${country.country}` : country.country}
-            </div>
-            {active && (
-              <motion.div layoutId="active-country-ring" className="absolute inset-0 rounded-full border border-lime-300 shadow-[0_0_45px_rgba(190,242,100,0.55)]" />
-            )}
-          </div>
+          )}
+
+          {/* Dot */}
+          <div
+            style={{
+              width: 11,
+              height: 11,
+              borderRadius: "50%",
+              background: dotColor,
+              boxShadow: `0 0 ${active ? 14 : nearby ? 10 : 5}px ${dotColor}`,
+              border: "1.5px solid rgba(255,255,255,0.35)",
+              flexShrink: 0,
+            }}
+          />
+
+          {/* Active ring */}
+          {active && (
+            <motion.div
+              layoutId="active-country-ring"
+              className="absolute rounded-full border border-lime-300/70"
+              style={{ inset: -7, boxShadow: "0 0 18px rgba(190,242,100,0.55)" }}
+            />
+          )}
         </motion.div>
       </button>
-    </motion.div>
+    </div>
   );
 }
 
