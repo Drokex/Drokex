@@ -14,8 +14,10 @@ export function hexToRgba(hex, alpha) {
 
 function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange, onFontSizeChange, onFontColorChange, isEditable, className, style, inline = false, wrapperStyle }) {
   const ref = useRef(null);
+  const wrapperRef = useRef(null);
   const [focused, setFocused] = useState(false);
   const [colorOpen, setColorOpen] = useState(false);
+  const [toolbarPos, setToolbarPos] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     if (ref.current && !focused) ref.current.innerText = value || "";
@@ -26,19 +28,35 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
   if (!isEditable) return <Tag className={className} style={computedStyle}>{value}</Tag>;
 
   const btnStyle = { background: "none", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 6, color: "#fff", fontWeight: 900, fontSize: "0.72rem", padding: "3px 8px", cursor: "pointer", lineHeight: 1.4, display: "flex", alignItems: "center", gap: 4 };
-  const colorOptions = [
-    "#191421", "#ffffff", "#59ff35", "#ff9f2e", "#ff7db8", "#b86cff",
-    "#00cfff", "#111827", "#6f6477", "#dc2626", "#facc15", "#14b8a6",
-    "#2563eb", "#7c3aed", "#f97316", "#0f172a",
-  ];
+  const nativePickerRef = useRef(null);
+
+  function hslToHex(h, s, l) {
+    l /= 100; const a = s * Math.min(l, 1 - l) / 100;
+    const f = n => { const k = (n + h / 30) % 12; const c = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1); return Math.round(255 * c).toString(16).padStart(2, "0"); };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
+  const PAL_HUES = [0, 24, 48, 60, 72, 96, 120, 144, 168, 192, 216, 240, 270, 300];
+  const PAL_LIGHTS = [10, 20, 30, 40, 55, 65, 75, 85];
+  const grayscaleRow = Array.from({ length: 14 }, (_, i) => { const v = Math.round(i * 255 / 13).toString(16).padStart(2, "0"); return `#${v}${v}${v}`; });
+  const colorPalette = [grayscaleRow, ...PAL_LIGHTS.map(l => PAL_HUES.map(h => hslToHex(h, 100, l)))];
 
   const Wrapper = inline ? "span" : "div";
 
   return (
-    <Wrapper style={{ position: "relative", display: inline ? "inline-block" : "block", ...wrapperStyle }}>
+    <Wrapper
+      ref={wrapperRef}
+      onBlur={(e) => {
+        if (!wrapperRef.current?.contains(e.relatedTarget)) {
+          setFocused(false);
+          setColorOpen(false);
+          onTextChange?.(ref.current?.innerText || "");
+        }
+      }}
+      style={{ position: "relative", display: inline ? "inline-block" : "block", ...wrapperStyle }}
+    >
       {focused && (
         <div onMouseDown={e => e.preventDefault()}
-          style={{ position: "absolute", top: -50, left: 0, zIndex: 400, background: "#0c140c", border: "1px solid rgba(89,255,53,0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
+          style={{ position: "fixed", top: toolbarPos.top, left: toolbarPos.left, zIndex: 9999, background: "#0c140c", border: "1px solid rgba(89,255,53,0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.(Math.max(10, (fontSize || 16) - 2)); }}>A−</button>
           <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.45)", minWidth: 34, textAlign: "center" }}>{fontSize || "auto"}px</span>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.((fontSize || 16) + 2); }}>A+</button>
@@ -60,62 +78,88 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
                 position: "absolute",
                 top: 46,
                 left: 0,
-                width: 292,
-                padding: 14,
-                borderRadius: 16,
-                border: "1px solid rgba(89,255,53,0.42)",
-                background: "linear-gradient(180deg, #071207 0%, #0d1c0d 100%)",
-                boxShadow: "0 18px 46px rgba(0,0,0,0.62), 0 0 28px rgba(89,255,53,0.16)",
-                display: "grid",
-                gridTemplateColumns: "repeat(8, 1fr)",
-                gap: 9,
+                padding: "10px 10px 8px",
+                borderRadius: 12,
+                border: "1px solid rgba(255,255,255,0.15)",
+                background: "#2a2a2a",
+                boxShadow: "0 12px 40px rgba(0,0,0,0.7)",
+                zIndex: 500,
               }}
             >
-              {colorOptions.map(color => (
-                <button
-                  key={color}
-                  type="button"
-                  aria-label={`Color ${color}`}
-                  onMouseDown={e => {
-                    e.preventDefault();
-                    onFontColorChange?.(color);
-                  }}
-                  style={{
-                    width: 25,
-                    height: 25,
-                    borderRadius: 8,
-                    border: color.toLowerCase() === (fontColor || "").toLowerCase() ? "2px solid #59ff35" : "1px solid rgba(255,255,255,0.28)",
-                    background: color,
-                    boxShadow: color.toLowerCase() === (fontColor || "").toLowerCase()
-                      ? "0 0 0 2px rgba(89,255,53,0.18), 0 0 16px rgba(89,255,53,0.28)"
-                      : "0 0 0 1px rgba(0,0,0,0.32)",
-                    cursor: "pointer",
-                  }}
-                />
-              ))}
+              {/* Color grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(14, 16px)", gap: 2 }}>
+                {colorPalette.flat().map((color, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    title={color}
+                    onMouseDown={e => { e.preventDefault(); onFontColorChange?.(color); }}
+                    style={{
+                      width: 16, height: 16,
+                      borderRadius: 2,
+                      border: color.toLowerCase() === (fontColor || "").toLowerCase() ? "2px solid #fff" : "1px solid rgba(0,0,0,0.3)",
+                      background: color,
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                  />
+                ))}
+              </div>
+              {/* Hex input */}
               <input
                 value={fontColor || ""}
                 onMouseDown={e => e.stopPropagation()}
                 onChange={e => {
                   const next = e.target.value;
-                  if (/^#[0-9a-fA-F]{0,6}$/.test(next)) onFontColorChange?.(next);
+                  if (next === "" || /^#[0-9a-fA-F]{0,6}$/.test(next)) onFontColorChange?.(next);
                 }}
-                placeholder="#191421"
+                onBlur={e => {
+                  const val = e.target.value;
+                  if (val && !val.startsWith("#")) onFontColorChange?.(`#${val}`);
+                }}
+                placeholder="#000000"
                 maxLength={7}
                 style={{
-                  gridColumn: "1 / -1",
                   width: "100%",
-                  marginTop: 6,
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  borderRadius: 10,
-                  background: "rgba(255,255,255,0.08)",
+                  marginTop: 8,
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  borderRadius: 6,
+                  background: "rgba(255,255,255,0.1)",
                   color: "#fff",
-                  padding: "10px 12px",
-                  fontSize: "0.82rem",
-                  fontWeight: 800,
+                  padding: "6px 10px",
+                  fontSize: "0.78rem",
+                  fontWeight: 700,
                   outline: "none",
+                  boxSizing: "border-box",
                 }}
               />
+              {/* Native picker button */}
+              <input
+                ref={nativePickerRef}
+                type="color"
+                value={/^#[0-9a-fA-F]{6}$/.test(fontColor || "") ? fontColor : "#000000"}
+                onMouseDown={e => e.stopPropagation()}
+                onChange={e => onFontColorChange?.(e.target.value)}
+                style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0 }}
+              />
+              <button
+                type="button"
+                onMouseDown={e => { e.preventDefault(); nativePickerRef.current?.click(); }}
+                style={{
+                  marginTop: 6,
+                  width: "100%",
+                  borderRadius: 6,
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  background: "rgba(255,255,255,0.08)",
+                  color: "#ccc",
+                  fontWeight: 600,
+                  fontSize: "0.75rem",
+                  padding: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                Mostrar colores...
+              </button>
             </div>
           )}
         </div>
@@ -123,8 +167,13 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
       <Tag
         ref={ref}
         contentEditable suppressContentEditableWarning
-        onFocus={() => setFocused(true)}
-        onBlur={() => { setFocused(false); onTextChange?.(ref.current?.innerText || ""); }}
+        onFocus={(e) => {
+          setFocused(true);
+          const rect = e.currentTarget.getBoundingClientRect();
+          const toolbarH = 44;
+          const top = rect.top >= toolbarH + 8 ? rect.top - toolbarH - 8 : rect.bottom + 8;
+          setToolbarPos({ top, left: Math.min(rect.left, window.innerWidth - 320) });
+        }}
         className={className}
         style={{ ...computedStyle, outline: focused ? "2px dashed rgba(89,255,53,0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40 }}
       />
@@ -150,7 +199,7 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
     <div
       className={className}
       style={{ ...style, position: "relative", cursor: "pointer" }}
-      onClick={() => fileRef.current?.click()}
+      onClick={(e) => { if (e.target.isContentEditable || e.target.closest("[contenteditable]")) return; fileRef.current?.click(); }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
@@ -169,7 +218,7 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
   );
 }
 
-export default function LandingPreview({ store, products, fullWidth = false, standalone = false, productsOnly = false, isEditable = false, onUpdate }) {
+export default function LandingPreview({ store, products, fullWidth = false, standalone = false, productsOnly = false, marcaOnly = false, isEditable = false, onUpdate }) {
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
   const productButtonText = store.productCtaText || "Agregar al carrito";
@@ -236,9 +285,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             <EditableText tag="span" value={store.nav2 || "Productos"} fontColor={textColor("nav2Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav2", v)} onFontColorChange={v => onUpdate?.("nav2Color", v)} isEditable={isEditable} inline />
           </a>
           <a
-            href={isEditable ? undefined : "#marca"}
+            href={isEditable ? undefined : standalone ? "./marca" : "#marca"}
             onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "marca"); } : undefined}
-            style={{ cursor: "pointer" }}
+            style={{ cursor: "pointer", fontWeight: marcaOnly ? 700 : 400, borderBottom: marcaOnly ? `2px solid ${store.primaryColor}` : "none", paddingBottom: 2 }}
           >
             <EditableText tag="span" value={store.nav3 || "Marca"} fontColor={textColor("nav3Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav3", v)} onFontColorChange={v => onUpdate?.("nav3Color", v)} isEditable={isEditable} inline />
           </a>
@@ -246,7 +295,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       </header>
 
       {/* Hero */}
-      {!productsOnly && <section
+      {!productsOnly && !marcaOnly && <section
         id="inicio"
         className="relative min-h-[520px] bg-cover bg-center px-8 py-16"
         style={{
@@ -324,7 +373,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         </div>
       </section>}
 
-      {!productsOnly && <section className="grid gap-4 p-8 md:grid-cols-3" style={{ backgroundColor: store.backgroundColor }}>
+      {!productsOnly && !marcaOnly && <section className="grid gap-4 p-8 md:grid-cols-3" style={{ backgroundColor: store.backgroundColor }}>
         {[
           [store.benefit1, store.benefit1Text],
           [store.benefit2, store.benefit2Text],
@@ -399,7 +448,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       </section>}
 
       {/* Catalog */}
-      <section id="productos" className="p-8" style={{ backgroundColor: store.backgroundColor }}>
+      {!marcaOnly && <section id="productos" className="p-8" style={{ backgroundColor: store.backgroundColor }}>
         <EditableText
           tag="p" value={store.catalogEyebrow}
           fontColor={textColor("catalogEyebrowColor", store.primaryColor)}
@@ -518,10 +567,10 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             </article>
           ))}
         </div>
-      </section>
+      </section>}
 
       {/* Final CTA */}
-      {!productsOnly && <section className="px-8 py-16 text-center" style={{ backgroundColor: store.surfaceColor }}>
+      {!productsOnly && !marcaOnly && <section className="px-8 py-16 text-center" style={{ backgroundColor: store.surfaceColor }}>
         <EditableText
           tag="p" value={store.finalEyebrow}
           fontColor={textColor("finalEyebrowColor", store.primaryColor)}
@@ -538,17 +587,60 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           isEditable={isEditable}
           className="mx-auto mt-4 max-w-2xl text-4xl font-black"
         />
-        <button className="mt-8 rounded-2xl px-10 py-4 font-black"
-          style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
-          <EditableText
-            tag="span" value={store.finalCtaText}
-            fontColor={textColor("finalCtaTextColor", store.buttonTextColor)}
-            onTextChange={v => onUpdate?.("finalCtaText", v)}
-            onFontColorChange={v => onUpdate?.("finalCtaTextColor", v)}
-            isEditable={isEditable}
-            inline
-          />
-        </button>
+        {store.catalogPdf && !isEditable ? (
+          <a
+            href={store.catalogPdf}
+            target="_blank"
+            rel="noopener noreferrer"
+            download="catalogo.pdf"
+            className="mt-8 inline-block rounded-2xl px-10 py-4 font-black"
+            style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor, textDecoration: "none" }}
+          >
+            {store.finalCtaText || "Ver catálogo"}
+          </a>
+        ) : (
+          <button className="mt-8 rounded-2xl px-10 py-4 font-black"
+            style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
+            <EditableText
+              tag="span" value={store.finalCtaText}
+              fontColor={textColor("finalCtaTextColor", store.buttonTextColor)}
+              onTextChange={v => onUpdate?.("finalCtaText", v)}
+              onFontColorChange={v => onUpdate?.("finalCtaTextColor", v)}
+              isEditable={isEditable}
+              inline
+            />
+          </button>
+        )}
+        {isEditable && (
+          <div style={{ marginTop: 16, display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+            <label style={{ cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 10, border: `1px dashed ${store.primaryColor}`, padding: "8px 18px", fontSize: "0.8rem", fontWeight: 700, color: store.primaryColor }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              {store.catalogPdf ? "Cambiar PDF" : "Subir PDF del catálogo"}
+              <input
+                type="file"
+                accept="application/pdf"
+                style={{ display: "none" }}
+                onChange={e => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const reader = new FileReader();
+                  reader.onload = ev => onUpdate?.("catalogPdf", ev.target.result);
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </label>
+            {store.catalogPdf && (
+              <button
+                type="button"
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => onUpdate?.("catalogPdf", "")}
+                style={{ fontSize: "0.72rem", color: "#f87171", background: "none", border: "none", cursor: "pointer" }}
+              >
+                Quitar PDF
+              </button>
+            )}
+          </div>
+        )}
       </section>}
     </div>
   );

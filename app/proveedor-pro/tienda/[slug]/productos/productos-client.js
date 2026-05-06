@@ -28,14 +28,26 @@ export default function ProductosClient({ slug, fallbackBrand }) {
   const [products, setProducts] = useState(fallbackProducts);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(`drokex-proveedor-pro:${slug}`);
-    if (saved) {
+    async function load() {
       try {
-        const parsed = JSON.parse(saved);
-        setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(parsed.store || {}) });
-        setProducts(parsed.products?.length ? parsed.products : fallbackProducts);
+        const res = await fetch(`/api/proveedor-pro?slug=${encodeURIComponent(slug)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(data.store || {}) });
+          setProducts(data.products?.length ? data.products : fallbackProducts);
+          return;
+        }
+      } catch {}
+      try {
+        const saved = window.localStorage.getItem(`drokex-proveedor-pro:${slug}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(parsed.store || {}) });
+          setProducts(parsed.products?.length ? parsed.products : fallbackProducts);
+        }
       } catch {}
     }
+    load();
   }, [slug, fallbackBrand]);
 
   const primary = store.primaryColor || "#ff9f2e";

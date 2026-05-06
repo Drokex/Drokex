@@ -35,6 +35,7 @@ const fallbackStore = {
   finalEyebrow: "Listo para comprar",
   finalTitle: "Descubre la coleccion de Mi Tienda",
   finalCtaText: "Ver catalogo",
+  catalogPdf: "",
   primaryColor: "#ff9f2e",
   backgroundColor: "#fff7fb",
   surfaceColor: "#ffffff",
@@ -68,19 +69,34 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
   const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(`drokex-proveedor-pro:${slug}`);
-    if (saved) {
+    async function load() {
+      // 1. intentar desde la BD
       try {
-        const parsed = JSON.parse(saved);
-        setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(parsed.store || {}) });
-        setProducts(parsed.products?.length ? parsed.products : fallbackProducts);
+        const res = await fetch(`/api/proveedor-pro?slug=${encodeURIComponent(slug)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(data.store || {}) });
+          setProducts(data.products?.length ? data.products : fallbackProducts);
+          setHasLoaded(true);
+          return;
+        }
+      } catch {}
+      // 2. fallback a localStorage
+      try {
+        const saved = window.localStorage.getItem(`drokex-proveedor-pro:${slug}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(parsed.store || {}) });
+          setProducts(parsed.products?.length ? parsed.products : fallbackProducts);
+        } else {
+          setNotFound(true);
+        }
       } catch {
         setNotFound(true);
       }
-    } else {
-      setNotFound(true);
+      setHasLoaded(true);
     }
-    setHasLoaded(true);
+    load();
   }, [slug, fallbackBrand]);
 
   const bg = store.backgroundColor || "#fff";

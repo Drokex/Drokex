@@ -138,6 +138,7 @@ export default function ProveedorProPage() {
     finalEyebrow: "Listo para comprar",
     finalTitle: "Descubre la colección de Muebles del Sur",
     finalCtaText: "Ver catálogo",
+    catalogPdf: "",
     primaryColor: "#ff9f2e",
     backgroundColor: "#fff7fb",
     surfaceColor: "#ffffff",
@@ -214,25 +215,25 @@ export default function ProveedorProPage() {
     setProducts(copy);
   }
 
-  function createLanding() {
+  async function createLanding() {
     const slug = slugify(store.brand) || "mi-tienda";
     const origin = window.location.origin;
     const link = `${origin}/proveedor-pro/tienda/${slug}`;
 
     try {
-      window.localStorage.setItem(
-        `drokex-proveedor-pro:${slug}`,
-        JSON.stringify({ store, products, createdAt: new Date().toISOString() })
-      );
+      const res = await fetch("/api/proveedor-pro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, store, products }),
+      });
+      if (!res.ok) throw new Error("api");
+      // también guardar en localStorage como caché local
+      try { window.localStorage.setItem(`drokex-proveedor-pro:${slug}`, JSON.stringify({ store, products })); } catch {}
       setLandingLink(link);
       setCopiedLink(false);
       setError("");
-    } catch (e) {
-      if (e?.name === "QuotaExceededError" || e?.code === 22) {
-        setError("Las imágenes son muy pesadas. Usa URLs externas en lugar de subir archivos.");
-      } else {
-        setError("No se pudo guardar. Intenta de nuevo.");
-      }
+    } catch {
+      setError("No se pudo guardar. Verifica tu conexión e intenta de nuevo.");
     }
   }
 
@@ -369,48 +370,6 @@ export default function ProveedorProPage() {
             <div style={{ padding: "12px 16px 24px", display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
               <p style={{ margin: "0 0 8px", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)" }}>Secciones de tu landing</p>
 
-              <SectionCard id="hero" label="Portada" icon={<HeroIcon />} open={openSection === "hero"} onToggle={() => setOpenSection(s => s === "hero" ? null : "hero")}>
-                <Input label="Link nav 1" value={store.nav1} onChange={v => updateStore("nav1", v)} />
-                <Input label="Link nav 2" value={store.nav2} onChange={v => updateStore("nav2", v)} />
-                <Input label="Link nav 3" value={store.nav3} onChange={v => updateStore("nav3", v)} />
-                <Input label="Titulo principal" value={store.heroTitle} onChange={v => updateStore("heroTitle", v)} />
-                <Textarea label="Subtitulo" value={store.heroSubtitle} onChange={v => updateStore("heroSubtitle", v)} />
-                <Input label="Texto del boton" value={store.ctaText} onChange={v => updateStore("ctaText", v)} />
-                <Input label="Boton secundario" value={store.secondaryCtaText} onChange={v => updateStore("secondaryCtaText", v)} />
-                <Input label="Boton del menu" value={store.headerCtaText} onChange={v => updateStore("headerCtaText", v)} />
-                <Input label="Texto promocional" value={store.promoText} onChange={v => updateStore("promoText", v)} />
-                <Input label="Titulo tarjeta de confianza" value={store.trustEyebrow} onChange={v => updateStore("trustEyebrow", v)} />
-                <Textarea label="Texto tarjeta de confianza" value={store.trustText} onChange={v => updateStore("trustText", v)} />
-                <Input label="Etiqueta estadistica" value={store.stockLabel} onChange={v => updateStore("stockLabel", v)} />
-                <Input label="Valor estadistica" value={store.stockValue} onChange={v => updateStore("stockValue", v)} />
-                <ImageUploader label="Imagen de fondo" value={store.heroImage} onChange={v => updateStore("heroImage", v)} />
-              </SectionCard>
-
-              <SectionCard id="benefits" label="Beneficios" icon={<CheckIcon />} open={openSection === "benefits"} onToggle={() => setOpenSection(s => s === "benefits" ? null : "benefits")}>
-                <Input label="Marca aliada 1" value={store.partner1} onChange={v => updateStore("partner1", v)} />
-                <Input label="Marca aliada 2" value={store.partner2} onChange={v => updateStore("partner2", v)} />
-                <Input label="Marca aliada 3" value={store.partner3} onChange={v => updateStore("partner3", v)} />
-                <Input label="Marca aliada 4" value={store.partner4} onChange={v => updateStore("partner4", v)} />
-                <Input label="Titulo del buscador" value={store.searchTitle} onChange={v => updateStore("searchTitle", v)} />
-                <Input label="Placeholder del buscador" value={store.searchPlaceholder} onChange={v => updateStore("searchPlaceholder", v)} />
-                <Input label="Boton del buscador" value={store.searchButtonText} onChange={v => updateStore("searchButtonText", v)} />
-                <Input label="Beneficio 1" value={store.benefit1} onChange={v => updateStore("benefit1", v)} />
-                <Textarea label="Descripcion beneficio 1" value={store.benefit1Text} onChange={v => updateStore("benefit1Text", v)} />
-                <Input label="Beneficio 2" value={store.benefit2} onChange={v => updateStore("benefit2", v)} />
-                <Textarea label="Descripcion beneficio 2" value={store.benefit2Text} onChange={v => updateStore("benefit2Text", v)} />
-                <Input label="Beneficio 3" value={store.benefit3} onChange={v => updateStore("benefit3", v)} />
-                <Textarea label="Descripcion beneficio 3" value={store.benefit3Text} onChange={v => updateStore("benefit3Text", v)} />
-                <ImageUploader label="Banner secundario" value={store.bannerSecondary} onChange={v => updateStore("bannerSecondary", v)} />
-              </SectionCard>
-
-              <SectionCard id="brand" label="Tu marca" icon={<BrandIcon />} open={openSection === "brand"} onToggle={() => setOpenSection(s => s === "brand" ? null : "brand")}>
-                <Input label="Nombre de marca" value={store.brand} onChange={v => updateStore("brand", v)} />
-                <Input label="Pais" value={store.country} onChange={v => updateStore("country", v)} />
-                <ImageUploader label="Logo" value={store.logo} onChange={v => updateStore("logo", v)} />
-                <Input label="Titulo seccion marca" value={store.aboutTitle} onChange={v => updateStore("aboutTitle", v)} />
-                <Textarea label="Historia / descripcion" value={store.aboutText} onChange={v => updateStore("aboutText", v)} />
-              </SectionCard>
-
               <button
                 type="button"
                 onClick={() => setShowProductsDrawer(true)}
@@ -466,8 +425,6 @@ export default function ProveedorProPage() {
                 <ColorInput label="Texto principal" value={store.textColor} onChange={v => updateStore("textColor", v)} />
                 <ColorInput label="Texto secundario" value={store.mutedTextColor} onChange={v => updateStore("mutedTextColor", v)} />
                 <ColorInput label="Texto de botones" value={store.buttonTextColor} onChange={v => updateStore("buttonTextColor", v)} />
-                <ColorInput label="Inicio degradado" value={store.gradientFromColor} onChange={v => updateStore("gradientFromColor", v)} />
-                <ColorInput label="Fin degradado" value={store.gradientToColor} onChange={v => updateStore("gradientToColor", v)} />
               </SectionCard>
             </div>
           </aside>
@@ -478,9 +435,10 @@ export default function ProveedorProPage() {
               products={products}
               isEditable
               productsOnly={previewPage === "products"}
+              marcaOnly={previewPage === "marca"}
               onUpdate={(field, value) => {
                 if (field === "__products__") setProducts(value);
-                else if (field === "__nav__") setPreviewPage(value === "products" ? "products" : "home");
+                else if (field === "__nav__") setPreviewPage(value === "products" ? "products" : value === "marca" ? "marca" : "home");
                 else updateStore(field, value);
               }}
             />

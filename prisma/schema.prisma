@@ -151,3 +151,12 @@ model GameScore {
   score     Int
   createdAt DateTime @default(now())
 }
+
+model ProveedorProLanding {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  store     Json
+  products  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
