@@ -17,10 +17,107 @@ const countries = [
 ];
 
 const HOW_IT_WORKS = [
-  { n: "01", label: "EXPLORAR PAÍSES",        desc: "Rota el globo y haz click en el punto de un país.", icon: Globe2 },
-  { n: "02", label: "VER TIENDAS PRO",        desc: "Descubre proveedores verificados por mercado.",      icon: Store },
-  { n: "03", label: "CONECTAR · COTIZAR",     desc: "Accede directo a la tienda y solicita tu precio.",  icon: Zap   },
+  {
+    n: "01", label: "EXPLORAR PAÍSES", icon: Globe2,
+    desc: "Rota el globo y haz click en el punto de un país.",
+    title: "Explora el mapa de proveedores LATAM",
+    detail: "Drokex World es un mapa interactivo 3D de toda la red de proveedores en América Latina. Cada punto de color representa un país activo con tiendas Pro disponibles.",
+    steps: [
+      "Arrastra el globo para rotarlo y navegar por la región.",
+      "Haz zoom con la rueda del mouse para acercarte.",
+      "Haz click en cualquier punto de color para entrar al país.",
+    ],
+  },
+  {
+    n: "02", label: "VER TIENDAS PRO", icon: Store,
+    desc: "Descubre proveedores verificados por mercado.",
+    title: "Tiendas Pro — proveedores verificados",
+    detail: "Al entrar a un país, verás todas las tiendas Proveedor Pro activas en ese mercado. Son catálogos oficiales con productos reales, precios y datos de contacto del proveedor.",
+    steps: [
+      "Cada tarjeta muestra el nombre, logo y cantidad de productos.",
+      "Toca «Ver tienda» para ver el catálogo completo.",
+      "Puedes filtrar países desde la barra de búsqueda arriba.",
+    ],
+  },
+  {
+    n: "03", label: "CONECTAR · COTIZAR", icon: Zap,
+    desc: "Accede directo a la tienda y solicita tu precio.",
+    title: "Conecta y solicita cotizaciones",
+    detail: "Dentro de cada tienda Pro puedes ver el catálogo, explorar productos con precios en tu moneda local y contactar directamente al proveedor para negociar volumen y precio.",
+    steps: [
+      "Los precios se convierten automáticamente a tu moneda.",
+      "Contacta al proveedor directamente desde su tienda.",
+      "¿Eres proveedor? Publica tu tienda desde «Para proveedores».",
+    ],
+  },
 ];
+
+function HowItWorksModal({ item, onClose }) {
+  const Icon = item?.icon;
+  return (
+    <AnimatePresence>
+      {item && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 20 }}
+            transition={{ type: "spring", stiffness: 320, damping: 28 }}
+            className="fixed left-1/2 top-1/2 z-[210] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/10 bg-zinc-950 p-7 shadow-2xl shadow-black/80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Glow */}
+            <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-lime-300/10 blur-3xl pointer-events-none" />
+
+            {/* Header */}
+            <div className="relative flex items-start justify-between gap-4 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-lime-300/10 border border-lime-300/20">
+                  {Icon && <Icon size={20} className="text-lime-300" />}
+                </div>
+                <div>
+                  <p className="text-[10px] font-black tracking-[0.18em] text-lime-400/60 uppercase">{item.n}</p>
+                  <h3 className="text-lg font-black text-white leading-tight">{item.title}</h3>
+                </div>
+              </div>
+              <button type="button" onClick={onClose} className="rounded-full border border-white/10 p-2 text-zinc-400 hover:bg-white/10 shrink-0">
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Detail */}
+            <p className="relative text-sm text-zinc-400 leading-relaxed mb-5">{item.detail}</p>
+
+            {/* Steps */}
+            <div className="relative space-y-3">
+              {item.steps.map((step, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-lime-300/10 border border-lime-300/20 text-[10px] font-black text-lime-300">{i + 1}</span>
+                  <p className="text-sm text-zinc-300 leading-snug">{step}</p>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="relative mt-7 w-full rounded-2xl bg-lime-300 py-3 text-sm font-black text-black transition hover:bg-lime-200"
+            >
+              Entendido
+            </button>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
 
 function StorePanel({ country, onClose, proLandings = [] }) {
   const countryLandings = useMemo(() => {
@@ -134,6 +231,7 @@ export default function DrokexWorldPage() {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [query, setQuery] = useState("");
   const [proLandings, setProLandings] = useState([]);
+  const [activeModal, setActiveModal] = useState(null);
 
   useEffect(() => {
     fetch("/api/proveedor-pro")
@@ -203,17 +301,19 @@ export default function DrokexWorldPage() {
       <div className="absolute left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 max-lg:hidden">
         <p className="mb-1 text-[11px] font-bold tracking-[0.22em] text-lime-400/60 uppercase">Cómo funciona</p>
 
-        {HOW_IT_WORKS.map(({ n, label, desc }) => (
+        {HOW_IT_WORKS.map((item) => (
           <motion.div
-            key={n}
+            key={item.n}
             whileHover={{ x: 5 }}
-            className="flex items-start gap-4 rounded-2xl border border-white/[0.08] bg-black/60 px-5 py-4 backdrop-blur-xl w-72 cursor-default"
+            onClick={() => setActiveModal(item)}
+            className="flex items-start gap-4 rounded-2xl border border-white/[0.08] bg-black/60 px-5 py-4 backdrop-blur-xl w-72 cursor-pointer hover:border-lime-300/20 transition-colors"
           >
-            <span className="mt-0.5 text-xs font-black text-lime-400/40 leading-none shrink-0">{n}</span>
-            <div>
-              <p className="text-sm font-black tracking-[0.08em] text-lime-300 uppercase leading-none mb-1.5">{label}</p>
-              <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
+            <span className="mt-0.5 text-xs font-black text-lime-400/40 leading-none shrink-0">{item.n}</span>
+            <div className="flex-1">
+              <p className="text-sm font-black tracking-[0.08em] text-lime-300 uppercase leading-none mb-1.5">{item.label}</p>
+              <p className="text-xs text-zinc-500 leading-relaxed">{item.desc}</p>
             </div>
+            <ArrowRight size={13} className="text-lime-400/30 shrink-0 mt-0.5" />
           </motion.div>
         ))}
 
@@ -247,6 +347,9 @@ export default function DrokexWorldPage() {
 
       {/* Store panel */}
       <StorePanel country={selectedCountry} onClose={() => setSelectedCountry(null)} proLandings={proLandings} />
+
+      {/* How it works modal */}
+      <HowItWorksModal item={activeModal} onClose={() => setActiveModal(null)} />
     </main>
   );
 }
