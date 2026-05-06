@@ -119,7 +119,7 @@ const countries = [
   },
   {
     id: "dominicana",
-    country: "Rep. Dominicana",
+    country: "República Dominicana",
     city: "Santo Domingo",
     label: "DO",
     name: "Caribe Trade DO",
@@ -174,52 +174,14 @@ const countries = [
       { name: "Set cocina", tag: "Promoción", type: "Cotizable" },
     ],
   },
-  {
-    id: "chile",
-    country: "Chile",
-    city: "Santiago",
-    label: "CL",
-    name: "Andino Trade CL",
-    category: "Minería",
-    x: 44,
-    y: 74,
-    color: "from-indigo-300 to-indigo-500",
-    glow: "bg-indigo-400/25",
-    shops: 21,
-    status: "Exportación activa",
-    products: [
-      { name: "Cobre industrial", tag: "Exportación", type: "Minería" },
-      { name: "Vino premium", tag: "Premium", type: "Agroindustria" },
-      { name: "Salmón fresco", tag: "Mayorista", type: "Alimentos" },
-    ],
-  },
-  {
-    id: "brasil",
-    country: "Brasil",
-    city: "São Paulo",
-    label: "BR",
-    name: "BrasilTech Hub",
-    category: "Tecnología",
-    x: 60,
-    y: 55,
-    color: "from-green-300 to-green-500",
-    glow: "bg-green-400/25",
-    shops: 45,
-    status: "Mayor mercado LATAM",
-    products: [
-      { name: "Electrónica local", tag: "Alta rotación", type: "Tecnología" },
-      { name: "Soja commodity", tag: "Exportación", type: "Agroindustria" },
-      { name: "Calzado premium", tag: "B2B", type: "Retail" },
-    ],
-  },
 ];
 
 const routePairs = [
   ["mexico", "colombia"],
   ["colombia", "peru"],
-  ["peru", "chile"],
-  ["colombia", "brasil"],
-  ["mexico", "brasil"],
+  ["mexico", "guatemala"],
+  ["guatemala", "honduras"],
+  ["colombia", "dominicana"],
 ];
 
 const particles = Array.from({ length: 34 }).map((_, index) => ({
@@ -697,7 +659,7 @@ export default function DrokexWorldPage() {
               <div className="space-y-2 text-xs text-zinc-400">
                 <div className="flex items-center justify-between gap-8"><span>México → Colombia</span><span className="text-lime-200">Activo</span></div>
                 <div className="flex items-center justify-between gap-8"><span>Colombia → Perú</span><span className="text-lime-200">Activo</span></div>
-                <div className="flex items-center justify-between gap-8"><span>Colombia → Brasil</span><span className="text-lime-200">Nuevo</span></div>
+                <div className="flex items-center justify-between gap-8"><span>Guatemala → Honduras</span><span className="text-lime-200">Nuevo</span></div>
               </div>
             </div>
 
