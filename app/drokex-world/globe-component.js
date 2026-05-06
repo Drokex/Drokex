@@ -9,14 +9,14 @@ const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 const LIME = "#bef264";
 
 const COUNTRY_POINTS = [
-  { id: "mexico",     name: "México",              lat: 23.6,   lng: -102.5, color: "#fb923c" },
-  { id: "guatemala",  name: "Guatemala",            lat: 15.5,   lng: -90.25, color: "#facc15" },
-  { id: "elsalvador", name: "El Salvador",          lat: 13.79,  lng: -88.9,  color: "#60a5fa" },
-  { id: "honduras",   name: "Honduras",             lat: 15.2,   lng: -86.24, color: "#22d3ee" },
-  { id: "nicaragua",  name: "Nicaragua",            lat: 12.87,  lng: -85.21, color: "#f87171" },
-  { id: "dominicana", name: "Rep. Dominicana",      lat: 18.9,   lng: -70.3,  color: "#fb7185" },
-  { id: "colombia",   name: "Colombia",             lat: 4.71,   lng: -74.07, color: "#a3e635" },
-  { id: "peru",       name: "Perú",                 lat: -9.19,  lng: -75.0,  color: "#38bdf8" },
+  { id: "mexico",     name: "México",              label: "Mexico",        lat: 23.6,   lng: -102.5, color: "#fb923c" },
+  { id: "guatemala",  name: "Guatemala",            label: "Guatemala",     lat: 15.5,   lng: -90.25, color: "#facc15" },
+  { id: "elsalvador", name: "El Salvador",          label: "El Salvador",   lat: 13.79,  lng: -88.9,  color: "#60a5fa" },
+  { id: "honduras",   name: "Honduras",             label: "Honduras",      lat: 15.2,   lng: -86.24, color: "#22d3ee" },
+  { id: "nicaragua",  name: "Nicaragua",            label: "Nicaragua",     lat: 12.87,  lng: -85.21, color: "#f87171" },
+  { id: "dominicana", name: "Rep. Dominicana",      label: "Rep. Dominic.", lat: 18.9,   lng: -70.3,  color: "#fb7185" },
+  { id: "colombia",   name: "Colombia",             label: "Colombia",      lat: 4.71,   lng: -74.07, color: "#a3e635" },
+  { id: "peru",       name: "Peru",                 label: "Peru",          lat: -9.19,  lng: -75.0,  color: "#38bdf8" },
 ];
 
 export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
@@ -141,7 +141,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         labelsData={selectedPoint ? [selectedPoint] : []}
         labelLat="lat"
         labelLng="lng"
-        labelText="name"
+        labelText="label"
         labelColor={(d) => d.color}
         labelSize={1.2}
         labelDotRadius={0.5}
