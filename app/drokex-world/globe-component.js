@@ -27,6 +27,10 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
   const [hoveredId, setHoveredId] = useState(null);
   const [geoFeatures, setGeoFeatures] = useState([]);
 
+  const selectedPoint = selectedCountry
+    ? COUNTRY_POINTS.find(p => p.id === selectedCountry.id)
+    : null;
+
   /* Load world country borders */
   useEffect(() => {
     fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
@@ -132,6 +136,17 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
           setHoveredId(point?.id || null);
           if (containerRef.current) containerRef.current.style.cursor = point ? "pointer" : "grab";
         }}
+
+        /* Country name label when zoomed in */
+        labelsData={selectedPoint ? [selectedPoint] : []}
+        labelLat="lat"
+        labelLng="lng"
+        labelText="name"
+        labelColor={(d) => d.color}
+        labelSize={1.2}
+        labelDotRadius={0.5}
+        labelAltitude={0.025}
+        labelResolution={4}
 
         /* Pulsing rings */
         ringsData={COUNTRY_POINTS}
