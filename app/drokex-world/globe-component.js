@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
+import { feature } from "topojson-client";
 
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 
 const LIME = "#bef264";
-const LIME_DIM = "rgba(190,242,100,";
 
 const COUNTRY_POINTS = [
   { id: "mexico",     name: "México",              lat: 23.6,   lng: -102.5, color: "#fb923c" },
@@ -25,6 +25,17 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
   const [size, setSize] = useState({ w: 800, h: 600 });
   const [ready, setReady] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
+  const [geoFeatures, setGeoFeatures] = useState([]);
+
+  /* Load world country borders */
+  useEffect(() => {
+    fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
+      .then(r => r.json())
+      .then(world => {
+        setGeoFeatures(feature(world, world.objects.countries).features);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     function update() {
@@ -39,7 +50,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
   useEffect(() => {
     if (!ready || !globeRef.current) return;
 
-    /* Tint the globe surface dark green via Three.js */
+    /* Tint globe surface to deep dark green */
     try {
       globeRef.current.scene().traverse(obj => {
         if (obj.isMesh && obj.geometry?.parameters?.radius > 50) {
@@ -58,7 +69,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
     globeRef.current.pointOfView({ lat: 12, lng: -78, altitude: 2.6 });
   }, [ready]);
 
-  // Zoom back out when panel closes
+  /* Zoom out when panel closes */
   useEffect(() => {
     if (!ready || !globeRef.current) return;
     if (!selectedCountry) {
@@ -78,6 +89,13 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
         backgroundColor="rgba(0,0,0,0)"
         showGraticules={true}
+
+        /* Country borders — line art style */
+        polygonsData={geoFeatures}
+        polygonAltitude={0.001}
+        polygonCapColor={() => "rgba(0,0,0,0)"}
+        polygonSideColor={() => "rgba(0,0,0,0)"}
+        polygonStrokeColor={() => "rgba(190,242,100,0.35)"}
 
         /* Atmosphere */
         atmosphereColor={LIME}
@@ -121,9 +139,9 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         ringLng="lng"
         ringColor={(d) => (t) => {
           const hex = d.color;
-          const r = parseInt(hex.slice(1,3),16);
-          const g = parseInt(hex.slice(3,5),16);
-          const b = parseInt(hex.slice(5,7),16);
+          const r = parseInt(hex.slice(1, 3), 16);
+          const g = parseInt(hex.slice(3, 5), 16);
+          const b = parseInt(hex.slice(5, 7), 16);
           return `rgba(${r},${g},${b},${Math.max(0, 1 - t * 1.6)})`;
         }}
         ringMaxRadius={4}
