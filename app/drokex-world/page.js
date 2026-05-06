@@ -177,46 +177,35 @@ export default function DrokexWorldPage() {
       </div>
 
       {/* ── LEFT PANEL: cómo funciona ── */}
-      <AnimatePresence>
-        {!selectedCountry && (
+      <div className="absolute left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 max-lg:hidden">
+        <p className="mb-1 text-[11px] font-bold tracking-[0.22em] text-lime-400/60 uppercase">Cómo funciona</p>
+
+        {HOW_IT_WORKS.map(({ n, label, desc }) => (
           <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -24 }}
-            transition={{ duration: 0.35 }}
-            className="absolute left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3 max-lg:hidden"
+            key={n}
+            whileHover={{ x: 5 }}
+            className="flex items-start gap-4 rounded-2xl border border-white/[0.08] bg-black/60 px-5 py-4 backdrop-blur-xl w-72 cursor-default"
           >
-            {/* Label */}
-            <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-lime-400/60 uppercase">Cómo funciona</p>
-
-            {HOW_IT_WORKS.map(({ n, label, desc, icon: Icon }) => (
-              <motion.div
-                key={n}
-                whileHover={{ x: 4 }}
-                className="flex items-start gap-3 rounded-2xl border border-white/[0.07] bg-black/50 px-4 py-3 backdrop-blur-xl w-60 cursor-default"
-              >
-                <span className="mt-0.5 text-[10px] font-black text-lime-400/50 leading-none">{n}</span>
-                <div>
-                  <p className="text-[11px] font-black tracking-[0.1em] text-lime-300 uppercase leading-none mb-1">{label}</p>
-                  <p className="text-[11px] text-zinc-500 leading-snug">{desc}</p>
-                </div>
-              </motion.div>
-            ))}
-
-            {/* Stats row */}
-            <div className="mt-2 flex gap-2">
-              <div className="flex-1 rounded-xl border border-white/[0.06] bg-black/40 px-3 py-2 backdrop-blur-xl text-center">
-                <p className="text-lg font-black text-lime-300 leading-none">{countries.length}</p>
-                <p className="text-[10px] text-zinc-600 mt-0.5">Países</p>
-              </div>
-              <div className="flex-1 rounded-xl border border-white/[0.06] bg-black/40 px-3 py-2 backdrop-blur-xl text-center">
-                <p className="text-lg font-black text-lime-300 leading-none">{proLandings.length}</p>
-                <p className="text-[10px] text-zinc-600 mt-0.5">Tiendas Pro</p>
-              </div>
+            <span className="mt-0.5 text-xs font-black text-lime-400/40 leading-none shrink-0">{n}</span>
+            <div>
+              <p className="text-sm font-black tracking-[0.08em] text-lime-300 uppercase leading-none mb-1.5">{label}</p>
+              <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        ))}
+
+        {/* Stats */}
+        <div className="mt-1 flex gap-3">
+          <div className="flex-1 rounded-2xl border border-white/[0.07] bg-black/50 px-4 py-3 backdrop-blur-xl text-center">
+            <p className="text-2xl font-black text-lime-300 leading-none">{countries.length}</p>
+            <p className="text-[11px] text-zinc-600 mt-1">Países</p>
+          </div>
+          <div className="flex-1 rounded-2xl border border-white/[0.07] bg-black/50 px-4 py-3 backdrop-blur-xl text-center">
+            <p className="text-2xl font-black text-lime-300 leading-none">{proLandings.length}</p>
+            <p className="text-[11px] text-zinc-600 mt-1">Tiendas Pro</p>
+          </div>
+        </div>
+      </div>
 
       {/* ── BOTTOM HINT ── */}
       <AnimatePresence>
