@@ -70,7 +70,7 @@ function HowItWorksModal({ item, onClose }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 20 }}
             transition={{ type: "spring", stiffness: 320, damping: 28 }}
-            className="fixed left-1/2 top-1/2 z-[210] w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/10 bg-zinc-950 p-7 shadow-2xl shadow-black/80"
+            className="fixed left-1/2 top-1/2 z-[210] w-[90vw] max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-[2rem] border border-white/10 bg-zinc-950 p-10 shadow-2xl shadow-black/80"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Glow */}
@@ -79,12 +79,12 @@ function HowItWorksModal({ item, onClose }) {
             {/* Header */}
             <div className="relative flex items-start justify-between gap-4 mb-5">
               <div className="flex items-center gap-3">
-                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-lime-300/10 border border-lime-300/20">
-                  {Icon && <Icon size={20} className="text-lime-300" />}
+                <div className="grid h-14 w-14 place-items-center rounded-2xl bg-lime-300/10 border border-lime-300/20 shrink-0">
+                  {Icon && <Icon size={26} className="text-lime-300" />}
                 </div>
                 <div>
-                  <p className="text-[10px] font-black tracking-[0.18em] text-lime-400/60 uppercase">{item.n}</p>
-                  <h3 className="text-lg font-black text-white leading-tight">{item.title}</h3>
+                  <p className="text-xs font-black tracking-[0.18em] text-lime-400/60 uppercase mb-1">{item.n}</p>
+                  <h3 className="text-2xl font-black text-white leading-tight">{item.title}</h3>
                 </div>
               </div>
               <button type="button" onClick={onClose} className="rounded-full border border-white/10 p-2 text-zinc-400 hover:bg-white/10 shrink-0">
@@ -93,14 +93,14 @@ function HowItWorksModal({ item, onClose }) {
             </div>
 
             {/* Detail */}
-            <p className="relative text-sm text-zinc-400 leading-relaxed mb-5">{item.detail}</p>
+            <p className="relative text-base text-zinc-400 leading-relaxed mb-6">{item.detail}</p>
 
             {/* Steps */}
-            <div className="relative space-y-3">
+            <div className="relative space-y-4">
               {item.steps.map((step, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-lime-300/10 border border-lime-300/20 text-[10px] font-black text-lime-300">{i + 1}</span>
-                  <p className="text-sm text-zinc-300 leading-snug">{step}</p>
+                <div key={i} className="flex items-start gap-4">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-lime-300/10 border border-lime-300/20 text-xs font-black text-lime-300">{i + 1}</span>
+                  <p className="text-base text-zinc-300 leading-snug">{step}</p>
                 </div>
               ))}
             </div>
@@ -108,7 +108,7 @@ function HowItWorksModal({ item, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="relative mt-7 w-full rounded-2xl bg-lime-300 py-3 text-sm font-black text-black transition hover:bg-lime-200"
+              className="relative mt-8 w-full rounded-2xl bg-lime-300 py-4 text-base font-black text-black transition hover:bg-lime-200"
             >
               Entendido
             </button>
