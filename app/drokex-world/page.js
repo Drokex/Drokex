@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, X, Radar, Sparkles } from "lucide-react";
+import { Search, MapPin, X, Globe2, Store, Zap, ArrowRight } from "lucide-react";
 import DrokexGlobe from "./globe-component";
 
 const countries = [
@@ -14,6 +14,12 @@ const countries = [
   { id: "dominicana", country: "República Dominicana",  glow: "bg-rose-400/25"   },
   { id: "colombia",   country: "Colombia",              glow: "bg-lime-400/25"   },
   { id: "peru",       country: "Perú",                  glow: "bg-sky-400/25"    },
+];
+
+const HOW_IT_WORKS = [
+  { n: "01", label: "EXPLORAR PAÍSES",        desc: "Rota el globo y haz click en el punto de un país.", icon: Globe2 },
+  { n: "02", label: "VER TIENDAS PRO",        desc: "Descubre proveedores verificados por mercado.",      icon: Store },
+  { n: "03", label: "CONECTAR · COTIZAR",     desc: "Accede directo a la tienda y solicita tu precio.",  icon: Zap   },
 ];
 
 function StorePanel({ country, onClose, proLandings = [] }) {
@@ -125,61 +131,113 @@ export default function DrokexWorldPage() {
   }, [query]);
 
   return (
-    <main className="h-screen overflow-hidden bg-[#030403] text-white flex flex-col">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(163,230,53,0.08),transparent_55%),radial-gradient(ellipse_at_20%_20%,rgba(163,230,53,0.05),transparent_40%),linear-gradient(180deg,#020602,#000)]" />
+    <main className="relative h-screen overflow-hidden bg-black text-white">
 
-      {/* Header */}
-      <header className="relative z-[80] flex flex-wrap items-center justify-between gap-4 mx-4 mt-4 rounded-[2rem] border border-white/10 bg-white/[0.045] px-5 py-4 shadow-2xl shadow-black/30 backdrop-blur-xl flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-lime-300 font-black text-black shadow-[0_0_28px_rgba(190,242,100,0.28)]">D</div>
-          <div>
-            <p className="text-xs text-zinc-400">Marketplace exploratorio · LATAM</p>
-            <h1 className="text-xl font-black">Drokex World</h1>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 max-md:w-full">
-          <div className="hidden items-center gap-2 rounded-full border border-lime-300/15 bg-lime-300/10 px-4 py-2 text-xs font-semibold text-lime-100 md:flex">
-            <Radar size={15} /> {countries.length} países activos
-          </div>
-          <div className="relative w-full min-w-[260px] max-w-sm">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar país..."
-              className="w-full rounded-2xl border border-white/10 bg-black/55 py-3 pl-11 pr-4 text-sm outline-none placeholder:text-zinc-600 focus:border-lime-300/60"
-            />
-          </div>
-        </div>
-
-        {/* Search results dropdown */}
-        {query && filteredCountries.length > 0 && (
-          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-[90] flex gap-2 flex-wrap justify-center">
-            {filteredCountries.map(c => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => { handleCountrySelect(c.id); setQuery(""); }}
-                className="rounded-full border border-lime-300/30 bg-black/80 px-4 py-2 text-sm font-semibold text-lime-200 backdrop-blur-md hover:bg-lime-300/10 transition"
-              >
-                {c.country}
-              </button>
-            ))}
-          </div>
-        )}
-      </header>
-
-      {/* Globe */}
-      <div className="relative flex-1 min-h-0 mx-4 mb-4 mt-3 rounded-[2.5rem] overflow-hidden border border-white/10">
+      {/* Globe — full screen */}
+      <div className="absolute inset-0">
         <DrokexGlobe onCountrySelect={handleCountrySelect} selectedCountry={selectedCountry} />
+      </div>
 
-        {/* Hint */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-4 py-2 text-xs text-zinc-400 backdrop-blur-md pointer-events-none">
-          <Sparkles size={13} className="text-lime-300" /> Haz click en un país para ver sus tiendas
+      {/* ── TOP BAR ── */}
+      <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 pt-5">
+
+        {/* Brand */}
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-lime-300 font-black text-black text-lg shadow-[0_0_24px_rgba(190,242,100,0.4)]">D</div>
+          <div>
+            <p className="text-[10px] font-semibold tracking-[0.18em] text-lime-400/70 uppercase">Marketplace · LATAM</p>
+            <h1 className="text-base font-black leading-none tracking-tight">Drokex World</h1>
+          </div>
         </div>
 
-        <StorePanel country={selectedCountry} onClose={() => setSelectedCountry(null)} proLandings={proLandings} />
+        {/* Search */}
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={15} />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar país..."
+            className="w-56 rounded-2xl border border-white/10 bg-black/60 py-2.5 pl-9 pr-4 text-sm outline-none placeholder:text-zinc-600 focus:border-lime-300/50 backdrop-blur-xl"
+          />
+          {query && filteredCountries.length > 0 && (
+            <div className="absolute top-full right-0 mt-2 z-[90] flex flex-col gap-1 min-w-full">
+              {filteredCountries.map(c => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => { handleCountrySelect(c.id); setQuery(""); }}
+                  className="rounded-xl border border-lime-300/20 bg-black/90 px-4 py-2 text-sm font-semibold text-lime-200 backdrop-blur-md hover:bg-lime-300/10 transition text-left"
+                >
+                  {c.country}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── LEFT PANEL: cómo funciona ── */}
+      <AnimatePresence>
+        {!selectedCountry && (
+          <motion.div
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -24 }}
+            transition={{ duration: 0.35 }}
+            className="absolute left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3 max-lg:hidden"
+          >
+            {/* Label */}
+            <p className="mb-1 text-[10px] font-bold tracking-[0.22em] text-lime-400/60 uppercase">Cómo funciona</p>
+
+            {HOW_IT_WORKS.map(({ n, label, desc, icon: Icon }) => (
+              <motion.div
+                key={n}
+                whileHover={{ x: 4 }}
+                className="flex items-start gap-3 rounded-2xl border border-white/[0.07] bg-black/50 px-4 py-3 backdrop-blur-xl w-60 cursor-default"
+              >
+                <span className="mt-0.5 text-[10px] font-black text-lime-400/50 leading-none">{n}</span>
+                <div>
+                  <p className="text-[11px] font-black tracking-[0.1em] text-lime-300 uppercase leading-none mb-1">{label}</p>
+                  <p className="text-[11px] text-zinc-500 leading-snug">{desc}</p>
+                </div>
+              </motion.div>
+            ))}
+
+            {/* Stats row */}
+            <div className="mt-2 flex gap-2">
+              <div className="flex-1 rounded-xl border border-white/[0.06] bg-black/40 px-3 py-2 backdrop-blur-xl text-center">
+                <p className="text-lg font-black text-lime-300 leading-none">{countries.length}</p>
+                <p className="text-[10px] text-zinc-600 mt-0.5">Países</p>
+              </div>
+              <div className="flex-1 rounded-xl border border-white/[0.06] bg-black/40 px-3 py-2 backdrop-blur-xl text-center">
+                <p className="text-lg font-black text-lime-300 leading-none">{proLandings.length}</p>
+                <p className="text-[10px] text-zinc-600 mt-0.5">Tiendas Pro</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── BOTTOM HINT ── */}
+      <AnimatePresence>
+        {!selectedCountry && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full border border-white/10 bg-black/55 px-5 py-2.5 text-xs text-zinc-400 backdrop-blur-xl pointer-events-none"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-lime-400 animate-pulse" />
+            Haz click en un país para ver sus tiendas Pro
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Store panel */}
+      <div className="absolute inset-0 pointer-events-none z-[60]">
+        <div className="relative h-full w-full pointer-events-auto">
+          <StorePanel country={selectedCountry} onClose={() => setSelectedCountry(null)} proLandings={proLandings} />
+        </div>
       </div>
     </main>
   );
