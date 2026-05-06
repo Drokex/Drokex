@@ -24,6 +24,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
   const containerRef = useRef(null);
   const [size, setSize] = useState({ w: 800, h: 600 });
   const [ready, setReady] = useState(false);
+  const [hoveredId, setHoveredId] = useState(null);
 
   useEffect(() => {
     function update() {
@@ -86,14 +87,30 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         pointLat="lat"
         pointLng="lng"
         pointAltitude={0.01}
-        pointRadius={0.6}
+        pointRadius={(d) => hoveredId === d.id ? 1.1 : 0.6}
         pointColor="color"
-        pointLabel="name"
+        pointLabel={(d) => `
+          <div style="
+            background: rgba(5,5,5,0.85);
+            color: ${d.color};
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+            font-family: sans-serif;
+            border: 1.5px solid ${d.color}55;
+            box-shadow: 0 0 18px ${d.color}44;
+            backdrop-filter: blur(12px);
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+          ">${d.name}</div>
+        `}
         onPointClick={(point) => {
           globeRef.current?.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.1 }, 1200);
           onCountrySelect(point.id);
         }}
         onPointHover={(point) => {
+          setHoveredId(point?.id || null);
           if (globeRef.current) globeRef.current.controls().autoRotate = !point && !selectedCountry;
           if (containerRef.current) containerRef.current.style.cursor = point ? "pointer" : "grab";
         }}
