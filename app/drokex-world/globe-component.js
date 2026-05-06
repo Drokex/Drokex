@@ -19,20 +19,6 @@ const COUNTRY_POINTS = [
   { id: "peru",       name: "Perú",                 lat: -9.19,  lng: -75.0  },
 ];
 
-const ARC_PAIRS = [
-  ["mexico", "guatemala"],
-  ["guatemala", "honduras"],
-  ["honduras", "nicaragua"],
-  ["nicaragua", "colombia"],
-  ["colombia", "peru"],
-];
-
-const arcData = ARC_PAIRS.map(([a, b]) => {
-  const from = COUNTRY_POINTS.find(p => p.id === a);
-  const to   = COUNTRY_POINTS.find(p => p.id === b);
-  return { startLat: from.lat, startLng: from.lng, endLat: to.lat, endLng: to.lng };
-});
-
 export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
   const globeRef = useRef(null);
   const containerRef = useRef(null);
@@ -41,12 +27,8 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
 
   useEffect(() => {
     function update() {
-      if (containerRef.current) {
-        setSize({
-          w: containerRef.current.offsetWidth,
-          h: containerRef.current.offsetHeight,
-        });
-      }
+      if (!containerRef.current) return;
+      setSize({ w: containerRef.current.offsetWidth, h: containerRef.current.offsetHeight });
     }
     update();
     window.addEventListener("resize", update);
@@ -55,78 +37,75 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
 
   useEffect(() => {
     if (!ready || !globeRef.current) return;
+
+    /* Tint the globe surface dark green via Three.js */
+    try {
+      globeRef.current.scene().traverse(obj => {
+        if (obj.isMesh && obj.geometry?.parameters?.radius > 50) {
+          obj.material.color?.set("#010c05");
+          if (obj.material.emissive) obj.material.emissive.set("#021208");
+          if (obj.material.emissiveIntensity !== undefined) obj.material.emissiveIntensity = 1;
+        }
+      });
+    } catch (_) {}
+
     const ctrl = globeRef.current.controls();
     ctrl.autoRotate = true;
-    ctrl.autoRotateSpeed = 0.4;
+    ctrl.autoRotateSpeed = 0.35;
     ctrl.enableZoom = true;
-    ctrl.minDistance = 200;
-    ctrl.maxDistance = 550;
-    globeRef.current.pointOfView({ lat: 10, lng: -82, altitude: 1.9 });
+    ctrl.minDistance = 280;
+    ctrl.maxDistance = 700;
+    globeRef.current.pointOfView({ lat: 12, lng: -78, altitude: 2.6 });
   }, [ready]);
 
-  // Pause rotation when a country is selected, resume on close
+  /* Pause / resume rotation based on selection */
   useEffect(() => {
     if (!ready || !globeRef.current) return;
     globeRef.current.controls().autoRotate = !selectedCountry;
   }, [ready, selectedCountry]);
 
   return (
-    <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
+    <div ref={containerRef} style={{ width: "100%", height: "100%", background: "radial-gradient(ellipse at 50% 50%, #001a08 0%, #000 70%)" }}>
       <Globe
         ref={globeRef}
         width={size.w}
         height={size.h}
         onGlobeReady={() => setReady(true)}
 
-        /* ── Globe surface ── */
+        /* Globe surface */
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
         backgroundColor="rgba(0,0,0,0)"
         showGraticules={true}
 
-        /* ── Atmosphere ── */
+        /* Atmosphere */
         atmosphereColor={LIME}
-        atmosphereAltitude={0.28}
+        atmosphereAltitude={0.35}
 
-        /* ── Country dots ── */
+        /* Country dots */
         pointsData={COUNTRY_POINTS}
         pointLat="lat"
         pointLng="lng"
-        pointAltitude={0.06}
-        pointRadius={0.45}
+        pointAltitude={0.07}
+        pointRadius={0.55}
         pointColor={() => LIME}
-        pointLabel=""
+        pointLabel="name"
         onPointClick={(point) => {
-          globeRef.current?.pointOfView(
-            { lat: point.lat, lng: point.lng, altitude: 0.9 },
-            1000
-          );
+          globeRef.current?.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.1 }, 1200);
           onCountrySelect(point.id);
         }}
         onPointHover={(point) => {
-          if (globeRef.current) globeRef.current.controls().autoRotate = !point;
+          if (globeRef.current) globeRef.current.controls().autoRotate = !point && !selectedCountry;
           if (containerRef.current) containerRef.current.style.cursor = point ? "pointer" : "grab";
         }}
 
-        /* ── Pulsing rings ── */
+        /* Pulsing rings */
         ringsData={COUNTRY_POINTS}
         ringLat="lat"
         ringLng="lng"
-        ringColor={() => (t) => `${LIME_DIM}${Math.max(0, 1 - t * 1.8)})`}
-        ringMaxRadius={3.5}
+        ringColor={() => (t) => `${LIME_DIM}${Math.max(0, 1 - t * 1.6)})`}
+        ringMaxRadius={4}
         ringPropagationSpeed={2.5}
-        ringRepeatPeriod={900}
-
-        /* ── Country labels ── */
-        labelsData={COUNTRY_POINTS}
-        labelLat="lat"
-        labelLng="lng"
-        labelText="name"
-        labelColor={() => LIME}
-        labelSize={0.55}
-        labelDotRadius={0.25}
-        labelAltitude={0.015}
-        labelResolution={3}
-
+        ringRepeatPeriod={1000}
       />
     </div>
   );

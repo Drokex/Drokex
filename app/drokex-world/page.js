@@ -126,7 +126,7 @@ export default function DrokexWorldPage() {
 
   return (
     <main className="h-screen overflow-hidden bg-[#030403] text-white flex flex-col">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(163,230,53,0.12),transparent_40%),radial-gradient(circle_at_70%_80%,rgba(163,230,53,0.06),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_60%,rgba(163,230,53,0.08),transparent_55%),radial-gradient(ellipse_at_20%_20%,rgba(163,230,53,0.05),transparent_40%),linear-gradient(180deg,#020602,#000)]" />
 
       {/* Header */}
       <header className="relative z-[80] flex flex-wrap items-center justify-between gap-4 mx-4 mt-4 rounded-[2rem] border border-white/10 bg-white/[0.045] px-5 py-4 shadow-2xl shadow-black/30 backdrop-blur-xl flex-shrink-0">
