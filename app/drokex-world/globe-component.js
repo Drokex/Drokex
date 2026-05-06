@@ -33,7 +33,7 @@ const arcData = ARC_PAIRS.map(([a, b]) => {
   return { startLat: from.lat, startLng: from.lng, endLat: to.lat, endLng: to.lng };
 });
 
-export default function DrokexGlobe({ onCountrySelect }) {
+export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
   const globeRef = useRef(null);
   const containerRef = useRef(null);
   const [size, setSize] = useState({ w: 800, h: 600 });
@@ -64,6 +64,12 @@ export default function DrokexGlobe({ onCountrySelect }) {
     globeRef.current.pointOfView({ lat: 10, lng: -82, altitude: 1.9 });
   }, [ready]);
 
+  // Pause rotation when a country is selected, resume on close
+  useEffect(() => {
+    if (!ready || !globeRef.current) return;
+    globeRef.current.controls().autoRotate = !selectedCountry;
+  }, [ready, selectedCountry]);
+
   return (
     <div ref={containerRef} style={{ width: "100%", height: "100%" }}>
       <Globe
@@ -89,7 +95,13 @@ export default function DrokexGlobe({ onCountrySelect }) {
         pointRadius={0.45}
         pointColor={() => LIME}
         pointLabel=""
-        onPointClick={(point) => onCountrySelect(point.id)}
+        onPointClick={(point) => {
+          globeRef.current?.pointOfView(
+            { lat: point.lat, lng: point.lng, altitude: 0.9 },
+            1000
+          );
+          onCountrySelect(point.id);
+        }}
         onPointHover={(point) => {
           if (globeRef.current) globeRef.current.controls().autoRotate = !point;
           if (containerRef.current) containerRef.current.style.cursor = point ? "pointer" : "grab";

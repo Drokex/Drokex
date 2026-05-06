@@ -172,7 +172,7 @@ export default function DrokexWorldPage() {
 
       {/* Globe */}
       <div className="relative flex-1 min-h-0 mx-4 mb-4 mt-3 rounded-[2.5rem] overflow-hidden border border-white/10">
-        <DrokexGlobe onCountrySelect={handleCountrySelect} />
+        <DrokexGlobe onCountrySelect={handleCountrySelect} selectedCountry={selectedCountry} />
 
         {/* Hint */}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-4 py-2 text-xs text-zinc-400 backdrop-blur-md pointer-events-none">
