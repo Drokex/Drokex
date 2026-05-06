@@ -75,7 +75,7 @@ export default function DrokexGlobe({ onCountrySelect }) {
         /* ── Globe surface ── */
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
         backgroundColor="rgba(0,0,0,0)"
-        showGraticules={true}
+        showGraticules={false}
 
         /* ── Atmosphere ── */
         atmosphereColor={LIME}
@@ -115,18 +115,6 @@ export default function DrokexGlobe({ onCountrySelect }) {
         labelAltitude={0.015}
         labelResolution={3}
 
-        /* ── Trade route arcs ── */
-        arcsData={arcData}
-        arcStartLat="startLat"
-        arcStartLng="startLng"
-        arcEndLat="endLat"
-        arcEndLng="endLng"
-        arcColor={() => LIME}
-        arcAltitude={0.28}
-        arcStroke={1.0}
-        arcDashLength={0.45}
-        arcDashGap={0.25}
-        arcDashAnimateTime={2000}
       />
     </div>
   );
