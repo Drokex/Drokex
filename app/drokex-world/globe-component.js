@@ -9,14 +9,14 @@ const LIME = "#bef264";
 const LIME_DIM = "rgba(190,242,100,";
 
 const COUNTRY_POINTS = [
-  { id: "mexico",     name: "México",              lat: 23.6,   lng: -102.5 },
-  { id: "guatemala",  name: "Guatemala",            lat: 15.5,   lng: -90.25 },
-  { id: "elsalvador", name: "El Salvador",          lat: 13.79,  lng: -88.9  },
-  { id: "honduras",   name: "Honduras",             lat: 15.2,   lng: -86.24 },
-  { id: "nicaragua",  name: "Nicaragua",            lat: 12.87,  lng: -85.21 },
-  { id: "dominicana", name: "Rep. Dominicana",      lat: 18.9,   lng: -70.3  },
-  { id: "colombia",   name: "Colombia",             lat: 4.71,   lng: -74.07 },
-  { id: "peru",       name: "Perú",                 lat: -9.19,  lng: -75.0  },
+  { id: "mexico",     name: "México",              lat: 23.6,   lng: -102.5, color: "#fb923c" },
+  { id: "guatemala",  name: "Guatemala",            lat: 15.5,   lng: -90.25, color: "#facc15" },
+  { id: "elsalvador", name: "El Salvador",          lat: 13.79,  lng: -88.9,  color: "#60a5fa" },
+  { id: "honduras",   name: "Honduras",             lat: 15.2,   lng: -86.24, color: "#22d3ee" },
+  { id: "nicaragua",  name: "Nicaragua",            lat: 12.87,  lng: -85.21, color: "#f87171" },
+  { id: "dominicana", name: "Rep. Dominicana",      lat: 18.9,   lng: -70.3,  color: "#fb7185" },
+  { id: "colombia",   name: "Colombia",             lat: 4.71,   lng: -74.07, color: "#a3e635" },
+  { id: "peru",       name: "Perú",                 lat: -9.19,  lng: -75.0,  color: "#38bdf8" },
 ];
 
 export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
@@ -85,9 +85,9 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         pointsData={COUNTRY_POINTS}
         pointLat="lat"
         pointLng="lng"
-        pointAltitude={0.07}
-        pointRadius={0.55}
-        pointColor={() => LIME}
+        pointAltitude={0.01}
+        pointRadius={0.6}
+        pointColor="color"
         pointLabel="name"
         onPointClick={(point) => {
           globeRef.current?.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.1 }, 1200);
@@ -102,7 +102,13 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         ringsData={COUNTRY_POINTS}
         ringLat="lat"
         ringLng="lng"
-        ringColor={() => (t) => `${LIME_DIM}${Math.max(0, 1 - t * 1.6)})`}
+        ringColor={(d) => (t) => {
+          const hex = d.color;
+          const r = parseInt(hex.slice(1,3),16);
+          const g = parseInt(hex.slice(3,5),16);
+          const b = parseInt(hex.slice(5,7),16);
+          return `rgba(${r},${g},${b},${Math.max(0, 1 - t * 1.6)})`;
+        }}
         ringMaxRadius={4}
         ringPropagationSpeed={2.5}
         ringRepeatPeriod={1000}
