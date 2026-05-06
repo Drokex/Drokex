@@ -1,5 +1,3 @@
-import "./tailwind.css";
-
 export const metadata = {
   title: "Drokex World",
   description: "Explora tiendas de LATAM como un videojuego.",

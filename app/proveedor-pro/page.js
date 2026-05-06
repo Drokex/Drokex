@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import SiteHeader from "@/app/components/site-header";
 import LandingPreview, { hexToRgba as _hexToRgba } from "@/app/components/landing-preview";
 
@@ -85,9 +86,17 @@ function ScrollFrameSequence({ alt, children }) {
   );
 }
 
-export default function ProveedorProPage() {
+export default function ProveedorProPage({
+  initialIsPro = false,
+  initialStore = null,
+  initialProducts = null,
+  initialSlug = "",
+  accountMode = false,
+}) {
+  const router = useRouter();
   const [code, setCode] = useState("");
-  const [isPro, setIsPro] = useState(false);
+  const [isPro, setIsPro] = useState(initialIsPro);
+  const [authStatus, setAuthStatus] = useState(accountMode ? "ready" : "checking");
   const [openSection, setOpenSection] = useState("hero");
   const [showProductsDrawer, setShowProductsDrawer] = useState(false);
   const [previewPage, setPreviewPage] = useState("home");
@@ -171,7 +180,50 @@ export default function ProveedorProPage() {
     },
   ]);
 
+  useEffect(() => {
+    if (initialStore) {
+      setStore((current) => ({ ...current, ...initialStore }));
+    }
+
+    if (Array.isArray(initialProducts) && initialProducts.length > 0) {
+      setProducts(initialProducts);
+    }
+
+    if (initialSlug && typeof window !== "undefined") {
+      setLandingLink(`${window.location.origin}/proveedor-pro/tienda/${initialSlug}`);
+    }
+  }, [initialStore, initialProducts, initialSlug]);
+
+  useEffect(() => {
+    if (accountMode) return;
+
+    let active = true;
+
+    async function verifyAccount() {
+      try {
+        const response = await fetch("/api/account", { cache: "no-store" });
+
+        if (!response.ok) {
+          router.replace(`/login?role=proveedor&next=${encodeURIComponent("/proveedor-pro")}`);
+          return;
+        }
+
+        if (active) setAuthStatus("ready");
+      } catch {
+        if (active) setAuthStatus("ready");
+      }
+    }
+
+    verifyAccount();
+
+    return () => {
+      active = false;
+    };
+  }, [accountMode, router]);
+
   function activatePro() {
+    if (authStatus !== "ready") return;
+
     if (code === VALID_CODE) {
       setIsPro(true);
       setError("");
@@ -248,7 +300,17 @@ export default function ProveedorProPage() {
     <main className="min-h-screen bg-white text-[#111]">
       <SiteHeader />
 
-      {!isPro ? (
+      {authStatus === "checking" ? (
+        <section className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-white px-6 text-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#2ea600]">
+              Proveedor Pro
+            </p>
+            <h1 className="mt-3 text-3xl font-black text-[#111]">Validando tu cuenta...</h1>
+            <p className="mt-2 text-sm text-[#666]">Para activar este servicio necesitas iniciar sesión.</p>
+          </div>
+        </section>
+      ) : !isPro ? (
         <section style={{ display: "grid", gridTemplateColumns: "420px 1fr", minHeight: "calc(100vh - 80px)", background: "#ffffff" }}>
           {/* Left: text + plan + form */}
           <div style={{ padding: "64px 40px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 24, background: "#ffffff" }}>
@@ -321,128 +383,129 @@ export default function ProveedorProPage() {
           <LandingPreview store={store} products={products} fullWidth />
         </section>
       ) : (
-        <section className="grid min-h-[calc(100vh-80px)] grid-cols-1 lg:grid-cols-[360px_1fr]">
-          <aside style={{ borderRight: "1px solid rgba(255,255,255,0.08)", background: "#060906", display: "flex", flexDirection: "column", overflowY: "auto" }}>
-            {/* Brand header */}
-            <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: "50%", background: store.primaryColor, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "1rem", color: store.buttonTextColor, flexShrink: 0 }}>
-                  {store.logo
-                    ? <img src={store.logo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} />
-                    : store.brand.charAt(0)}
+        <section className="relative min-h-[calc(100vh-80px)]" style={{ backgroundColor: store.backgroundColor }}>
+          <div
+            style={{
+              position: "sticky",
+              top: 80,
+              zIndex: 70,
+              display: "flex",
+              justifyContent: "center",
+              padding: "12px 18px",
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              style={{
+                width: "min(1120px, 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                border: "1px solid rgba(0,0,0,0.12)",
+                borderRadius: 18,
+                background: "rgba(255,255,255,0.88)",
+                boxShadow: "0 18px 48px rgba(0,0,0,0.16)",
+                backdropFilter: "blur(18px)",
+                padding: "10px 12px",
+                pointerEvents: "auto",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+                <div style={{ width: 38, height: 38, borderRadius: "50%", background: store.primaryColor, color: store.buttonTextColor, display: "grid", placeItems: "center", fontWeight: 950, flexShrink: 0 }}>
+                  {store.logo ? <img src={store.logo} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} /> : store.brand.charAt(0)}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <p style={{ margin: 0, fontWeight: 900, fontSize: "0.9rem", color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{store.brand}</p>
-                  <p style={{ margin: 0, fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>{store.country}</p>
+                  <p style={{ margin: 0, color: "#111", fontSize: "0.86rem", fontWeight: 950, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{store.brand}</p>
+                  <p style={{ margin: 0, color: "#777", fontSize: "0.72rem" }}>Editando landing Pro</p>
                 </div>
-                <span style={{ marginLeft: "auto", flexShrink: 0, background: "rgba(89,255,53,0.15)", color: "#59ff35", fontSize: "0.62rem", fontWeight: 900, letterSpacing: "0.1em", padding: "3px 8px", borderRadius: 6, textTransform: "uppercase" }}>Pro</span>
               </div>
-            </div>
 
-            {/* Action buttons */}
-            <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-              {error && <p style={{ margin: 0, fontSize: "0.75rem", color: "#f87171", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 8, padding: "8px 12px" }}>{error}</p>}
-              <div style={{ display: "flex", gap: 8 }}>
-              <button type="button" onClick={createLanding}
-                style={{ flex: 1, borderRadius: 12, background: "#59ff35", color: "#050505", fontWeight: 900, fontSize: "0.82rem", padding: "11px 8px", border: "none", cursor: "pointer" }}>
-                Publicar
-              </button>
-              <button type="button" onClick={() => setIsPreviewMode(true)}
-                style={{ flex: 1, borderRadius: 12, background: "rgba(255,255,255,0.06)", color: "#fff", fontWeight: 700, fontSize: "0.82rem", padding: "11px 8px", border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer" }}>
-                Previsualizar
-              </button>
-              </div>
-            </div>
-
-            {/* Landing link */}
-            {landingLink && (
-              <div style={{ margin: "12px 16px", borderRadius: 14, border: "1px solid rgba(89,255,53,0.3)", background: "rgba(89,255,53,0.07)", padding: "14px" }}>
-                <p style={{ margin: "0 0 6px", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "#59ff35" }}>Landing publicada</p>
-                <a href={landingLink} style={{ display: "block", wordBreak: "break-all", fontSize: "0.72rem", color: "rgba(255,255,255,0.6)", marginBottom: 8 }}>{landingLink}</a>
-                <button type="button" onClick={copyLandingLink}
-                  style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(89,255,53,0.4)", background: "transparent", color: "#59ff35", fontWeight: 900, fontSize: "0.78rem", padding: "8px", cursor: "pointer" }}>
-                  {copiedLink ? "Copiado" : "Copiar link"}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                {error && <span style={{ color: "#b91c1c", fontSize: "0.74rem", fontWeight: 800 }}>{error}</span>}
+                <button type="button" onClick={() => { setShowProductsDrawer((open) => !open); setOpenSection(null); }}
+                  style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.1)", background: showProductsDrawer ? "#111" : "#fff", color: showProductsDrawer ? "#fff" : "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer" }}>
+                  Productos · {products.length}
+                </button>
+                <button type="button" onClick={() => { setOpenSection((s) => s === "style" ? null : "style"); setShowProductsDrawer(false); }}
+                  style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.1)", background: openSection === "style" ? "#111" : "#fff", color: openSection === "style" ? "#fff" : "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer" }}>
+                  Colores
+                </button>
+                <button type="button" onClick={() => setIsPreviewMode(true)}
+                  style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.1)", background: "#fff", color: "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer" }}>
+                  Previsualizar
+                </button>
+                <button type="button" onClick={createLanding}
+                  style={{ borderRadius: 13, border: "none", background: "#22c400", color: "#fff", fontWeight: 950, padding: "10px 16px", boxShadow: "0 12px 28px rgba(34,196,0,0.28)", cursor: "pointer" }}>
+                  Publicar
                 </button>
               </div>
-            )}
-
-            {/* Section list */}
-            <div style={{ padding: "12px 16px 24px", display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
-              <p style={{ margin: "0 0 8px", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)" }}>Secciones de tu landing</p>
-
-              <button
-                type="button"
-                onClick={() => setShowProductsDrawer(true)}
-                style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)", padding: "12px 14px", cursor: "pointer", color: "#fff", fontWeight: 700, fontSize: "0.85rem", textAlign: "left" }}
-              >
-                <ProductIcon />
-                Productos
-                <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: "rgba(255,255,255,0.35)", fontWeight: 400 }}>{products.length} producto{products.length !== 1 ? "s" : ""}</span>
-                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "1rem" }}>→</span>
-              </button>
-
-              {showProductsDrawer && (
-                <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex" }}>
-                  <div onClick={() => setShowProductsDrawer(false)} style={{ flex: 1, background: "rgba(0,0,0,0.55)" }} />
-                  <div style={{ width: 420, background: "#060906", borderLeft: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "sticky", top: 0, background: "#060906", zIndex: 1 }}>
-                      <p style={{ margin: 0, fontWeight: 900, fontSize: "0.9rem", color: "#fff" }}>Productos</p>
-                      <button type="button" onClick={() => setShowProductsDrawer(false)} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 8, color: "#fff", fontWeight: 700, fontSize: "1rem", width: 32, height: 32, cursor: "pointer", display: "grid", placeItems: "center" }}>✕</button>
-                    </div>
-                    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
-                      <Input label="Etiqueta de catalogo" value={store.catalogEyebrow} onChange={v => updateStore("catalogEyebrow", v)} />
-                      <Input label="Titulo de catalogo" value={store.catalogTitle} onChange={v => updateStore("catalogTitle", v)} />
-                      <Textarea label="Texto de catalogo" value={store.catalogText} onChange={v => updateStore("catalogText", v)} />
-                      <Input label="Boton de producto" value={store.productCtaText} onChange={v => updateStore("productCtaText", v)} />
-                      <p style={{ margin: "8px 0 0", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)" }}>Tus productos</p>
-                      {products.map((product, index) => (
-                        <div key={index} style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.3)", padding: "14px", display: "flex", flexDirection: "column", gap: 12 }}>
-                          <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 900, color: "#59ff35" }}>Producto {index + 1}</p>
-                          <Input label="Nombre" value={product.name} onChange={v => updateProduct(index, "name", v)} />
-                          <Input label="Categoria" value={product.category} onChange={v => updateProduct(index, "category", v)} />
-                          <Input label="Precio" value={product.price} onChange={v => updateProduct(index, "price", v)} />
-                          <Input label="Stock" value={product.stock} onChange={v => updateProduct(index, "stock", v)} />
-                          <ImageUploader label="Imagen" value={product.image} onChange={v => updateProduct(index, "image", v)} />
-                          <Textarea label="Descripcion" value={product.description} onChange={v => updateProduct(index, "description", v)} />
-                        </div>
-                      ))}
-                      <button onClick={addProduct} style={{ width: "100%", borderRadius: 12, border: "1px dashed rgba(89,255,53,0.4)", background: "transparent", color: "#59ff35", fontWeight: 900, fontSize: "0.82rem", padding: "12px", cursor: "pointer" }}>
-                        + Agregar producto
-                      </button>
-                      <p style={{ margin: "8px 0 0", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)" }}>Cierre final</p>
-                      <Input label="Etiqueta cierre final" value={store.finalEyebrow} onChange={v => updateStore("finalEyebrow", v)} />
-                      <Input label="Titulo cierre final" value={store.finalTitle} onChange={v => updateStore("finalTitle", v)} />
-                      <Input label="Boton cierre final" value={store.finalCtaText} onChange={v => updateStore("finalCtaText", v)} />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <SectionCard id="style" label="Colores y diseño" icon={<PaletteIcon />} open={openSection === "style"} onToggle={() => setOpenSection(s => s === "style" ? null : "style")}>
-                <ColorInput label="Color principal" value={store.primaryColor} onChange={v => updateStore("primaryColor", v)} />
-                <ColorInput label="Fondo de landing" value={store.backgroundColor} onChange={v => updateStore("backgroundColor", v)} />
-                <ColorInput label="Color de secciones" value={store.surfaceColor} onChange={v => updateStore("surfaceColor", v)} />
-                <ColorInput label="Texto principal" value={store.textColor} onChange={v => updateStore("textColor", v)} />
-                <ColorInput label="Texto secundario" value={store.mutedTextColor} onChange={v => updateStore("mutedTextColor", v)} />
-                <ColorInput label="Texto de botones" value={store.buttonTextColor} onChange={v => updateStore("buttonTextColor", v)} />
-              </SectionCard>
             </div>
-          </aside>
+          </div>
 
-          <section className="overflow-y-auto p-6" style={{ backgroundColor: store.backgroundColor }}>
-            <LandingPreview
-              store={store}
-              products={products}
-              isEditable
-              productsOnly={previewPage === "products"}
-              marcaOnly={previewPage === "marca"}
-              onUpdate={(field, value) => {
-                if (field === "__products__") setProducts(value);
-                else if (field === "__nav__") setPreviewPage(value === "products" ? "products" : value === "marca" ? "marca" : "home");
-                else updateStore(field, value);
-              }}
-            />
-          </section>
+          {landingLink && (
+            <div style={{ position: "fixed", left: 22, bottom: 22, zIndex: 80, width: 300, borderRadius: 18, border: "1px solid rgba(34,196,0,0.3)", background: "rgba(255,255,255,0.92)", boxShadow: "0 18px 50px rgba(0,0,0,0.16)", padding: 14, backdropFilter: "blur(14px)" }}>
+              <p style={{ margin: "0 0 6px", color: "#22a600", fontSize: "0.68rem", fontWeight: 950, letterSpacing: "0.14em", textTransform: "uppercase" }}>Landing publicada</p>
+              <a href={landingLink} style={{ display: "block", color: "#555", fontSize: "0.74rem", wordBreak: "break-all", marginBottom: 8 }}>{landingLink}</a>
+              <button type="button" onClick={copyLandingLink} style={{ width: "100%", borderRadius: 11, border: "1px solid rgba(34,196,0,0.35)", background: "rgba(34,196,0,0.08)", color: "#159000", fontWeight: 950, padding: "8px 10px", cursor: "pointer" }}>
+                {copiedLink ? "Copiado" : "Copiar link"}
+              </button>
+            </div>
+          )}
+
+          {showProductsDrawer && (
+            <FloatingEditorCard title="Productos" onClose={() => setShowProductsDrawer(false)}>
+              <Input label="Etiqueta de catalogo" value={store.catalogEyebrow} onChange={v => updateStore("catalogEyebrow", v)} />
+              <Input label="Titulo de catalogo" value={store.catalogTitle} onChange={v => updateStore("catalogTitle", v)} />
+              <Textarea label="Texto de catalogo" value={store.catalogText} onChange={v => updateStore("catalogText", v)} />
+              <Input label="Boton de producto" value={store.productCtaText} onChange={v => updateStore("productCtaText", v)} />
+              <p style={{ margin: "4px 0 0", fontSize: "0.68rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.36)" }}>Tus productos</p>
+              {products.map((product, index) => (
+                <div key={index} style={{ borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", padding: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+                  <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 950, color: "#59ff35" }}>Producto {index + 1}</p>
+                  <Input label="Nombre" value={product.name} onChange={v => updateProduct(index, "name", v)} />
+                  <Input label="Categoria" value={product.category} onChange={v => updateProduct(index, "category", v)} />
+                  <Input label="Precio" value={product.price} onChange={v => updateProduct(index, "price", v)} />
+                  <Input label="Stock" value={product.stock} onChange={v => updateProduct(index, "stock", v)} />
+                  <ImageUploader label="Imagen" value={product.image} onChange={v => updateProduct(index, "image", v)} />
+                  <Textarea label="Descripcion" value={product.description} onChange={v => updateProduct(index, "description", v)} />
+                </div>
+              ))}
+              <button onClick={addProduct} style={{ width: "100%", borderRadius: 14, border: "1px dashed rgba(89,255,53,0.48)", background: "rgba(89,255,53,0.08)", color: "#59ff35", fontWeight: 950, fontSize: "0.84rem", padding: "12px", cursor: "pointer" }}>
+                + Agregar producto
+              </button>
+              <p style={{ margin: "4px 0 0", fontSize: "0.68rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.36)" }}>Cierre final</p>
+              <Input label="Etiqueta cierre final" value={store.finalEyebrow} onChange={v => updateStore("finalEyebrow", v)} />
+              <Input label="Titulo cierre final" value={store.finalTitle} onChange={v => updateStore("finalTitle", v)} />
+              <Input label="Boton cierre final" value={store.finalCtaText} onChange={v => updateStore("finalCtaText", v)} />
+            </FloatingEditorCard>
+          )}
+
+          {openSection === "style" && (
+            <FloatingEditorCard title="Colores y diseño" onClose={() => setOpenSection(null)}>
+              <ColorInput label="Color principal" value={store.primaryColor} onChange={v => updateStore("primaryColor", v)} />
+              <ColorInput label="Fondo de landing" value={store.backgroundColor} onChange={v => updateStore("backgroundColor", v)} />
+              <ColorInput label="Color de secciones" value={store.surfaceColor} onChange={v => updateStore("surfaceColor", v)} />
+              <ColorInput label="Texto principal" value={store.textColor} onChange={v => updateStore("textColor", v)} />
+              <ColorInput label="Texto secundario" value={store.mutedTextColor} onChange={v => updateStore("mutedTextColor", v)} />
+              <ColorInput label="Texto de botones" value={store.buttonTextColor} onChange={v => updateStore("buttonTextColor", v)} />
+            </FloatingEditorCard>
+          )}
+
+          <LandingPreview
+            store={store}
+            products={products}
+            isEditable
+            standalone
+            basePath=""
+            productsOnly={previewPage === "products"}
+            marcaOnly={previewPage === "marca"}
+            onUpdate={(field, value) => {
+              if (field === "__products__") setProducts(value);
+              else if (field === "__nav__") setPreviewPage(value === "products" ? "products" : value === "marca" ? "marca" : "home");
+              else updateStore(field, value);
+            }}
+          />
         </section>
       )}
     </main>
@@ -810,6 +873,67 @@ function ClickableImageZone({ value, onUpload, isEditable, className, style, pla
         </div>
       )}
       <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} onClick={e => e.stopPropagation()} />
+    </div>
+  );
+}
+
+function FloatingEditorCard({ title, onClose, children }) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 154,
+        right: 22,
+        zIndex: 90,
+        width: "min(430px, calc(100vw - 32px))",
+        maxHeight: "calc(100vh - 184px)",
+        overflowY: "auto",
+        border: "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 22,
+        background: "rgba(6,9,6,0.94)",
+        boxShadow: "0 28px 80px rgba(0,0,0,0.36)",
+        backdropFilter: "blur(18px)",
+        padding: 16,
+      }}
+    >
+      <div
+        style={{
+          position: "sticky",
+          top: -16,
+          zIndex: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          margin: "-16px -16px 14px",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(6,9,6,0.96)",
+          padding: "15px 16px",
+          backdropFilter: "blur(18px)",
+        }}
+      >
+        <p style={{ margin: 0, color: "#fff", fontSize: "0.92rem", fontWeight: 950 }}>{title}</p>
+        <button
+          type="button"
+          onClick={onClose}
+          style={{
+            width: 34,
+            height: 34,
+            display: "grid",
+            placeItems: "center",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 10,
+            background: "rgba(255,255,255,0.08)",
+            color: "#fff",
+            fontSize: "1.1rem",
+            fontWeight: 950,
+            cursor: "pointer",
+          }}
+        >
+          ×
+        </button>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>{children}</div>
     </div>
   );
 }

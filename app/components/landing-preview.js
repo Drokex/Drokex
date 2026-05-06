@@ -198,19 +198,21 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
   return (
     <div
       className={className}
-      style={{ ...style, position: "relative", cursor: "pointer" }}
+      style={{ position: "relative", cursor: "pointer", ...style }}
       onClick={(e) => { if (e.target.isContentEditable || e.target.closest("[contenteditable]")) return; fileRef.current?.click(); }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {children}
       {hovered && (
-        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: "inherit", zIndex: 20, pointerEvents: "none" }}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: "inherit", zIndex: 20, pointerEvents: "none", overflow: "hidden" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
             <circle cx="12" cy="13" r="4"/>
           </svg>
-          <span style={{ color: "#59ff35", fontSize: "0.8rem", fontWeight: 900 }}>{value ? "Cambiar imagen" : "Subir imagen"}</span>
+          <span style={{ color: "#59ff35", fontSize: "0.68rem", fontWeight: 900, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden", maxWidth: "100%", padding: "0 4px" }}>
+            {value ? "Cambiar" : "Subir"}
+          </span>
         </div>
       )}
       <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} onClick={e => e.stopPropagation()} />
@@ -218,12 +220,24 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
   );
 }
 
-export default function LandingPreview({ store, products, fullWidth = false, standalone = false, productsOnly = false, marcaOnly = false, isEditable = false, onUpdate }) {
+export default function LandingPreview({ store, products, fullWidth = false, standalone = false, basePath = "", productsOnly = false, marcaOnly = false, isEditable = false, onUpdate }) {
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
   const productButtonText = store.productCtaText || "Agregar al carrito";
   const textColor = (field, fallback) => store[field] || fallback;
   const productTextColor = (product, field, fallback) => product?.[field] || fallback;
+  const shellClassName = standalone
+    ? "w-full overflow-hidden"
+    : `mx-auto overflow-hidden border border-white/10 ${fullWidth ? "max-w-7xl rounded-[2rem]" : "max-w-6xl rounded-[2rem]"}`;
+  const sectionPadding = standalone ? "p-5 md:p-7" : "p-8";
+  const heroClassName = standalone
+    ? "relative bg-cover bg-center px-5 py-12 md:px-8 md:py-20"
+    : "relative min-h-[520px] bg-cover bg-center px-8 py-16";
+  const heroTitleSize = Math.min(store.heroTitleSize || 60, standalone ? 42 : 72);
+  const heroSubtitleSize = Math.min(store.heroSubtitleSize || 18, standalone ? 16 : 24);
+  const aboutTitleSize = Math.min(store.aboutTitleSize || 36, standalone ? 28 : 48);
+  const aboutBodySize = Math.min(store.aboutBodySize || 16, standalone ? 15 : 22);
+  const standalonePath = basePath.replace(/\/$/, "");
 
   function updateProductField(index, field, value) {
     const copy = [...products];
@@ -233,14 +247,11 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
   return (
     <div
-      className={standalone
-        ? "w-full"
-        : `mx-auto overflow-hidden border border-white/10 ${fullWidth ? "max-w-7xl rounded-[2rem]" : "max-w-6xl rounded-[2rem]"}`
-      }
+      className={shellClassName}
       style={{ backgroundColor: store.surfaceColor, color: store.textColor }}
     >
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-white/10 px-8 py-5">
+      <header className={`${standalone ? "mx-auto max-w-6xl" : ""} flex items-center justify-between border-b border-white/10 px-5 py-4 md:px-7`}>
         <div className="flex items-center gap-3">
           {store.logo ? (
             <img src={store.logo} alt={`${store.brand} logo`} className="h-10 w-10 rounded-full object-cover" />
@@ -271,21 +282,21 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         </div>
         <nav className="hidden gap-6 text-sm md:flex" style={{ color: store.mutedTextColor }}>
           <a
-            href={isEditable ? undefined : "#inicio"}
+            href={isEditable ? undefined : standalonePath ? `${standalonePath}#inicio` : "#inicio"}
             onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "home"); } : undefined}
             style={{ cursor: "pointer", fontWeight: productsOnly ? 400 : 700 }}
           >
             <EditableText tag="span" value={store.nav1 || "Inicio"} fontColor={textColor("nav1Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav1", v)} onFontColorChange={v => onUpdate?.("nav1Color", v)} isEditable={isEditable} inline />
           </a>
           <a
-            href={isEditable ? undefined : standalone ? "./productos" : "#productos"}
+            href={isEditable ? undefined : standalonePath ? `${standalonePath}#productos` : "#productos"}
             onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "products"); } : undefined}
             style={{ cursor: "pointer", fontWeight: productsOnly ? 700 : 400, borderBottom: productsOnly ? `2px solid ${store.primaryColor}` : "none", paddingBottom: 2 }}
           >
             <EditableText tag="span" value={store.nav2 || "Productos"} fontColor={textColor("nav2Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav2", v)} onFontColorChange={v => onUpdate?.("nav2Color", v)} isEditable={isEditable} inline />
           </a>
           <a
-            href={isEditable ? undefined : standalone ? "./marca" : "#marca"}
+            href={isEditable ? undefined : standalonePath ? `${standalonePath}#marca` : "#marca"}
             onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "marca"); } : undefined}
             style={{ cursor: "pointer", fontWeight: marcaOnly ? 700 : 400, borderBottom: marcaOnly ? `2px solid ${store.primaryColor}` : "none", paddingBottom: 2 }}
           >
@@ -297,12 +308,15 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       {/* Hero */}
       {!productsOnly && !marcaOnly && <section
         id="inicio"
-        className="relative min-h-[520px] bg-cover bg-center px-8 py-16"
+        className={heroClassName}
         style={{
+          minHeight: standalone ? "clamp(520px, 68vh, 760px)" : undefined,
           backgroundColor: store.backgroundColor,
           backgroundImage: store.heroImage
             ? `url(${store.heroImage})`
             : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)`,
+          backgroundSize: store.heroImage ? "cover" : undefined,
+          backgroundPosition: store.heroImage ? "center center" : undefined,
         }}
       >
         {isEditable && (
@@ -318,7 +332,8 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             </svg>
           </ClickableImageZone>
         )}
-        <div className="max-w-3xl p-2">
+        <div className={`${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
+          <div className={standalone ? "max-w-xl" : ""}>
           <span className="rounded-full px-4 py-2 text-sm font-black"
             style={{ backgroundColor: primarySoft, color: store.primaryColor }}>
             <EditableText
@@ -332,7 +347,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           </span>
           <EditableText
             tag="h1" value={store.heroTitle}
-            fontSize={store.heroTitleSize} fontColor={store.heroTitleColor || store.textColor}
+            fontSize={heroTitleSize} fontColor={store.heroTitleColor || store.textColor}
             onTextChange={v => onUpdate?.("heroTitle", v)}
             onFontSizeChange={v => onUpdate?.("heroTitleSize", v)}
             onFontColorChange={v => onUpdate?.("heroTitleColor", v)}
@@ -341,7 +356,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           />
           <EditableText
             tag="p" value={store.heroSubtitle}
-            fontSize={store.heroSubtitleSize} fontColor={store.heroSubtitleColor || store.mutedTextColor}
+            fontSize={heroSubtitleSize} fontColor={store.heroSubtitleColor || store.mutedTextColor}
             onTextChange={v => onUpdate?.("heroSubtitle", v)}
             onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)}
             onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)}
@@ -370,10 +385,11 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
               inline
             />
           </button>
+          </div>
         </div>
       </section>}
 
-      {!productsOnly && !marcaOnly && <section className="grid gap-4 p-8 md:grid-cols-3" style={{ backgroundColor: store.backgroundColor }}>
+      {!productsOnly && !marcaOnly && <section className={`mx-auto grid max-w-6xl gap-4 ${sectionPadding} md:grid-cols-3`} style={{ backgroundColor: store.backgroundColor }}>
         {[
           [store.benefit1, store.benefit1Text],
           [store.benefit2, store.benefit2Text],
@@ -402,11 +418,11 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         ))}
       </section>}
 
-      {!productsOnly && <section id="marca" className="grid gap-8 p-8 md:grid-cols-2">
+      {!productsOnly && <section id="marca" className={`mx-auto grid max-w-6xl gap-7 ${sectionPadding} md:grid-cols-2`}>
         <div>
           <EditableText
             tag="h2" value={store.aboutTitle}
-            fontSize={store.aboutTitleSize} fontColor={store.aboutTitleColor || store.textColor}
+            fontSize={aboutTitleSize} fontColor={store.aboutTitleColor || store.textColor}
             onTextChange={v => onUpdate?.("aboutTitle", v)}
             onFontSizeChange={v => onUpdate?.("aboutTitleSize", v)}
             onFontColorChange={v => onUpdate?.("aboutTitleColor", v)}
@@ -415,19 +431,19 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           />
           <EditableText
             tag="p" value={store.aboutText}
-            fontSize={store.aboutBodySize} fontColor={store.aboutBodyColor || store.mutedTextColor}
+            fontSize={aboutBodySize} fontColor={store.aboutBodyColor || store.mutedTextColor}
             onTextChange={v => onUpdate?.("aboutText", v)}
             onFontSizeChange={v => onUpdate?.("aboutBodySize", v)}
             onFontColorChange={v => onUpdate?.("aboutBodyColor", v)}
             isEditable={isEditable}
-            className="mt-4"
+            className={standalone ? "mt-4 text-justify" : "mt-4"}
           />
         </div>
         <ClickableImageZone
           value={store.bannerSecondary}
           onUpload={v => onUpdate?.("bannerSecondary", v)}
           isEditable={isEditable}
-          className="min-h-[280px] overflow-hidden rounded-[2rem]"
+          className={`${standalone ? "min-h-[220px]" : "min-h-[280px]"} overflow-hidden rounded-[1.5rem]`}
           style={{ backgroundColor: store.backgroundColor }}
         >
           {store.bannerSecondary ? (
@@ -448,7 +464,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       </section>}
 
       {/* Catalog */}
-      {!marcaOnly && <section id="productos" className="p-8" style={{ backgroundColor: store.backgroundColor }}>
+      {!marcaOnly && <section id="productos" className={`mx-auto max-w-6xl ${sectionPadding}`} style={{ backgroundColor: store.backgroundColor }}>
         <EditableText
           tag="p" value={store.catalogEyebrow}
           fontColor={textColor("catalogEyebrowColor", store.primaryColor)}
@@ -473,7 +489,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           isEditable={isEditable}
           className="mt-3 max-w-2xl text-sm"
         />
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
           {products.map((product, index) => (
             <article key={index} className="overflow-hidden rounded-[2rem] border border-white/10 p-4"
               style={{ backgroundColor: store.surfaceColor }}>
@@ -485,7 +501,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
                   onUpdate?.("__products__", copy);
                 }}
                 isEditable={isEditable}
-                className="h-56 overflow-hidden rounded-[1.5rem]"
+                className={`${standalone ? "h-44" : "h-56"} overflow-hidden rounded-[1.25rem]`}
                 style={{ backgroundColor: store.backgroundColor }}
               >
                 {product.image ? (
@@ -570,7 +586,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       </section>}
 
       {/* Final CTA */}
-      {!productsOnly && !marcaOnly && <section className="px-8 py-16 text-center" style={{ backgroundColor: store.surfaceColor }}>
+      {!productsOnly && !marcaOnly && <section className={`${standalone ? "px-5 py-12 md:px-8" : "px-8 py-16"} text-center`} style={{ backgroundColor: store.surfaceColor }}>
         <EditableText
           tag="p" value={store.finalEyebrow}
           fontColor={textColor("finalEyebrowColor", store.primaryColor)}

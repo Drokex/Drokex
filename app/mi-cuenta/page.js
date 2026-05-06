@@ -14,6 +14,7 @@ const providerQuickActions = [
 ];
 
 const customerQuickActions = [
+  { title: "Mi tienda", href: "/mi-cuenta/tienda", icon: "building" },
   { title: "Explorar productos", href: "/categorias", icon: "box" },
   { title: "Mis cotizaciones", href: "/mi-cuenta/cotizaciones", icon: "chart" },
   { title: "Mis pedidos", href: "/mi-cuenta/pedidos", icon: "grid" },
@@ -39,6 +40,16 @@ function DashboardIcon({ name }) {
         <path d="M5 20V6l7-2v16" />
         <path d="M12 8h7v12h-7" />
         <path d="M8 9h1M8 12h1M8 15h1M15 11h1M15 14h1" />
+      </svg>
+    );
+  }
+
+  if (name === "page") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="dashboard-icon">
+        <path d="M6 3h8l4 4v14H6z" />
+        <path d="M14 3v5h4" />
+        <path d="M9 13h6M9 17h4" />
       </svg>
     );
   }
@@ -109,13 +120,15 @@ export default async function AccountPage({ searchParams }) {
     .map((part) => part[0])
     .join("");
   const requestedRole = resolvedSearchParams?.role;
+  const showProveedorProUpgrade = resolvedSearchParams?.upgrade === "proveedor-pro";
+  const isProviderAccount = user.role === "PROVIDER" || user.role === "ADMIN";
   const customerSignals = [
-    user.role === "CUSTOMER",
-    session?.role === "CUSTOMER",
-    session?.audience === "cliente",
-    requestedRole === "cliente",
-    user.email?.toLowerCase() === "cliente@drokex.com",
-    user.company?.toLowerCase().includes("cliente"),
+    !isProviderAccount && user.role === "CUSTOMER",
+    !isProviderAccount && session?.role === "CUSTOMER",
+    !isProviderAccount && session?.audience === "cliente",
+    !isProviderAccount && requestedRole === "cliente",
+    !isProviderAccount && user.email?.toLowerCase() === "cliente@drokex.com",
+    !isProviderAccount && user.company?.toLowerCase().includes("cliente"),
   ];
   const isCustomer = customerSignals.some(Boolean);
 
@@ -290,6 +303,123 @@ export default async function AccountPage({ searchParams }) {
           </div>
         </section>
       </section>
+
+      {showProveedorProUpgrade ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="proveedor-pro-upgrade-title"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 120,
+            display: "grid",
+            placeItems: "center",
+            padding: 20,
+            background: "rgba(5,5,5,0.28)",
+            backdropFilter: "blur(2px)",
+          }}
+        >
+          <div
+            style={{
+              width: "min(440px, 100%)",
+              overflow: "hidden",
+              border: "1px solid rgba(17,17,17,0.12)",
+              borderRadius: 22,
+              background: "#fff",
+              color: "#111",
+              boxShadow: "0 28px 90px rgba(0,0,0,0.34)",
+            }}
+          >
+            <div
+              style={{
+                minHeight: 150,
+                backgroundImage: "linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.64)), url('/hero-banner-dark.gif')",
+                backgroundPosition: "center",
+                backgroundSize: "cover",
+              }}
+            />
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 15, padding: "24px 26px 26px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+                <span
+                  style={{
+                    border: "1px solid rgba(46,166,0,0.25)",
+                    borderRadius: 8,
+                    background: "rgba(46,166,0,0.08)",
+                    color: "#2ea600",
+                    fontSize: "0.68rem",
+                    fontWeight: 900,
+                    letterSpacing: "0.14em",
+                    padding: "6px 10px",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Mi tienda
+                </span>
+                <Link href={isCustomer ? "/mi-cuenta?role=cliente" : "/mi-cuenta?role=proveedor"} style={{ color: "#777", fontSize: "1.25rem", fontWeight: 900, lineHeight: 1 }}>
+                  ×
+                </Link>
+              </div>
+
+              <div>
+                <h2
+                  id="proveedor-pro-upgrade-title"
+                  style={{
+                    margin: 0,
+                    color: "#111",
+                    fontSize: "2.15rem",
+                    fontWeight: 950,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1,
+                  }}
+                >
+                  Pásate a <span style={{ color: "#22a600" }}>Proveedor Pro</span>
+                </h2>
+                <p style={{ margin: "12px 0 0", color: "#555", fontSize: "0.95rem", lineHeight: 1.6 }}>
+                  Tu cuenta todavía no tiene una tienda Pro activa. Activa el plan para crear tu
+                  landing, subir banners, cambiar imágenes y publicar tus productos.
+                </p>
+              </div>
+
+              <div
+                style={{
+                  border: "1px solid rgba(46,166,0,0.22)",
+                  borderRadius: 18,
+                  background: "rgba(46,166,0,0.06)",
+                  padding: 17,
+                }}
+              >
+                <p style={{ margin: 0, color: "#777", fontSize: "0.8rem" }}>Plan demo</p>
+                <strong style={{ display: "block", marginTop: 5, color: "#21a600", fontSize: "1.95rem", fontWeight: 950, lineHeight: 1 }}>
+                  $99.000 COP
+                </strong>
+                <p style={{ margin: "8px 0 0", color: "#777", fontSize: "0.8rem" }}>
+                  Crea y edita tu tienda premium dentro de Drokex.
+                </p>
+              </div>
+
+              <Link
+                href="/proveedor-pro"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 15,
+                  background: "#22b400",
+                  boxShadow: "0 14px 30px rgba(34,180,0,0.26)",
+                  color: "#fff",
+                  fontWeight: 950,
+                  padding: "14px 20px",
+                  textDecoration: "none",
+                }}
+              >
+                Suscribirse a Proveedor Pro
+              </Link>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

@@ -127,6 +127,7 @@ export default function DirectorioPage() {
   const [suppliers, setSuppliers] = useState([]);
   const [proLandings, setProLandings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [proLoading, setProLoading] = useState(true);
 
   const fetchSuppliers = useCallback(async (q) => {
     setLoading(true);
@@ -137,23 +138,97 @@ export default function DirectorioPage() {
   }, []);
 
   useEffect(() => {
-    // Load pro landings from localStorage
+    async function loadProLandings() {
+      setProLoading(true);
+      const landingsBySlug = new Map();
+
+      try {
+        const res = await fetch("/api/proveedor-pro");
+        if (res.ok) {
+          const data = await res.json();
+          for (const item of data.landings || []) {
+            landingsBySlug.set(item.slug, {
+              slug: item.slug,
+              landing: {
+                store: item.store || {},
+                products: Array.isArray(item.products) ? item.products : [],
+              },
+            });
+          }
+        }
+      } catch {}
+
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key?.startsWith("drokex-proveedor-pro:")) {
+            const slug = key.replace("drokex-proveedor-pro:", "");
+            const raw = localStorage.getItem(key);
+            if (raw && !landingsBySlug.has(slug)) {
+              const parsed = JSON.parse(raw);
+              landingsBySlug.set(slug, { slug, landing: parsed });
+            }
+          }
+        }
+      } catch {}
+
+      setProLandings(Array.from(landingsBySlug.values()));
+      setProLoading(false);
+    }
+
+    loadProLandings();
+  }, []);
+
+  useEffect(() => {
+    // Refresh local unpublished previews if another tab updates them.
+    function handleStorage() {
+      const localLandings = [];
+      const knownSlugs = new Set(proLandings.map(({ slug }) => slug));
+
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key?.startsWith("drokex-proveedor-pro:")) {
+            const slug = key.replace("drokex-proveedor-pro:", "");
+            if (knownSlugs.has(slug)) continue;
+            const raw = localStorage.getItem(key);
+            if (raw) localLandings.push({ slug, landing: JSON.parse(raw) });
+          }
+        }
+      } catch {}
+
+      if (localLandings.length) {
+        setProLandings((current) => [...current, ...localLandings]);
+      }
+    }
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [proLandings]);
+
+  useEffect(() => {
+    /*
+      Kept as a fallback for same-tab constructor saves that happen before
+      the database request finishes.
+    */
     try {
-      const landings = [];
+      const localOnly = [];
+      const knownSlugs = new Set(proLandings.map(({ slug }) => slug));
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key?.startsWith("drokex-proveedor-pro:")) {
           const slug = key.replace("drokex-proveedor-pro:", "");
+          if (knownSlugs.has(slug)) continue;
           const raw = localStorage.getItem(key);
           if (raw) {
             const parsed = JSON.parse(raw);
-            landings.push({ slug, landing: parsed });
+            localOnly.push({ slug, landing: parsed });
           }
         }
       }
-      setProLandings(landings);
+      if (localOnly.length) setProLandings((current) => [...current, ...localOnly]);
     } catch {}
-  }, []);
+  }, [proLandings]);
 
   useEffect(() => {
     const timer = setTimeout(() => fetchSuppliers(query), 300);
@@ -202,18 +277,22 @@ export default function DirectorioPage() {
       </section>
 
       {/* Pro landings section */}
-      {filteredPro.length > 0 && (
+      {(proLoading || filteredPro.length > 0) && (
         <section className="shell" style={{ padding: "32px 0 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
             <span style={{ background: "#59ff35", color: "#050505", fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 10px", borderRadius: 6, textTransform: "uppercase" }}>Pro</span>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: "0.95rem", color: "#fff" }}>Tiendas Proveedor Pro</p>
-            <span style={{ marginLeft: "auto", fontSize: "0.8rem", color: "rgba(255,255,255,0.35)" }}>{filteredPro.length} tienda{filteredPro.length !== 1 ? "s" : ""}</span>
+            <p style={{ margin: 0, fontWeight: 800, fontSize: "0.95rem", color: "#111" }}>Tiendas Proveedor Pro</p>
+            <span style={{ marginLeft: "auto", fontSize: "0.8rem", color: "#777" }}>
+              {proLoading ? "Cargando..." : `${filteredPro.length} tienda${filteredPro.length !== 1 ? "s" : ""}`}
+            </span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20, marginBottom: 40 }}>
-            {filteredPro.map(({ slug, landing }) => (
-              <ProLandingThumbnail key={slug} slug={slug} landing={landing} />
-            ))}
-          </div>
+          {!proLoading && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 20, marginBottom: 40 }}>
+              {filteredPro.map(({ slug, landing }) => (
+                <ProLandingThumbnail key={slug} slug={slug} landing={landing} />
+              ))}
+            </div>
+          )}
         </section>
       )}
 

@@ -78,6 +78,7 @@ model User {
   role         UserRole @default(CUSTOMER)
   passwordHash String
   logoUrl      String?
+  proveedorProLanding ProveedorProLanding?
   orders       Order[]
   quotes       Quote[]
   createdAt    DateTime @default(now())
@@ -155,6 +156,8 @@ model GameScore {
 model ProveedorProLanding {
   id        String   @id @default(cuid())
   slug      String   @unique
+  userId    String?  @unique
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   store     Json
   products  Json
   createdAt DateTime @default(now())

@@ -121,8 +121,8 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand }) {
           </p>
         </div>
       )}
-      <div style={{ paddingTop: 0, backgroundColor: bg, minHeight: "100vh" }}>
-        <LandingPreview store={store} products={products} standalone />
+      <div style={{ backgroundColor: bg, minHeight: "100vh" }}>
+        <LandingPreview store={store} products={products} standalone basePath={`/proveedor-pro/tienda/${slug}`} />
       </div>
     </div>
   );
