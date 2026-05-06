@@ -53,10 +53,18 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
     const ctrl = globeRef.current.controls();
     ctrl.autoRotate = false;
     ctrl.enableZoom = true;
-    ctrl.minDistance = 280;
+    ctrl.minDistance = 150;
     ctrl.maxDistance = 700;
     globeRef.current.pointOfView({ lat: 12, lng: -78, altitude: 2.6 });
   }, [ready]);
+
+  // Zoom back out when panel closes
+  useEffect(() => {
+    if (!ready || !globeRef.current) return;
+    if (!selectedCountry) {
+      globeRef.current.pointOfView({ lat: 12, lng: -78, altitude: 2.6 }, 1200);
+    }
+  }, [ready, selectedCountry]);
 
   return (
     <div ref={containerRef} style={{ width: "100%", height: "100%", background: "radial-gradient(ellipse at 50% 50%, #001a08 0%, #000 70%)" }}>
@@ -99,7 +107,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
           ">${d.name}</div>
         `}
         onPointClick={(point) => {
-          globeRef.current?.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.1 }, 1200);
+          globeRef.current?.pointOfView({ lat: point.lat, lng: point.lng, altitude: 0.35 }, 1400);
           onCountrySelect(point.id);
         }}
         onPointHover={(point) => {
