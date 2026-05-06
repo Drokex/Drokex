@@ -89,6 +89,8 @@ export default function ProveedorProPage() {
   const [code, setCode] = useState("");
   const [isPro, setIsPro] = useState(false);
   const [openSection, setOpenSection] = useState("hero");
+  const [showProductsDrawer, setShowProductsDrawer] = useState(false);
+  const [previewPage, setPreviewPage] = useState("home");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [landingLink, setLandingLink] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
@@ -409,29 +411,53 @@ export default function ProveedorProPage() {
                 <Textarea label="Historia / descripcion" value={store.aboutText} onChange={v => updateStore("aboutText", v)} />
               </SectionCard>
 
-              <SectionCard id="products" label="Productos" icon={<ProductIcon />} open={openSection === "products"} onToggle={() => setOpenSection(s => s === "products" ? null : "products")}>
-                <Input label="Etiqueta de catalogo" value={store.catalogEyebrow} onChange={v => updateStore("catalogEyebrow", v)} />
-                <Input label="Titulo de catalogo" value={store.catalogTitle} onChange={v => updateStore("catalogTitle", v)} />
-                <Textarea label="Texto de catalogo" value={store.catalogText} onChange={v => updateStore("catalogText", v)} />
-                <Input label="Boton de producto" value={store.productCtaText} onChange={v => updateStore("productCtaText", v)} />
-                {products.map((product, index) => (
-                  <div key={index} style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.3)", padding: "14px", display: "flex", flexDirection: "column", gap: 12 }}>
-                    <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 900, color: "#59ff35" }}>Producto {index + 1}</p>
-                    <Input label="Nombre" value={product.name} onChange={v => updateProduct(index, "name", v)} />
-                    <Input label="Categoria" value={product.category} onChange={v => updateProduct(index, "category", v)} />
-                    <Input label="Precio" value={product.price} onChange={v => updateProduct(index, "price", v)} />
-                    <Input label="Stock" value={product.stock} onChange={v => updateProduct(index, "stock", v)} />
-                    <ImageUploader label="Imagen" value={product.image} onChange={v => updateProduct(index, "image", v)} />
-                    <Textarea label="Descripcion" value={product.description} onChange={v => updateProduct(index, "description", v)} />
+              <button
+                type="button"
+                onClick={() => setShowProductsDrawer(true)}
+                style={{ display: "flex", alignItems: "center", gap: 10, width: "100%", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)", padding: "12px 14px", cursor: "pointer", color: "#fff", fontWeight: 700, fontSize: "0.85rem", textAlign: "left" }}
+              >
+                <ProductIcon />
+                Productos
+                <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: "rgba(255,255,255,0.35)", fontWeight: 400 }}>{products.length} producto{products.length !== 1 ? "s" : ""}</span>
+                <span style={{ color: "rgba(255,255,255,0.4)", fontSize: "1rem" }}>→</span>
+              </button>
+
+              {showProductsDrawer && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex" }}>
+                  <div onClick={() => setShowProductsDrawer(false)} style={{ flex: 1, background: "rgba(0,0,0,0.55)" }} />
+                  <div style={{ width: 420, background: "#060906", borderLeft: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", overflowY: "auto" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)", position: "sticky", top: 0, background: "#060906", zIndex: 1 }}>
+                      <p style={{ margin: 0, fontWeight: 900, fontSize: "0.9rem", color: "#fff" }}>Productos</p>
+                      <button type="button" onClick={() => setShowProductsDrawer(false)} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 8, color: "#fff", fontWeight: 700, fontSize: "1rem", width: 32, height: 32, cursor: "pointer", display: "grid", placeItems: "center" }}>✕</button>
+                    </div>
+                    <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
+                      <Input label="Etiqueta de catalogo" value={store.catalogEyebrow} onChange={v => updateStore("catalogEyebrow", v)} />
+                      <Input label="Titulo de catalogo" value={store.catalogTitle} onChange={v => updateStore("catalogTitle", v)} />
+                      <Textarea label="Texto de catalogo" value={store.catalogText} onChange={v => updateStore("catalogText", v)} />
+                      <Input label="Boton de producto" value={store.productCtaText} onChange={v => updateStore("productCtaText", v)} />
+                      <p style={{ margin: "8px 0 0", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)" }}>Tus productos</p>
+                      {products.map((product, index) => (
+                        <div key={index} style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(0,0,0,0.3)", padding: "14px", display: "flex", flexDirection: "column", gap: 12 }}>
+                          <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 900, color: "#59ff35" }}>Producto {index + 1}</p>
+                          <Input label="Nombre" value={product.name} onChange={v => updateProduct(index, "name", v)} />
+                          <Input label="Categoria" value={product.category} onChange={v => updateProduct(index, "category", v)} />
+                          <Input label="Precio" value={product.price} onChange={v => updateProduct(index, "price", v)} />
+                          <Input label="Stock" value={product.stock} onChange={v => updateProduct(index, "stock", v)} />
+                          <ImageUploader label="Imagen" value={product.image} onChange={v => updateProduct(index, "image", v)} />
+                          <Textarea label="Descripcion" value={product.description} onChange={v => updateProduct(index, "description", v)} />
+                        </div>
+                      ))}
+                      <button onClick={addProduct} style={{ width: "100%", borderRadius: 12, border: "1px dashed rgba(89,255,53,0.4)", background: "transparent", color: "#59ff35", fontWeight: 900, fontSize: "0.82rem", padding: "12px", cursor: "pointer" }}>
+                        + Agregar producto
+                      </button>
+                      <p style={{ margin: "8px 0 0", fontSize: "0.68rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.3)" }}>Cierre final</p>
+                      <Input label="Etiqueta cierre final" value={store.finalEyebrow} onChange={v => updateStore("finalEyebrow", v)} />
+                      <Input label="Titulo cierre final" value={store.finalTitle} onChange={v => updateStore("finalTitle", v)} />
+                      <Input label="Boton cierre final" value={store.finalCtaText} onChange={v => updateStore("finalCtaText", v)} />
+                    </div>
                   </div>
-                ))}
-                <button onClick={addProduct} style={{ width: "100%", borderRadius: 12, border: "1px dashed rgba(89,255,53,0.4)", background: "transparent", color: "#59ff35", fontWeight: 900, fontSize: "0.82rem", padding: "12px", cursor: "pointer" }}>
-                  + Agregar producto
-                </button>
-                <Input label="Etiqueta cierre final" value={store.finalEyebrow} onChange={v => updateStore("finalEyebrow", v)} />
-                <Input label="Titulo cierre final" value={store.finalTitle} onChange={v => updateStore("finalTitle", v)} />
-                <Input label="Boton cierre final" value={store.finalCtaText} onChange={v => updateStore("finalCtaText", v)} />
-              </SectionCard>
+                </div>
+              )}
 
               <SectionCard id="style" label="Colores y diseño" icon={<PaletteIcon />} open={openSection === "style"} onToggle={() => setOpenSection(s => s === "style" ? null : "style")}>
                 <ColorInput label="Color principal" value={store.primaryColor} onChange={v => updateStore("primaryColor", v)} />
@@ -451,8 +477,10 @@ export default function ProveedorProPage() {
               store={store}
               products={products}
               isEditable
+              productsOnly={previewPage === "products"}
               onUpdate={(field, value) => {
                 if (field === "__products__") setProducts(value);
+                else if (field === "__nav__") setPreviewPage(value === "products" ? "products" : "home");
                 else updateStore(field, value);
               }}
             />

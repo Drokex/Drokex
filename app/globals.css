@@ -2177,16 +2177,16 @@ button {
 
 .markets-interactive {
   display: grid;
-  grid-template-columns: 78px minmax(0, 1fr);
+  grid-template-columns: 128px minmax(0, 1fr);
   gap: 18px;
   align-items: center;
   width: 100%;
 }
 
 .markets-rail {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
 }
 
 .market-flag {
@@ -2215,7 +2215,7 @@ button {
 
 .markets-scene {
   position: relative;
-  min-height: 310px;
+  min-height: 400px;
 }
 
 .markets-glow {
@@ -2281,7 +2281,7 @@ button {
   top: 10px;
   left: 88px;
   width: 370px;
-  height: 300px;
+  height: 360px;
 }
 
 .market-card {
@@ -2437,6 +2437,7 @@ button {
   max-width: 620px;
   animation: market-copy-fade 280ms ease;
   text-align: left;
+  margin-top: 16px;
 }
 
 @keyframes market-pill-slide {
@@ -2465,16 +2466,16 @@ button {
 
 .markets-copy h3 {
   margin: 0;
-  font-size: clamp(1.5rem, 2.8vw, 2.2rem);
-  line-height: 1.06;
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  line-height: 1.1;
 }
 
 .markets-copy p {
-  margin: 16px 0 0;
+  margin: 10px 0 0;
   max-width: 54ch;
   color: rgba(245, 250, 248, 0.74);
-  font-size: 0.98rem;
-  line-height: 1.65;
+  font-size: 0.82rem;
+  line-height: 1.55;
 }
 
 .testimonials-header {
@@ -3100,8 +3101,9 @@ button {
   }
 
   .markets-rail {
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 58px);
+    gap: 10px;
     justify-content: center;
   }
 
@@ -3326,12 +3328,12 @@ button {
   }
 
   .markets-copy h3 {
-    font-size: clamp(1.55rem, 7vw, 2rem);
+    font-size: clamp(1rem, 4.5vw, 1.3rem);
   }
 
   .markets-copy p {
-    font-size: 0.98rem;
-    line-height: 1.58;
+    font-size: 0.82rem;
+    line-height: 1.5;
   }
 
   .hero-shell {

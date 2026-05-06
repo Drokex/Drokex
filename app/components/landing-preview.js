@@ -169,7 +169,7 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
   );
 }
 
-export default function LandingPreview({ store, products, fullWidth = false, standalone = false, isEditable = false, onUpdate }) {
+export default function LandingPreview({ store, products, fullWidth = false, standalone = false, productsOnly = false, isEditable = false, onUpdate }) {
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
   const productButtonText = store.productCtaText || "Agregar al carrito";
@@ -221,20 +221,32 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           </div>
         </div>
         <nav className="hidden gap-6 text-sm md:flex" style={{ color: store.mutedTextColor }}>
-          <a href="#inicio" style={{ cursor: "pointer" }}>
+          <a
+            href={isEditable ? undefined : "#inicio"}
+            onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "home"); } : undefined}
+            style={{ cursor: "pointer", fontWeight: productsOnly ? 400 : 700 }}
+          >
             <EditableText tag="span" value={store.nav1 || "Inicio"} fontColor={textColor("nav1Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav1", v)} onFontColorChange={v => onUpdate?.("nav1Color", v)} isEditable={isEditable} inline />
           </a>
-          <a href="#productos" style={{ cursor: "pointer" }}>
+          <a
+            href={isEditable ? undefined : standalone ? "./productos" : "#productos"}
+            onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "products"); } : undefined}
+            style={{ cursor: "pointer", fontWeight: productsOnly ? 700 : 400, borderBottom: productsOnly ? `2px solid ${store.primaryColor}` : "none", paddingBottom: 2 }}
+          >
             <EditableText tag="span" value={store.nav2 || "Productos"} fontColor={textColor("nav2Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav2", v)} onFontColorChange={v => onUpdate?.("nav2Color", v)} isEditable={isEditable} inline />
           </a>
-          <a href="#marca" style={{ cursor: "pointer" }}>
+          <a
+            href={isEditable ? undefined : "#marca"}
+            onClick={isEditable ? (e) => { e.preventDefault(); onUpdate?.("__nav__", "marca"); } : undefined}
+            style={{ cursor: "pointer" }}
+          >
             <EditableText tag="span" value={store.nav3 || "Marca"} fontColor={textColor("nav3Color", store.mutedTextColor)} onTextChange={v => onUpdate?.("nav3", v)} onFontColorChange={v => onUpdate?.("nav3Color", v)} isEditable={isEditable} inline />
           </a>
         </nav>
       </header>
 
       {/* Hero */}
-      <section
+      {!productsOnly && <section
         id="inicio"
         className="relative min-h-[520px] bg-cover bg-center px-8 py-16"
         style={{
@@ -310,10 +322,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             />
           </button>
         </div>
-      </section>
+      </section>}
 
-      {/* Benefits */}
-      <section className="grid gap-4 p-8 md:grid-cols-3" style={{ backgroundColor: store.backgroundColor }}>
+      {!productsOnly && <section className="grid gap-4 p-8 md:grid-cols-3" style={{ backgroundColor: store.backgroundColor }}>
         {[
           [store.benefit1, store.benefit1Text],
           [store.benefit2, store.benefit2Text],
@@ -340,10 +351,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             />
           </div>
         ))}
-      </section>
+      </section>}
 
-      {/* About */}
-      <section id="marca" className="grid gap-8 p-8 md:grid-cols-2">
+      {!productsOnly && <section id="marca" className="grid gap-8 p-8 md:grid-cols-2">
         <div>
           <EditableText
             tag="h2" value={store.aboutTitle}
@@ -386,7 +396,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             </div>
           )}
         </ClickableImageZone>
-      </section>
+      </section>}
 
       {/* Catalog */}
       <section id="productos" className="p-8" style={{ backgroundColor: store.backgroundColor }}>
@@ -511,7 +521,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
       </section>
 
       {/* Final CTA */}
-      <section className="px-8 py-16 text-center" style={{ backgroundColor: store.surfaceColor }}>
+      {!productsOnly && <section className="px-8 py-16 text-center" style={{ backgroundColor: store.surfaceColor }}>
         <EditableText
           tag="p" value={store.finalEyebrow}
           fontColor={textColor("finalEyebrowColor", store.primaryColor)}
@@ -539,7 +549,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             inline
           />
         </button>
-      </section>
+      </section>}
     </div>
   );
 }
