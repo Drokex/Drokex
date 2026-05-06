@@ -67,34 +67,57 @@ function StorePanel({ country, onClose, proLandings = [] }) {
                 <p className="mt-1 text-xs text-zinc-600">Sé el primero en publicar aquí.</p>
               </div>
             ) : (
-              <div className="mt-5 space-y-3">
+              <div className="mt-5 space-y-4">
                 {countryLandings.map((l) => {
                   const s = l.store || {};
-                  const primary = s.primaryColor || "#22c400";
-                  const firstProduct = l.products?.find(p => p.image);
+                  const primary = s.primaryColor || "#ff9f2e";
+                  const gradFrom = s.gradientFromColor || "#b86cff";
+                  const gradTo = s.gradientToColor || "#ff7db8";
+                  const heroImg = s.heroImage || "";
+                  const btnText = s.buttonTextColor || "#ffffff";
+                  const products = l.products || [];
+                  const countryDisplay = (s.countries?.length ? s.countries : s.country ? [s.country] : []).join(" · ");
                   return (
                     <motion.a
                       key={l.slug}
                       href={`/proveedor-pro/tienda/${l.slug}`}
-                      whileHover={{ x: 4 }}
-                      style={{ textDecoration: "none" }}
-                      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/35 p-3 transition hover:border-lime-300/40"
+                      whileHover={{ y: -3 }}
+                      style={{ textDecoration: "none", display: "block", borderRadius: 18, overflow: "hidden", background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
                     >
-                      <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: primary, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "1rem", color: "#fff" }}>
-                        {s.logo
-                          ? <img src={s.logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                          : (s.brand || "?").charAt(0)}
+                      {/* Hero banner */}
+                      <div style={{ height: 130, position: "relative", overflow: "hidden", background: heroImg ? `url(${heroImg}) center/cover no-repeat` : `linear-gradient(135deg, ${gradFrom}, ${gradTo})` }}>
+                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%)" }} />
+                        <span style={{ position: "absolute", top: 10, right: 10, background: "#59ff35", color: "#050505", fontSize: "0.55rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 8px", borderRadius: 6, textTransform: "uppercase" }}>PRO</span>
+                        {!heroImg && products.some(p => p.image) && (
+                          <div style={{ position: "absolute", bottom: 10, left: 10, display: "flex", gap: 5 }}>
+                            {products.slice(0, 3).filter(p => p.image).map((p, i) => (
+                              <div key={i} style={{ width: 38, height: 38, borderRadius: 8, overflow: "hidden", border: "2px solid rgba(255,255,255,0.3)" }}>
+                                <img src={p.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <div style={{ minWidth: 0, flex: 1 }}>
-                        <p style={{ margin: 0, fontWeight: 800, fontSize: "0.9rem", color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.brand || "Tienda"}</p>
-                        <p style={{ margin: 0, fontSize: "0.72rem", color: "#888" }}>{l.products?.length || 0} producto{l.products?.length !== 1 ? "s" : ""}</p>
-                      </div>
-                      {firstProduct && (
-                        <div style={{ width: 40, height: 40, borderRadius: 8, overflow: "hidden", flexShrink: 0 }}>
-                          <img src={firstProduct.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      {/* Logo flotante */}
+                      <div style={{ padding: "0 16px", marginTop: -18, position: "relative", zIndex: 1 }}>
+                        <div style={{ width: 38, height: 38, borderRadius: "50%", background: s.logo ? "transparent" : primary, border: "3px solid #0d0d0d", boxShadow: "0 2px 10px rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "0.9rem", color: btnText, overflow: "hidden" }}>
+                          {s.logo ? <img src={s.logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain" }} /> : (s.brand || "?").charAt(0)}
                         </div>
-                      )}
-                      <span style={{ fontSize: "0.8rem", color: "#bef264", fontWeight: 900 }}>→</span>
+                      </div>
+                      {/* Info */}
+                      <div style={{ padding: "8px 16px 14px" }}>
+                        <p style={{ margin: 0, fontWeight: 900, fontSize: "0.95rem", color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.brand || "Tienda"}</p>
+                        {countryDisplay && <p style={{ margin: "2px 0 0", fontSize: "0.72rem", color: "#888", fontWeight: 600 }}>{countryDisplay}</p>}
+                        <div style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <span style={{ fontSize: "0.7rem", background: `${primary}22`, color: primary, fontWeight: 800, padding: "3px 9px", borderRadius: 7 }}>
+                            {products.length} producto{products.length !== 1 ? "s" : ""}
+                          </span>
+                          <span style={{ fontSize: "0.72rem", fontWeight: 900, color: "#bef264", display: "flex", alignItems: "center", gap: 3 }}>
+                            Ver tienda
+                            <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                          </span>
+                        </div>
+                      </div>
                     </motion.a>
                   );
                 })}
