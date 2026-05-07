@@ -6,7 +6,7 @@ import { feature } from "topojson-client";
 
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 
-const LIME = "#bef264";
+const LIME = "#7FE040";
 
 const COUNTRY_POINTS = [
   { id: "mexico",     name: "México",              label: "Mexico",        lat: 23.6,   lng: -102.5, color: "#fb923c" },
@@ -15,7 +15,7 @@ const COUNTRY_POINTS = [
   { id: "honduras",   name: "Honduras",             label: "Honduras",      lat: 15.2,   lng: -86.24, color: "#22d3ee" },
   { id: "nicaragua",  name: "Nicaragua",            label: "Nicaragua",     lat: 12.87,  lng: -85.21, color: "#f87171" },
   { id: "dominicana", name: "Rep. Dominicana",      label: "Rep. Dominic.", lat: 18.9,   lng: -70.3,  color: "#fb7185" },
-  { id: "colombia",   name: "Colombia",             label: "Colombia",      lat: 4.71,   lng: -74.07, color: "#a3e635" },
+  { id: "colombia",   name: "Colombia",             label: "Colombia",      lat: 4.71,   lng: -74.07, color: "#7FE040" },
   { id: "peru",       name: "Peru",                 label: "Peru",          lat: -9.19,  lng: -75.0,  color: "#38bdf8" },
 ];
 
@@ -99,7 +99,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         polygonAltitude={0.001}
         polygonCapColor={() => "rgba(0,0,0,0)"}
         polygonSideColor={() => "rgba(0,0,0,0)"}
-        polygonStrokeColor={() => "rgba(190,242,100,0.35)"}
+        polygonStrokeColor={() => "rgba(127, 224, 64, 0.35)"}
 
         /* Atmosphere */
         atmosphereColor={LIME}

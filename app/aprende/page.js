@@ -493,7 +493,7 @@ export default function AprendePage() {
       if (w === 2) return { glow: "#00ffaa", glowSoft: "rgba(0,255,170,0.22)", edge: "#00cc88", accent: "#88ffdd", fog: "rgba(0,255,170,0.1)", bg1: "#000f0a", bg2: "#001a10", country: "Chile", flag: "🇨🇱" };
       if (w === 3) return { glow: "#00cfff", glowSoft: "rgba(0,207,255,0.22)", edge: "#0088cc", accent: "#aaeeff", fog: "rgba(0,160,255,0.12)", bg1: "#00080f", bg2: "#001018", country: "Perú", flag: "🇵🇪" };
       if (w === 4) return { glow: "#cc44ff", glowSoft: "rgba(204,68,255,0.22)", edge: "#aa00ff", accent: "#ee88ff", fog: "rgba(100,0,200,0.15)", bg1: "#060008", bg2: "#0f0020", country: "Argentina", flag: "🇦🇷" };
-      return { glow: "#59ff35", glowSoft: "rgba(89,255,53,0.23)", edge: "#2ea600", accent: "#ccffaa", fog: "rgba(89,255,53,0.1)", bg1: "#020805", bg2: "#050f05", country: "Colombia", flag: "🇨🇴" };
+      return { glow: "#7FE040", glowSoft: "rgba(127, 224, 64, 0.23)", edge: "#7FE040", accent: "#ccffaa", fog: "rgba(127, 224, 64, 0.1)", bg1: "#020805", bg2: "#050f05", country: "Colombia", flag: "🇨🇴" };
     }
     function platformSkin(idx, theme) {
       const w = worldOf(idx);
@@ -501,7 +501,7 @@ export default function AprendePage() {
       if (w === 2) return { topA: "rgba(48,42,36,0.98)", topB: "rgba(24,18,14,0.98)", faceA: "rgba(59,33,17,0.98)", faceB: "rgba(10,8,8,0.96)", sideA: "rgba(111,75,42,0.72)", detail: "#a68f72" };
       if (w === 3) return { topA: "rgba(83,102,76,0.98)", topB: "rgba(28,43,34,0.98)", faceA: "rgba(58,73,48,0.98)", faceB: "rgba(8,16,12,0.96)", sideA: "rgba(94,120,82,0.72)", detail: "#d2b875" };
       if (w === 4) return { topA: "rgba(37,38,48,0.98)", topB: "rgba(13,15,21,0.98)", faceA: "rgba(30,32,42,0.98)", faceB: "rgba(5,6,10,0.96)", sideA: "rgba(76,82,100,0.72)", detail: "#8fd3ff" };
-      return { topA: "rgba(25,71,34,0.98)", topB: "rgba(8,31,14,0.98)", faceA: "rgba(13,48,22,0.98)", faceB: "rgba(2,12,6,0.96)", sideA: "rgba(38,105,46,0.72)", detail: "#9de86a" };
+      return { topA: "rgba(25,71,34,0.98)", topB: "rgba(8,31,14,0.98)", faceA: "rgba(13,48,22,0.98)", faceB: "rgba(2,12,6,0.96)", sideA: "rgba(38,105,46,0.72)", detail: "#7FE040" };
     }
     function roundRect(x, y, w, h, r) {
       const rr = Math.min(r, w / 2, h / 2);
@@ -1074,7 +1074,7 @@ export default function AprendePage() {
       const label = e.isFinalBoss ? "JEFE FINAL" : "JEFE";
       ctx.fillStyle = "rgba(0,0,0,0.78)";
       ctx.fillRect(e.x - 4, e.y - 36, e.w + 8, 12);
-      ctx.fillStyle = hpR > 0.6 ? "#7cff2f" : hpR > 0.3 ? "#ffaa00" : "#ff2200";
+      ctx.fillStyle = hpR > 0.6 ? "#7FE040" : hpR > 0.3 ? "#ffaa00" : "#ff2200";
       ctx.fillRect(e.x - 4, e.y - 36, (e.w + 8) * hpR, 12);
       ctx.strokeStyle = theme.accent;
       ctx.lineWidth = 1;
@@ -1320,7 +1320,7 @@ export default function AprendePage() {
             // HUGE colorful beak (toucan's signature)
             ctx.fillStyle = "#ff8c00";
             ctx.beginPath(); ctx.moveTo(cx + 4, cy - 14); ctx.quadraticCurveTo(cx + 28, cy - 12, cx + 30, cy - 8); ctx.quadraticCurveTo(cx + 28, cy - 7, cx + 4, cy - 8); ctx.closePath(); ctx.fill();
-            ctx.fillStyle = "#aadd00";
+            ctx.fillStyle = "#7FE040";
             ctx.beginPath(); ctx.moveTo(cx + 4, cy - 8); ctx.quadraticCurveTo(cx + 28, cy - 7, cx + 30, cy - 8); ctx.quadraticCurveTo(cx + 26, cy - 4, cx + 4, cy - 5); ctx.closePath(); ctx.fill();
             ctx.strokeStyle = "#773300"; ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(cx + 4, cy - 8); ctx.lineTo(cx + 29, cy - 8); ctx.stroke();
@@ -1371,12 +1371,12 @@ export default function AprendePage() {
           } else if (wGnd === 1) {
             // ── Cactus con sombrero (México) ──
             const gt = frame * 0.05;
-            ctx.fillStyle = "#1a6600";
+            ctx.fillStyle = "#7FE040";
             ctx.fillRect(cx - 8, e.y, 16, e.h);
             ctx.fillRect(e.x, e.y + 10, cx - 8 - e.x, 10); ctx.fillRect(e.x, e.y + 10, 8, 16);
             ctx.fillRect(cx + 8, e.y + 6, e.x + e.w - (cx + 8), 10); ctx.fillRect(e.x + e.w - 8, e.y + 6, 8, 18);
-            ctx.fillStyle = "#2a8a00";
-            for (let s = 0; s < 4; s++) { ctx.beginPath(); ctx.moveTo(cx - 8, e.y + 6 + s * 9); ctx.lineTo(cx - 14, e.y + 3 + s * 9); ctx.strokeStyle = "#44aa22"; ctx.lineWidth = 2; ctx.stroke(); }
+            ctx.fillStyle = "#7FE040";
+            for (let s = 0; s < 4; s++) { ctx.beginPath(); ctx.moveTo(cx - 8, e.y + 6 + s * 9); ctx.lineTo(cx - 14, e.y + 3 + s * 9); ctx.strokeStyle = "#7FE040"; ctx.lineWidth = 2; ctx.stroke(); }
             for (let s = 0; s < 4; s++) { ctx.beginPath(); ctx.moveTo(cx + 8, e.y + 6 + s * 9); ctx.lineTo(cx + 14, e.y + 3 + s * 9); ctx.stroke(); }
             ctx.lineWidth = 1;
             ctx.fillStyle = "#000";
@@ -1474,7 +1474,7 @@ export default function AprendePage() {
             ctx.beginPath(); ctx.ellipse(cx + 6, cy - 5, 8, 6, 0, 0, Math.PI * 2); ctx.fill();
             ctx.fillStyle = "#cc4400";
             ctx.beginPath(); ctx.arc(cx + 6, cy - 7, 2.5, 0, Math.PI * 2); ctx.fill();
-            ctx.fillStyle = "#88cc00";
+            ctx.fillStyle = "#7FE040";
             ctx.beginPath(); ctx.arc(cx + 1, cy - 11, 4, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.arc(cx + 11, cy - 11, 4, 0, Math.PI * 2); ctx.fill();
             ctx.fillStyle = "#000";
@@ -1694,7 +1694,7 @@ export default function AprendePage() {
         const animFrame = p.grounded ? Math.floor(frame / 5) % SPRITE_FRAMES : 2;
         ctx.drawImage(sprite, animFrame * SPRITE_SRC_W, 0, SPRITE_SRC_W, SPRITE_SRC_H, -p.w / 2, -p.h / 2, p.w, p.h);
       } else {
-        ctx.fillStyle = "#84cc16"; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.fillStyle = "#7FE040"; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
       }
       ctx.shadowBlur = 0;
       ctx.restore();
@@ -1854,12 +1854,12 @@ export default function AprendePage() {
         ctx.save();
         ctx.shadowColor = ready ? theme.glow : "transparent";
         ctx.shadowBlur = ready ? 8 : 0;
-        ctx.fillStyle = ready ? theme.glow : "rgba(89,255,53,0.3)";
+        ctx.fillStyle = ready ? theme.glow : "rgba(127, 224, 64, 0.3)";
         ctx.textAlign = "center";
         ctx.fillText(ready ? "⚡ PODER [X]" : `⚡ ${g.powerCooldown}...`, 650, 30);
         ctx.restore();
       } else {
-        ctx.fillStyle = "rgba(89,255,53,0.38)";
+        ctx.fillStyle = "rgba(127, 224, 64, 0.38)";
         ctx.textAlign = "center";
         ctx.fillText(`ENERGIA: ${g.coins}/10`, 640, 30);
       }
@@ -2202,8 +2202,8 @@ export default function AprendePage() {
 
       // Progress bar
       const prog = Math.min(1, (p.x + p.w) / lev.width);
-      ctx.fillStyle = "rgba(89,255,53,0.15)"; ctx.fillRect(0, 46, W, 4);
-      ctx.fillStyle = bossAlive ? "#ff2200" : "#59ff35"; ctx.fillRect(0, 46, W * prog, 4);
+      ctx.fillStyle = "rgba(127, 224, 64, 0.15)"; ctx.fillRect(0, 46, W, 4);
+      ctx.fillStyle = bossAlive ? "#ff2200" : "#7FE040"; ctx.fillRect(0, 46, W * prog, 4);
       ctx.fillStyle = "#fff"; ctx.fillRect(W - 6, 44, 4, 8);
 
       // Boss block warning
@@ -2326,7 +2326,7 @@ export default function AprendePage() {
     ? {
         width: "100vw",
         height: "100vh",
-        background: "radial-gradient(circle at center, rgba(89,255,53,0.08), transparent 45%), #020402",
+        background: "radial-gradient(circle at center, rgba(127, 224, 64, 0.08), transparent 45%), #020402",
         display: "grid",
         gridTemplateRows: "auto minmax(0, 1fr) auto",
         alignItems: "center",
@@ -2345,8 +2345,8 @@ export default function AprendePage() {
     borderRadius: isFullscreen ? 24 : 16,
     overflow: "hidden",
     boxShadow: isFullscreen
-      ? "0 0 70px rgba(89,255,53,0.28), 0 0 0 1px rgba(89,255,53,0.42), 0 0 160px rgba(89,255,53,0.12)"
-      : "0 0 60px rgba(89,255,53,0.22), 0 0 0 1px rgba(89,255,53,0.3), 0 0 120px rgba(89,255,53,0.08)",
+      ? "0 0 70px rgba(127, 224, 64, 0.28), 0 0 0 1px rgba(127, 224, 64, 0.42), 0 0 160px rgba(127, 224, 64, 0.12)"
+      : "0 0 60px rgba(127, 224, 64, 0.22), 0 0 0 1px rgba(127, 224, 64, 0.3), 0 0 120px rgba(127, 224, 64, 0.08)",
     width: isFullscreen ? "min(100%, calc((100vh - 156px) * 16 / 9))" : "min(100%, 960px)",
     maxWidth: isFullscreen ? "calc(100vw - 56px)" : "960px",
   };
@@ -2395,15 +2395,15 @@ export default function AprendePage() {
               {/* Dark overlay */}
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, rgba(2,8,2,0.88) 0%, rgba(3,18,3,0.82) 100%)" }} />
               {/* Green radial glow */}
-              <div style={{ position: "absolute", top: "30%", left: "50%", transform: "translate(-50%,-50%)", width: 500, height: 300, background: "radial-gradient(ellipse, rgba(132,204,22,0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", top: "30%", left: "50%", transform: "translate(-50%,-50%)", width: 500, height: 300, background: "radial-gradient(ellipse, rgba(127, 224, 64, 0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
               {/* Content on top */}
               <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
               {/* Portal header */}
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#84cc16", boxShadow: "0 0 8px #84cc16", display: "inline-block" }} />
-                <span style={{ color: "#84cc16", fontSize: "0.68rem", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase" }}>Portal Drokex</span>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#7FE040", boxShadow: "0 0 8px #7FE040", display: "inline-block" }} />
+                <span style={{ color: "#7FE040", fontSize: "0.68rem", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase" }}>Portal Drokex</span>
               </div>
-              <p style={{ color: "rgba(132,204,22,0.6)", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.18em", margin: "0 0 28px", textTransform: "uppercase" }}>
+              <p style={{ color: "rgba(127, 224, 64, 0.6)", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.18em", margin: "0 0 28px", textTransform: "uppercase" }}>
                 GATEWAY ACTIVO / MODO JUEGO
               </p>
 
@@ -2412,18 +2412,18 @@ export default function AprendePage() {
                 <div style={{ fontSize: "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "rgba(255,255,255,0.08)", fontFamily: "monospace", lineHeight: 0.88 }}>
                   DROKEX
                 </div>
-                <div style={{ fontSize: "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "#84cc16", fontFamily: "monospace", lineHeight: 0.88 }}>
+                <div style={{ fontSize: "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "#7FE040", fontFamily: "monospace", lineHeight: 0.88 }}>
                   PLATFORM
                 </div>
               </div>
 
               {/* Top 3 scores */}
               <div style={{ width: "min(420px, 100%)", marginBottom: 32 }}>
-                <p style={{ color: "rgba(132,204,22,0.55)", fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 10px", textAlign: "center" }}>
+                <p style={{ color: "rgba(127, 224, 64, 0.55)", fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 10px", textAlign: "center" }}>
                   — Top agentes —
                 </p>
                 {highScores.length === 0 ? (
-                  <div style={{ border: "1px solid rgba(132,204,22,0.12)", borderRadius: 10, padding: "14px 18px", textAlign: "center" }}>
+                  <div style={{ border: "1px solid rgba(127, 224, 64, 0.12)", borderRadius: 10, padding: "14px 18px", textAlign: "center" }}>
                     <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.82rem" }}>Sin puntajes aún — sé el primero</span>
                   </div>
                 ) : (
@@ -2431,17 +2431,17 @@ export default function AprendePage() {
                     {highScores.slice(0, 3).map((s, i) => (
                       <div key={s.id ?? i} style={{
                         display: "flex", alignItems: "center", gap: 14,
-                        border: `1px solid ${i === 0 ? "rgba(132,204,22,0.35)" : "rgba(255,255,255,0.07)"}`,
+                        border: `1px solid ${i === 0 ? "rgba(127, 224, 64, 0.35)" : "rgba(255,255,255,0.07)"}`,
                         borderRadius: 10, padding: "11px 16px",
-                        background: i === 0 ? "rgba(132,204,22,0.06)" : "rgba(255,255,255,0.02)",
+                        background: i === 0 ? "rgba(127, 224, 64, 0.06)" : "rgba(255,255,255,0.02)",
                       }}>
                         <span style={{
                           fontSize: "0.65rem", fontWeight: 900, fontFamily: "monospace",
-                          color: i === 0 ? "#84cc16" : "rgba(255,255,255,0.3)",
+                          color: i === 0 ? "#7FE040" : "rgba(255,255,255,0.3)",
                           letterSpacing: "0.1em", minWidth: 22,
                         }}>0{i + 1}</span>
                         <span style={{ flex: 1, fontSize: "0.88rem", fontWeight: 700, color: i === 0 ? "#fff" : "rgba(255,255,255,0.6)" }}>{s.name}</span>
-                        <span style={{ fontSize: "0.85rem", fontWeight: 900, fontFamily: "monospace", color: i === 0 ? "#84cc16" : "rgba(255,255,255,0.4)" }}>
+                        <span style={{ fontSize: "0.85rem", fontWeight: 900, fontFamily: "monospace", color: i === 0 ? "#7FE040" : "rgba(255,255,255,0.4)" }}>
                           {s.score.toLocaleString()} pts
                         </span>
                       </div>
@@ -2452,11 +2452,11 @@ export default function AprendePage() {
 
               {/* CTA */}
               <button onClick={startGame} style={{
-                background: "#84cc16", color: "#050505", border: "none",
+                background: "#7FE040", color: "#050505", border: "none",
                 borderRadius: 10, padding: "15px 48px",
                 fontSize: "0.9rem", fontWeight: 900, cursor: "pointer",
                 letterSpacing: "0.12em", textTransform: "uppercase",
-                boxShadow: "0 0 32px rgba(132,204,22,0.4)",
+                boxShadow: "0 0 32px rgba(127, 224, 64, 0.4)",
                 transition: "box-shadow 0.2s",
               }}>
                 Iniciar misión →
@@ -2486,13 +2486,13 @@ export default function AprendePage() {
           )}
           {screen === "win" && (
             <div style={overlayStyle}>
-              <p style={{ ...tagStyle, color: "#84cc16" }}>¡Completado!</p>
+              <p style={{ ...tagStyle, color: "#7FE040" }}>¡Completado!</p>
               <h2 style={titleStyle}>🏆 ¡Ganaste!</h2>
               <p style={subStyle}>Derrotaste al Jefe Final · {finalScore} pts · {hudCoins} monedas</p>
               <form onSubmit={saveHighScore} style={{ ...scoreFormStyle, marginBottom: 14 }}>
                 <input value={playerName} onChange={(e) => setPlayerName(e.target.value)}
                   placeholder="Tu nombre (opcional)" maxLength={18} style={scoreInputStyle} autoFocus disabled={savingScore} />
-                <button type="submit" style={{ ...btnStyle, background: "#84cc16", color: "#050505", opacity: savingScore ? 0.6 : 1 }} disabled={savingScore}>
+                <button type="submit" style={{ ...btnStyle, background: "#7FE040", color: "#050505", opacity: savingScore ? 0.6 : 1 }} disabled={savingScore}>
                   {savingScore ? "Guardando..." : "Guardar puntaje"}
                 </button>
               </form>
@@ -2503,7 +2503,7 @@ export default function AprendePage() {
           )}
           {screen === "scores" && (
             <div style={overlayStyle}>
-              <p style={{ ...tagStyle, color: "#84cc16" }}>Ranking Global</p>
+              <p style={{ ...tagStyle, color: "#7FE040" }}>Ranking Global</p>
               <h2 style={titleStyle}>Top 10 Drokex</h2>
               <div style={scoreListStyle}>
                 {highScores.length === 0
@@ -2527,7 +2527,7 @@ export default function AprendePage() {
   );
 }
 
-const kbdStyle = { background: "rgba(132,204,22,0.1)", color: "#84cc16", padding: "2px 8px", borderRadius: 6, border: "1px solid rgba(132,204,22,0.3)", fontFamily: "monospace", fontSize: "0.8rem" };
+const kbdStyle = { background: "rgba(127, 224, 64, 0.1)", color: "#7FE040", padding: "2px 8px", borderRadius: 6, border: "1px solid rgba(127, 224, 64, 0.3)", fontFamily: "monospace", fontSize: "0.8rem" };
 const overlayStyle = { position: "absolute", inset: 0, background: "rgba(6,13,26,0.88)", backdropFilter: "blur(4px)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32 };
 const tagStyle = { color: "#ff8500", fontWeight: 800, fontSize: "0.8rem", letterSpacing: "0.14em", textTransform: "uppercase", margin: "0 0 12px" };
 const titleStyle = { color: "#fff", fontSize: "2rem", fontWeight: 800, margin: "0 0 8px" };
@@ -2544,12 +2544,12 @@ const fullscreenBtnStyle = {
   zIndex: 70,
   width: 38,
   height: 38,
-  border: "1px solid rgba(89,255,53,0.45)",
+  border: "1px solid rgba(127, 224, 64, 0.45)",
   borderRadius: 10,
   background: "rgba(2,8,2,0.72)",
-  color: "#59ff35",
+  color: "#7FE040",
   fontSize: 20,
   fontWeight: 900,
   lineHeight: 1,
-  boxShadow: "0 0 18px rgba(89,255,53,0.18)",
+  boxShadow: "0 0 18px rgba(127, 224, 64, 0.18)",
 };

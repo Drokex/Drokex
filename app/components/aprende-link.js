@@ -92,7 +92,7 @@ export default function AprendeLink() {
                   marginTop: "0.8rem",
                   width: "100%",
                   padding: "0.75rem",
-                  background: "#9be02f",
+                  background: "#7FE040",
                   color: "#111",
                   border: "none",
                   borderRadius: 8,

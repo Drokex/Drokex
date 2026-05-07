@@ -19,9 +19,9 @@ function ProLandingThumbnail({ slug, landing }) {
   const countryDisplay = (store.countries?.length ? store.countries : store.country ? [store.country] : []).join(" · ");
 
   return (
-    <Link href={`/proveedor-pro/tienda/${slug}`} style={{ textDecoration: "none", display: "block" }}>
+    <Link href={`/proveedor-pro/tienda/${slug}`} style={{ textDecoration: "none", display: "block", height: "100%" }}>
       <article
-        style={{ borderRadius: 22, overflow: "hidden", background: "#fff", border: "1px solid rgba(0,0,0,0.07)", boxShadow: "0 4px 24px rgba(0,0,0,0.06)", cursor: "pointer", transition: "transform 0.18s, box-shadow 0.18s" }}
+        style={{ borderRadius: 22, overflow: "hidden", background: "#fff", border: "1px solid rgba(0,0,0,0.07)", boxShadow: "0 4px 24px rgba(0,0,0,0.06)", cursor: "pointer", transition: "transform 0.18s, box-shadow 0.18s", height: "100%", display: "flex", flexDirection: "column" }}
         onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = `0 16px 48px rgba(0,0,0,0.13)`; }}
         onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.06)"; }}
       >
@@ -34,7 +34,7 @@ function ProLandingThumbnail({ slug, landing }) {
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.45) 100%)" }} />
 
           {/* PRO badge */}
-          <span style={{ position: "absolute", top: 12, right: 12, background: "#59ff35", color: "#050505", fontSize: "0.58rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 9px", borderRadius: 7, textTransform: "uppercase" }}>
+          <span style={{ position: "absolute", top: 12, right: 12, background: "#7FE040", color: "#050505", fontSize: "0.58rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 9px", borderRadius: 7, textTransform: "uppercase" }}>
             PRO
           </span>
 
@@ -65,7 +65,7 @@ function ProLandingThumbnail({ slug, landing }) {
         </div>
 
         {/* Info */}
-        <div style={{ padding: "10px 18px 18px" }}>
+        <div style={{ padding: "10px 18px 18px", display: "flex", flexDirection: "column", flex: 1 }}>
           <p style={{ margin: 0, fontWeight: 900, fontSize: "1rem", color: "#111", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {store.brand || "Mi Tienda"}
           </p>
@@ -75,7 +75,7 @@ function ProLandingThumbnail({ slug, landing }) {
           <p style={{ margin: "8px 0 0", fontSize: "0.8rem", color: "#555", overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", lineHeight: 1.55 }}>
             {store.heroTitle || store.heroSubtitle || "Tienda Proveedor Pro"}
           </p>
-          <div style={{ marginTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ marginTop: "auto", paddingTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "0.73rem", background: `${primary}18`, color: primary, fontWeight: 800, padding: "4px 10px", borderRadius: 8 }}>
               {products.length} producto{products.length !== 1 ? "s" : ""}
             </span>
@@ -206,7 +206,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
       {(proLoading || filteredPro.length > 0) && (
         <section className="shell" style={{ padding: "32px 0 0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-            <span style={{ background: "#59ff35", color: "#050505", fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 10px", borderRadius: 6, textTransform: "uppercase" }}>Pro</span>
+            <span style={{ background: "#7FE040", color: "#050505", fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 10px", borderRadius: 6, textTransform: "uppercase" }}>Pro</span>
             <p style={{ margin: 0, fontWeight: 800, fontSize: "0.95rem", color: "#111" }}>Tiendas Proveedor Pro</p>
             <span style={{ marginLeft: "auto", fontSize: "0.8rem", color: "#777" }}>
               {proLoading ? "Cargando..." : `${filteredPro.length} tienda${filteredPro.length !== 1 ? "s" : ""}`}
@@ -222,48 +222,11 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
         </section>
       )}
 
-      <section className="directorio-results shell">
-        {loading ? (
-          <p className="directorio-empty">Cargando proveedores...</p>
-        ) : suppliers.length === 0 ? (
-          filteredPro.length === 0 ? (
-            <p className="directorio-empty">No se encontraron proveedores para <strong>"{query}"</strong>.</p>
-          ) : null
-        ) : (
-          <>
-            <p className="directorio-count">
-              <strong>{suppliers.length}</strong> proveedores encontrados
-            </p>
-            <div className="directorio-grid">
-              {suppliers.map((supplier) => (
-                <article key={supplier.name} className="directorio-card">
-                  <div className="directorio-card-image">
-                    <Image
-                      src={supplier.image}
-                      alt={supplier.name}
-                      width={80}
-                      height={80}
-                      className="directorio-card-img"
-                    />
-                  </div>
-                  <div className="directorio-card-body">
-                    <h3 className="directorio-card-name">{supplier.name}</h3>
-                    <p className="directorio-card-country">{supplier.country}</p>
-                    <div className="directorio-card-tags">
-                      {supplier.categories.slice(0, 3).map((cat) => (
-                        <span key={cat} className="directorio-tag">{cat}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="directorio-card-footer">
-                    <span className="directorio-card-count">{supplier.productCount} producto{supplier.productCount !== 1 ? "s" : ""}</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </>
-        )}
-      </section>
+      {!loading && suppliers.length === 0 && filteredPro.length === 0 && (
+        <section className="directorio-results shell">
+          <p className="directorio-empty">No se encontraron proveedores para <strong>"{query}"</strong>.</p>
+        </section>
+      )}
 
       <SiteFooter />
     </main>

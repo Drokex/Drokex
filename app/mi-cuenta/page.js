@@ -344,10 +344,10 @@ export default async function AccountPage({ searchParams }) {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
                 <span
                   style={{
-                    border: "1px solid rgba(46,166,0,0.25)",
+                    border: "1px solid rgba(127, 224, 64, 0.25)",
                     borderRadius: 8,
-                    background: "rgba(46,166,0,0.08)",
-                    color: "#2ea600",
+                    background: "rgba(127, 224, 64, 0.08)",
+                    color: "#7FE040",
                     fontSize: "0.68rem",
                     fontWeight: 900,
                     letterSpacing: "0.14em",
@@ -374,7 +374,7 @@ export default async function AccountPage({ searchParams }) {
                     lineHeight: 1,
                   }}
                 >
-                  Pásate a <span style={{ color: "#22a600" }}>Proveedor Pro</span>
+                  Pásate a <span style={{ color: "#7FE040" }}>Proveedor Pro</span>
                 </h2>
                 <p style={{ margin: "12px 0 0", color: "#555", fontSize: "0.95rem", lineHeight: 1.6 }}>
                   Tu cuenta todavía no tiene una tienda Pro activa. Activa el plan para crear tu
@@ -384,14 +384,14 @@ export default async function AccountPage({ searchParams }) {
 
               <div
                 style={{
-                  border: "1px solid rgba(46,166,0,0.22)",
+                  border: "1px solid rgba(127, 224, 64, 0.22)",
                   borderRadius: 18,
-                  background: "rgba(46,166,0,0.06)",
+                  background: "rgba(127, 224, 64, 0.06)",
                   padding: 17,
                 }}
               >
                 <p style={{ margin: 0, color: "#777", fontSize: "0.8rem" }}>Plan demo</p>
-                <strong style={{ display: "block", marginTop: 5, color: "#21a600", fontSize: "1.95rem", fontWeight: 950, lineHeight: 1 }}>
+                <strong style={{ display: "block", marginTop: 5, color: "#7FE040", fontSize: "1.95rem", fontWeight: 950, lineHeight: 1 }}>
                   $99.000 COP
                 </strong>
                 <p style={{ margin: "8px 0 0", color: "#777", fontSize: "0.8rem" }}>
@@ -406,8 +406,8 @@ export default async function AccountPage({ searchParams }) {
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: 15,
-                  background: "#22b400",
-                  boxShadow: "0 14px 30px rgba(34,180,0,0.26)",
+                  background: "#7FE040",
+                  boxShadow: "0 14px 30px rgba(127, 224, 64, 0.26)",
                   color: "#fff",
                   fontWeight: 950,
                   padding: "14px 20px",

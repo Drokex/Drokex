@@ -184,7 +184,7 @@ function StorePanel({ country, onClose, proLandings = [] }) {
                       {/* Hero banner */}
                       <div style={{ height: 130, position: "relative", overflow: "hidden", background: heroImg ? `url(${heroImg}) center/cover no-repeat` : `linear-gradient(135deg, ${gradFrom}, ${gradTo})` }}>
                         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%)" }} />
-                        <span style={{ position: "absolute", top: 10, right: 10, background: "#59ff35", color: "#050505", fontSize: "0.55rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 8px", borderRadius: 6, textTransform: "uppercase" }}>PRO</span>
+                        <span style={{ position: "absolute", top: 10, right: 10, background: "#7FE040", color: "#050505", fontSize: "0.55rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 8px", borderRadius: 6, textTransform: "uppercase" }}>PRO</span>
                         {!heroImg && products.some(p => p.image) && (
                           <div style={{ position: "absolute", bottom: 10, left: 10, display: "flex", gap: 5 }}>
                             {products.slice(0, 3).filter(p => p.image).map((p, i) => (
@@ -209,7 +209,7 @@ function StorePanel({ country, onClose, proLandings = [] }) {
                           <span style={{ fontSize: "0.7rem", background: `${primary}22`, color: primary, fontWeight: 800, padding: "3px 9px", borderRadius: 7 }}>
                             {products.length} producto{products.length !== 1 ? "s" : ""}
                           </span>
-                          <span style={{ fontSize: "0.72rem", fontWeight: 900, color: "#bef264", display: "flex", alignItems: "center", gap: 3 }}>
+                          <span style={{ fontSize: "0.72rem", fontWeight: 900, color: "#7FE040", display: "flex", alignItems: "center", gap: 3 }}>
                             Ver tienda
                             <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                           </span>
@@ -264,7 +264,7 @@ export default function DrokexWorldPage() {
 
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-lime-300 font-black text-black text-lg shadow-[0_0_24px_rgba(190,242,100,0.4)]">D</div>
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-lime-300 font-black text-black text-lg shadow-[0_0_24px_rgba(127, 224, 64, 0.4)]">D</div>
           <div>
             <p className="text-[10px] font-semibold tracking-[0.18em] text-lime-400/70 uppercase">Marketplace · LATAM</p>
             <h1 className="text-base font-black leading-none tracking-tight">Drokex World</h1>

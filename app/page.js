@@ -73,8 +73,8 @@ const platformHighlights = {
     "Acelera compras, cotizaciones y rutas sin depender de mensajes dispersos.",
   ],
   proveedores: [
-    "Convierte tu inventario en una vitrina comercial para compradores de Latinoamerica.",
-    "Muestra productos, capacidad y condiciones con una experiencia mas clara.",
+    "Convierte tu inventario en una vitrina comercial para compradores de Latinoamérica.",
+    "Muestra productos, capacidad y condiciones con una experiencia más clara.",
     "Recibe contactos, cotizaciones y pedidos con trazabilidad dentro de Drokex.",
   ],
 };
@@ -127,11 +127,11 @@ const globalMarkets = [
     role: "Aliada comercial",
     badge: "CR",
     portrait: "/market-person-3.jpg",
-    accent: "#9be02f",
-    accentSoft: "rgba(155, 224, 47, 0.22)",
+    accent: "#7FE040",
+    accentSoft: "rgba(127, 224, 64, 0.22)",
     orderLabel: "Pedido para NI",
     orderAmount: "US$ 125,00",
-    headline: "Activa oportunidades comerciales para Nicaragua con una vitrina mas clara.",
+    headline: "Activa oportunidades comerciales para Nicaragua con una vitrina más clara.",
     description:
       "Adapta tu vitrina a mercados clave y muestra una propuesta mas confiable para compradores que necesitan velocidad, contexto y seguimiento.",
   },
@@ -147,7 +147,7 @@ const globalMarkets = [
     accentSoft: "rgba(110, 135, 255, 0.2)",
     orderLabel: "Pedido para HN",
     orderAmount: "US$ 110,00",
-    headline: "Convierte expansion regional en una experiencia mas visual y mas agil.",
+    headline: "Convierte expansión regional en una experiencia más visual y más ágil.",
     description:
       "Desde el interes inicial hasta el pedido, Drokex puede mostrar una narrativa comercial distinta para cada pais objetivo.",
   },
@@ -159,8 +159,8 @@ const globalMarkets = [
     role: "Proveedor exportador",
     badge: "AS",
     portrait: "/market-person-1.jpg",
-    accent: "#b7e600",
-    accentSoft: "rgba(183, 230, 0, 0.2)",
+    accent: "#7FE040",
+    accentSoft: "rgba(127, 224, 64, 0.2)",
     orderLabel: "Pedido para GT",
     orderAmount: "US$ 94,00",
     headline: "Haz que tu oferta se sienta lista para crecer en Centroamerica.",
@@ -181,7 +181,7 @@ const globalMarkets = [
     orderAmount: "US$ 138,00",
     headline: "Presenta una experiencia comercial pensada para El Salvador.",
     description:
-      "Cada bandera puede activar otra vitrina, otra historia y otro ritmo de conversion para una expansion mas inteligente.",
+      "Cada bandera puede activar otra vitrina, otra historia y otro ritmo de conversión para una expansión más inteligente.",
   },
   {
     id: "do",
@@ -239,8 +239,8 @@ const globalMarkets = [
     role: "Distribuidora industrial",
     badge: "VM",
     portrait: "/market-person-3.jpg",
-    accent: "#22c55e",
-    accentSoft: "rgba(34, 197, 94, 0.2)",
+    accent: "#7FE040",
+    accentSoft: "rgba(127, 224, 64, 0.2)",
     orderLabel: "Pedido para MX",
     orderAmount: "US$ 125,00",
     headline: "Vende y realiza envios a México con mas claridad comercial.",
@@ -277,14 +277,14 @@ const operatingSteps = [
     number: "04",
     title: "Ruta optimizada",
     description:
-      "Aterrizamos la operacion con rutas logisticas y decisiones mas claras segun el destino y el tipo de pedido.",
+      "Aterrizamos la operación con rutas logísticas y decisiones más claras según el destino y el tipo de pedido.",
     iconSrc: "/ruta optimizada.png",
   },
   {
     number: "05",
-    title: "Expansion lograda",
+    title: "Expansión lograda",
     description:
-      "Tu negocio gana alcance real: nuevos mercados, mejores conexiones y mas oportunidades para crecer.",
+      "Tu negocio gana alcance real: nuevos mercados, mejores conexiones y más oportunidades para crecer.",
     iconSrc: "/expansion lograda.png",
   },
 ];
@@ -292,7 +292,7 @@ const operatingSteps = [
 const operatingHighlights = [
   {
     title: "Visibilidad total",
-    description: "Monitorea el avance de cada operacion con una lectura mas clara.",
+    description: "Monitorea el avance de cada operación con una lectura más clara.",
     icon: <SystemTargetIcon />,
   },
   {
@@ -324,7 +324,7 @@ function getWrappedOffset(index, activeIndex, total) {
 
 const gifItems = [
   { src: "/home-feature-globe.mp4", label: "Expande a nuevos mercados" },
-  { src: "/home-feature-delivery.mp4", label: "Activa rutas logisticas" },
+  { src: "/home-feature-delivery.mp4", label: "Activa rutas logísticas" },
   { src: "/home-feature-laptop.mp4", label: "Crea tu tienda digital" },
   { src: "/home-feature-products.mp4", label: "Gestiona tus productos" },
   { src: "/home-feature-warehouse-mobile.mp4", label: "Controla inventario" },
@@ -561,13 +561,13 @@ export default function Home() {
           <motion.div className="system-header" {...fadeUp(0)}>
             <p className="section-tag section-tag-green">Sistema operativo Drokex</p>
             <h2>
-              <span>Un sistema disenado para</span>
-              <span>mover tu negocio sin limites</span>
+              <span>Un sistema diseñado para</span>
+              <span>mover tu negocio sin límites</span>
             </h2>
             <div className="system-header-line" aria-hidden="true" />
             <p>
-              Conectamos descubrimiento, cotizacion, confianza y operacion para
-              que vender y expandirse en LATAM se sienta mas simple.
+              Conectamos descubrimiento, cotización, confianza y operación para
+              que vender y expandirse en LATAM se sienta más simple.
             </p>
           </motion.div>
 
@@ -935,7 +935,7 @@ export default function Home() {
                 required
               />
               {contactStatus === "sent" && (
-                <p style={{ color: "#22c55e", fontSize: "0.9rem" }}>Mensaje enviado correctamente.</p>
+                <p style={{ color: "#7FE040", fontSize: "0.9rem" }}>Mensaje enviado correctamente.</p>
               )}
               {contactStatus === "error" && (
                 <p style={{ color: "#ef4444", fontSize: "0.9rem" }}>No fue posible enviar. Intenta de nuevo.</p>
