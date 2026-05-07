@@ -186,36 +186,50 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
         {/* Pantalla inicial de selección */}
         {step === -1 && (
           <div>
-            <p style={{ color: "#7FE040", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 10px" }}>Drokex Estudio</p>
-            <h3 style={{ color: "#fff", fontSize: "1.2rem", fontWeight: 800, margin: "0 0 6px" }}>¿Cómo quieres crear tu imagen?</h3>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.82rem", margin: "0 0 28px" }}>Elige una opción para continuar.</p>
+            {/* Header llamativo */}
+            <div style={{ textAlign: "center", marginBottom: 24 }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(127,224,64,0.1)", border: "1px solid rgba(127,224,64,0.25)", borderRadius: 20, padding: "5px 14px", marginBottom: 16 }}>
+                <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#7FE040", display: "inline-block" }} />
+                <span style={{ color: "#7FE040", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.12em", textTransform: "uppercase" }}>IA generativa</span>
+              </div>
+              <h3 style={{ color: "#fff", fontSize: "1.5rem", fontWeight: 900, margin: "0 0 8px", lineHeight: 1.2 }}>
+                Drokex <span style={{ color: "#7FE040" }}>Estudio</span>
+              </h3>
+              <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.83rem", margin: 0, lineHeight: 1.5 }}>
+                Crea banners e imágenes profesionales<br/>con inteligencia artificial en segundos.
+              </p>
+            </div>
 
+            {/* Features */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 22 }}>
+              {["Genera imágenes únicas para tu marca", "Incluye tu mascota o personaje", "Elige color, estilo y productos"].map(f => (
+                <div key={f} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(127,224,64,0.15)", border: "1px solid rgba(127,224,64,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <span style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.82rem" }}>{f}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA principal */}
             <button type="button" onClick={() => setStep(0)}
-              style={{ width: "100%", borderRadius: 16, border: "2px solid #7FE040", background: "rgba(127,224,64,0.08)", padding: "20px 18px", cursor: "pointer", textAlign: "left", marginBottom: 12, display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(127,224,64,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              </div>
-              <div>
-                <div style={{ color: "#7FE040", fontWeight: 900, fontSize: "0.95rem", marginBottom: 3 }}>Crear con Drokex Estudio</div>
-                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>La IA genera tu imagen paso a paso con tu marca</div>
-              </div>
+              style={{ width: "100%", borderRadius: 14, border: "none", background: "linear-gradient(135deg, #7FE040 0%, #5bc42d 100%)", padding: "15px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 10, boxShadow: "0 6px 24px rgba(127,224,64,0.35)" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#050505" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span style={{ color: "#050505", fontWeight: 900, fontSize: "0.97rem" }}>Crear con Drokex Estudio</span>
             </button>
 
+            {/* Opción subir imagen */}
             {onUploadFile && (
               <button type="button" onClick={() => { onUploadFile(); onClose(); }}
-                style={{ width: "100%", borderRadius: 16, border: "1.5px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.03)", padding: "20px 18px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 16 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                </div>
-                <div>
-                  <div style={{ color: "rgba(255,255,255,0.75)", fontWeight: 800, fontSize: "0.95rem", marginBottom: 3 }}>Subir mi propia imagen</div>
-                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.78rem" }}>Sube una foto desde tu dispositivo</div>
-                </div>
+                style={{ width: "100%", borderRadius: 14, border: "1.5px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)", padding: "13px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, marginBottom: 10 }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span style={{ color: "rgba(255,255,255,0.55)", fontWeight: 700, fontSize: "0.88rem" }}>Subir mi propia imagen</span>
               </button>
             )}
 
-            <button type="button" onClick={onClose} disabled={loading}
-              style={{ width: "100%", marginTop: 20, borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.4)", padding: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.85rem" }}>
+            <button type="button" onClick={onClose}
+              style={{ width: "100%", borderRadius: 12, border: "none", background: "transparent", color: "rgba(255,255,255,0.25)", padding: "10px", fontWeight: 600, cursor: "pointer", fontSize: "0.8rem" }}>
               Cancelar
             </button>
           </div>
