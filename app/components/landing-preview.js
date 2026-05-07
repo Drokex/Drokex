@@ -364,7 +364,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             ? `url(${store.heroImage})`
             : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)`,
           backgroundSize: store.heroImage ? "cover" : undefined,
-          backgroundPosition: store.heroImage ? `center ${store.heroImageY ?? 50}%` : undefined,
+          backgroundPosition: store.heroImage ? `${store.heroImageX ?? 50}% ${store.heroImageY ?? 50}%` : undefined,
         }}
       >
         {isEditable && (
@@ -382,12 +382,20 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         )}
         {isEditable && store.heroImage && (
           <div style={{ position: "absolute", top: 12, right: 64, zIndex: 30, display: "flex", flexDirection: "column", gap: 4 }}>
-            <button type="button" title="Subir imagen"
-              onClick={() => onUpdate?.("heroImageY", Math.max(0, (store.heroImageY ?? 50) - 10))}
-              style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>↑</button>
-            <button type="button" title="Bajar imagen"
-              onClick={() => onUpdate?.("heroImageY", Math.min(100, (store.heroImageY ?? 50) + 10))}
-              style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>↓</button>
+            <div style={{ display: "flex", gap: 4 }}>
+              <button type="button" title="Mover izquierda"
+                onClick={() => onUpdate?.("heroImageX", Math.max(0, (store.heroImageX ?? 50) - 10))}
+                style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
+              <button type="button" title="Subir imagen"
+                onClick={() => onUpdate?.("heroImageY", Math.max(0, (store.heroImageY ?? 50) - 10))}
+                style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>↑</button>
+              <button type="button" title="Bajar imagen"
+                onClick={() => onUpdate?.("heroImageY", Math.min(100, (store.heroImageY ?? 50) + 10))}
+                style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>↓</button>
+              <button type="button" title="Mover derecha"
+                onClick={() => onUpdate?.("heroImageX", Math.min(100, (store.heroImageX ?? 50) + 10))}
+                style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>→</button>
+            </div>
           </div>
         )}
         <div className={`${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
