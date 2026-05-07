@@ -463,7 +463,6 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         ].map(([benefit, description], index) => (
           <div key={index} className="rounded-3xl border border-white/10 p-6"
             style={{ backgroundColor: store.surfaceColor }}>
-            <div className="mb-4 h-10 w-10 rounded-full" style={{ backgroundColor: store.primaryColor }} />
             <EditableText
               tag="h4" value={benefit}
               fontColor={textColor(`benefit${index + 1}Color`, store.textColor)}
