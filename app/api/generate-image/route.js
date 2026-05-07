@@ -1,7 +1,5 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 function hexToColorName(hex) {
   const h = hex.replace("#", "").toLowerCase();
   const r = parseInt(h.slice(0,2),16);
@@ -20,6 +18,7 @@ function hexToColorName(hex) {
 }
 
 export async function POST(request) {
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   try {
     const body = await request.json();
     let b64;
