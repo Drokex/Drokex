@@ -167,8 +167,9 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error generando imagen");
-      const bannerImage = await toBannerFormat(data.image, color);
-      onGenerated(bannerImage);
+      const isBanner = bannerLabel !== "imagen";
+      const finalImage = isBanner ? await toBannerFormat(data.image, color) : data.image;
+      onGenerated(finalImage);
       onClose();
     } catch (err) {
       setError(err.message);

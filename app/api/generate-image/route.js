@@ -25,7 +25,8 @@ export async function POST(request) {
     let b64;
 
     if (body.guided) {
-      const { color, productos, tieneMascota, mascotaImg, tieneProductosImg, estilo } = body;
+      const { color, productos, tieneMascota, mascotaImg, tieneProductosImg, estilo, bannerLabel } = body;
+      const isBanner = bannerLabel !== "imagen";
       const colorName = hexToColorName(color);
 
       const styleMap = {
@@ -70,22 +71,21 @@ Background: solid ${colorName} (${color}). Style: ${styleWord}. Context: ${busin
           image: file,
           prompt: mascotPrompt,
           n: 1,
-          size: "1536x1024",
+          size: isBanner ? "1536x1024" : "1024x1024",
         });
         b64 = res.data[0].b64_json;
 
       } else {
         // Sin mascota: DALL-E 3 genera escena de productos, sin personajes
-        const noMascotPrompt =
-`Premium horizontal website banner background. NO TEXT. NO CHARACTERS. NO ANIMALS. NO PEOPLE.
-
-Solid ${colorName} (${color}) background. Right side has elegant product/lifestyle objects related to: ${businessContext}. Left side completely empty. ${styleWord} aesthetic, ultra clean, professional. 1792x1024.`;
+        const noMascotPrompt = isBanner
+          ? `Premium horizontal website banner. NO TEXT. NO CHARACTERS. NO ANIMALS. NO PEOPLE. Solid ${colorName} (${color}) background. Right side has elegant product/lifestyle objects: ${businessContext}. Left side empty. ${styleWord} style.`
+          : `Premium product lifestyle photo. NO TEXT. NO PEOPLE. Elegant arrangement of ${businessContext} on a ${colorName} background. ${styleWord} style, ultra clean, commercial photography aesthetic.`;
 
         const res = await openai.images.generate({
           model: "dall-e-3",
           prompt: noMascotPrompt,
           n: 1,
-          size: "1792x1024",
+          size: isBanner ? "1792x1024" : "1024x1024",
           response_format: "b64_json",
         });
         b64 = res.data[0].b64_json;

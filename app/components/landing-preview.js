@@ -501,6 +501,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           value={store.bannerSecondary}
           onUpload={v => onUpdate?.("bannerSecondary", v)}
           isEditable={isEditable}
+          bannerLabel="imagen"
           className={`${standalone ? "min-h-[220px]" : "min-h-[280px]"} overflow-hidden rounded-[1.5rem]`}
           style={{ backgroundColor: store.backgroundColor }}
         >
