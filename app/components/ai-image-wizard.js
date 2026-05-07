@@ -23,7 +23,7 @@ const STEPS = [
 ];
 
 export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bannerLabel = "banner" }) {
-  const [step, setStep]                 = useState(0);
+  const [step, setStep]                 = useState(-1); // -1 = pantalla inicial
   const [color, setColor]               = useState("#7FE040");
   const [productos, setProductos]       = useState("");
   const [tieneMascota, setTieneMascota] = useState(null);
@@ -183,22 +183,46 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
       <div style={{ background: "#0f0f0f", border: "1px solid rgba(127,224,64,0.25)", borderRadius: 24, padding: "36px 32px", width: "100%", maxWidth: 500, position: "relative" }}
         onClick={e => e.stopPropagation()}>
 
-        {/* Subir foto propia */}
-        {onUploadFile && (
-          <button type="button" onClick={() => { onUploadFile(); onClose(); }}
-            style={{ width: "100%", border: "1.5px dashed rgba(255,255,255,0.15)", borderRadius: 12, background: "transparent", color: "rgba(255,255,255,0.5)", padding: "11px", fontSize: "0.8rem", fontWeight: 600, cursor: "pointer", marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            Subir mi propia imagen
-          </button>
+        {/* Pantalla inicial de selección */}
+        {step === -1 && (
+          <div>
+            <p style={{ color: "#7FE040", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 10px" }}>Drokex Estudio</p>
+            <h3 style={{ color: "#fff", fontSize: "1.2rem", fontWeight: 800, margin: "0 0 6px" }}>¿Cómo quieres crear tu imagen?</h3>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.82rem", margin: "0 0 28px" }}>Elige una opción para continuar.</p>
+
+            <button type="button" onClick={() => setStep(0)}
+              style={{ width: "100%", borderRadius: 16, border: "2px solid #7FE040", background: "rgba(127,224,64,0.08)", padding: "20px 18px", cursor: "pointer", textAlign: "left", marginBottom: 12, display: "flex", alignItems: "center", gap: 16 }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(127,224,64,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <div>
+                <div style={{ color: "#7FE040", fontWeight: 900, fontSize: "0.95rem", marginBottom: 3 }}>Crear con Drokex Estudio</div>
+                <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>La IA genera tu imagen paso a paso con tu marca</div>
+              </div>
+            </button>
+
+            {onUploadFile && (
+              <button type="button" onClick={() => { onUploadFile(); onClose(); }}
+                style={{ width: "100%", borderRadius: 16, border: "1.5px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.03)", padding: "20px 18px", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: "rgba(255,255,255,0.07)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <div>
+                  <div style={{ color: "rgba(255,255,255,0.75)", fontWeight: 800, fontSize: "0.95rem", marginBottom: 3 }}>Subir mi propia imagen</div>
+                  <div style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.78rem" }}>Sube una foto desde tu dispositivo</div>
+                </div>
+              </button>
+            )}
+
+            <button type="button" onClick={onClose} disabled={loading}
+              style={{ width: "100%", marginTop: 20, borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.4)", padding: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.85rem" }}>
+              Cancelar
+            </button>
+          </div>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-          <span style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.72rem" }}>o crea una con IA</span>
-          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
-        </div>
-
-        {/* Barra de progreso */}
+        {/* Barra de progreso (solo en pasos del wizard) */}
+        {step >= 0 && (<>
         <div style={{ display: "flex", gap: 6, marginBottom: 28 }}>
           {STEPS.map((s, i) => (
             <div key={s.id} style={{ flex: 1, height: 4, borderRadius: 4, background: i <= step ? "#7FE040" : "rgba(255,255,255,0.1)", transition: "background 0.3s" }} />
@@ -316,10 +340,10 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
         {/* Botones de navegación */}
         <div style={{ display: "flex", gap: 10, marginTop: 28 }}>
           <button type="button"
-            onClick={() => step === 0 ? onClose() : setStep(s => s - 1)}
+            onClick={() => step === 0 ? setStep(-1) : setStep(s => s - 1)}
             disabled={loading}
             style={{ flex: 1, borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.5)", padding: "13px", fontWeight: 700, cursor: "pointer", fontSize: "0.88rem" }}>
-            {step === 0 ? "Cancelar" : "← Atrás"}
+            {step === 0 ? "← Volver" : "← Atrás"}
           </button>
 
           {step < total - 1 ? (
@@ -334,6 +358,7 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
             </button>
           )}
         </div>
+        </>)}
       </div>
     </div>
   );
