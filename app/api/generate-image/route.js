@@ -52,18 +52,20 @@ export async function POST(request) {
 
 The uploaded reference image is split in two halves: LEFT HALF shows product items to include in the scene, RIGHT HALF shows the mascot/character. Use both as visual references.
 
-Place the exact mascot character (from the right half of the reference) FULLY VISIBLE on the right side of the banner. Display the products (from the left half of the reference) naturally arranged in the scene around the character.
+Place the exact mascot character (from the right half of the reference) FULLY VISIBLE on the right side of the banner. Display the products (from the left half of the reference) naturally arranged in the scene around the character. The business sells "${productos}" — make the atmosphere and any extra scene elements thematically match this (subtle props, textures, or floating elements related to "${productos}").
 
 The far LEFT area of the banner must be clean — only the background color.
 
 Background: solid ${colorName} (${color}). Style: ${styleWord}.`
           : `Create a premium horizontal website banner. NO TEXT, NO WORDS, NO LETTERS anywhere.
 
-The character from the uploaded image appears on the RIGHT SIDE of the banner, FULLY VISIBLE from head to feet with comfortable space around it. The character maintains its exact colors, design and style. It blends naturally with the scene.
+The character from the uploaded image appears on the RIGHT SIDE of the banner, FULLY VISIBLE from head to feet with comfortable space around it. The character maintains its exact colors, design and style.
+
+IMPORTANT: The business sells "${productos}". Make the scene thematically relevant: surround the character with subtle, elegant props or elements directly related to "${productos}" (for example, if it's coffee → floating coffee beans, steam wisps, coffee cups nearby; if it's flowers → petals drifting around; if it's technology → soft glowing circuit lines; if it's food → tasteful food items floating near). The character may wear a small accessory or hold an item related to "${productos}" if it fits naturally. Keep these elements subtle and elegant — they enhance, not overwhelm.
 
 The LEFT HALF is completely empty — only the background color.
 
-Background: solid ${colorName} (${color}). Style: ${styleWord}. Context: ${businessContext}.`;
+Background: solid ${colorName} (${color}). Style: ${styleWord}.`;
 
         const res = await openai.images.edit({
           model: "gpt-image-1",
