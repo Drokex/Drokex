@@ -334,7 +334,7 @@ export default function ProveedorProPage({
       {authStatus === "checking" ? (
         <section className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-white px-6 text-center">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#2ea600]">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#7FE040]">
               Proveedor Pro
             </p>
             <h1 className="mt-3 text-3xl font-black text-[#111]">Validando tu cuenta...</h1>
@@ -345,23 +345,33 @@ export default function ProveedorProPage({
         <section style={{ display: "grid", gridTemplateColumns: "420px 1fr", minHeight: "calc(100vh - 80px)", background: "#ffffff" }}>
           {/* Left: text + plan + form */}
           <div style={{ padding: "64px 40px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 24, background: "#ffffff" }}>
-            <span style={{ display: "inline-block", background: "rgba(46,166,0,0.1)", color: "#2ea600", fontSize: "0.7rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(46,166,0,0.25)", alignSelf: "flex-start" }}>
+            <span style={{ display: "inline-block", background: "rgba(127, 224, 64, 0.1)", color: "#7FE040", fontSize: "0.7rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(127, 224, 64, 0.25)", alignSelf: "flex-start" }}>
               Proveedor Pro
             </span>
 
             <h1 style={{ fontSize: "clamp(1.35rem, 2vw, 1.9rem)", fontWeight: 700, lineHeight: 1.25, margin: 0, color: "#111", letterSpacing: "-0.01em" }}>
               Crea tu tienda premium<br />dentro de{" "}
-              <span style={{ color: "#2ea600" }}>Drokex</span>
+              <span style={{ color: "#7FE040" }}>Drokex</span>
             </h1>
 
             <p style={{ color: "#666", fontSize: "0.95rem", lineHeight: 1.7, margin: 0 }}>
               Activa el modo Pro para construir una landing personalizada, subir banners, productos, textos comerciales y vender directo.
             </p>
 
-            <div style={{ borderRadius: 24, border: "1px solid rgba(46,166,0,0.25)", background: "rgba(46,166,0,0.06)", padding: "24px" }}>
-              <p style={{ margin: 0, color: "#888", fontSize: "0.82rem" }}>Plan demo</p>
-              <h2 style={{ margin: "8px 0 0", fontSize: "2.4rem", fontWeight: 900, color: "#2ea600", lineHeight: 1 }}>$99.000 COP</h2>
-              <p style={{ margin: "8px 0 0", color: "#999", fontSize: "0.82rem" }}>Simulación para validar experiencia.</p>
+            <div style={{ borderRadius: 24, border: "1px solid rgba(127, 224, 64, 0.35)", background: "rgba(127, 224, 64, 0.06)", padding: "24px" }}>
+              <div style={{ display: "inline-block", background: "#7FE040", color: "#050505", fontSize: "0.68rem", fontWeight: 900, padding: "3px 12px", borderRadius: 20, letterSpacing: "0.1em", marginBottom: 12 }}>
+                OFERTA DE LANZAMIENTO
+              </div>
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 8, marginBottom: 4 }}>
+                <h2 style={{ margin: 0, fontSize: "2.8rem", fontWeight: 900, color: "#7FE040", lineHeight: 1 }}>$5 USD</h2>
+                <span style={{ color: "#888", fontSize: "0.9rem", marginBottom: 6 }}>/mes</span>
+              </div>
+              <p style={{ margin: "4px 0 12px", color: "#666", fontSize: "0.82rem" }}>Primeros 2 meses con precio promocional.</p>
+              <div style={{ borderTop: "1px solid rgba(127,224,64,0.2)", paddingTop: 12 }}>
+                <p style={{ margin: 0, color: "#999", fontSize: "0.78rem" }}>
+                  A partir del mes 3 → <strong style={{ color: "#444" }}>$20 USD / mes</strong>
+                </p>
+              </div>
             </div>
 
             <div style={{ borderRadius: 24, border: "1px solid rgba(0,0,0,0.1)", background: "#f7f7f7", padding: "28px" }}>
@@ -371,13 +381,13 @@ export default function ProveedorProPage({
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="Código de activación"
                 style={{ width: "100%", borderRadius: 14, border: "1px solid rgba(0,0,0,0.15)", background: "#fff", color: "#111", padding: "14px 18px", fontSize: "0.92rem", outline: "none", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#2ea600"}
+                onFocus={e => e.target.style.borderColor = "#7FE040"}
                 onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.15)"}
               />
               {error && <p style={{ margin: "8px 0 0", color: "#dc2626", fontSize: "0.82rem" }}>{error}</p>}
               <button
                 onClick={activatePro}
-                style={{ marginTop: 14, width: "100%", borderRadius: 14, background: "#2ea600", color: "#fff", fontWeight: 900, fontSize: "1rem", padding: "14px", border: "none", cursor: "pointer", boxShadow: "0 4px 20px rgba(46,166,0,0.3)" }}
+                style={{ marginTop: 14, width: "100%", borderRadius: 14, background: "#7FE040", color: "#fff", fontWeight: 900, fontSize: "1rem", padding: "14px", border: "none", cursor: "pointer", boxShadow: "0 4px 20px rgba(127, 224, 64, 0.3)" }}
               >
                 Activar plan Pro
               </button>
@@ -394,7 +404,7 @@ export default function ProveedorProPage({
         <section className="bg-[#050705] px-4 py-6 sm:px-6 lg:px-10">
           <div className="mx-auto mb-5 flex max-w-7xl items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-[#59ff35]">
+              <p className="text-xs font-black uppercase tracking-[0.25em] text-[#7FE040]">
                 Previsualizacion
               </p>
               <h2 className="mt-1 text-2xl font-black">
@@ -405,7 +415,7 @@ export default function ProveedorProPage({
             <button
               type="button"
               onClick={() => setIsPreviewMode(false)}
-              className="rounded-2xl border border-white/15 px-5 py-3 font-black text-white transition hover:border-[#59ff35] hover:text-[#59ff35]"
+              className="rounded-2xl border border-white/15 px-5 py-3 font-black text-white transition hover:border-[#7FE040] hover:text-[#7FE040]"
             >
               Volver a editar
             </button>
@@ -515,7 +525,7 @@ export default function ProveedorProPage({
                           }
                           setShowCountryDropdown(v => !v);
                         }}
-                        style={{ borderRadius: 13, border: `1px solid ${selected.length ? "rgba(0,0,0,0.1)" : "rgba(34,196,0,0.5)"}`, background: selected.length ? "#fff" : "rgba(34,196,0,0.06)", color: "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", whiteSpace: "nowrap" }}
+                        style={{ borderRadius: 13, border: `1px solid ${selected.length ? "rgba(0,0,0,0.1)" : "rgba(127, 224, 64, 0.5)"}`, background: selected.length ? "#fff" : "rgba(127, 224, 64, 0.06)", color: "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", whiteSpace: "nowrap" }}
                       >
                         <span>{label}</span>
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ opacity: 0.4, flexShrink: 0 }}>
@@ -536,11 +546,11 @@ export default function ProveedorProPage({
                                 key={c.label}
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); toggle(c.label); }}
-                                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", background: active ? "rgba(34,196,0,0.07)" : "transparent", border: "none", cursor: "pointer", fontSize: "0.88rem", fontWeight: active ? 900 : 600, color: "#111", textAlign: "left" }}
+                                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", background: active ? "rgba(127, 224, 64, 0.07)" : "transparent", border: "none", cursor: "pointer", fontSize: "0.88rem", fontWeight: active ? 900 : 600, color: "#111", textAlign: "left" }}
                               >
                                 <span style={{ fontSize: "1.1rem" }}>{c.flag}</span>
                                 <span style={{ flex: 1 }}>{c.label}</span>
-                                <span style={{ width: 18, height: 18, borderRadius: 6, border: `2px solid ${active ? "#22c400" : "rgba(0,0,0,0.15)"}`, background: active ? "#22c400" : "transparent", display: "grid", placeItems: "center", flexShrink: 0 }}>
+                                <span style={{ width: 18, height: 18, borderRadius: 6, border: `2px solid ${active ? "#7FE040" : "rgba(0,0,0,0.15)"}`, background: active ? "#7FE040" : "transparent", display: "grid", placeItems: "center", flexShrink: 0 }}>
                                   {active && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                                 </span>
                               </button>
@@ -561,7 +571,7 @@ export default function ProveedorProPage({
                   Colores
                 </button>
                 <button type="button" onClick={createLanding} disabled={isPublishing}
-                  style={{ borderRadius: 13, border: "none", background: isPublishing ? "#aaa" : "#22c400", color: "#fff", fontWeight: 950, padding: "10px 16px", boxShadow: isPublishing ? "none" : "0 12px 28px rgba(34,196,0,0.28)", cursor: isPublishing ? "not-allowed" : "pointer", transition: "background 0.2s" }}>
+                  style={{ borderRadius: 13, border: "none", background: isPublishing ? "#aaa" : "#7FE040", color: "#fff", fontWeight: 950, padding: "10px 16px", boxShadow: isPublishing ? "none" : "0 12px 28px rgba(127, 224, 64, 0.28)", cursor: isPublishing ? "not-allowed" : "pointer", transition: "background 0.2s" }}>
                   {isPublishing ? "Publicando..." : "Publicar"}
                 </button>
               </div>
@@ -569,10 +579,10 @@ export default function ProveedorProPage({
           </div>
 
           {landingLink && (
-            <div style={{ position: "fixed", left: 22, bottom: 22, zIndex: 80, width: 300, borderRadius: 18, border: "1px solid rgba(34,196,0,0.3)", background: "rgba(255,255,255,0.92)", boxShadow: "0 18px 50px rgba(0,0,0,0.16)", padding: 14, backdropFilter: "blur(14px)" }}>
-              <p style={{ margin: "0 0 6px", color: "#22a600", fontSize: "0.68rem", fontWeight: 950, letterSpacing: "0.14em", textTransform: "uppercase" }}>Landing publicada</p>
+            <div style={{ position: "fixed", left: 22, bottom: 22, zIndex: 80, width: 300, borderRadius: 18, border: "1px solid rgba(127, 224, 64, 0.3)", background: "rgba(255,255,255,0.92)", boxShadow: "0 18px 50px rgba(0,0,0,0.16)", padding: 14, backdropFilter: "blur(14px)" }}>
+              <p style={{ margin: "0 0 6px", color: "#7FE040", fontSize: "0.68rem", fontWeight: 950, letterSpacing: "0.14em", textTransform: "uppercase" }}>Landing publicada</p>
               <a href={landingLink} style={{ display: "block", color: "#555", fontSize: "0.74rem", wordBreak: "break-all", marginBottom: 8 }}>{landingLink}</a>
-              <button type="button" onClick={copyLandingLink} style={{ width: "100%", borderRadius: 11, border: "1px solid rgba(34,196,0,0.35)", background: "rgba(34,196,0,0.08)", color: "#159000", fontWeight: 950, padding: "8px 10px", cursor: "pointer" }}>
+              <button type="button" onClick={copyLandingLink} style={{ width: "100%", borderRadius: 11, border: "1px solid rgba(127, 224, 64, 0.35)", background: "rgba(127, 224, 64, 0.08)", color: "#7FE040", fontWeight: 950, padding: "8px 10px", cursor: "pointer" }}>
                 {copiedLink ? "Copiado" : "Copiar link"}
               </button>
             </div>
@@ -587,7 +597,7 @@ export default function ProveedorProPage({
               <p style={{ margin: "4px 0 0", fontSize: "0.68rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.36)" }}>Tus productos</p>
               {products.map((product, index) => (
                 <div key={index} style={{ borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", padding: 14, display: "flex", flexDirection: "column", gap: 12 }}>
-                  <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 950, color: "#59ff35" }}>Producto {index + 1}</p>
+                  <p style={{ margin: 0, fontSize: "0.78rem", fontWeight: 950, color: "#7FE040" }}>Producto {index + 1}</p>
                   <Input label="Nombre" value={product.name} onChange={v => updateProduct(index, "name", v)} />
                   <Input label="Categoria" value={product.category} onChange={v => updateProduct(index, "category", v)} />
                   <Input label="Precio" value={product.price} onChange={v => updateProduct(index, "price", v)} />
@@ -596,7 +606,7 @@ export default function ProveedorProPage({
                   <Textarea label="Descripcion" value={product.description} onChange={v => updateProduct(index, "description", v)} />
                 </div>
               ))}
-              <button onClick={addProduct} style={{ width: "100%", borderRadius: 14, border: "1px dashed rgba(89,255,53,0.48)", background: "rgba(89,255,53,0.08)", color: "#59ff35", fontWeight: 950, fontSize: "0.84rem", padding: "12px", cursor: "pointer" }}>
+              <button onClick={addProduct} style={{ width: "100%", borderRadius: 14, border: "1px dashed rgba(127, 224, 64, 0.48)", background: "rgba(127, 224, 64, 0.08)", color: "#7FE040", fontWeight: 950, fontSize: "0.84rem", padding: "12px", cursor: "pointer" }}>
                 + Agregar producto
               </button>
               <p style={{ margin: "4px 0 0", fontSize: "0.68rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.36)" }}>Cierre final</p>
@@ -639,7 +649,7 @@ export default function ProveedorProPage({
           <style>{`@keyframes drokex-spin { to { transform: rotate(360deg); } }`}</style>
           <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.18)", backdropFilter: "blur(4px)" }}>
             <div style={{ background: "#fff", borderRadius: 22, padding: "36px 48px", textAlign: "center", boxShadow: "0 24px 60px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-              <div style={{ width: 48, height: 48, borderRadius: "50%", border: "4px solid #e5e5e5", borderTopColor: "#22c400", animation: "drokex-spin 0.8s linear infinite" }} />
+              <div style={{ width: 48, height: 48, borderRadius: "50%", border: "4px solid #e5e5e5", borderTopColor: "#7FE040", animation: "drokex-spin 0.8s linear infinite" }} />
               <p style={{ margin: 0, fontSize: "1.15rem", fontWeight: 900, color: "#111" }}>Publicando tu página...</p>
               <p style={{ margin: 0, fontSize: "0.85rem", color: "#888" }}>Esto solo tomará un momento</p>
             </div>
@@ -649,7 +659,7 @@ export default function ProveedorProPage({
       {publishSuccess && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.18)", backdropFilter: "blur(4px)" }}>
           <div style={{ background: "#fff", borderRadius: 22, padding: "36px 48px", textAlign: "center", boxShadow: "0 24px 60px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
-            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#22c400", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#7FE040", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <p style={{ margin: 0, fontSize: "1.25rem", fontWeight: 900, color: "#111" }}>¡Publicada con éxito!</p>
@@ -726,9 +736,9 @@ function _LandingPreview_UNUSED({ store, products, fullWidth = false, isEditable
             value={store.heroImage}
             onUpload={v => onUpdate?.("heroImage", v)}
             isEditable={isEditable}
-            style={{ position: "absolute", top: 12, right: 12, zIndex: 30, borderRadius: 12, overflow: "hidden", width: 44, height: 44, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(89,255,53,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}
+            style={{ position: "absolute", top: 12, right: 12, zIndex: 30, borderRadius: 12, overflow: "hidden", width: 44, height: 44, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(127, 224, 64, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
               <circle cx="12" cy="13" r="4"/>
             </svg>
@@ -962,7 +972,7 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
     <div style={{ position: "relative" }}>
       {focused && (
         <div onMouseDown={e => e.preventDefault()}
-          style={{ position: "absolute", top: -50, left: 0, zIndex: 400, background: "#0c140c", border: "1px solid rgba(89,255,53,0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
+          style={{ position: "absolute", top: -50, left: 0, zIndex: 400, background: "#0c140c", border: "1px solid rgba(127, 224, 64, 0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.(Math.max(10, (fontSize || 16) - 2)); }}>A−</button>
           <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.45)", minWidth: 34, textAlign: "center" }}>{fontSize || "auto"}px</span>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.((fontSize || 16) + 2); }}>A+</button>
@@ -983,7 +993,7 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
         onFocus={() => setFocused(true)}
         onBlur={() => { setFocused(false); onTextChange?.(ref.current?.innerText || ""); }}
         className={className}
-        style={{ ...computedStyle, outline: focused ? "2px dashed rgba(89,255,53,0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40 }}
+        style={{ ...computedStyle, outline: focused ? "2px dashed rgba(127, 224, 64, 0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40 }}
       />
     </div>
   );
@@ -1014,11 +1024,11 @@ function ClickableImageZone({ value, onUpload, isEditable, className, style, pla
       {children}
       {hovered && (
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: "inherit", zIndex: 20, pointerEvents: "none" }}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
             <circle cx="12" cy="13" r="4"/>
           </svg>
-          <span style={{ color: "#59ff35", fontSize: "0.8rem", fontWeight: 900 }}>{value ? "Cambiar imagen" : "Subir imagen"}</span>
+          <span style={{ color: "#7FE040", fontSize: "0.8rem", fontWeight: 900 }}>{value ? "Cambiar imagen" : "Subir imagen"}</span>
         </div>
       )}
       <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} onClick={e => e.stopPropagation()} />
@@ -1089,12 +1099,12 @@ function FloatingEditorCard({ title, onClose, children }) {
 
 function SectionCard({ id, label, icon, open, onToggle, children }) {
   return (
-    <div style={{ borderRadius: 14, border: open ? "1px solid rgba(89,255,53,0.25)" : "1px solid rgba(255,255,255,0.07)", overflow: "hidden", background: open ? "rgba(89,255,53,0.04)" : "rgba(255,255,255,0.02)" }}>
+    <div style={{ borderRadius: 14, border: open ? "1px solid rgba(127, 224, 64, 0.25)" : "1px solid rgba(255,255,255,0.07)", overflow: "hidden", background: open ? "rgba(127, 224, 64, 0.04)" : "rgba(255,255,255,0.02)" }}>
       <button type="button" onClick={onToggle}
         style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "13px 14px", background: "transparent", border: "none", cursor: "pointer", color: "#fff" }}>
-        <span style={{ color: open ? "#59ff35" : "rgba(255,255,255,0.35)", display: "flex", alignItems: "center" }}>{icon}</span>
+        <span style={{ color: open ? "#7FE040" : "rgba(255,255,255,0.35)", display: "flex", alignItems: "center" }}>{icon}</span>
         <span style={{ fontWeight: 700, fontSize: "0.85rem", flex: 1, textAlign: "left" }}>{label}</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={open ? "#59ff35" : "rgba(255,255,255,0.3)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "none" }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={open ? "#7FE040" : "rgba(255,255,255,0.3)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "none" }}>
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
@@ -1160,7 +1170,7 @@ function ColorInput({ label, value, onChange }) {
         <input
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#59ff35]"
+          className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#7FE040]"
         />
       </div>
     </label>
@@ -1176,7 +1186,7 @@ function Input({ label, value, onChange }) {
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#59ff35]"
+        className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#7FE040]"
       />
     </label>
   );
@@ -1191,7 +1201,7 @@ function Textarea({ label, value, onChange }) {
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="min-h-24 w-full resize-none rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#59ff35]"
+        className="min-h-24 w-full resize-none rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#7FE040]"
       />
     </label>
   );
@@ -1232,18 +1242,18 @@ function ImageUploader({ label, value, onChange }) {
         onClick={() => fileRef.current?.click()}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="relative flex min-h-36 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-white/15 bg-[#050705] text-sm font-bold text-white/40 transition hover:border-[#59ff35]/70 hover:text-[#59ff35]"
+        className="relative flex min-h-36 w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-white/15 bg-[#050705] text-sm font-bold text-white/40 transition hover:border-[#7FE040]/70 hover:text-[#7FE040]"
       >
         {value ? (
           <>
             <img src={value} alt={label} className="h-full min-h-36 w-full object-cover" />
             {hovered && (
               <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                   <circle cx="12" cy="13" r="4"/>
                 </svg>
-                <span style={{ color: "#59ff35", fontSize: "0.72rem", fontWeight: 900 }}>Cambiar imagen</span>
+                <span style={{ color: "#7FE040", fontSize: "0.72rem", fontWeight: 900 }}>Cambiar imagen</span>
               </div>
             )}
           </>
@@ -1264,7 +1274,7 @@ function ImageUploader({ label, value, onChange }) {
         value={value?.startsWith("data:") ? "" : value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="O pegar URL de imagen"
-        className="mt-3 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#59ff35]"
+        className="mt-3 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#7FE040]"
       />
     </div>
   );

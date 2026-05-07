@@ -4,8 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const COUNTRIES = [
-  "Nicaragua", "Honduras", "Guatemala", "El Salvador",
-  "República Dominicana", "Colombia", "Perú", "México", "Otro",
+  "Argentina", "Bolivia", "Brasil", "Chile", "Colombia",
+  "Costa Rica", "Cuba", "Ecuador", "El Salvador", "Guatemala",
+  "Haití", "Honduras", "Jamaica", "México", "Nicaragua",
+  "Panamá", "Paraguay", "Perú", "Puerto Rico", "República Dominicana",
+  "Trinidad y Tobago", "Uruguay", "Venezuela", "Otro",
 ];
 
 function CountrySelect({ value, onChange }) {
@@ -31,7 +34,7 @@ function CountrySelect({ value, onChange }) {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "0.75rem 1rem",
-          border: open ? "1.5px solid #9be02f" : "1.5px solid #e5e7eb",
+          border: open ? "1.5px solid #7FE040" : "1.5px solid #e5e7eb",
           borderRadius: 10,
           fontSize: "0.97rem",
           fontFamily: "inherit",
@@ -78,7 +81,7 @@ function CountrySelect({ value, onChange }) {
                 padding: "10px 16px",
                 fontSize: "0.95rem",
                 cursor: "pointer",
-                color: c === value ? "#5aab00" : "#1a1a1a",
+                color: c === value ? "#7FE040" : "#1a1a1a",
                 fontWeight: c === value ? 700 : 400,
                 background: c === value ? "#f4ffe8" : "transparent",
                 transition: "background 0.1s",
@@ -166,8 +169,8 @@ export default function QuoteForm({ productId, productName, onClose }) {
       <div className="qf-field">
         <label>Mensaje adicional (opcional)</label>
         <textarea
-          rows={3}
-          placeholder="Especificaciones, condiciones de pago, plazos de entrega..."
+          rows={5}
+          placeholder={`• ¿Lo quieres con caja o sin caja?\n• ¿Necesitas etiqueta propia o del proveedor?\n• ¿Qué tamaño o peso por unidad necesitas?\n• ¿Lo quieres a granel o empacado individualmente?\n• ¿Requieres algún color, sabor o variante específica?\n• ¿En cuánto tiempo necesitas el pedido?`}
           value={form.message}
           onChange={(e) => set("message", e.target.value)}
         />

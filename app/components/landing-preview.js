@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { buildMarketPrice, inferCurrencyFromOriginCountry, COUNTRY_PREFERENCE_STORAGE_KEY } from "@/lib/market-pricing";
+import AiImageWizard from "@/app/components/ai-image-wizard";
 
 export function hexToRgba(hex, alpha) {
   const normalized = (hex || "#000000").replace("#", "");
@@ -57,7 +58,7 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
     >
       {focused && (
         <div onMouseDown={e => e.preventDefault()}
-          style={{ position: "fixed", top: toolbarPos.top, left: toolbarPos.left, zIndex: 9999, background: "#0c140c", border: "1px solid rgba(89,255,53,0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
+          style={{ position: "fixed", top: toolbarPos.top, left: toolbarPos.left, zIndex: 9999, background: "#0c140c", border: "1px solid rgba(127, 224, 64, 0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.(Math.max(10, (fontSize || 16) - 2)); }}>A−</button>
           <span style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.45)", minWidth: 34, textAlign: "center" }}>{fontSize || "auto"}px</span>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.((fontSize || 16) + 2); }}>A+</button>
@@ -176,14 +177,15 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
           setToolbarPos({ top, left: Math.min(rect.left, window.innerWidth - 320) });
         }}
         className={className}
-        style={{ ...computedStyle, outline: focused ? "2px dashed rgba(89,255,53,0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40 }}
+        style={{ ...computedStyle, outline: focused ? "2px dashed rgba(127, 224, 64, 0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40 }}
       />
     </Wrapper>
   );
 }
 
-export function ClickableImageZone({ value, onUpload, isEditable, className, style, children }) {
+export function ClickableImageZone({ value, onUpload, isEditable, className, style, children, bannerLabel = "banner" }) {
   const [hovered, setHovered] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
   const fileRef = useRef(null);
 
   function handleFile(event) {
@@ -197,27 +199,35 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
   if (!isEditable) return <div className={className} style={style}>{children}</div>;
 
   return (
-    <div
-      className={className}
-      style={{ position: "relative", cursor: "pointer", ...style }}
-      onClick={(e) => { if (e.target.isContentEditable || e.target.closest("[contenteditable]")) return; fileRef.current?.click(); }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {children}
-      {hovered && (
-        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.52)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, borderRadius: "inherit", zIndex: 20, pointerEvents: "none", overflow: "hidden" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-            <circle cx="12" cy="13" r="4"/>
-          </svg>
-          <span style={{ color: "#59ff35", fontSize: "0.68rem", fontWeight: 900, whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden", maxWidth: "100%", padding: "0 4px" }}>
-            {value ? "Cambiar" : "Subir"}
-          </span>
-        </div>
+    <>
+      <div
+        className={className}
+        style={{ position: "relative", cursor: "pointer", ...style }}
+        onClick={(e) => { if (e.target.isContentEditable || e.target.closest("[contenteditable]")) return; setShowWizard(true); }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        {children}
+        {hovered && (
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: "inherit", zIndex: 20, overflow: "hidden", pointerEvents: "none" }}>
+            <div style={{ background: "#7FE040", borderRadius: 10, padding: "8px 18px", color: "#050505", fontSize: "0.78rem", fontWeight: 900 }}>
+              ✦ Crear imagen
+            </div>
+            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem" }}>Subir o generar con IA</div>
+          </div>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} onClick={e => e.stopPropagation()} />
+      </div>
+
+      {showWizard && (
+        <AiImageWizard
+          bannerLabel={bannerLabel}
+          onClose={() => setShowWizard(false)}
+          onGenerated={(img) => { onUpload(img); setShowWizard(false); }}
+          onUploadFile={() => fileRef.current?.click()}
+        />
       )}
-      <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} onClick={e => e.stopPropagation()} />
-    </div>
+    </>
   );
 }
 
@@ -354,7 +364,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             ? `url(${store.heroImage})`
             : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)`,
           backgroundSize: store.heroImage ? "cover" : undefined,
-          backgroundPosition: store.heroImage ? "center center" : undefined,
+          backgroundPosition: store.heroImage ? `center ${store.heroImageY ?? 50}%` : undefined,
         }}
       >
         {isEditable && (
@@ -362,13 +372,23 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             value={store.heroImage}
             onUpload={v => onUpdate?.("heroImage", v)}
             isEditable={isEditable}
-            style={{ position: "absolute", top: 12, right: 12, zIndex: 30, borderRadius: 12, overflow: "hidden", width: 44, height: 44, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(89,255,53,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}
+            style={{ position: "absolute", top: 12, right: 12, zIndex: 30, borderRadius: 12, overflow: "hidden", width: 44, height: 44, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(127, 224, 64, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#59ff35" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
               <circle cx="12" cy="13" r="4"/>
             </svg>
           </ClickableImageZone>
+        )}
+        {isEditable && store.heroImage && (
+          <div style={{ position: "absolute", top: 12, right: 64, zIndex: 30, display: "flex", flexDirection: "column", gap: 4 }}>
+            <button type="button" title="Subir imagen"
+              onClick={() => onUpdate?.("heroImageY", Math.max(0, (store.heroImageY ?? 50) - 10))}
+              style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>↑</button>
+            <button type="button" title="Bajar imagen"
+              onClick={() => onUpdate?.("heroImageY", Math.min(100, (store.heroImageY ?? 50) + 10))}
+              style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>↓</button>
+          </div>
         )}
         <div className={`${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
           <div className={standalone ? "max-w-xl" : ""}>
