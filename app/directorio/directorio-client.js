@@ -104,7 +104,9 @@ function HeroThumb({ slug, landing, active, onClick }) {
   );
 }
 
-const HERO_VIDEO = "/banner-pro.mp4";
+const HERO_VIDEO =
+  "https://f96gfpetvymkefdo.public.blob.vercel-storage.com/drokex%20video%20pro.mp4";
+const HERO_VIDEO_FALLBACK = "/banner-pro.mp4";
 
 // ── Hero principal (full-width) ──
 function HeroFeatured({ slug, landing, sideItems, featured, setFeatured, allItems }) {
@@ -124,6 +126,7 @@ function HeroFeatured({ slug, landing, sideItems, featured, setFeatured, allItem
         style={{ position: "absolute", inset: 0, zIndex: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
       >
         <source src={HERO_VIDEO} type="video/mp4" />
+        <source src={HERO_VIDEO_FALLBACK} type="video/mp4" />
       </video>
       {/* Gradiente lateral izquierdo para texto legible */}
       <div style={{
