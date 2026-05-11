@@ -35,7 +35,6 @@ const marketLabels = {
 
 const menuItemsEs = [
   { label: "Productos", href: "/productos" },
-  { label: "3D", href: "/3d" },
   { label: "Directorio", href: "/directorio" },
   { label: "Para proveedores", href: "/para-proveedores" },
   { label: "Servicios", submenu: [{ label: "Proveedor", href: "/servicios/proveedor" }, { label: "Cliente", href: "/servicios/cliente" }] },
@@ -44,7 +43,6 @@ const menuItemsEs = [
 ];
 const menuItemsEn = [
   { label: "Products", href: "/productos" },
-  { label: "3D", href: "/3d" },
   { label: "Directory", href: "/directorio" },
   { label: "For suppliers", href: "/para-proveedores" },
   { label: "Services", submenu: [{ label: "Supplier", href: "/servicios/proveedor" }, { label: "Buyer", href: "/servicios/cliente" }] },
