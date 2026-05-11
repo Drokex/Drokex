@@ -1223,7 +1223,12 @@ export default function Home() {
               <p>+57 311 531 2623</p>
               <p>Bogota, Colombia</p>
             </div>
-            <a href="#" className="whatsapp-link">
+            <a
+              href="https://wa.me/573115312623?text=Hola%2C%20quiero%20hablar%20con%20Drokex"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="whatsapp-link"
+            >
               {t.contactWhatsApp}
             </a>
           </motion.div>
