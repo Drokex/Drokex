@@ -29,55 +29,280 @@ const fadeRight = (delay = 0) => ({
   transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay },
 });
 
-const benefits = [
-  "Origen colombiano",
-  "Expansion LATAM",
-  "Red de aliados",
-  "Logistica eficiente",
-];
+// ─── Translations ────────────────────────────────────────────────────────────
+const T = {
+  es: {
+    // Hero
+    heroTag: "Marketplace internacional",
+    heroHeadline: "Tecnologia que conecta empresas con oportunidades globales.",
+    heroSubtitle:
+      "Drokex conecta proveedores latinoamericanos con compradores internacionales de forma agil, visual y con una experiencia pensada para crecer.",
+    heroSellSpan: "Quiero",
+    heroSellStrong: "vender productos",
+    heroBuySpan: "Quiero",
+    heroBuyStrong: "buscar proveedor",
 
-const tabs = [
-  {
-    id: "dropshippers",
-    label: "Dropshippers",
-    image: "/plataforma-dropshippers.png",
-    alt: "Vista plataforma para dropshippers",
-    title: "Visualiza productos y proveedores con mas claridad para vender mejor.",
-    description:
+    // System section
+    systemTag: "Sistema operativo Drokex",
+    systemHeadlineLine1: "Un sistema diseñado para",
+    systemHeadlineLine2: "mover tu negocio sin límites",
+    systemBody:
+      "Conectamos descubrimiento, cotización, confianza y operación para que vender y expandirse en LATAM se sienta más simple.",
+
+    // Operating steps
+    step1Title: "Conexion activa",
+    step1Desc:
+      "Detectamos oportunidades de compra y venta en tiempo real para empresas que quieren moverse mejor en LATAM.",
+    step2Title: "Cotizacion inteligente",
+    step2Desc:
+      "La plataforma conecta oferta y demanda para ayudarte a responder con mas contexto y mejor timing comercial.",
+    step3Title: "Operacion segura",
+    step3Desc:
+      "Validamos pagos, contactos y señales de confianza para cuidar cada proceso de principio a fin.",
+    step4Title: "Ruta optimizada",
+    step4Desc:
+      "Aterrizamos la operación con rutas logísticas y decisiones más claras según el destino y el tipo de pedido.",
+    step5Title: "Expansión lograda",
+    step5Desc:
+      "Tu negocio gana alcance real: nuevos mercados, mejores conexiones y más oportunidades para crecer.",
+
+    // Operating highlights
+    highlight1Title: "Visibilidad total",
+    highlight1Desc: "Monitorea el avance de cada operación con una lectura más clara.",
+    highlight2Title: "Control y seguridad",
+    highlight2Desc: "Tu decides como avanzar y Drokex ayuda a proteger el proceso.",
+    highlight3Title: "Integracion simple",
+    highlight3Desc: "Conecta tu oferta y tus flujos sin depender de procesos dispersos.",
+    highlight4Title: "Soporte humano",
+    highlight4Desc: "Un equipo cercano que entiende el mercado y acompana cada paso.",
+
+    // Benefits
+    benefit1: "Origen colombiano",
+    benefit2: "Expansion LATAM",
+    benefit3: "Red de aliados",
+    benefit4: "Logistica eficiente",
+
+    // Markets
+    marketsGrow: "Crece en todo el mundo",
+    marketsBuyNow: "Compra ahora",
+
+    // Platform section
+    platformTag: "Plataforma",
+    platformHeading: "Conoce a Drokex",
+    platformTabProvider: "Proveedor",
+    platformTabClient: "Cliente",
+
+    // Tabs
+    tabDropshippersLabel: "Dropshippers",
+    tabDropshippersTitle:
+      "Visualiza productos y proveedores con mas claridad para vender mejor.",
+    tabDropshippersDesc:
       "Una experiencia pensada para quienes necesitan detectar oportunidades, comparar oferta y validar origen sin perder tiempo entre canales dispersos.",
-  },
-  {
-    id: "marcas",
-    label: "Cliente",
-    image: "/plataforma-marcas.png",
-    alt: "Vista plataforma para marcas",
-    title: "Escala tu catalogo con una plataforma preparada para crecer entre mercados.",
-    description:
+    tabMarcasLabel: "Cliente",
+    tabMarcasTitle:
+      "Escala tu catalogo con una plataforma preparada para crecer entre mercados.",
+    tabMarcasDesc:
       "Drokex ayuda a organizar busqueda, seleccion y relacion comercial para marcas que quieren expandirse con estructura y velocidad.",
-  },
-  {
-    id: "proveedores",
-    label: "Proveedor",
-    image: "/plataforma-proveedores.png",
-    alt: "Infografia para proveedores Drokex",
-    title: "Presenta tu oferta internacional de una forma mas directa y mas comercial.",
-    description:
+    tabProveedoresLabel: "Proveedor",
+    tabProveedoresTitle:
+      "Presenta tu oferta internacional de una forma mas directa y mas comercial.",
+    tabProveedoresDesc:
       "Fabricantes y distribuidores pueden mostrar capacidad, alcance y propuesta de valor en una vitrina pensada para negocios reales.",
-  },
-];
 
-const platformHighlights = {
-  marcas: [
-    "Explora catalogos listos para vender en nuevos mercados.",
-    "Conecta con proveedores verificados y gestiona oportunidades desde un solo lugar.",
-    "Acelera compras, cotizaciones y rutas sin depender de mensajes dispersos.",
-  ],
-  proveedores: [
-    "Convierte tu inventario en una vitrina comercial para compradores de Latinoamérica.",
-    "Muestra productos, capacidad y condiciones con una experiencia más clara.",
-    "Recibe contactos, cotizaciones y pedidos con trazabilidad dentro de Drokex.",
-  ],
+    // Platform highlights – marcas
+    phMarcas1: "Explora catalogos listos para vender en nuevos mercados.",
+    phMarcas2:
+      "Conecta con proveedores verificados y gestiona oportunidades desde un solo lugar.",
+    phMarcas3:
+      "Acelera compras, cotizaciones y rutas sin depender de mensajes dispersos.",
+
+    // Platform highlights – proveedores
+    phProveedores1:
+      "Convierte tu inventario en una vitrina comercial para compradores de Latinoamérica.",
+    phProveedores2:
+      "Muestra productos, capacidad y condiciones con una experiencia más clara.",
+    phProveedores3:
+      "Recibe contactos, cotizaciones y pedidos con trazabilidad dentro de Drokex.",
+
+    // GIF / feature labels
+    gifLabel1: "Expande a nuevos mercados",
+    gifLabel2: "Activa rutas logísticas",
+    gifLabel3: "Crea tu tienda digital",
+    gifLabel4: "Gestiona tus productos",
+    gifLabel5: "Controla inventario",
+    gifLabel6: "Opera pedidos en equipo",
+
+    // Testimonials section
+    testimonialsTag: "Casos de exito",
+    testimonialsHeadlinePre: "Asi crecen con ",
+    testimonialsBody:
+      "Historias de empresarios, marcas y operadores que usan Drokex para abrir nuevas oportunidades comerciales.",
+
+    // Aria labels
+    ariaVideoPrev: "Video anterior",
+    ariaVideoNext: "Siguiente video",
+    ariaVideoPlay: "Reproducir historia de",
+    ariaVideoGoto: "Ir al video",
+    ariaModalClose: "Cerrar video",
+    ariaMarkets: "Mercados",
+    ariaAudiences: "Audiencias",
+
+    // Contact section
+    contactSectionTag: "Contacto",
+    contactHeadline1: "Hablemos de",
+    contactHeadline2: "crecimiento",
+    contactHeadline3: "internacional.",
+    contactFormHeading: "Envianos un mensaje",
+    contactPlaceholderName: "Nombre",
+    contactPlaceholderEmail: "Correo electronico",
+    contactSelectDefault: "Selecciona un motivo",
+    contactOptionSales: "Ventas",
+    contactOptionSupport: "Soporte",
+    contactOptionAlliances: "Alianzas",
+    contactPlaceholderMessage: "Escribe tu mensaje aqui...",
+    contactMsgSent: "Mensaje enviado correctamente.",
+    contactMsgError: "No fue posible enviar. Intenta de nuevo.",
+    contactBtnSending: "Enviando...",
+    contactBtnSend: "Enviar mensaje",
+    contactWhatsApp: "Escribenos por WhatsApp",
+  },
+  en: {
+    // Hero
+    heroTag: "International Marketplace",
+    heroHeadline: "Technology that connects businesses with global opportunities.",
+    heroSubtitle:
+      "Drokex connects Latin American suppliers with international buyers in an agile, visual way — built for growth.",
+    heroSellSpan: "I want to",
+    heroSellStrong: "sell products",
+    heroBuySpan: "I want to",
+    heroBuyStrong: "find a supplier",
+
+    // System section
+    systemTag: "Drokex Operating System",
+    systemHeadlineLine1: "A system designed to",
+    systemHeadlineLine2: "move your business without limits",
+    systemBody:
+      "We connect discovery, quoting, trust, and operations so selling and expanding in LATAM feels simpler.",
+
+    // Operating steps
+    step1Title: "Active Connection",
+    step1Desc:
+      "We detect buying and selling opportunities in real time for companies that want to move smarter across LATAM.",
+    step2Title: "Smart Quoting",
+    step2Desc:
+      "The platform bridges supply and demand to help you respond with more context and better commercial timing.",
+    step3Title: "Secure Operations",
+    step3Desc:
+      "We validate payments, contacts, and trust signals to protect every process from start to finish.",
+    step4Title: "Optimized Route",
+    step4Desc:
+      "We ground the operation with clear logistics routes and decisions based on destination and order type.",
+    step5Title: "Growth Achieved",
+    step5Desc:
+      "Your business gains real reach: new markets, better connections, and more opportunities to grow.",
+
+    // Operating highlights
+    highlight1Title: "Full Visibility",
+    highlight1Desc: "Monitor the progress of every operation with a clearer reading.",
+    highlight2Title: "Control & Security",
+    highlight2Desc: "You decide how to move forward and Drokex helps protect the process.",
+    highlight3Title: "Simple Integration",
+    highlight3Desc: "Connect your offer and your workflows without depending on scattered processes.",
+    highlight4Title: "Human Support",
+    highlight4Desc: "A close-knit team that understands the market and accompanies every step.",
+
+    // Benefits
+    benefit1: "Colombian origin",
+    benefit2: "LATAM expansion",
+    benefit3: "Ally network",
+    benefit4: "Efficient logistics",
+
+    // Markets
+    marketsGrow: "Grow worldwide",
+    marketsBuyNow: "Buy now",
+
+    // Platform section
+    platformTag: "Platform",
+    platformHeading: "Meet Drokex",
+    platformTabProvider: "Supplier",
+    platformTabClient: "Client",
+
+    // Tabs
+    tabDropshippersLabel: "Dropshippers",
+    tabDropshippersTitle:
+      "Visualize products and suppliers with more clarity to sell better.",
+    tabDropshippersDesc:
+      "An experience designed for those who need to spot opportunities, compare supply, and validate origin without losing time across scattered channels.",
+    tabMarcasLabel: "Client",
+    tabMarcasTitle:
+      "Scale your catalog with a platform ready to grow across markets.",
+    tabMarcasDesc:
+      "Drokex helps organize search, selection, and commercial relationships for brands that want to expand with structure and speed.",
+    tabProveedoresLabel: "Supplier",
+    tabProveedoresTitle:
+      "Present your international offer in a more direct and commercial way.",
+    tabProveedoresDesc:
+      "Manufacturers and distributors can showcase capacity, reach, and value proposition in a storefront built for real business.",
+
+    // Platform highlights – marcas
+    phMarcas1: "Explore catalogs ready to sell in new markets.",
+    phMarcas2:
+      "Connect with verified suppliers and manage opportunities from one place.",
+    phMarcas3:
+      "Speed up purchases, quotes, and routes without relying on scattered messages.",
+
+    // Platform highlights – proveedores
+    phProveedores1:
+      "Turn your inventory into a commercial storefront for buyers across Latin America.",
+    phProveedores2:
+      "Show products, capacity, and terms with a clearer experience.",
+    phProveedores3:
+      "Receive contacts, quotes, and orders with full traceability inside Drokex.",
+
+    // GIF / feature labels
+    gifLabel1: "Expand into new markets",
+    gifLabel2: "Activate logistics routes",
+    gifLabel3: "Create your digital store",
+    gifLabel4: "Manage your products",
+    gifLabel5: "Control inventory",
+    gifLabel6: "Operate orders as a team",
+
+    // Testimonials section
+    testimonialsTag: "Success stories",
+    testimonialsHeadlinePre: "Growing with ",
+    testimonialsBody:
+      "Stories from entrepreneurs, brands, and operators who use Drokex to open new commercial opportunities.",
+
+    // Aria labels
+    ariaVideoPrev: "Previous video",
+    ariaVideoNext: "Next video",
+    ariaVideoPlay: "Play story of",
+    ariaVideoGoto: "Go to video",
+    ariaModalClose: "Close video",
+    ariaMarkets: "Markets",
+    ariaAudiences: "Audiences",
+
+    // Contact section
+    contactSectionTag: "Contact",
+    contactHeadline1: "Let's talk about",
+    contactHeadline2: "international",
+    contactHeadline3: "growth.",
+    contactFormHeading: "Send us a message",
+    contactPlaceholderName: "Name",
+    contactPlaceholderEmail: "Email address",
+    contactSelectDefault: "Select a reason",
+    contactOptionSales: "Sales",
+    contactOptionSupport: "Support",
+    contactOptionAlliances: "Partnerships",
+    contactPlaceholderMessage: "Write your message here...",
+    contactMsgSent: "Message sent successfully.",
+    contactMsgError: "Could not send. Please try again.",
+    contactBtnSending: "Sending...",
+    contactBtnSend: "Send message",
+    contactWhatsApp: "Message us on WhatsApp",
+  },
 };
+// ─────────────────────────────────────────────────────────────────────────────
 
 const videos = [
   {
@@ -254,60 +479,55 @@ const COUNTRY_PREFERENCE_STORAGE_KEY = "drokex-selected-country";
 const operatingSteps = [
   {
     number: "01",
-    title: "Conexion activa",
-    description:
-      "Detectamos oportunidades de compra y venta en tiempo real para empresas que quieren moverse mejor en LATAM.",
+    titleKey: "step1Title",
+    descKey: "step1Desc",
     iconSrc: "/conexion activa.png",
   },
   {
     number: "02",
-    title: "Cotizacion inteligente",
-    description:
-      "La plataforma conecta oferta y demanda para ayudarte a responder con mas contexto y mejor timing comercial.",
+    titleKey: "step2Title",
+    descKey: "step2Desc",
     iconSrc: "/cotizacion inteligente.png",
   },
   {
     number: "03",
-    title: "Operacion segura",
-    description:
-      "Validamos pagos, contactos y señales de confianza para cuidar cada proceso de principio a fin.",
+    titleKey: "step3Title",
+    descKey: "step3Desc",
     iconSrc: "/operacion segura.png",
   },
   {
     number: "04",
-    title: "Ruta optimizada",
-    description:
-      "Aterrizamos la operación con rutas logísticas y decisiones más claras según el destino y el tipo de pedido.",
+    titleKey: "step4Title",
+    descKey: "step4Desc",
     iconSrc: "/ruta optimizada.png",
   },
   {
     number: "05",
-    title: "Expansión lograda",
-    description:
-      "Tu negocio gana alcance real: nuevos mercados, mejores conexiones y más oportunidades para crecer.",
+    titleKey: "step5Title",
+    descKey: "step5Desc",
     iconSrc: "/expansion lograda.png",
   },
 ];
 
 const operatingHighlights = [
   {
-    title: "Visibilidad total",
-    description: "Monitorea el avance de cada operación con una lectura más clara.",
+    titleKey: "highlight1Title",
+    descKey: "highlight1Desc",
     icon: <SystemTargetIcon />,
   },
   {
-    title: "Control y seguridad",
-    description: "Tu decides como avanzar y Drokex ayuda a proteger el proceso.",
+    titleKey: "highlight2Title",
+    descKey: "highlight2Desc",
     icon: <SystemLockIcon />,
   },
   {
-    title: "Integracion simple",
-    description: "Conecta tu oferta y tus flujos sin depender de procesos dispersos.",
+    titleKey: "highlight3Title",
+    descKey: "highlight3Desc",
     icon: <SystemNodesIcon />,
   },
   {
-    title: "Soporte humano",
-    description: "Un equipo cercano que entiende el mercado y acompana cada paso.",
+    titleKey: "highlight4Title",
+    descKey: "highlight4Desc",
     icon: <SystemHeadsetIcon />,
   },
 ];
@@ -323,20 +543,21 @@ function getWrappedOffset(index, activeIndex, total) {
 }
 
 const gifItems = [
-  { src: "/home-feature-globe.mp4", label: "Expande a nuevos mercados" },
-  { src: "/home-feature-delivery.mp4", label: "Activa rutas logísticas" },
-  { src: "/home-feature-laptop.mp4", label: "Crea tu tienda digital" },
-  { src: "/home-feature-products.mp4", label: "Gestiona tus productos" },
-  { src: "/home-feature-warehouse-mobile.mp4", label: "Controla inventario" },
-  { src: "/home-feature-warehouse-workflow.mp4", label: "Opera pedidos en equipo" },
+  { src: "/home-feature-globe.mp4", labelKey: "gifLabel1" },
+  { src: "/home-feature-delivery.mp4", labelKey: "gifLabel2" },
+  { src: "/home-feature-laptop.mp4", labelKey: "gifLabel3" },
+  { src: "/home-feature-products.mp4", labelKey: "gifLabel4" },
+  { src: "/home-feature-warehouse-mobile.mp4", labelKey: "gifLabel5" },
+  { src: "/home-feature-warehouse-workflow.mp4", labelKey: "gifLabel6" },
 ];
 
-function FeatureVideoCarousel() {
+function FeatureVideoCarousel({ lang }) {
   const [active, setActive] = useState(2);
   const activeRef = useRef(2);
   const carouselRef = useRef(null);
   const cooldown = useRef(false);
   const activeVideo = gifItems[active];
+  const t = T[lang];
 
   const goTo = (index) => {
     const total = gifItems.length;
@@ -382,13 +603,13 @@ function FeatureVideoCarousel() {
 
   return (
     <div className="feature-video-carousel" ref={carouselRef}>
-      <button className="gif-scroll-arrow" onClick={() => goTo(active - 1)} aria-label="Video anterior">◀</button>
+      <button className="gif-scroll-arrow" onClick={() => goTo(active - 1)} aria-label={t.ariaVideoPrev}>◀</button>
       <div className="feature-video-frame">
         <div className="gif-card gif-card-single" key={activeVideo.src}>
           <div className="gif-card-media">
             <video
               src={activeVideo.src}
-              aria-label={activeVideo.label}
+              aria-label={t[activeVideo.labelKey]}
               autoPlay
               muted
               loop
@@ -397,16 +618,16 @@ function FeatureVideoCarousel() {
             />
           </div>
           <div className="gif-card-label">
-            <p>{activeVideo.label}</p>
+            <p>{t[activeVideo.labelKey]}</p>
           </div>
         </div>
       </div>
 
-      <button className="gif-scroll-arrow" onClick={() => goTo(active + 1)} aria-label="Siguiente video">▶</button>
+      <button className="gif-scroll-arrow" onClick={() => goTo(active + 1)} aria-label={t.ariaVideoNext}>▶</button>
 
       <div className="gif-scroll-dots">
         {gifItems.map((_, i) => (
-          <button key={i} className={i === active ? "gif-dot is-active" : "gif-dot"} onClick={() => goTo(i)} aria-label={`Ir al video ${i + 1}`} />
+          <button key={i} className={i === active ? "gif-dot is-active" : "gif-dot"} onClick={() => goTo(i)} aria-label={`${t.ariaVideoGoto} ${i + 1}`} />
         ))}
       </div>
     </div>
@@ -414,6 +635,7 @@ function FeatureVideoCarousel() {
 }
 
 export default function Home() {
+  const [lang, setLang] = useState("es");
   const [activeTab, setActiveTab] = useState(2);
   const [currentVideo, setCurrentVideo] = useState(2);
   const [openVideo, setOpenVideo] = useState(null);
@@ -423,7 +645,44 @@ export default function Home() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [contactStatus, setContactStatus] = useState(null); // null | "sending" | "sent" | "error"
 
-  const activeAudience = useMemo(() => tabs[activeTab], [activeTab]);
+  const t = T[lang];
+
+  // Derived tab data using translation keys
+  const tabs = [
+    {
+      id: "dropshippers",
+      label: t.tabDropshippersLabel,
+      image: "/plataforma-dropshippers.png",
+      alt: "Vista plataforma para dropshippers",
+      title: t.tabDropshippersTitle,
+      description: t.tabDropshippersDesc,
+    },
+    {
+      id: "marcas",
+      label: t.tabMarcasLabel,
+      image: "/plataforma-marcas.png",
+      alt: "Vista plataforma para marcas",
+      title: t.tabMarcasTitle,
+      description: t.tabMarcasDesc,
+    },
+    {
+      id: "proveedores",
+      label: t.tabProveedoresLabel,
+      image: "/plataforma-proveedores.png",
+      alt: "Infografia para proveedores Drokex",
+      title: t.tabProveedoresTitle,
+      description: t.tabProveedoresDesc,
+    },
+  ];
+
+  const platformHighlights = {
+    marcas: [t.phMarcas1, t.phMarcas2, t.phMarcas3],
+    proveedores: [t.phProveedores1, t.phProveedores2, t.phProveedores3],
+  };
+
+  const benefits = [t.benefit1, t.benefit2, t.benefit3, t.benefit4];
+
+  const activeAudience = useMemo(() => tabs[activeTab], [activeTab, lang]);
   const activePlatformHighlights = platformHighlights[activeAudience.id] || platformHighlights.marcas;
 
   async function handleContactSubmit(e) {
@@ -451,6 +710,20 @@ export default function Home() {
     [heroTheme],
   );
   const currentMarket = useMemo(() => globalMarkets[activeMarket], [activeMarket]);
+
+  // Read lang from localStorage on mount and listen for changes
+  useEffect(() => {
+    const stored = localStorage.getItem("drokex-lang") || "es";
+    setLang(stored === "en" ? "en" : "es");
+
+    const handleLangChange = () => {
+      const updated = localStorage.getItem("drokex-lang") || "es";
+      setLang(updated === "en" ? "en" : "es");
+    };
+
+    window.addEventListener("drokex-lang-change", handleLangChange);
+    return () => window.removeEventListener("drokex-lang-change", handleLangChange);
+  }, []);
 
   useEffect(() => {
     const savedCountry = window.localStorage.getItem(COUNTRY_PREFERENCE_STORAGE_KEY) || "";
@@ -511,15 +784,13 @@ export default function Home() {
         <div className="shell hero-shell">
           <div className="hero-copy hero-copy-compact">
             <motion.p className="section-tag" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
-              Marketplace internacional
+              {t.heroTag}
             </motion.p>
             <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.38, ease: [0.22, 1, 0.36, 1] }}>
-              Tecnologia que conecta empresas con oportunidades globales.
+              {t.heroHeadline}
             </motion.h1>
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.55 }}>
-              Drokex conecta proveedores latinoamericanos con compradores
-              internacionales de forma agil, visual y con una experiencia pensada
-              para crecer.
+              {t.heroSubtitle}
             </motion.p>
           </div>
 
@@ -532,8 +803,8 @@ export default function Home() {
                 onFocus={() => setHeroTheme("green")}
                 onPointerDown={() => setHeroTheme("green")}
               >
-                <span>Quiero</span>
-                <strong>vender productos</strong>
+                <span>{t.heroSellSpan}</span>
+                <strong>{t.heroSellStrong}</strong>
               </Link>
             </motion.div>
 
@@ -545,8 +816,8 @@ export default function Home() {
                 onFocus={() => setHeroTheme("orange")}
                 onPointerDown={() => setHeroTheme("orange")}
               >
-                <span>Quiero</span>
-                <strong>buscar proveedor</strong>
+                <span>{t.heroBuySpan}</span>
+                <strong>{t.heroBuyStrong}</strong>
               </Link>
             </motion.div>
           </motion.div>
@@ -559,16 +830,13 @@ export default function Home() {
 
         <div className="shell">
           <motion.div className="system-header" {...fadeUp(0)}>
-            <p className="section-tag section-tag-green">Sistema operativo Drokex</p>
+            <p className="section-tag section-tag-green">{t.systemTag}</p>
             <h2>
-              <span>Un sistema diseñado para</span>
-              <span>mover tu negocio sin límites</span>
+              <span>{t.systemHeadlineLine1}</span>
+              <span>{t.systemHeadlineLine2}</span>
             </h2>
             <div className="system-header-line" aria-hidden="true" />
-            <p>
-              Conectamos descubrimiento, cotización, confianza y operación para
-              que vender y expandirse en LATAM se sienta más simple.
-            </p>
+            <p>{t.systemBody}</p>
           </motion.div>
 
           <div className="system-timeline">
@@ -591,13 +859,13 @@ export default function Home() {
                       whileHover={{ scale: 1.08 }}
                       transition={{ type: "spring", stiffness: 260, damping: 18 }}
                     >
-                      <img src={step.iconSrc} alt={step.title} className="system-step-hologram" />
+                      <img src={step.iconSrc} alt={t[step.titleKey]} className="system-step-hologram" />
                     </motion.div>
                   </div>
                   <div className="system-step-marker" aria-hidden="true"><span /></div>
-                  <h3>{step.title}</h3>
+                  <h3>{t[step.titleKey]}</h3>
                   <div className="system-step-accent" aria-hidden="true" />
-                  <p>{step.description}</p>
+                  <p>{t[step.descKey]}</p>
                 </motion.article>
               ))}
             </div>
@@ -606,7 +874,7 @@ export default function Home() {
           <div className="system-highlights">
             {operatingHighlights.map((item, index) => (
               <motion.article
-                key={item.title}
+                key={item.titleKey}
                 className={index < operatingHighlights.length - 1 ? "system-highlight has-divider" : "system-highlight"}
                 initial={{ opacity: 0, x: -24 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -618,8 +886,8 @@ export default function Home() {
                   {item.icon}
                 </motion.div>
                 <div>
-                  <h4>{item.title}</h4>
-                  <p>{item.description}</p>
+                  <h4>{t[item.titleKey]}</h4>
+                  <p>{t[item.descKey]}</p>
                 </div>
               </motion.article>
             ))}
@@ -670,11 +938,11 @@ export default function Home() {
                     sizes="(max-width: 720px) 220px, 320px"
                     className="markets-brand-logo"
                   />
-                  <p>Crece en todo el mundo</p>
+                  <p>{t.marketsGrow}</p>
                 </div>
 
                 <div className="markets-interactive">
-                  <div className="markets-rail" role="tablist" aria-label="Mercados">
+                  <div className="markets-rail" role="tablist" aria-label={t.ariaMarkets}>
                     {globalMarkets.map((market, index) => (
                       <button
                         key={market.id}
@@ -732,7 +1000,7 @@ export default function Home() {
                                   <span>{market.role}</span>
                                 </div>
                               </div>
-                              <div className="market-card-action">Compra ahora</div>
+                              <div className="market-card-action">{t.marketsBuyNow}</div>
                             </div>
                           </article>
                         );
@@ -771,11 +1039,11 @@ export default function Home() {
           <div className="platform-layout">
             <motion.div className="platform-copy" {...fadeLeft(0)}>
               <div className="platform-header">
-                <p className="section-tag section-tag-dark">Plataforma</p>
-                <h2>Conoce a Drokex</h2>
+                <p className="section-tag section-tag-dark">{t.platformTag}</p>
+                <h2>{t.platformHeading}</h2>
               </div>
 
-              <div className="platform-tabs" role="tablist" aria-label="Audiencias">
+              <div className="platform-tabs" role="tablist" aria-label={t.ariaAudiences}>
                 <button
                   type="button"
                   className={activeTab === 2 ? "platform-tab is-active" : "platform-tab"}
@@ -783,7 +1051,7 @@ export default function Home() {
                   aria-selected={activeTab === 2}
                   role="tab"
                 >
-                  Proveedor
+                  {t.platformTabProvider}
                 </button>
                 <button
                   type="button"
@@ -792,7 +1060,7 @@ export default function Home() {
                   aria-selected={activeTab === 1}
                   role="tab"
                 >
-                  Cliente
+                  {t.platformTabClient}
                 </button>
               </div>
 
@@ -808,7 +1076,7 @@ export default function Home() {
             </motion.div>
 
             <motion.div className="platform-panel" {...fadeRight(0.08)}>
-              <FeatureVideoCarousel />
+              <FeatureVideoCarousel lang={lang} />
             </motion.div>
           </div>
         </div>
@@ -817,18 +1085,15 @@ export default function Home() {
       <section className="testimonials-section">
         <div className="shell">
           <motion.div className="testimonials-header" {...fadeUp(0)}>
-            <p className="section-tag">Casos de exito</p>
+            <p className="section-tag">{t.testimonialsTag}</p>
             <h2>
-              Asi crecen con <span>Drokex</span>
+              {t.testimonialsHeadlinePre}<span>Drokex</span>
             </h2>
-            <p>
-              Historias de empresarios, marcas y operadores que usan Drokex
-              para abrir nuevas oportunidades comerciales.
-            </p>
+            <p>{t.testimonialsBody}</p>
           </motion.div>
 
           <div className="testimonials-carousel">
-            <button type="button" className="carousel-button" onClick={previousVideo} aria-label="Video anterior">
+            <button type="button" className="carousel-button" onClick={previousVideo} aria-label={t.ariaVideoPrev}>
               ◀
             </button>
 
@@ -842,7 +1107,7 @@ export default function Home() {
                       type="button"
                       onClick={() => setOpenVideo(video)}
                       className="video-link"
-                      aria-label={`Reproducir historia de ${video.name}`}
+                      aria-label={`${t.ariaVideoPlay} ${video.name}`}
                     >
                     <img
                       src={video.src}
@@ -863,7 +1128,7 @@ export default function Home() {
               })}
             </div>
 
-            <button type="button" className="carousel-button" onClick={nextVideo} aria-label="Siguiente video">
+            <button type="button" className="carousel-button" onClick={nextVideo} aria-label={t.ariaVideoNext}>
               ▶
             </button>
           </div>
@@ -871,22 +1136,22 @@ export default function Home() {
       </section>
 
       {openVideo ? (
-        <div className="video-modal" role="dialog" aria-modal="true" aria-label={`Historia de ${openVideo.name}`}>
-          <button type="button" className="video-modal-backdrop" onClick={() => setOpenVideo(null)} aria-label="Cerrar video" />
+        <div className="video-modal" role="dialog" aria-modal="true" aria-label={`${t.ariaVideoPlay} ${openVideo.name}`}>
+          <button type="button" className="video-modal-backdrop" onClick={() => setOpenVideo(null)} aria-label={t.ariaModalClose} />
           <div className="video-modal-panel">
             <div className="video-modal-header">
               <div>
                 <p>{openVideo.name}</p>
                 <span>{openVideo.role}</span>
               </div>
-              <button type="button" className="video-modal-close" onClick={() => setOpenVideo(null)} aria-label="Cerrar video">
+              <button type="button" className="video-modal-close" onClick={() => setOpenVideo(null)} aria-label={t.ariaModalClose}>
                 X
               </button>
             </div>
             <iframe
               className="video-modal-player"
               src={openVideo.embedUrl}
-              title={`Video de ${openVideo.name}`}
+              title={`${t.ariaVideoPlay} ${openVideo.name}`}
               allow="autoplay; fullscreen"
               allowFullScreen
             />
@@ -897,19 +1162,19 @@ export default function Home() {
       <section className="contact-section" id="contacto">
         <div className="shell contact-grid">
           <motion.div className="contact-card" {...fadeLeft(0)}>
-            <h3>Envianos un mensaje</h3>
+            <h3>{t.contactFormHeading}</h3>
 
             <form className="contact-form" onSubmit={handleContactSubmit}>
               <input
                 type="text"
-                placeholder="Nombre"
+                placeholder={t.contactPlaceholderName}
                 value={contactForm.name}
                 onChange={(e) => setContactForm((f) => ({ ...f, name: e.target.value }))}
                 required
               />
               <input
                 type="email"
-                placeholder="Correo electronico"
+                placeholder={t.contactPlaceholderEmail}
                 value={contactForm.email}
                 onChange={(e) => setContactForm((f) => ({ ...f, email: e.target.value }))}
                 required
@@ -920,38 +1185,38 @@ export default function Home() {
                   onChange={(e) => setContactForm((f) => ({ ...f, subject: e.target.value }))}
                 >
                   <option value="" disabled>
-                    Selecciona un motivo
+                    {t.contactSelectDefault}
                   </option>
-                  <option value="Ventas">Ventas</option>
-                  <option value="Soporte">Soporte</option>
-                  <option value="Alianzas">Alianzas</option>
+                  <option value="Ventas">{t.contactOptionSales}</option>
+                  <option value="Soporte">{t.contactOptionSupport}</option>
+                  <option value="Alianzas">{t.contactOptionAlliances}</option>
                 </select>
               </div>
               <textarea
                 rows={4}
-                placeholder="Escribe tu mensaje aqui..."
+                placeholder={t.contactPlaceholderMessage}
                 value={contactForm.message}
                 onChange={(e) => setContactForm((f) => ({ ...f, message: e.target.value }))}
                 required
               />
               {contactStatus === "sent" && (
-                <p style={{ color: "#7FE040", fontSize: "0.9rem" }}>Mensaje enviado correctamente.</p>
+                <p style={{ color: "#7FE040", fontSize: "0.9rem" }}>{t.contactMsgSent}</p>
               )}
               {contactStatus === "error" && (
-                <p style={{ color: "#ef4444", fontSize: "0.9rem" }}>No fue posible enviar. Intenta de nuevo.</p>
+                <p style={{ color: "#ef4444", fontSize: "0.9rem" }}>{t.contactMsgError}</p>
               )}
               <button type="submit" className="submit-button" disabled={contactStatus === "sending"}>
-                {contactStatus === "sending" ? "Enviando..." : "Enviar mensaje"}
+                {contactStatus === "sending" ? t.contactBtnSending : t.contactBtnSend}
               </button>
             </form>
           </motion.div>
 
           <motion.div className="contact-copy" {...fadeRight(0.15)}>
-            <p className="section-tag section-tag-green">Contacto</p>
+            <p className="section-tag section-tag-green">{t.contactSectionTag}</p>
             <h2>
-              <span>Hablemos de</span>
-              <span>crecimiento</span>
-              <span>internacional.</span>
+              <span>{t.contactHeadline1}</span>
+              <span>{t.contactHeadline2}</span>
+              <span>{t.contactHeadline3}</span>
             </h2>
             <div className="contact-list">
               <p>contacto@drokex.com</p>
@@ -959,7 +1224,7 @@ export default function Home() {
               <p>Bogota, Colombia</p>
             </div>
             <a href="#" className="whatsapp-link">
-              Escribenos por WhatsApp
+              {t.contactWhatsApp}
             </a>
           </motion.div>
 

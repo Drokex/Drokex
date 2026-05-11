@@ -6,6 +6,8 @@ import Link from "next/link";
 import LogoutButton from "@/app/components/logout-button";
 
 const COUNTRY_PREFERENCE_STORAGE_KEY = "drokex-selected-country";
+const LANG_KEY = "drokex-lang";
+const EN_COUNTRIES = new Set(["us", "ca"]);
 const marketFlags = {
   ni: "🇳🇮",
   hn: "🇭🇳",
@@ -15,6 +17,8 @@ const marketFlags = {
   co: "🇨🇴",
   pe: "🇵🇪",
   mx: "🇲🇽",
+  us: "🇺🇸",
+  ca: "🇨🇦",
 };
 const marketLabels = {
   ni: "Nicaragua",
@@ -25,22 +29,27 @@ const marketLabels = {
   co: "Colombia",
   pe: "Perú",
   mx: "México",
+  us: "United States",
+  ca: "Canada",
 };
 
-const menuItems = [
-  { label: "Portal", href: "/portal" },
+const menuItemsEs = [
   { label: "Productos", href: "/productos" },
+  { label: "3D", href: "/3d" },
   { label: "Directorio", href: "/directorio" },
   { label: "Para proveedores", href: "/para-proveedores" },
-  {
-    label: "Servicios",
-    submenu: [
-      { label: "Proveedor", href: "/servicios/proveedor" },
-      { label: "Cliente", href: "/servicios/cliente" },
-    ],
-  },
+  { label: "Servicios", submenu: [{ label: "Proveedor", href: "/servicios/proveedor" }, { label: "Cliente", href: "/servicios/cliente" }] },
   { label: "Sobre nosotros", href: "/sobre-nosotros" },
   { label: "Contacto", href: "/#contacto" },
+];
+const menuItemsEn = [
+  { label: "Products", href: "/productos" },
+  { label: "3D", href: "/3d" },
+  { label: "Directory", href: "/directorio" },
+  { label: "For suppliers", href: "/para-proveedores" },
+  { label: "Services", submenu: [{ label: "Supplier", href: "/servicios/proveedor" }, { label: "Buyer", href: "/servicios/cliente" }] },
+  { label: "About us", href: "/sobre-nosotros" },
+  { label: "Contact", href: "/#contacto" },
 ];
 
 function NavDropdown({ item }) {
@@ -82,6 +91,7 @@ export default function SiteHeader({ hideCountry = false }) {
   const [countryFlag, setCountryFlag] = useState("");
   const [countryLabel, setCountryLabel] = useState("");
   const [isCountryDialogOpen, setIsCountryDialogOpen] = useState(false);
+  const [lang, setLang] = useState("es");
 
   function handleCountryFlagClick() {
     setIsCountryDialogOpen(true);
@@ -143,12 +153,14 @@ export default function SiteHeader({ hideCountry = false }) {
       const countryId = window.localStorage.getItem(COUNTRY_PREFERENCE_STORAGE_KEY) || "";
       setCountryFlag(marketFlags[countryId] || "");
       setCountryLabel(marketLabels[countryId] || "");
+      setLang(EN_COUNTRIES.has(countryId) ? "en" : "es");
     }
 
     function handleCountryChange(event) {
       const nextCountryId = event?.detail || "";
       setCountryFlag(marketFlags[nextCountryId] || "");
       setCountryLabel(marketLabels[nextCountryId] || "");
+      setLang(EN_COUNTRIES.has(nextCountryId) ? "en" : "es");
     }
 
     syncCountryFlag();
@@ -177,7 +189,7 @@ export default function SiteHeader({ hideCountry = false }) {
         </Link>
 
         <nav className="main-nav" aria-label="Principal">
-          {menuItems.map((item) =>
+          {(lang === "en" ? menuItemsEn : menuItemsEs).map((item) =>
             item.submenu ? (
               <NavDropdown key={item.label} item={item} />
             ) : (
@@ -194,8 +206,8 @@ export default function SiteHeader({ hideCountry = false }) {
               type="button"
               className="header-country-trigger"
               onClick={handleCountryFlagClick}
-              aria-label="Cambiar país"
-              title="Cambiar país"
+              aria-label={lang === "en" ? "Change country" : "Cambiar país"}
+              title={lang === "en" ? "Change country" : "Cambiar país"}
             >
               <span className="header-country-flag" aria-hidden="true">
                 {countryFlag}
@@ -206,17 +218,17 @@ export default function SiteHeader({ hideCountry = false }) {
           {user ? (
             <>
               <Link href={accountLink} className="text-link header-account-link">
-                Mi cuenta
+                {lang === "en" ? "My account" : "Mi cuenta"}
               </Link>
               <LogoutButton />
             </>
           ) : (
             <>
               <Link href="/login" className="text-link">
-                Iniciar sesión
+                {lang === "en" ? "Sign in" : "Iniciar sesión"}
               </Link>
               <Link href="/registro" className="primary-button">
-                Registrate
+                {lang === "en" ? "Sign up" : "Registrate"}
               </Link>
             </>
           )}
@@ -233,30 +245,23 @@ export default function SiteHeader({ hideCountry = false }) {
             onClick={(event) => event.stopPropagation()}
           >
             <div className="header-country-modal-chip">
-              <span className="header-country-modal-flag" aria-hidden="true">
-                {countryFlag}
-              </span>
-              <span>{countryLabel || "Tu mercado actual"}</span>
+              <span className="header-country-modal-flag" aria-hidden="true">{countryFlag}</span>
+              <span>{countryLabel || (lang === "en" ? "Your current market" : "Tu mercado actual")}</span>
             </div>
-            <h3 id="change-country-title">¿Quieres cambiar de país?</h3>
+            <h3 id="change-country-title">
+              {lang === "en" ? "Want to change your country?" : "¿Quieres cambiar de país?"}
+            </h3>
             <p>
-              Volverás al selector inicial para elegir otro mercado y adaptar la experiencia de
-              Drokex a ese país.
+              {lang === "en"
+                ? "You'll return to the initial selector to choose another market and adapt your Drokex experience."
+                : "Volverás al selector inicial para elegir otro mercado y adaptar la experiencia de Drokex a ese país."}
             </p>
             <div className="header-country-modal-actions">
-              <button
-                type="button"
-                className="header-country-modal-secondary"
-                onClick={handleCountryDialogClose}
-              >
-                Cancelar
+              <button type="button" className="header-country-modal-secondary" onClick={handleCountryDialogClose}>
+                {lang === "en" ? "Cancel" : "Cancelar"}
               </button>
-              <button
-                type="button"
-                className="header-country-modal-primary"
-                onClick={handleCountryChangeConfirm}
-              >
-                Sí, cambiar
+              <button type="button" className="header-country-modal-primary" onClick={handleCountryChangeConfirm}>
+                {lang === "en" ? "Yes, change" : "Sí, cambiar"}
               </button>
             </div>
           </div>
