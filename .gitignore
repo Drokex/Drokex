@@ -90,3 +90,4 @@ build/Release
 # Vite logs
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+.vercel

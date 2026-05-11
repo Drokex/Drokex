@@ -106,7 +106,6 @@ function HeroThumb({ slug, landing, active, onClick }) {
 
 const HERO_VIDEO =
   "https://f96gfpetvymkefdo.public.blob.vercel-storage.com/drokex%20video%20pro.mp4";
-const HERO_VIDEO_FALLBACK = "/banner-pro.mp4";
 
 // ── Hero principal (full-width) ──
 function HeroFeatured({ slug, landing, sideItems, featured, setFeatured, allItems }) {
@@ -119,15 +118,18 @@ function HeroFeatured({ slug, landing, sideItems, featured, setFeatured, allItem
 
   return (
     <div style={{ position: "relative", height: "100vh", overflow: "hidden" }}>
-      {/* Video full-width con fallback poster */}
+      {/* Video full-width */}
       <video
+        key={HERO_VIDEO}
         autoPlay muted loop playsInline preload="auto"
-        poster={hero}
+        src={HERO_VIDEO}
+        crossOrigin="anonymous"
+        onCanPlay={(event) => {
+          const playPromise = event.currentTarget.play();
+          if (playPromise) playPromise.catch(() => {});
+        }}
         style={{ position: "absolute", inset: 0, zIndex: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
-      >
-        <source src={HERO_VIDEO} type="video/mp4" />
-        <source src={HERO_VIDEO_FALLBACK} type="video/mp4" />
-      </video>
+      />
       {/* Gradiente lateral izquierdo para texto legible */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
