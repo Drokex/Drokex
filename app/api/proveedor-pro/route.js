@@ -97,3 +97,22 @@ export async function POST(request) {
 
   return Response.json({ ok: true, slug: landing.slug });
 }
+
+export async function DELETE(request) {
+  const session = await getCurrentSession();
+  if (!session?.userId) return Response.json({ error: "No autorizado." }, { status: 401 });
+
+  const landing = await prisma.proveedorProLanding.findUnique({ where: { userId: session.userId } });
+  if (!landing) return Response.json({ error: "No encontrado." }, { status: 404 });
+
+  await prisma.proveedorProLanding.delete({ where: { id: landing.id } });
+
+  if (globalThis.__drokexDirCache5) {
+    if (globalThis.__drokexDirCache5.proLandings) {
+      globalThis.__drokexDirCache5.proLandings = globalThis.__drokexDirCache5.proLandings.filter(l => l.slug !== landing.slug);
+    }
+    globalThis.__drokexDirCache5.ts = 0;
+  }
+
+  return Response.json({ ok: true, slug: landing.slug });
+}

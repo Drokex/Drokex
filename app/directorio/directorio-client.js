@@ -130,7 +130,7 @@ function HeroFeatured({ lm = false }) {
 }
 
 // ── Card del grid ──
-function StoreCard({ slug, landing, lm = false }) {
+function StoreCard({ slug, landing, lm = false, isLocal = false, onDelete }) {
   const hero    = useThumbnail(slug, getHero(landing));
   const brand   = getBrand(landing);
   const country = getCountry(landing);
@@ -166,6 +166,14 @@ function StoreCard({ slug, landing, lm = false }) {
         {/* Poster */}
         <div style={{ height: 170, flexShrink: 0, position: "relative", background: `url(${hero}) center/cover no-repeat` }}>
           <span style={{ position: "absolute", top: 8, right: 8, background: "#7FE040", color: "#050505", fontSize: "0.52rem", fontWeight: 900, letterSpacing: "0.1em", padding: "2px 7px", borderRadius: 5, textTransform: "uppercase" }}>PRO</span>
+          {isLocal && onDelete && (
+            <button
+              type="button"
+              title="Eliminar del directorio"
+              onClick={e => { e.preventDefault(); e.stopPropagation(); onDelete(slug); }}
+              style={{ position: "absolute", top: 8, left: 8, width: 26, height: 26, borderRadius: 8, background: "rgba(200,30,30,0.82)", border: "none", color: "#fff", fontWeight: 900, fontSize: "0.8rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10 }}
+            >✕</button>
+          )}
           <div style={{ position: "absolute", bottom: 10, left: 12, width: 36, height: 36, borderRadius: 9, background: logo ? (lm ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.5)") : primary, border: "1.5px solid rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "0.85rem", color: "#fff", overflow: "hidden" }}>
             {logo ? <img src={logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3 }} /> : brand.charAt(0)}
           </div>
@@ -229,25 +237,37 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
 
   useEffect(() => { setPage(1); }, [query, selCountry, selCategory]);
 
+  const [localSlugs, setLocalSlugs] = useState(new Set());
+
   useEffect(() => {
     try {
       const knownSlugs = new Set(proLandings.map(({ slug }) => slug));
       const localOnly  = [];
+      const foundLocal = new Set();
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key?.startsWith("drokex-proveedor-pro:")) {
           const slug = key.replace("drokex-proveedor-pro:", "");
           if (knownSlugs.has(slug)) continue;
           const raw = localStorage.getItem(key);
-          if (raw) localOnly.push({ slug, landing: JSON.parse(raw) });
+          if (raw) { localOnly.push({ slug, landing: JSON.parse(raw) }); foundLocal.add(slug); }
         }
       }
-      if (localOnly.length) setProLandings(c => {
-        const known = new Set(c.map(x => x.slug));
-        return [...c, ...localOnly.filter(x => !known.has(x.slug))];
-      });
+      if (localOnly.length) {
+        setLocalSlugs(foundLocal);
+        setProLandings(c => {
+          const known = new Set(c.map(x => x.slug));
+          return [...c, ...localOnly.filter(x => !known.has(x.slug))];
+        });
+      }
     } catch {}
   }, []);
+
+  function deleteLocalLanding(slug) {
+    try { localStorage.removeItem(`drokex-proveedor-pro:${slug}`); } catch {}
+    setProLandings(c => c.filter(x => x.slug !== slug));
+    setLocalSlugs(s => { const n = new Set(s); n.delete(slug); return n; });
+  }
 
   const allCountries = [...new Set(proLandings.map(({ landing }) => landing.store?.country).filter(Boolean))].sort();
 
@@ -435,7 +455,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
               {pagedPro.length > 0 ? (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
                   {pagedPro.map(({ slug, landing }) => (
-                    <StoreCard key={slug} slug={slug} landing={landing} lm={lm} />
+                    <StoreCard key={slug} slug={slug} landing={landing} lm={lm} isLocal={localSlugs.has(slug)} onDelete={deleteLocalLanding} />
                   ))}
                 </div>
               ) : (

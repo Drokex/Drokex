@@ -190,7 +190,7 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
           setToolbarPos({ top, left: Math.min(rect.left, window.innerWidth - 320) });
         }}
         className={className}
-        style={{ ...computedStyle, outline: focused ? "2px dashed rgba(127, 224, 64, 0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40 }}
+        style={{ ...computedStyle, outline: focused ? "2px dashed rgba(127, 224, 64, 0.6)" : "2px dashed transparent", outlineOffset: 4, borderRadius: 4, cursor: "text", minWidth: 40, position: "relative", zIndex: 1 }}
       />
     </Wrapper>
   );
@@ -230,24 +230,32 @@ function DraggableBlock({ dx, dy, onChange, isEditable, children, style }) {
     return <div style={{ ...offsetStyle, ...style }}>{children}</div>;
   }
 
+  function handleOuterMouseDown(e) {
+    // Draggable from anywhere except editable text, buttons, inputs, links
+    if (e.target.closest('[contenteditable]') || e.target.closest('button') || e.target.closest('input') || e.target.closest('a')) return;
+    startDrag(e);
+  }
+
   return (
     <div
-      style={{ ...offsetStyle, ...style }}
+      style={{ ...offsetStyle, cursor: dragging ? "grabbing" : "grab", ...style }}
+      onMouseDown={handleOuterMouseDown}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => { if (!dragging) setHovering(false); }}
     >
-      <div style={{ position: "absolute", top: -38, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, zIndex: 200, opacity: hovering || dragging ? 1 : 0.3, transition: "opacity 0.15s", pointerEvents: "auto" }}>
+      {/* Handle pill — siempre visible en edit mode */}
+      <div style={{ position: "absolute", top: -38, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, zIndex: 200, pointerEvents: "auto", userSelect: "none" }}>
         <div
-          onMouseDown={startDrag}
+          onMouseDown={e => { e.stopPropagation(); startDrag(e); }}
           title="Arrastra para mover el bloque de texto"
-          style={{ display: "flex", alignItems: "center", gap: 5, background: dragging ? "rgba(127,224,64,0.22)" : "rgba(0,0,0,0.78)", border: "1px solid rgba(127,224,64,0.55)", borderRadius: 20, padding: "4px 12px", fontSize: "0.63rem", color: "#7FE040", fontWeight: 800, whiteSpace: "nowrap", cursor: dragging ? "grabbing" : "grab", userSelect: "none" }}
+          style={{ display: "flex", alignItems: "center", gap: 5, background: dragging ? "rgba(127,224,64,0.22)" : "rgba(0,0,0,0.85)", border: "1px solid rgba(127,224,64,0.6)", borderRadius: 20, padding: "4px 12px", fontSize: "0.63rem", color: "#7FE040", fontWeight: 800, whiteSpace: "nowrap", cursor: dragging ? "grabbing" : "grab", boxShadow: "0 2px 10px rgba(0,0,0,0.5)" }}
         >
           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>
           Mover bloque
         </div>
         {hasMoved && (
-          <button type="button" onMouseDown={e => { e.preventDefault(); onChange(0, 0); }}
-            style={{ background: "rgba(0,0,0,0.72)", border: "1px solid rgba(255,100,100,0.45)", borderRadius: 12, padding: "4px 9px", color: "#f87171", fontSize: "0.6rem", fontWeight: 800, cursor: "pointer", userSelect: "none" }}>
+          <button type="button" onMouseDown={e => { e.preventDefault(); e.stopPropagation(); onChange(0, 0); }}
+            style={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,100,100,0.5)", borderRadius: 12, padding: "4px 9px", color: "#f87171", fontSize: "0.6rem", fontWeight: 800, cursor: "pointer", userSelect: "none", boxShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
             ↩ Reset
           </button>
         )}
