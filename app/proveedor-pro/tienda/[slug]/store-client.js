@@ -65,7 +65,7 @@ const fallbackProducts = [
 function cleanStoreText(s) {
   if (!s) return s;
   return Object.fromEntries(
-    Object.entries(s).map(([k, v]) => [k, typeof v === "string" ? v.replace(/\n/g, " ").replace(/ {2,}/g, " ").trim() : v])
+    Object.entries(s).map(([k, v]) => [k, typeof v === "string" ? v.replace(/ /g, " ").replace(/\n/g, " ").replace(/\s{2,}/g, " ").trim() : v])
   );
 }
 
