@@ -196,21 +196,31 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
   );
 }
 
-function DraggableBlock({ dx, dy, onChange, isEditable, children, style }) {
+function DraggableBlock({ xPct, yPct, onChange, isEditable, children, style }) {
   const [hovering, setHovering] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const ndx = dx || 0;
-  const ndy = dy || 0;
-  const hasMoved = ndx !== 0 || ndy !== 0;
+  const containerRef = useRef(null);
+  const nx = xPct || 0;
+  const ny = yPct || 0;
+  const hasMoved = nx !== 0 || ny !== 0;
 
   function startDrag(e) {
     if (!onChange) return;
     e.preventDefault();
     e.stopPropagation();
-    const startX = e.clientX - ndx;
-    const startY = e.clientY - ndy;
+    const parent = containerRef.current?.parentElement;
+    const pr = parent?.getBoundingClientRect() ?? { width: 1, height: 1, left: 0, top: 0 };
+    // Convert current % offset back to px to find mouse anchor point
+    const curLeftPx = nx * pr.width / 100;
+    const curTopPx = ny * pr.height / 100;
+    const anchorX = e.clientX - curLeftPx;
+    const anchorY = e.clientY - curTopPx;
     setDragging(true);
-    function onMove(ev) { onChange(ev.clientX - startX, ev.clientY - startY); }
+    function onMove(ev) {
+      const newX = Math.round((ev.clientX - anchorX) / pr.width * 1000) / 10;
+      const newY = Math.round((ev.clientY - anchorY) / pr.height * 1000) / 10;
+      onChange(newX, newY);
+    }
     function onUp() {
       setDragging(false);
       document.removeEventListener("mousemove", onMove);
@@ -220,25 +230,25 @@ function DraggableBlock({ dx, dy, onChange, isEditable, children, style }) {
     document.addEventListener("mouseup", onUp);
   }
 
-  // Use position:relative + top/left instead of transform — transforms break position:fixed children
-  // (EditableText toolbar is position:fixed and would mis-render inside a transformed ancestor)
+  // Use position:relative + top/left % — scales proportionally in editor preview AND published page
+  // position:relative avoids creating a stacking context that breaks position:fixed EditableText toolbar
   const offsetStyle = hasMoved
-    ? { position: "relative", top: `${ndy}px`, left: `${ndx}px` }
+    ? { position: "relative", top: `${ny}%`, left: `${nx}%` }
     : { position: "relative" };
 
   if (!isEditable) {
-    return <div style={{ ...offsetStyle, ...style }}>{children}</div>;
+    return <div ref={containerRef} style={{ ...offsetStyle, ...style }}>{children}</div>;
   }
 
   function handleOuterMouseDown(e) {
-    // Draggable from anywhere except editable text, buttons, inputs, links
     if (e.target.closest('[contenteditable]') || e.target.closest('button') || e.target.closest('input') || e.target.closest('a')) return;
     startDrag(e);
   }
 
   return (
     <div
-      style={{ ...offsetStyle, cursor: dragging ? "grabbing" : "grab", ...style }}
+      ref={containerRef}
+      style={{ ...offsetStyle, cursor: dragging ? "grabbing" : "grab", userSelect: dragging ? "none" : undefined, ...style }}
       onMouseDown={handleOuterMouseDown}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => { if (!dragging) setHovering(false); }}
@@ -529,9 +539,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
       {/* Hero — layout-aware */}
       {!productsOnly && !marcaOnly && (() => {
-        const heroBlockDX = store.heroBlock?.dx || 0;
-        const heroBlockDY = store.heroBlock?.dy || 0;
-        const heroBlockChange = isEditable ? (dx, dy) => onUpdate?.("heroBlock", { dx: Math.round(dx), dy: Math.round(dy) }) : null;
+        const heroBlockXPct = store.heroBlock?.xPct || 0;
+        const heroBlockYPct = store.heroBlock?.yPct || 0;
+        const heroBlockChange = isEditable ? (xPct, yPct) => onUpdate?.("heroBlock", { xPct, yPct }) : null;
 
         const imgUploadBtn = isEditable && (
           <ClickableImageZone value={store.heroImage} onUpload={v => onUpdate?.("heroImage", v)} isEditable={isEditable}
@@ -575,7 +585,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         if (layout === "split") return (
           <section id="inicio" style={{ display: "grid", gridTemplateColumns: standalone ? "1fr 1fr" : "1fr 1fr", backgroundColor: store.backgroundColor, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, position: "relative" }}>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: standalone ? "56px 40px 56px 56px" : "56px 40px" }}>
-              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+              <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {heroTextContent()}
               </DraggableBlock>
             </div>
@@ -596,7 +606,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             {imgUploadBtn}
             {imgPosControls}
             <div style={{ maxWidth: 780, width: "100%", margin: "0 auto" }}>
-              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+              <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {heroTextContent(true)}
               </DraggableBlock>
             </div>
@@ -620,7 +630,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             {imgPosControls}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.38) 55%, transparent 85%)" }} />
             <div style={{ position: "relative", zIndex: 2, padding: standalone ? "56px 48px" : "56px 40px", maxWidth: "58%" }}>
-              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+              <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {(store.promoText || isEditable) && (
                   <span className="rounded-full px-4 py-1.5 text-xs font-black uppercase tracking-widest mb-6 self-start" style={{ backgroundColor: hexToRgba(store.primaryColor,0.25), color: store.primaryColor, letterSpacing: "0.2em", display: "inline-block" }}>
                     <EditableText tag="span" value={store.promoText} fontColor={textColor("promoTextColor", store.primaryColor)} onTextChange={v => onUpdate?.("promoText", v)} onFontColorChange={v => onUpdate?.("promoTextColor", v)} isEditable={isEditable} inline />
@@ -644,7 +654,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             {imgPosControls}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)" }} />
             <div style={{ position: "relative", zIndex: 2, padding: standalone ? "0 48px 48px" : "0 40px 56px", maxWidth: 800 }}>
-              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+              <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {(store.promoText || isEditable) && (
                   <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: store.primaryColor, color: store.buttonTextColor, borderRadius: 8, padding: "4px 14px 4px 6px", marginBottom: 20 }}>
                     <span style={{ width: 20, height: 20, borderRadius: 4, background: "rgba(255,255,255,0.3)", display: "inline-block" }} />
@@ -673,7 +683,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             {imgPosControls}
             <div className={`${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
               <div className={standalone ? "max-w-xl" : ""}>
-              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+              <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {heroTextContent()}
               </DraggableBlock>
             </div>

@@ -417,7 +417,7 @@ export default function ProveedorProPage({
       promoText: tpl.promoText,
       aboutTitle: tpl.aboutTitle,
       aboutText: tpl.aboutText,
-      heroBlock: { dx: 0, dy: 0 },
+      heroBlock: { xPct: 0, yPct: 0 },
     }));
     setTemplateChosen(true);
   }
