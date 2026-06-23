@@ -170,33 +170,6 @@ export default function AyudaPage() {
         </div>
       </section>
 
-      {/* FORMULARIO PQR */}
-      <section className="ayuda-pqr" id="contacto">
-        <div className="shell ayuda-pqr-grid">
-          <div className="ayuda-pqr-info">
-            <p className="ayuda-pqr-tag">PQR</p>
-            <h2>¿No encontraste<br />lo que buscabas?</h2>
-            <p>Envíanos tu petición, queja, reclamo o sugerencia. Nuestro equipo te responde directamente.</p>
-            <div className="ayuda-pqr-meta">
-              <div className="ayuda-meta-item">
-                <span>⏱</span>
-                <div>
-                  <strong>Tiempo de respuesta</strong>
-                  <p>24 a 48 horas hábiles</p>
-                </div>
-              </div>
-              <div className="ayuda-meta-item">
-                <span>📧</span>
-                <div>
-                  <strong>Correo directo</strong>
-                  <p>soporte@drokex.com</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <PqrForm />
-        </div>
-      </section>
 
       <SiteFooter />
     </div>

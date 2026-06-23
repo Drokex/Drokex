@@ -74,6 +74,19 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
             <span style={{ width: 14, height: 14, borderRadius: 4, background: fontColor || "#ffffff", border: "1px solid rgba(255,255,255,0.4)", display: "inline-block", flexShrink: 0 }} />
             Color
           </button>
+          {onTextChange && (
+            <>
+              <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.12)", margin: "0 2px" }} />
+              <button
+                type="button"
+                title="Borrar texto"
+                style={{ ...btnStyle, borderColor: "rgba(255,80,80,0.35)", color: "#f87171" }}
+                onMouseDown={e => { e.preventDefault(); onTextChange(""); if (ref.current) ref.current.innerText = ""; }}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
+            </>
+          )}
           {colorOpen && (
             <div
               style={{
@@ -183,6 +196,67 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
   );
 }
 
+function DraggableBlock({ dx, dy, onChange, isEditable, children, style }) {
+  const [hovering, setHovering] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const ndx = dx || 0;
+  const ndy = dy || 0;
+  const hasMoved = ndx !== 0 || ndy !== 0;
+
+  function startDrag(e) {
+    if (!onChange) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX - ndx;
+    const startY = e.clientY - ndy;
+    setDragging(true);
+    function onMove(ev) { onChange(ev.clientX - startX, ev.clientY - startY); }
+    function onUp() {
+      setDragging(false);
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    }
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }
+
+  // Use position:relative + top/left instead of transform — transforms break position:fixed children
+  // (EditableText toolbar is position:fixed and would mis-render inside a transformed ancestor)
+  const offsetStyle = hasMoved
+    ? { position: "relative", top: `${ndy}px`, left: `${ndx}px` }
+    : { position: "relative" };
+
+  if (!isEditable) {
+    return <div style={{ ...offsetStyle, ...style }}>{children}</div>;
+  }
+
+  return (
+    <div
+      style={{ ...offsetStyle, ...style }}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => { if (!dragging) setHovering(false); }}
+    >
+      <div style={{ position: "absolute", top: -38, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, zIndex: 200, opacity: hovering || dragging ? 1 : 0.3, transition: "opacity 0.15s", pointerEvents: "auto" }}>
+        <div
+          onMouseDown={startDrag}
+          title="Arrastra para mover el bloque de texto"
+          style={{ display: "flex", alignItems: "center", gap: 5, background: dragging ? "rgba(127,224,64,0.22)" : "rgba(0,0,0,0.78)", border: "1px solid rgba(127,224,64,0.55)", borderRadius: 20, padding: "4px 12px", fontSize: "0.63rem", color: "#7FE040", fontWeight: 800, whiteSpace: "nowrap", cursor: dragging ? "grabbing" : "grab", userSelect: "none" }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"/></svg>
+          Mover bloque
+        </div>
+        {hasMoved && (
+          <button type="button" onMouseDown={e => { e.preventDefault(); onChange(0, 0); }}
+            style={{ background: "rgba(0,0,0,0.72)", border: "1px solid rgba(255,100,100,0.45)", borderRadius: 12, padding: "4px 9px", color: "#f87171", fontSize: "0.6rem", fontWeight: 800, cursor: "pointer", userSelect: "none" }}>
+            ↩ Reset
+          </button>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 export function ClickableImageZone({ value, onUpload, isEditable, className, style, children, bannerLabel = "banner" }) {
   const [hovered, setHovered] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
@@ -271,12 +345,104 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
   const aboutTitleSize = Math.min(store.aboutTitleSize || 36, standalone ? 28 : 48);
   const aboutBodySize = Math.min(store.aboutBodySize || 16, standalone ? 15 : 22);
   const standalonePath = basePath.replace(/\/$/, "");
+  const layout = store.layout || "overlay";
 
   function updateProductField(index, field, value) {
     const copy = [...products];
     copy[index] = { ...copy[index], [field]: value };
     onUpdate?.("__products__", copy);
   }
+
+  const contactHandler = (product) => !isEditable ? () => {
+    const raw = store.contactLink || "";
+    if (!raw) return;
+    const href = /^https?:\/\//i.test(raw) ? raw : `https://wa.me/${raw.replace(/\D/g,"")}?text=${encodeURIComponent(`Hola, me interesa el producto: ${product.name}`)}`;
+    window.open(href, "_blank");
+  } : undefined;
+
+  const renderProductCard = (product, index) => {
+    const imgZone = (cls, sty = {}) => (
+      <ClickableImageZone value={product.image} onUpload={v => { const c=[...products]; c[index]={...c[index],image:v}; onUpdate?.("__products__",c); }} isEditable={isEditable} className={`overflow-hidden ${cls}`} style={{ backgroundColor: store.backgroundColor, ...sty }}>
+        {product.image ? <img src={product.image} alt={product.name||"Producto"} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center" style={{ color: store.mutedTextColor, minHeight: 120 }}><EditableText tag="span" value={product.imageLabel||"Imagen"} fontColor={productTextColor(product,"imageLabelColor",store.mutedTextColor)} onTextChange={v=>updateProductField(index,"imageLabel",v)} onFontColorChange={v=>updateProductField(index,"imageLabelColor",v)} isEditable={isEditable} inline /></div>}
+      </ClickableImageZone>
+    );
+    const cat = <EditableText tag="p" value={product.category||"Categoría"} fontColor={productTextColor(product,"categoryColor",store.primaryColor)} onTextChange={v=>updateProductField(index,"category",v)} onFontColorChange={v=>updateProductField(index,"categoryColor",v)} isEditable={isEditable} className="text-xs font-black uppercase tracking-widest" />;
+    const name = <EditableText tag="h3" value={product.name||"Nombre producto"} fontColor={productTextColor(product,"nameColor",store.textColor)} onTextChange={v=>updateProductField(index,"name",v)} onFontColorChange={v=>updateProductField(index,"nameColor",v)} isEditable={isEditable} className="mt-1 font-black leading-tight" style={{ fontSize: "1.1rem" }} />;
+    const desc = <EditableText tag="p" value={product.description||"Descripción del producto"} fontColor={productTextColor(product,"descriptionColor",store.mutedTextColor)} onTextChange={v=>updateProductField(index,"description",v)} onFontColorChange={v=>updateProductField(index,"descriptionColor",v)} isEditable={isEditable} className="mt-2 text-sm" />;
+    const ctaBtn = (full = true) => (
+      <button className={`${full?"w-full":""}  rounded-xl px-5 py-3 font-black text-sm`} style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor, cursor:"pointer", whiteSpace:"nowrap" }} onClick={contactHandler(product)}>
+        <EditableText tag="span" value={productButtonText} fontColor={textColor("productCtaTextColor",store.buttonTextColor)} onTextChange={v=>onUpdate?.("productCtaText",v)} onFontColorChange={v=>onUpdate?.("productCtaTextColor",v)} isEditable={isEditable} inline />
+      </button>
+    );
+
+    /* ── FEATURE (Noche): horizontal row ── */
+    if (layout === "feature") return (
+      <article key={index} style={{ display:"flex", gap: 20, alignItems:"center", padding:"20px 0", borderBottom:`1px solid ${hexToRgba(store.textColor,0.07)}` }}>
+        {imgZone("rounded-2xl shrink-0", { width:120, height:120, minWidth:120 })}
+        <div style={{ flex:1, minWidth:0 }}>
+          {cat}
+          {name}
+          {desc}
+        </div>
+        <div style={{ flexShrink:0, paddingLeft:12 }}>{ctaBtn(false)}</div>
+      </article>
+    );
+
+    /* ── MAGAZINE (Coral): first product is featured full-width ── */
+    if (layout === "magazine" && index === 0) return (
+      <article key={index} style={{ gridColumn:"1 / -1", display:"grid", gridTemplateColumns:"55% 45%", borderRadius:24, overflow:"hidden", border:`1px solid ${hexToRgba(store.textColor,0.07)}` }}>
+        {imgZone("h-full", { minHeight:280 })}
+        <div style={{ padding:"40px 36px", backgroundColor: store.surfaceColor, display:"flex", flexDirection:"column", justifyContent:"center" }}>
+          {cat}
+          <EditableText tag="h3" value={product.name||"Nombre producto"} fontColor={productTextColor(product,"nameColor",store.textColor)} onTextChange={v=>updateProductField(index,"name",v)} onFontColorChange={v=>updateProductField(index,"nameColor",v)} isEditable={isEditable} style={{ fontSize:"1.8rem", fontWeight:900, lineHeight:1.1, margin:"10px 0 14px" }} />
+          {desc}
+          <div style={{ marginTop:24 }}>{ctaBtn(false)}</div>
+        </div>
+      </article>
+    );
+
+    /* ── SPLIT (Océano): card with top accent border ── */
+    if (layout === "split") return (
+      <article key={index} style={{ borderRadius:20, overflow:"hidden", borderTop:`3px solid ${store.primaryColor}`, background: store.surfaceColor }}>
+        {imgZone(`${standalone?"h-44":"h-56"} rounded-none`)}
+        <div style={{ padding:"20px 20px 24px" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+            <span style={{ fontSize:"0.65rem", fontWeight:900, textTransform:"uppercase", letterSpacing:"0.16em", color: store.primaryColor }}>{product.category||"Categoría"}</span>
+          </div>
+          {name}
+          {desc}
+          <div style={{ marginTop:16 }}>{ctaBtn()}</div>
+        </div>
+      </article>
+    );
+
+    /* ── CENTERED (Bosque): generous whitespace, minimal border ── */
+    if (layout === "centered") return (
+      <article key={index} style={{ borderRadius:24, overflow:"hidden", background: store.surfaceColor, border:`1px solid ${hexToRgba(store.textColor,0.07)}` }}>
+        {imgZone(`${standalone?"h-56":"h-72"} rounded-none`)}
+        <div style={{ padding:"24px 24px 28px" }}>
+          {cat}
+          {name}
+          <div style={{ width:32, height:2, background: store.primaryColor, margin:"12px 0" }} />
+          {desc}
+          <div style={{ marginTop:20 }}>{ctaBtn()}</div>
+        </div>
+      </article>
+    );
+
+    /* ── OVERLAY (Fuego / default): standard clean card ── */
+    return (
+      <article key={index} style={{ borderRadius:24, overflow:"hidden", background: store.surfaceColor, boxShadow:`0 2px 16px ${hexToRgba(store.textColor,0.06)}` }}>
+        {imgZone(`${standalone?"h-44":"h-56"} rounded-none`)}
+        <div style={{ padding:"18px 20px 22px" }}>
+          {cat}
+          {name}
+          {desc}
+          <div style={{ marginTop:16 }}>{ctaBtn()}</div>
+        </div>
+      </article>
+    );
+  };
 
   return (
     <div
@@ -353,181 +519,295 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         </div>
       </header>
 
-      {/* Hero */}
-      {!productsOnly && !marcaOnly && <section
-        id="inicio"
-        className={heroClassName}
-        style={{
-          minHeight: standalone ? "clamp(520px, 68vh, 760px)" : undefined,
-          backgroundColor: store.backgroundColor,
-          backgroundImage: store.heroImage
-            ? `url(${store.heroImage})`
-            : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)`,
-          backgroundSize: store.heroImage ? "cover" : undefined,
-          backgroundPosition: store.heroImage ? `${store.heroImageX ?? 50}% ${store.heroImageY ?? 50}%` : undefined,
-        }}
-      >
-        {isEditable && (
-          <ClickableImageZone
-            value={store.heroImage}
-            onUpload={v => onUpdate?.("heroImage", v)}
-            isEditable={isEditable}
-            style={{ position: "absolute", top: 12, right: 12, zIndex: 30, borderRadius: 12, overflow: "hidden", width: 44, height: 44, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(127, 224, 64, 0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
-            </svg>
+      {/* Hero — layout-aware */}
+      {!productsOnly && !marcaOnly && (() => {
+        const heroBlockDX = store.heroBlock?.dx || 0;
+        const heroBlockDY = store.heroBlock?.dy || 0;
+        const heroBlockChange = isEditable ? (dx, dy) => onUpdate?.("heroBlock", { dx: Math.round(dx), dy: Math.round(dy) }) : null;
+
+        const imgUploadBtn = isEditable && (
+          <ClickableImageZone value={store.heroImage} onUpload={v => onUpdate?.("heroImage", v)} isEditable={isEditable}
+            style={{ position: "absolute", top: 12, right: 12, zIndex: 30, borderRadius: 12, overflow: "hidden", width: 44, height: 44, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(127,224,64,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           </ClickableImageZone>
-        )}
-        {isEditable && store.heroImage && (
-          <div style={{ position: "absolute", top: 12, right: 64, zIndex: 30, display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ display: "flex", gap: 4 }}>
-              <button type="button" title="Mover izquierda"
-                onClick={() => onUpdate?.("heroImageX", Math.max(0, (store.heroImageX ?? 50) - 10))}
-                style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>←</button>
-              <button type="button" title="Subir imagen"
-                onClick={() => onUpdate?.("heroImageY", Math.max(0, (store.heroImageY ?? 50) - 10))}
-                style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>↑</button>
-              <button type="button" title="Bajar imagen"
-                onClick={() => onUpdate?.("heroImageY", Math.min(100, (store.heroImageY ?? 50) + 10))}
-                style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>↓</button>
-              <button type="button" title="Mover derecha"
-                onClick={() => onUpdate?.("heroImageX", Math.min(100, (store.heroImageX ?? 50) + 10))}
-                style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", fontSize: "1rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>→</button>
+        );
+        const imgPosControls = isEditable && store.heroImage && (
+          <div style={{ position: "absolute", top: 12, right: 64, zIndex: 30, display: "flex", gap: 4 }}>
+            {[["←","heroImageX",-10,0],["↑","heroImageY",-10,0],["↓","heroImageY",10,100],["→","heroImageX",10,100]].map(([label,field,delta,clamp],i)=>(
+              <button key={i} type="button" title={label} onClick={() => onUpdate?.(field, delta<0 ? Math.max(clamp,(store[field]??50)+delta) : Math.min(clamp,(store[field]??50)+delta))}
+                style={{ width:36,height:36,borderRadius:10,background:"rgba(0,0,0,0.6)",border:"1px solid rgba(255,255,255,0.2)",color:"#fff",fontSize:"1rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center" }}>{label}</button>
+            ))}
+            <button type="button" title="Eliminar imagen" onClick={() => onUpdate?.("heroImage", "")}
+              style={{ width:36,height:36,borderRadius:10,background:"rgba(180,20,20,0.75)",border:"1px solid rgba(255,100,100,0.3)",color:"#fff",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </div>
+        );
+        const heroTextContent = (centered = false, dark = false) => (
+          <>
+            {(store.promoText || isEditable) && (
+              <span className="rounded-full px-4 py-2 text-sm font-black" style={{ display: "inline-block", backgroundColor: dark ? hexToRgba(store.primaryColor,0.25) : primarySoft, color: dark ? "#fff" : store.primaryColor }}>
+                <EditableText tag="span" value={store.promoText} fontColor={textColor("promoTextColor", dark ? "#fff" : store.primaryColor)} onTextChange={v => onUpdate?.("promoText", v)} onFontColorChange={v => onUpdate?.("promoTextColor", v)} isEditable={isEditable} inline />
+              </span>
+            )}
+            <EditableText tag="h1" value={store.heroTitle} fontSize={heroTitleSize} fontColor={store.heroTitleColor || (dark ? "#fff" : store.textColor)} onTextChange={v => onUpdate?.("heroTitle", v)} onFontSizeChange={v => onUpdate?.("heroTitleSize", v)} onFontColorChange={v => onUpdate?.("heroTitleColor", v)} isEditable={isEditable} className={`mt-6 font-black leading-none ${centered ? "mx-auto" : "max-w-3xl"}`} />
+            <EditableText tag="p" value={store.heroSubtitle} fontSize={heroSubtitleSize} fontColor={store.heroSubtitleColor || (dark ? "rgba(255,255,255,0.7)" : store.mutedTextColor)} onTextChange={v => onUpdate?.("heroSubtitle", v)} onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)} onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)} isEditable={isEditable} className={`mt-4 ${centered ? "mx-auto max-w-lg" : "max-w-xl"}`} />
+            <div className={`mt-8 flex gap-3 ${centered ? "justify-center" : ""} flex-wrap`}>
+              <button className="rounded-2xl px-8 py-4 font-black" style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
+                <EditableText tag="span" value={store.ctaText} fontColor={textColor("ctaTextColor", store.buttonTextColor)} onTextChange={v => onUpdate?.("ctaText", v)} onFontColorChange={v => onUpdate?.("ctaTextColor", v)} isEditable={isEditable} inline />
+              </button>
+              <button className="rounded-2xl px-8 py-4 font-black" style={{ border: `1px solid ${dark ? "rgba(255,255,255,0.2)" : hexToRgba(store.textColor,0.15)}`, color: dark ? "#fff" : store.textColor, background: "transparent" }}>
+                <EditableText tag="span" value={store.secondaryCtaText} fontColor={textColor("secondaryCtaTextColor", dark ? "#fff" : store.textColor)} onTextChange={v => onUpdate?.("secondaryCtaText", v)} onFontColorChange={v => onUpdate?.("secondaryCtaTextColor", v)} isEditable={isEditable} inline />
+              </button>
             </div>
-          </div>
-        )}
-        <div className={`${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
-          <div className={standalone ? "max-w-xl" : ""}>
-          <span className="rounded-full px-4 py-2 text-sm font-black"
-            style={{ backgroundColor: primarySoft, color: store.primaryColor }}>
-            <EditableText
-              tag="span" value={store.promoText}
-              fontColor={textColor("promoTextColor", store.primaryColor)}
-              onTextChange={v => onUpdate?.("promoText", v)}
-              onFontColorChange={v => onUpdate?.("promoTextColor", v)}
-              isEditable={isEditable}
-              inline
-            />
-          </span>
-          <EditableText
-            tag="h1" value={store.heroTitle}
-            fontSize={heroTitleSize} fontColor={store.heroTitleColor || store.textColor}
-            onTextChange={v => onUpdate?.("heroTitle", v)}
-            onFontSizeChange={v => onUpdate?.("heroTitleSize", v)}
-            onFontColorChange={v => onUpdate?.("heroTitleColor", v)}
-            isEditable={isEditable}
-            className="mt-8 max-w-3xl font-black leading-none"
-          />
-          <EditableText
-            tag="p" value={store.heroSubtitle}
-            fontSize={heroSubtitleSize} fontColor={store.heroSubtitleColor || store.mutedTextColor}
-            onTextChange={v => onUpdate?.("heroSubtitle", v)}
-            onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)}
-            onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)}
-            isEditable={isEditable}
-            className="mt-6 max-w-xl"
-          />
-          <button className="mt-8 rounded-2xl px-8 py-4 font-black"
-            style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
-            <EditableText
-              tag="span" value={store.ctaText}
-              fontColor={textColor("ctaTextColor", store.buttonTextColor)}
-              onTextChange={v => onUpdate?.("ctaText", v)}
-              onFontColorChange={v => onUpdate?.("ctaTextColor", v)}
-              isEditable={isEditable}
-              inline
-            />
-          </button>
-          <button className="ml-3 mt-8 rounded-2xl border border-white/15 px-8 py-4 font-black"
-            style={{ color: store.textColor }}>
-            <EditableText
-              tag="span" value={store.secondaryCtaText}
-              fontColor={textColor("secondaryCtaTextColor", store.textColor)}
-              onTextChange={v => onUpdate?.("secondaryCtaText", v)}
-              onFontColorChange={v => onUpdate?.("secondaryCtaTextColor", v)}
-              isEditable={isEditable}
-              inline
-            />
-          </button>
-          </div>
-        </div>
-      </section>}
+          </>
+        );
 
-      {!productsOnly && !marcaOnly && <section className={`mx-auto grid max-w-6xl gap-4 ${sectionPadding} md:grid-cols-3`} style={{ backgroundColor: store.backgroundColor }}>
-        {[
-          [store.benefit1, store.benefit1Text],
-          [store.benefit2, store.benefit2Text],
-          [store.benefit3, store.benefit3Text],
-        ].map(([benefit, description], index) => (
-          <div key={index} className="rounded-3xl border border-white/10 p-6"
-            style={{ backgroundColor: store.surfaceColor }}>
-            <EditableText
-              tag="h4" value={benefit}
-              fontColor={textColor(`benefit${index + 1}Color`, store.textColor)}
-              onTextChange={v => onUpdate?.(`benefit${index + 1}`, v)}
-              onFontColorChange={v => onUpdate?.(`benefit${index + 1}Color`, v)}
-              isEditable={isEditable}
-              className="font-black"
-            />
-            <EditableText
-              tag="p" value={description}
-              fontColor={textColor(`benefit${index + 1}TextColor`, store.mutedTextColor)}
-              onTextChange={v => onUpdate?.(`benefit${index + 1}Text`, v)}
-              onFontColorChange={v => onUpdate?.(`benefit${index + 1}TextColor`, v)}
-              isEditable={isEditable}
-              className="mt-3 text-sm"
-            />
-          </div>
-        ))}
-      </section>}
-
-      {!productsOnly && <section id="marca" className={`mx-auto grid max-w-6xl gap-7 ${sectionPadding} md:grid-cols-2`}>
-        <div>
-          <EditableText
-            tag="h2" value={store.aboutTitle}
-            fontSize={aboutTitleSize} fontColor={store.aboutTitleColor || store.textColor}
-            onTextChange={v => onUpdate?.("aboutTitle", v)}
-            onFontSizeChange={v => onUpdate?.("aboutTitleSize", v)}
-            onFontColorChange={v => onUpdate?.("aboutTitleColor", v)}
-            isEditable={isEditable}
-            className="font-black"
-          />
-          <EditableText
-            tag="p" value={store.aboutText}
-            fontSize={aboutBodySize} fontColor={store.aboutBodyColor || store.mutedTextColor}
-            onTextChange={v => onUpdate?.("aboutText", v)}
-            onFontSizeChange={v => onUpdate?.("aboutBodySize", v)}
-            onFontColorChange={v => onUpdate?.("aboutBodyColor", v)}
-            isEditable={isEditable}
-            className={standalone ? "mt-4 text-justify" : "mt-4"}
-          />
-        </div>
-        <ClickableImageZone
-          value={store.bannerSecondary}
-          onUpload={v => onUpdate?.("bannerSecondary", v)}
-          isEditable={isEditable}
-          bannerLabel="imagen"
-          className={`${standalone ? "min-h-[220px]" : "min-h-[280px]"} overflow-hidden rounded-[1.5rem]`}
-          style={{ backgroundColor: store.backgroundColor }}
-        >
-          {store.bannerSecondary ? (
-            <img src={store.bannerSecondary} alt="Banner secundario" className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full min-h-[280px] items-center justify-center" style={{ color: store.mutedTextColor }}>
-              <EditableText
-                tag="span" value={store.bannerSecondaryLabel || "Banner secundario"}
-                fontColor={textColor("bannerSecondaryLabelColor", store.mutedTextColor)}
-                onTextChange={v => onUpdate?.("bannerSecondaryLabel", v)}
-                onFontColorChange={v => onUpdate?.("bannerSecondaryLabelColor", v)}
-                isEditable={isEditable}
-                inline
-              />
+        /* ── SPLIT (Océano): text left | image right explicit ── */
+        if (layout === "split") return (
+          <section id="inicio" style={{ display: "grid", gridTemplateColumns: standalone ? "1fr 1fr" : "1fr 1fr", backgroundColor: store.backgroundColor, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, position: "relative" }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: standalone ? "56px 40px 56px 56px" : "56px 40px" }}>
+              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+                {heroTextContent()}
+              </DraggableBlock>
             </div>
-          )}
-        </ClickableImageZone>
-      </section>}
+            <div style={{ position: "relative", overflow: "hidden" }}>
+              {imgUploadBtn}
+              {imgPosControls}
+              {store.heroImage
+                ? <img src={store.heroImage} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: `${store.heroImageX??50}% ${store.heroImageY??50}%` }} />
+                : <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor}, ${store.gradientToColor||store.primaryColor})` }} />
+              }
+            </div>
+          </section>
+        );
+
+        /* ── CENTERED (Bosque): full-width centered text, gradient bg ── */
+        if (layout === "centered") return (
+          <section id="inicio" style={{ position: "relative", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? `url(${store.heroImage})` : `radial-gradient(ellipse at 50% -10%, ${primaryGlow}, transparent 55%), radial-gradient(ellipse at 80% 100%, ${hexToRgba(store.primaryColor,0.12)}, transparent 40%)`, backgroundSize: "cover", backgroundPosition: `${store.heroImageX??50}% ${store.heroImageY??50}%`, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, padding: standalone ? "72px 24px" : "80px 32px" }}>
+            {imgUploadBtn}
+            {imgPosControls}
+            <div style={{ maxWidth: 780, width: "100%", margin: "0 auto" }}>
+              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+                {heroTextContent(true)}
+              </DraggableBlock>
+            </div>
+          </section>
+        );
+
+        /* ── FEATURE (Noche): full-bleed bg + text anchored bottom-left ── */
+        if (layout === "feature") return (
+          <section id="inicio" style={{
+            position: "relative", overflow: "hidden",
+            backgroundColor: store.backgroundColor,
+            backgroundImage: store.heroImage
+              ? `url(${store.heroImage})`
+              : `linear-gradient(160deg, ${store.gradientFromColor||store.primaryColor} 0%, ${store.gradientToColor||store.primaryColor} 100%)`,
+            backgroundSize: "cover",
+            backgroundPosition: store.heroImage ? `${store.heroImageX??50}% ${store.heroImageY??50}%` : "center",
+            minHeight: standalone ? "clamp(520px,68vh,760px)" : 520,
+            display: "flex", flexDirection: "column", justifyContent: "flex-end",
+          }}>
+            {imgUploadBtn}
+            {imgPosControls}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.38) 55%, transparent 85%)" }} />
+            <div style={{ position: "relative", zIndex: 2, padding: standalone ? "56px 48px" : "56px 40px", maxWidth: "58%" }}>
+              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+                {(store.promoText || isEditable) && (
+                  <span className="rounded-full px-4 py-1.5 text-xs font-black uppercase tracking-widest mb-6 self-start" style={{ backgroundColor: hexToRgba(store.primaryColor,0.25), color: store.primaryColor, letterSpacing: "0.2em", display: "inline-block" }}>
+                    <EditableText tag="span" value={store.promoText} fontColor={textColor("promoTextColor", store.primaryColor)} onTextChange={v => onUpdate?.("promoText", v)} onFontColorChange={v => onUpdate?.("promoTextColor", v)} isEditable={isEditable} inline />
+                  </span>
+                )}
+                <EditableText tag="h1" value={store.heroTitle} fontSize={Math.min((heroTitleSize*1.25)|0, standalone?54:80)} fontColor={store.heroTitleColor||"#fff"} onTextChange={v => onUpdate?.("heroTitle", v)} onFontSizeChange={v => onUpdate?.("heroTitleSize", v)} onFontColorChange={v => onUpdate?.("heroTitleColor", v)} isEditable={isEditable} className="font-black leading-none" />
+                <div style={{ width: 48, height: 4, borderRadius: 2, background: store.primaryColor, margin: "20px 0" }} />
+                <EditableText tag="p" value={store.heroSubtitle} fontSize={heroSubtitleSize} fontColor={store.heroSubtitleColor||"rgba(255,255,255,0.72)"} onTextChange={v => onUpdate?.("heroSubtitle", v)} onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)} onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)} isEditable={isEditable} className="max-w-md mb-8" />
+                <button className="rounded-2xl px-8 py-4 font-black self-start" style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
+                  <EditableText tag="span" value={store.ctaText} fontColor={textColor("ctaTextColor", store.buttonTextColor)} onTextChange={v => onUpdate?.("ctaText", v)} onFontColorChange={v => onUpdate?.("ctaTextColor", v)} isEditable={isEditable} inline />
+                </button>
+              </DraggableBlock>
+            </div>
+          </section>
+        );
+
+        /* ── MAGAZINE (Coral): bg image full + accent stripe bottom ── */
+        if (layout === "magazine") return (
+          <section id="inicio" style={{ position: "relative", overflow: "hidden", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? `url(${store.heroImage})` : `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor} 0%, ${store.gradientToColor||store.primaryColor} 100%)`, backgroundSize: "cover", backgroundPosition: `${store.heroImageX??50}% ${store.heroImageY??50}%`, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+            {imgUploadBtn}
+            {imgPosControls}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)" }} />
+            <div style={{ position: "relative", zIndex: 2, padding: standalone ? "0 48px 48px" : "0 40px 56px", maxWidth: 800 }}>
+              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+                {(store.promoText || isEditable) && (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: store.primaryColor, color: store.buttonTextColor, borderRadius: 8, padding: "4px 14px 4px 6px", marginBottom: 20 }}>
+                    <span style={{ width: 20, height: 20, borderRadius: 4, background: "rgba(255,255,255,0.3)", display: "inline-block" }} />
+                    <EditableText tag="span" value={store.promoText} fontColor={textColor("promoTextColor", store.buttonTextColor)} onTextChange={v => onUpdate?.("promoText", v)} onFontColorChange={v => onUpdate?.("promoTextColor", v)} isEditable={isEditable} inline style={{ fontSize: "0.8rem", fontWeight: 900, letterSpacing: "0.1em" }} />
+                  </div>
+                )}
+                <EditableText tag="h1" value={store.heroTitle} fontSize={heroTitleSize} fontColor={store.heroTitleColor||"#fff"} onTextChange={v => onUpdate?.("heroTitle", v)} onFontSizeChange={v => onUpdate?.("heroTitleSize", v)} onFontColorChange={v => onUpdate?.("heroTitleColor", v)} isEditable={isEditable} className="font-black leading-none max-w-3xl" />
+                <EditableText tag="p" value={store.heroSubtitle} fontSize={heroSubtitleSize} fontColor={store.heroSubtitleColor||"rgba(255,255,255,0.7)"} onTextChange={v => onUpdate?.("heroSubtitle", v)} onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)} onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)} isEditable={isEditable} className="mt-4 max-w-xl" />
+                <div className="mt-8 flex gap-3 flex-wrap">
+                  <button className="rounded-2xl px-8 py-4 font-black" style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
+                    <EditableText tag="span" value={store.ctaText} fontColor={textColor("ctaTextColor", store.buttonTextColor)} onTextChange={v => onUpdate?.("ctaText", v)} onFontColorChange={v => onUpdate?.("ctaTextColor", v)} isEditable={isEditable} inline />
+                  </button>
+                  <button className="rounded-2xl px-8 py-4 font-black" style={{ border: "1px solid rgba(255,255,255,0.3)", color: "#fff", background: "transparent" }}>
+                    <EditableText tag="span" value={store.secondaryCtaText} fontColor={textColor("secondaryCtaTextColor","#fff")} onTextChange={v => onUpdate?.("secondaryCtaText", v)} onFontColorChange={v => onUpdate?.("secondaryCtaTextColor", v)} isEditable={isEditable} inline />
+                  </button>
+                </div>
+              </DraggableBlock>
+            </div>
+          </section>
+        );
+
+        /* ── OVERLAY (default / Fuego): text overlay on bg image ── */
+        return (
+          <section id="inicio" className={heroClassName} style={{ minHeight: standalone ? "clamp(520px,68vh,760px)" : undefined, backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? `url(${store.heroImage})` : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)`, backgroundSize: store.heroImage ? "cover" : undefined, backgroundPosition: store.heroImage ? `${store.heroImageX??50}% ${store.heroImageY??50}%` : undefined }}>
+            {imgUploadBtn}
+            {imgPosControls}
+            <div className={`${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
+              <div className={standalone ? "max-w-xl" : ""}>
+              <DraggableBlock dx={heroBlockDX} dy={heroBlockDY} onChange={heroBlockChange} isEditable={isEditable}>
+                {heroTextContent()}
+              </DraggableBlock>
+            </div>
+            </div>
+          </section>
+        );
+      })()}
+
+      {!productsOnly && !marcaOnly && (() => {
+        const benefits = [[store.benefit1,store.benefit1Text],[store.benefit2,store.benefit2Text],[store.benefit3,store.benefit3Text]];
+        /* split (Océano): numbered list — 01 02 03 style */
+        if (layout === "split") return (
+          <section className={`mx-auto max-w-6xl ${sectionPadding}`} style={{ backgroundColor: store.backgroundColor }}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:1, background: hexToRgba(store.textColor,0.08), borderRadius:20, overflow:"hidden" }}>
+              {benefits.map(([b,d],i) => (
+                <div key={i} style={{ background: store.surfaceColor, padding:"28px 28px 32px" }}>
+                  <span style={{ fontSize:"0.65rem", fontWeight:900, letterSpacing:"0.2em", color: store.primaryColor }}>0{i+1}</span>
+                  <EditableText tag="h4" value={b} fontColor={textColor(`benefit${i+1}Color`,store.textColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}Color`,v)} isEditable={isEditable} className="font-black mt-3" style={{ fontSize:"1rem" }} />
+                  <EditableText tag="p" value={d} fontColor={textColor(`benefit${i+1}TextColor`,store.mutedTextColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}Text`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}TextColor`,v)} isEditable={isEditable} className="mt-2 text-sm" />
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+        /* centered (Bosque): horizontal thin text rows, no cards */
+        if (layout === "centered") return (
+          <section className={`mx-auto max-w-3xl ${sectionPadding} text-center`} style={{ backgroundColor: store.backgroundColor }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:0 }}>
+              {benefits.map(([b,d],i) => (
+                <div key={i} style={{ padding:"20px 0", borderBottom: i<2 ? `1px solid ${hexToRgba(store.textColor,0.07)}` : "none", display:"flex", alignItems:"baseline", gap:24, textAlign:"left" }}>
+                  <span style={{ fontSize:"1.8rem", fontWeight:900, color: store.primaryColor, lineHeight:1, flexShrink:0, width:32, textAlign:"right" }}>·</span>
+                  <div>
+                    <EditableText tag="h4" value={b} fontColor={textColor(`benefit${i+1}Color`,store.textColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}Color`,v)} isEditable={isEditable} className="font-black" />
+                    <EditableText tag="p" value={d} fontColor={textColor(`benefit${i+1}TextColor`,store.mutedTextColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}Text`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}TextColor`,v)} isEditable={isEditable} className="mt-1 text-sm" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+        /* feature (Noche): left-border accent bars */
+        if (layout === "feature") return (
+          <section className={`mx-auto max-w-6xl ${sectionPadding}`} style={{ backgroundColor: store.backgroundColor }}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:24 }}>
+              {benefits.map(([b,d],i) => (
+                <div key={i} style={{ paddingLeft:20, borderLeft:`3px solid ${store.primaryColor}` }}>
+                  <EditableText tag="h4" value={b} fontColor={textColor(`benefit${i+1}Color`,store.textColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}Color`,v)} isEditable={isEditable} className="font-black" />
+                  <EditableText tag="p" value={d} fontColor={textColor(`benefit${i+1}TextColor`,store.mutedTextColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}Text`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}TextColor`,v)} isEditable={isEditable} className="mt-2 text-sm" />
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+        /* magazine (Coral): minimal, no cards, just text columns */
+        if (layout === "magazine") return (
+          <section className={`mx-auto max-w-6xl ${sectionPadding}`} style={{ backgroundColor: store.backgroundColor, borderTop:`1px solid ${hexToRgba(store.textColor,0.07)}`, borderBottom:`1px solid ${hexToRgba(store.textColor,0.07)}` }}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:32 }}>
+              {benefits.map(([b,d],i) => (
+                <div key={i}>
+                  <div style={{ width:24, height:2, background:store.primaryColor, marginBottom:14 }} />
+                  <EditableText tag="h4" value={b} fontColor={textColor(`benefit${i+1}Color`,store.textColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}Color`,v)} isEditable={isEditable} className="font-black text-sm uppercase tracking-wider" />
+                  <EditableText tag="p" value={d} fontColor={textColor(`benefit${i+1}TextColor`,store.mutedTextColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}Text`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}TextColor`,v)} isEditable={isEditable} className="mt-2 text-sm" />
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+        /* overlay (Fuego / default): rounded shadow cards */
+        return (
+          <section className={`mx-auto grid max-w-6xl gap-4 ${sectionPadding} md:grid-cols-3`} style={{ backgroundColor: store.backgroundColor }}>
+            {benefits.map(([b,d],i) => (
+              <div key={i} style={{ borderRadius:20, padding:"24px 22px", backgroundColor: store.surfaceColor, boxShadow:`0 2px 16px ${hexToRgba(store.textColor,0.05)}` }}>
+                <div style={{ width:36, height:36, borderRadius:10, background: hexToRgba(store.primaryColor,0.12), display:"flex", alignItems:"center", justifyContent:"center", marginBottom:14 }}>
+                  <div style={{ width:14, height:14, borderRadius:"50%", background: store.primaryColor }} />
+                </div>
+                <EditableText tag="h4" value={b} fontColor={textColor(`benefit${i+1}Color`,store.textColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}Color`,v)} isEditable={isEditable} className="font-black" />
+                <EditableText tag="p" value={d} fontColor={textColor(`benefit${i+1}TextColor`,store.mutedTextColor)} onTextChange={v=>onUpdate?.(`benefit${i+1}Text`,v)} onFontColorChange={v=>onUpdate?.(`benefit${i+1}TextColor`,v)} isEditable={isEditable} className="mt-2 text-sm" />
+              </div>
+            ))}
+          </section>
+        );
+      })()}
+
+      {!productsOnly && (() => {
+        const aboutText = (
+          <>
+            <EditableText tag="h2" value={store.aboutTitle} fontSize={aboutTitleSize} fontColor={store.aboutTitleColor||store.textColor} onTextChange={v=>onUpdate?.("aboutTitle",v)} onFontSizeChange={v=>onUpdate?.("aboutTitleSize",v)} onFontColorChange={v=>onUpdate?.("aboutTitleColor",v)} isEditable={isEditable} className="font-black" />
+            <EditableText tag="p" value={store.aboutText} fontSize={aboutBodySize} fontColor={store.aboutBodyColor||store.mutedTextColor} onTextChange={v=>onUpdate?.("aboutText",v)} onFontSizeChange={v=>onUpdate?.("aboutBodySize",v)} onFontColorChange={v=>onUpdate?.("aboutBodyColor",v)} isEditable={isEditable} className={standalone?"mt-4 text-justify":"mt-4"} />
+          </>
+        );
+        const aboutImage = (
+          <ClickableImageZone value={store.bannerSecondary} onUpload={v=>onUpdate?.("bannerSecondary",v)} isEditable={isEditable} bannerLabel="imagen" className="overflow-hidden rounded-[1.5rem]" style={{ backgroundColor: store.backgroundColor, position: "relative", height: "clamp(280px, 42vh, 500px)" }}>
+            {store.bannerSecondary
+              ? <img src={store.bannerSecondary} alt="Banner secundario" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
+              : <div className="flex h-full items-center justify-center" style={{ color: store.mutedTextColor, minHeight: 280 }}><EditableText tag="span" value={store.bannerSecondaryLabel||"Banner secundario"} fontColor={textColor("bannerSecondaryLabelColor",store.mutedTextColor)} onTextChange={v=>onUpdate?.("bannerSecondaryLabel",v)} onFontColorChange={v=>onUpdate?.("bannerSecondaryLabelColor",v)} isEditable={isEditable} inline /></div>}
+          </ClickableImageZone>
+        );
+        /* centered: single column */
+        if (layout === "centered") return (
+          <section id="marca" className={`mx-auto max-w-4xl ${sectionPadding} text-center`}>
+            <EditableText tag="h2" value={store.aboutTitle} fontSize={aboutTitleSize} fontColor={store.aboutTitleColor||store.textColor} onTextChange={v=>onUpdate?.("aboutTitle",v)} onFontSizeChange={v=>onUpdate?.("aboutTitleSize",v)} onFontColorChange={v=>onUpdate?.("aboutTitleColor",v)} isEditable={isEditable} className="font-black" />
+            <EditableText tag="p" value={store.aboutText} fontSize={aboutBodySize} fontColor={store.aboutBodyColor||store.mutedTextColor} onTextChange={v=>onUpdate?.("aboutText",v)} onFontSizeChange={v=>onUpdate?.("aboutBodySize",v)} onFontColorChange={v=>onUpdate?.("aboutBodyColor",v)} isEditable={isEditable} className="mt-4 mx-auto max-w-2xl" />
+            <div style={{ width: 64, height: 4, borderRadius: 2, background: store.primaryColor, margin: "28px auto 0" }} />
+          </section>
+        );
+        /* split: image left, text right */
+        if (layout === "split") return (
+          <section id="marca" className={`mx-auto grid max-w-6xl gap-7 ${sectionPadding} md:grid-cols-2`} style={{ alignItems: "center" }}>
+            {aboutImage}
+            <div>{aboutText}</div>
+          </section>
+        );
+        /* feature: full-width panel with accent bar */
+        if (layout === "feature") return (
+          <section id="marca" style={{ backgroundColor: store.surfaceColor }}>
+            <div className={`mx-auto max-w-6xl ${sectionPadding}`} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 40, alignItems: "center" }}>
+              <div>
+                <div style={{ width: 40, height: 4, borderRadius: 2, background: store.primaryColor, marginBottom: 20 }} />
+                {aboutText}
+              </div>
+              {aboutImage}
+            </div>
+          </section>
+        );
+        /* magazine: 3 columns — image, title, body */
+        if (layout === "magazine") return (
+          <section id="marca" className={`mx-auto max-w-6xl ${sectionPadding}`} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 32, alignItems: "start" }}>
+            <div style={{ gridColumn: "1 / 2" }}>{aboutImage}</div>
+            <div style={{ gridColumn: "2 / 4" }}>
+              <div style={{ width: 40, height: 4, borderRadius: 2, background: store.primaryColor, marginBottom: 16 }} />
+              {aboutText}
+            </div>
+          </section>
+        );
+        /* overlay (default): text left, image right */
+        return (
+          <section id="marca" className={`mx-auto grid max-w-6xl gap-7 ${sectionPadding} md:grid-cols-2`} style={{ alignItems: "center" }}>
+            <div>{aboutText}</div>
+            {aboutImage}
+          </section>
+        );
+      })()}
 
       {/* Catalog */}
       {!marcaOnly && <section id="productos" className={`mx-auto max-w-6xl ${sectionPadding}`} style={{ backgroundColor: store.backgroundColor }}>
@@ -555,99 +835,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           isEditable={isEditable}
           className="mt-3 max-w-2xl text-sm"
         />
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
-          {products.map((product, index) => (
-            <article key={index} className="overflow-hidden rounded-[2rem] border border-white/10 p-4"
-              style={{ backgroundColor: store.surfaceColor }}>
-              <ClickableImageZone
-                value={product.image}
-                onUpload={v => {
-                  const copy = [...products];
-                  copy[index] = { ...copy[index], image: v };
-                  onUpdate?.("__products__", copy);
-                }}
-                isEditable={isEditable}
-                className={`${standalone ? "h-44" : "h-56"} overflow-hidden rounded-[1.25rem]`}
-                style={{ backgroundColor: store.backgroundColor }}
-              >
-                {product.image ? (
-                  <img src={product.image} alt={product.name || "Producto"} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-56 items-center justify-center" style={{ color: store.mutedTextColor }}>
-                    <EditableText
-                      tag="span" value={product.imageLabel || "Imagen producto"}
-                      fontColor={productTextColor(product, "imageLabelColor", store.mutedTextColor)}
-                      onTextChange={v => updateProductField(index, "imageLabel", v)}
-                      onFontColorChange={v => updateProductField(index, "imageLabelColor", v)}
-                      isEditable={isEditable}
-                      inline
-                    />
-                  </div>
-                )}
-              </ClickableImageZone>
-              <EditableText
-                tag="p" value={product.category || "Categoria"}
-                fontColor={productTextColor(product, "categoryColor", store.primaryColor)}
-                onTextChange={v => updateProductField(index, "category", v)}
-                onFontColorChange={v => updateProductField(index, "categoryColor", v)}
-                isEditable={isEditable}
-                className="mt-4 text-xs font-black"
-              />
-              <EditableText
-                tag="h3" value={product.name || "Nombre producto"}
-                fontColor={productTextColor(product, "nameColor", store.textColor)}
-                onTextChange={v => updateProductField(index, "name", v)}
-                onFontColorChange={v => updateProductField(index, "nameColor", v)}
-                isEditable={isEditable}
-                className="mt-1 text-xl font-black"
-              />
-              <EditableText
-                tag="p" value={product.description || "Descripcion del producto"}
-                fontColor={productTextColor(product, "descriptionColor", store.mutedTextColor)}
-                onTextChange={v => updateProductField(index, "description", v)}
-                onFontColorChange={v => updateProductField(index, "descriptionColor", v)}
-                isEditable={isEditable}
-                className="mt-2 text-sm"
-              />
-              <EditableText
-                tag="p" value={product.price ? formatProductPrice(product.price) : "$0"}
-                fontColor={productTextColor(product, "priceColor", store.primaryColor)}
-                onTextChange={v => updateProductField(index, "price", v.replace(/[^\d]/g, ""))}
-                onFontColorChange={v => updateProductField(index, "priceColor", v)}
-                isEditable={isEditable}
-                className="mt-4 text-xl font-black"
-              />
-              <p className="text-sm" style={{ color: productTextColor(product, "stockLabelColor", store.mutedTextColor) }}>
-                <EditableText
-                  tag="span" value={product.stockLabel || "Stock:"}
-                  fontColor={productTextColor(product, "stockLabelColor", store.mutedTextColor)}
-                  onTextChange={v => updateProductField(index, "stockLabel", v)}
-                  onFontColorChange={v => updateProductField(index, "stockLabelColor", v)}
-                  isEditable={isEditable}
-                  inline
-                />{" "}
-                <EditableText
-                  tag="span" value={product.stock || "0"}
-                  fontColor={productTextColor(product, "stockColor", store.mutedTextColor)}
-                  onTextChange={v => updateProductField(index, "stock", v)}
-                  onFontColorChange={v => updateProductField(index, "stockColor", v)}
-                  isEditable={isEditable}
-                  inline
-                />
-              </p>
-              <button className="mt-5 w-full rounded-xl px-5 py-3 font-black"
-                style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
-                <EditableText
-                  tag="span" value={productButtonText}
-                  fontColor={textColor("productCtaTextColor", store.buttonTextColor)}
-                  onTextChange={v => onUpdate?.("productCtaText", v)}
-                  onFontColorChange={v => onUpdate?.("productCtaTextColor", v)}
-                  isEditable={isEditable}
-                  inline
-                />
-              </button>
-            </article>
-          ))}
+        <div className={`mt-8 ${layout === "feature" ? "" : "grid"} ${layout === "centered" ? "gap-8 md:grid-cols-2" : layout === "feature" ? "" : layout === "magazine" ? "gap-6 md:grid-cols-2" : "gap-5 md:grid-cols-3"}`}
+          style={layout === "feature" ? { display:"flex", flexDirection:"column", gap:0 } : {}}>
+          {products.map(renderProductCard)}
         </div>
       </section>}
 

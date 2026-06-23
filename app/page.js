@@ -765,10 +765,9 @@ export default function Home() {
   const [marketChatState, setMarketChatState] = useState("idle"); // idle | auth-wall | chat
   const [marketChatTarget, setMarketChatTarget] = useState(null);
 
-  async function handleMarketContact(market) {
-    setMarketChatTarget(market);
-    const res = await fetch("/api/account");
-    setMarketChatState(res.ok ? "chat" : "auth-wall");
+  function handleMarketContact(market) {
+    const msg = encodeURIComponent(`Hola, estoy interesado en conectar con el mercado de ${market.label} a través de Drokex. ¿Me puedes ayudar?`);
+    window.open(`https://wa.me/573209654384?text=${msg}`, "_blank");
   }
   const [activeMarket, setActiveMarket] = useState(0);
   const marketPausedRef = useRef(false);
@@ -1153,7 +1152,6 @@ export default function Home() {
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <div className="system-step-number">{step.number}</div>
                   <div className="system-step-orb">
                     <motion.div
                       className="system-step-icon"
@@ -1700,14 +1698,6 @@ export default function Home() {
         </div>
       )}
 
-      {marketChatState === "chat" && marketChatTarget && (
-        <div className="qf-overlay" onClick={e => e.target === e.currentTarget && setMarketChatState("idle")}>
-          <div className="qf-modal qf-modal-chat">
-            <button className="qf-close" onClick={() => setMarketChatState("idle")} aria-label="Cerrar">×</button>
-            <ProductChat productId={marketChatTarget.id} productName={marketChatTarget.seller} onClose={() => setMarketChatState("idle")} />
-          </div>
-        </div>
-      )}
 
       {/* Drokex World Banner */}
       <Link href="/drokex-world" className="dw-banner-img-link">

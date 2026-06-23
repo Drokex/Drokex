@@ -8,6 +8,104 @@ import LandingPreview, { hexToRgba as _hexToRgba } from "@/app/components/landin
 
 const VALID_CODE = "15472007";
 
+const TEMPLATES = [
+  {
+    id: "oceano",
+    name: "Océano",
+    tag: "Tecnología · Servicios",
+    primaryColor: "#0e7490",
+    backgroundColor: "#f0f9ff",
+    surfaceColor: "#ffffff",
+    textColor: "#0c1a2e",
+    mutedTextColor: "#64748b",
+    buttonTextColor: "#ffffff",
+    gradientFromColor: "#0e7490",
+    gradientToColor: "#0284c7",
+    layout: "split",
+    heroTitle: "Soluciones que transforman tu negocio",
+    heroSubtitle: "Calidad, tecnología y servicio directo del proveedor.",
+    promoText: "Innovación garantizada",
+    aboutTitle: "Una marca pensada para crecer",
+    aboutText: "Ofrecemos productos de alta calidad respaldados por años de experiencia y compromiso con nuestros clientes.",
+  },
+  {
+    id: "fuego",
+    name: "Fuego",
+    tag: "Comercio · Retail",
+    primaryColor: "#ea580c",
+    backgroundColor: "#fff7ed",
+    surfaceColor: "#ffffff",
+    textColor: "#1c0a00",
+    mutedTextColor: "#9a3412",
+    buttonTextColor: "#ffffff",
+    gradientFromColor: "#ea580c",
+    gradientToColor: "#dc2626",
+    layout: "overlay",
+    heroTitle: "Productos que mueven tu negocio",
+    heroSubtitle: "Stock disponible, precios directos y envío rápido.",
+    promoText: "Oferta de temporada",
+    aboutTitle: "Calidad que se nota desde el primer pedido",
+    aboutText: "Distribuimos directo, sin intermediarios, para que tu margen sea mejor y tu cliente quede satisfecho.",
+  },
+  {
+    id: "bosque",
+    name: "Bosque",
+    tag: "Natural · Alimentos · Salud",
+    primaryColor: "#15803d",
+    backgroundColor: "#f0fdf4",
+    surfaceColor: "#ffffff",
+    textColor: "#14532d",
+    mutedTextColor: "#4b7a5b",
+    buttonTextColor: "#ffffff",
+    gradientFromColor: "#15803d",
+    gradientToColor: "#065f46",
+    layout: "centered",
+    heroTitle: "Lo mejor de la naturaleza para tu vida",
+    heroSubtitle: "Productos naturales, frescos y directos del productor.",
+    promoText: "100% Natural",
+    aboutTitle: "Cultivado con propósito, entregado con cuidado",
+    aboutText: "Trabajamos con productores comprometidos para llevarte lo más fresco y auténtico de la tierra.",
+  },
+  {
+    id: "noche",
+    name: "Noche",
+    tag: "Premium · Lujo · Exclusivo",
+    primaryColor: "#d4af37",
+    backgroundColor: "#0a0a0a",
+    surfaceColor: "#111111",
+    textColor: "#f5f5f0",
+    mutedTextColor: "#a0a0a0",
+    buttonTextColor: "#0a0a0a",
+    gradientFromColor: "#d4af37",
+    gradientToColor: "#b8860b",
+    layout: "feature",
+    heroTitle: "Exclusividad que se distingue",
+    heroSubtitle: "Una marca que define estándares y supera expectativas.",
+    promoText: "Edición limitada",
+    aboutTitle: "Diseñado para quienes aprecian lo mejor",
+    aboutText: "Cada detalle importa. Materiales selectos, acabados perfectos y una experiencia de compra sin igual.",
+  },
+  {
+    id: "coral",
+    name: "Coral",
+    tag: "Moda · Belleza · Lifestyle",
+    primaryColor: "#db2777",
+    backgroundColor: "#fdf2f8",
+    surfaceColor: "#ffffff",
+    textColor: "#3b0a2a",
+    mutedTextColor: "#9d4b7a",
+    buttonTextColor: "#ffffff",
+    gradientFromColor: "#db2777",
+    gradientToColor: "#7c3aed",
+    layout: "magazine",
+    heroTitle: "Diseño que enamora a primera vista",
+    heroSubtitle: "Colecciones únicas con identidad propia y estilo inconfundible.",
+    promoText: "Nueva colección",
+    aboutTitle: "Una marca con alma y estética propia",
+    aboutText: "Creamos piezas que cuentan historias. Cada producto es una declaración de estilo y confianza.",
+  },
+];
+
 const hexToRgba = _hexToRgba;
 const PRO_FRAME_COUNT = 72;
 const PRO_FRAME_BASE = "/proveedor-pro-frames";
@@ -112,6 +210,12 @@ export default function ProveedorProPage({
   const [error, setError] = useState("");
   const [publishSuccess, setPublishSuccess] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [publishSlow, setPublishSlow] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [contactDraft, setContactDraft] = useState("");
+  const [templateChosen, setTemplateChosen] = useState(!!(initialStore || initialSlug));
+  const [showAddMenu, setShowAddMenu] = useState(false);
+  const addMenuRef = useRef(null);
 
   const [store, setStore] = useState({
     brand: "Muebles del Sur",
@@ -156,6 +260,7 @@ export default function ProveedorProPage({
     finalTitle: "Descubre la colección de Muebles del Sur",
     finalCtaText: "Ver catálogo",
     catalogPdf: "",
+    contactLink: "",
     primaryColor: "#ff9f2e",
     backgroundColor: "#fff7fb",
     surfaceColor: "#ffffff",
@@ -240,6 +345,15 @@ export default function ProveedorProPage({
     return () => document.removeEventListener("mousedown", close);
   }, [showCountryDropdown]);
 
+  useEffect(() => {
+    if (!showAddMenu) return;
+    const close = (e) => {
+      if (addMenuRef.current && !addMenuRef.current.contains(e.target)) setShowAddMenu(false);
+    };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [showAddMenu]);
+
   function activatePro() {
     if (authStatus !== "ready") return;
 
@@ -286,38 +400,119 @@ export default function ProveedorProPage({
     setProducts(copy);
   }
 
-  async function createLanding() {
-    const slug = slugify(store.brand) || "mi-tienda";
+  function applyTemplate(tpl) {
+    setStore(current => ({
+      ...current,
+      layout: tpl.layout || "overlay",
+      primaryColor: tpl.primaryColor,
+      backgroundColor: tpl.backgroundColor,
+      surfaceColor: tpl.surfaceColor,
+      textColor: tpl.textColor,
+      mutedTextColor: tpl.mutedTextColor,
+      buttonTextColor: tpl.buttonTextColor,
+      gradientFromColor: tpl.gradientFromColor,
+      gradientToColor: tpl.gradientToColor,
+      heroTitle: tpl.heroTitle,
+      heroSubtitle: tpl.heroSubtitle,
+      promoText: tpl.promoText,
+      aboutTitle: tpl.aboutTitle,
+      aboutText: tpl.aboutText,
+      heroBlock: { dx: 0, dy: 0 },
+    }));
+    setTemplateChosen(true);
+  }
+
+  function handlePublishClick() {
+    if (!store.contactLink) {
+      setContactDraft("");
+      setShowContactModal(true);
+    } else {
+      createLanding();
+    }
+  }
+
+  function confirmContact() {
+    const val = contactDraft.trim();
+    if (!val) return;
+    updateStore("contactLink", val);
+    setShowContactModal(false);
+    createLanding({ contactLink: val });
+  }
+
+  async function createLanding(storeOverride = {}) {
+    const finalStore = { ...store, ...storeOverride };
+    const slug = slugify(finalStore.brand) || "mi-tienda";
     const link = `/proveedor-pro/tienda/${slug}`;
 
-    if (!store.countries?.length) {
+    if (!finalStore.countries?.length) {
       setError("Selecciona al menos un país antes de publicar.");
       return;
     }
     setIsPublishing(true);
+    setPublishSlow(false);
     setError("");
 
+    // Guardar en localStorage de inmediato (la landing es visible incluso si la BD falla)
+    try { window.localStorage.setItem(`drokex-proveedor-pro:${slug}`, JSON.stringify({ store: finalStore, products, savedAt: Date.now() })); } catch {}
+
+    // Intentar sincronizar con BD (timeout 12s — si Supabase está cálido basta con < 5s)
+    let dbOk = false;
     try {
-      const res = await fetch("/api/proveedor-pro", {
+      const ctrl = new AbortController();
+      const slowTimer = setTimeout(() => setPublishSlow(true), 6000);
+      const timeoutId = setTimeout(() => ctrl.abort(), 12000);
+      try {
+        const res = await fetch("/api/proveedor-pro", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug, store: finalStore, products }),
+          signal: ctrl.signal,
+        });
+        if (res.ok) dbOk = true;
+        else {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || `Error ${res.status}`);
+        }
+      } finally {
+        clearTimeout(slowTimer);
+        clearTimeout(timeoutId);
+        setPublishSlow(false);
+      }
+    } catch (err) {
+      const msg = err.message || "";
+      if (err.name !== "AbortError" && !msg.includes("AbortError")) {
+        // Error real (no timeout): mostrar al usuario
+        if (msg.includes("autorizado") || msg.includes("401")) {
+          setIsPublishing(false);
+          setError("Tu sesión expiró. Recarga la página e inicia sesión de nuevo.");
+          return;
+        }
+        if (msg.includes("uso")) {
+          setIsPublishing(false);
+          setError(msg);
+          return;
+        }
+      }
+      // Timeout o error de red: continuar optimistamente y reintentar en background
+      fetch("/api/proveedor-pro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, store, products }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "api");
-      }
-      try { window.localStorage.setItem(`drokex-proveedor-pro:${slug}`, JSON.stringify({ store, products })); } catch {}
-      setLandingLink(`${window.location.origin}${link}`);
-      setCopiedLink(false);
-      setError("");
-      setIsPublishing(false);
-      setPublishSuccess(true);
-      setTimeout(() => { setPublishSuccess(false); router.push(link); }, 1800);
-    } catch (err) {
-      setIsPublishing(false);
-      setError(err.message === "api" ? "No se pudo guardar. Verifica tu conexión e intenta de nuevo." : (err.message || "No se pudo guardar."));
+        body: JSON.stringify({ slug, store: finalStore, products }),
+      }).catch(() => {});
     }
+
+    // Inyectar en caché del directorio
+    fetch("/api/proveedor-pro/dir-hint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, store: finalStore }),
+    }).catch(() => {});
+
+    setLandingLink(`${window.location.origin}${link}`);
+    setCopiedLink(false);
+    setIsPublishing(false);
+    setPublishSuccess(true);
+    setTimeout(() => { setPublishSuccess(false); router.push(link); }, 1500);
   }
 
   async function copyLandingLink() {
@@ -399,6 +594,133 @@ export default function ProveedorProPage({
           <ScrollFrameSequence alt="Drokex Proveedor Pro">
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, rgba(3,5,3,0.75) 0%, rgba(3,5,3,0.1) 50%)" }} />
           </ScrollFrameSequence>
+        </section>
+      ) : !templateChosen ? (
+        <section style={{ minHeight: "calc(100vh - 80px)", background: "#050807", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "48px 24px" }}>
+          <p style={{ margin: "0 0 8px", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.18em", textTransform: "uppercase", color: "#7FE040" }}>Proveedor Pro</p>
+          <h1 style={{ margin: "0 0 8px", fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", textAlign: "center" }}>Elige tu plantilla</h1>
+          <p style={{ margin: "0 0 48px", fontSize: "0.95rem", color: "rgba(255,255,255,0.45)", textAlign: "center" }}>Puedes cambiar colores y textos después desde el editor.</p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 220px)", gap: 18, maxWidth: 1200 }}>
+            {TEMPLATES.map(tpl => (
+              <button key={tpl.id} onClick={() => applyTemplate(tpl)} type="button"
+                style={{ textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer", borderRadius: 20, outline: "none" }}
+                onMouseEnter={e => { e.currentTarget.firstChild.style.borderColor = tpl.primaryColor; e.currentTarget.firstChild.style.transform = "translateY(-6px)"; e.currentTarget.firstChild.style.boxShadow = `0 20px 48px rgba(0,0,0,0.5), 0 0 0 1px ${tpl.primaryColor}`; }}
+                onMouseLeave={e => { e.currentTarget.firstChild.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.firstChild.style.transform = "translateY(0)"; e.currentTarget.firstChild.style.boxShadow = "0 4px 20px rgba(0,0,0,0.3)"; }}
+              >
+                <div style={{ borderRadius: 20, border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden", transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s", boxShadow: "0 4px 20px rgba(0,0,0,0.3)", background: tpl.backgroundColor }}>
+                  {/* Mini hero — distinto por layout */}
+                  {tpl.layout === "split" && (
+                    <div style={{ height: 120, display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+                      <div style={{ background: tpl.backgroundColor, padding: "12px 10px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 5 }}>
+                        <div style={{ width: "55%", height: 4, borderRadius: 2, background: tpl.primaryColor }} />
+                        <div style={{ width: "90%", height: 7, borderRadius: 3, background: `${tpl.textColor}cc` }} />
+                        <div style={{ width: "70%", height: 5, borderRadius: 2, background: `${tpl.textColor}44` }} />
+                        <div style={{ width: 40, height: 14, borderRadius: 5, background: tpl.primaryColor, marginTop: 4 }} />
+                      </div>
+                      <div style={{ background: `linear-gradient(135deg, ${tpl.gradientFromColor}, ${tpl.gradientToColor})` }} />
+                    </div>
+                  )}
+                  {tpl.layout === "overlay" && (
+                    <div style={{ height: 120, background: `linear-gradient(135deg, ${tpl.gradientFromColor}bb, ${tpl.gradientToColor}bb)`, position: "relative", display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "10px 12px" }}>
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)" }} />
+                      <div style={{ position: "relative", zIndex: 1 }}>
+                        <div style={{ width: 36, height: 8, borderRadius: 4, background: tpl.primaryColor, marginBottom: 5 }} />
+                        <div style={{ width: "85%", height: 6, borderRadius: 3, background: "rgba(255,255,255,0.9)", marginBottom: 3 }} />
+                        <div style={{ width: "65%", height: 4, borderRadius: 2, background: "rgba(255,255,255,0.5)" }} />
+                      </div>
+                    </div>
+                  )}
+                  {tpl.layout === "centered" && (
+                    <div style={{ height: 120, background: `radial-gradient(ellipse at 50% -20%, ${tpl.primaryColor}33, transparent 60%), ${tpl.backgroundColor}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, padding: "0 16px" }}>
+                      <div style={{ width: 36, height: 5, borderRadius: 6, background: tpl.primaryColor }} />
+                      <div style={{ width: "80%", height: 7, borderRadius: 3, background: `${tpl.textColor}cc` }} />
+                      <div style={{ width: "60%", height: 4, borderRadius: 2, background: `${tpl.mutedTextColor}88` }} />
+                      <div style={{ width: 48, height: 14, borderRadius: 7, background: tpl.primaryColor, marginTop: 2 }} />
+                    </div>
+                  )}
+                  {tpl.layout === "feature" && (
+                    <div style={{ height: 120, display: "grid", gridTemplateColumns: "55% 45%" }}>
+                      <div style={{ background: tpl.backgroundColor, padding: "10px 10px 10px 12px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                        <div style={{ width: "50%", height: 3, borderRadius: 2, background: tpl.primaryColor, marginBottom: 6 }} />
+                        <div style={{ width: "95%", height: 10, borderRadius: 3, background: `${tpl.textColor}cc`, marginBottom: 4 }} />
+                        <div style={{ width: "85%", height: 7, borderRadius: 3, background: `${tpl.textColor}88`, marginBottom: 4 }} />
+                        <div style={{ width: "40%", height: 3, borderRadius: 2, background: `${tpl.mutedTextColor}66`, marginBottom: 8 }} />
+                        <div style={{ width: 36, height: 12, borderRadius: 5, background: tpl.primaryColor }} />
+                      </div>
+                      <div style={{ background: `linear-gradient(160deg, ${tpl.gradientFromColor}, ${tpl.gradientToColor})` }} />
+                    </div>
+                  )}
+                  {tpl.layout === "magazine" && (
+                    <div style={{ height: 120, background: `linear-gradient(135deg, ${tpl.gradientFromColor}dd, ${tpl.gradientToColor}dd)`, position: "relative", display: "flex", alignItems: "flex-end", padding: "0 12px 10px" }}>
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.65), transparent 55%)" }} />
+                      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, background: tpl.primaryColor }} />
+                      <div style={{ position: "relative", zIndex: 1 }}>
+                        <div style={{ width: "90%", height: 9, borderRadius: 3, background: "rgba(255,255,255,0.95)", marginBottom: 4 }} />
+                        <div style={{ width: "65%", height: 5, borderRadius: 2, background: "rgba(255,255,255,0.55)", marginBottom: 6 }} />
+                        <div style={{ width: 40, height: 12, borderRadius: 5, background: tpl.primaryColor }} />
+                      </div>
+                    </div>
+                  )}
+                  {/* Mini products — distinto por layout */}
+                  <div style={{ padding: "10px 12px", background: tpl.backgroundColor }}>
+                    {tpl.layout === "feature" ? (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                        {[0,1].map(i => (
+                          <div key={i} style={{ display: "flex", gap: 7, alignItems: "center", padding: "5px 0", borderBottom: `1px solid ${tpl.textColor}11` }}>
+                            <div style={{ width: 28, height: 28, borderRadius: 6, background: `${tpl.primaryColor}22`, flexShrink: 0 }} />
+                            <div style={{ flex: 1 }}>
+                              <div style={{ width: "70%", height: 4, borderRadius: 2, background: `${tpl.textColor}55`, marginBottom: 3 }} />
+                              <div style={{ width: "50%", height: 3, borderRadius: 2, background: `${tpl.mutedTextColor}44` }} />
+                            </div>
+                            <div style={{ width: 28, height: 12, borderRadius: 4, background: tpl.primaryColor, flexShrink: 0 }} />
+                          </div>
+                        ))}
+                      </div>
+                    ) : tpl.layout === "magazine" ? (
+                      <div style={{ display: "grid", gridTemplateColumns: "55% 45%", gap: 6 }}>
+                        <div style={{ borderRadius: 8, background: `${tpl.primaryColor}18`, height: 52 }} />
+                        <div style={{ display: "flex", flexDirection: "column", gap: 3, justifyContent: "center" }}>
+                          <div style={{ width: "70%", height: 4, borderRadius: 2, background: `${tpl.textColor}44` }} />
+                          <div style={{ width: "50%", height: 3, borderRadius: 2, background: `${tpl.mutedTextColor}33` }} />
+                        </div>
+                      </div>
+                    ) : tpl.layout === "centered" ? (
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        {[0,1].map(i => (
+                          <div key={i} style={{ borderRadius: 8, background: tpl.surfaceColor, padding: "6px", border: `1px solid ${tpl.textColor}11` }}>
+                            <div style={{ height: 28, borderRadius: 5, background: `${tpl.primaryColor}18`, marginBottom: 4 }} />
+                            <div style={{ width: "60%", height: 3, borderRadius: 2, background: `${tpl.textColor}44` }} />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", gap: 6 }}>
+                        {[0,1,2].map(i => (
+                          <div key={i} style={{ flex: 1, borderRadius: 7, background: tpl.surfaceColor, borderTop: tpl.layout === "split" ? `2px solid ${tpl.primaryColor}` : "none", padding: "6px 5px", border: tpl.layout !== "split" ? `1px solid ${tpl.textColor}11` : undefined }}>
+                            <div style={{ width: "100%", height: 26, borderRadius: 4, background: `${tpl.primaryColor}18`, marginBottom: 4 }} />
+                            <div style={{ width: "65%", height: 3, borderRadius: 2, background: `${tpl.textColor}44`, marginBottom: 2 }} />
+                            <div style={{ width: "100%", height: 10, borderRadius: 4, background: tpl.primaryColor, opacity: 0.85, marginTop: 4 }} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {/* Info */}
+                  <div style={{ padding: "12px 14px 16px", background: tpl.surfaceColor }}>
+                    <p style={{ margin: "0 0 2px", fontWeight: 900, fontSize: "0.95rem", color: tpl.textColor }}>{tpl.name}</p>
+                    <p style={{ margin: "0 0 8px", fontSize: "0.68rem", color: tpl.mutedTextColor }}>{tpl.tag}</p>
+                    <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                      {[tpl.primaryColor, tpl.gradientToColor, tpl.surfaceColor, tpl.textColor].map((c, i) => (
+                        <div key={i} style={{ width: 12, height: 12, borderRadius: "50%", background: c, border: "1px solid rgba(0,0,0,0.12)", flexShrink: 0 }} />
+                      ))}
+                      <span style={{ marginLeft: "auto", fontSize: "0.68rem", fontWeight: 800, color: tpl.primaryColor }}>Elegir →</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
         </section>
       ) : isPreviewMode ? (
         <section className="bg-[#050705] px-4 py-6 sm:px-6 lg:px-10">
@@ -570,7 +892,43 @@ export default function ProveedorProPage({
                   style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.1)", background: openSection === "style" ? "#111" : "#fff", color: openSection === "style" ? "#fff" : "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer" }}>
                   Colores
                 </button>
-                <button type="button" onClick={createLanding} disabled={isPublishing}
+                <button type="button" onClick={() => setTemplateChosen(false)}
+                  style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.12)", background: "#fff", color: "#555", fontWeight: 700, padding: "10px 14px", cursor: "pointer", fontSize: "0.82rem", display: "flex", alignItems: "center", gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                  Plantillas
+                </button>
+
+                {/* Botón Agregar + menú */}
+                <div ref={addMenuRef} style={{ position: "relative" }}>
+                  <button type="button" onClick={() => setShowAddMenu(o => !o)}
+                    style={{ borderRadius: 13, border: "1px solid rgba(0,0,0,0.12)", background: showAddMenu ? "#111" : "#fff", color: showAddMenu ? "#fff" : "#111", fontWeight: 900, padding: "10px 14px", cursor: "pointer", fontSize: "0.88rem", display: "flex", alignItems: "center", gap: 5 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Agregar
+                  </button>
+                  {showAddMenu && (
+                    <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 200, background: "#fff", borderRadius: 16, border: "1px solid rgba(0,0,0,0.1)", boxShadow: "0 16px 40px rgba(0,0,0,0.14)", padding: "8px", minWidth: 210 }}>
+                      {[
+                        { icon: "📦", label: "Producto", desc: "Añade un producto al catálogo", action: () => { addProduct(); setShowProductsDrawer(true); setOpenSection(null); setShowAddMenu(false); } },
+                        { icon: "🖼️", label: "Imagen del hero", desc: "Sube la foto principal", action: () => { setOpenSection("hero"); setShowProductsDrawer(false); setShowAddMenu(false); } },
+                        { icon: "🏷️", label: "Banner de marca", desc: "Foto en la sección Marca", action: () => { setOpenSection("about"); setShowProductsDrawer(false); setShowAddMenu(false); } },
+                        { icon: "🎨", label: "Cambiar colores", desc: "Paleta y tipografía", action: () => { setOpenSection("style"); setShowProductsDrawer(false); setShowAddMenu(false); } },
+                      ].map(({ icon, label, desc, action }) => (
+                        <button key={label} type="button" onClick={action}
+                          style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", textAlign: "left" }}
+                          onMouseEnter={e => e.currentTarget.style.background = "#f5f5f5"}
+                          onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                          <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>{icon}</span>
+                          <div>
+                            <p style={{ margin: 0, fontWeight: 800, fontSize: "0.86rem", color: "#111" }}>{label}</p>
+                            <p style={{ margin: 0, fontSize: "0.72rem", color: "#888" }}>{desc}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button type="button" onClick={handlePublishClick} disabled={isPublishing}
                   style={{ borderRadius: 13, border: "none", background: isPublishing ? "#aaa" : "#7FE040", color: "#fff", fontWeight: 950, padding: "10px 16px", boxShadow: isPublishing ? "none" : "0 12px 28px rgba(127, 224, 64, 0.28)", cursor: isPublishing ? "not-allowed" : "pointer", transition: "background 0.2s" }}>
                   {isPublishing ? "Publicando..." : "Publicar"}
                 </button>
@@ -616,6 +974,38 @@ export default function ProveedorProPage({
             </FloatingEditorCard>
           )}
 
+          {openSection === "hero" && (
+            <FloatingEditorCard title="Hero principal" onClose={() => setOpenSection(null)}>
+              <Input label="Texto badge" value={store.promoText} onChange={v => updateStore("promoText", v)} />
+              <Input label="Título principal" value={store.heroTitle} onChange={v => updateStore("heroTitle", v)} />
+              <Input label="Subtítulo" value={store.heroSubtitle} onChange={v => updateStore("heroSubtitle", v)} />
+              <Input label="Botón principal" value={store.ctaText} onChange={v => updateStore("ctaText", v)} />
+              <Input label="Botón secundario" value={store.secondaryCtaText} onChange={v => updateStore("secondaryCtaText", v)} />
+              <p style={{ margin: "4px 0 0", fontSize: "0.68rem", fontWeight: 950, textTransform: "uppercase", letterSpacing: "0.14em", color: "rgba(255,255,255,0.36)" }}>Imagen de fondo</p>
+              <ImageUploader label="Imagen hero" value={store.heroImage} onChange={v => updateStore("heroImage", v)} />
+              {store.heroImage && (
+                <button type="button" onClick={() => updateStore("heroImage", "")}
+                  style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(220,50,50,0.4)", background: "rgba(220,50,50,0.08)", color: "#f87171", fontWeight: 800, padding: "8px", cursor: "pointer", fontSize: "0.82rem" }}>
+                  🗑 Eliminar imagen
+                </button>
+              )}
+            </FloatingEditorCard>
+          )}
+
+          {openSection === "about" && (
+            <FloatingEditorCard title="Sección Marca" onClose={() => setOpenSection(null)}>
+              <Input label="Título de marca" value={store.aboutTitle} onChange={v => updateStore("aboutTitle", v)} />
+              <Textarea label="Texto de marca" value={store.aboutText} onChange={v => updateStore("aboutText", v)} />
+              <ImageUploader label="Banner de marca" value={store.bannerSecondary} onChange={v => updateStore("bannerSecondary", v)} />
+              {store.bannerSecondary && (
+                <button type="button" onClick={() => updateStore("bannerSecondary", "")}
+                  style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(220,50,50,0.4)", background: "rgba(220,50,50,0.08)", color: "#f87171", fontWeight: 800, padding: "8px", cursor: "pointer", fontSize: "0.82rem" }}>
+                  🗑 Eliminar banner
+                </button>
+              )}
+            </FloatingEditorCard>
+          )}
+
           {openSection === "style" && (
             <FloatingEditorCard title="Colores y diseño" onClose={() => setOpenSection(null)}>
               <ColorInput label="Color principal" value={store.primaryColor} onChange={v => updateStore("primaryColor", v)} />
@@ -651,10 +1041,63 @@ export default function ProveedorProPage({
             <div style={{ background: "#fff", borderRadius: 22, padding: "36px 48px", textAlign: "center", boxShadow: "0 24px 60px rgba(0,0,0,0.18)", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
               <div style={{ width: 48, height: 48, borderRadius: "50%", border: "4px solid #e5e5e5", borderTopColor: "#7FE040", animation: "drokex-spin 0.8s linear infinite" }} />
               <p style={{ margin: 0, fontSize: "1.15rem", fontWeight: 900, color: "#111" }}>Publicando tu página...</p>
-              <p style={{ margin: 0, fontSize: "0.85rem", color: "#888" }}>Esto solo tomará un momento</p>
+              <p style={{ margin: 0, fontSize: "0.85rem", color: "#888" }}>
+                {publishSlow ? "Conectando con el servidor, espera un poco más..." : "Esto solo tomará un momento"}
+              </p>
             </div>
           </div>
         </>
+      )}
+      {showContactModal && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowContactModal(false); }}>
+          <div style={{ background: "#fff", borderRadius: 24, padding: "36px 40px", width: 420, boxShadow: "0 32px 80px rgba(0,0,0,0.22)", display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <div style={{ width: 46, height: 46, borderRadius: 14, background: "rgba(127,224,64,0.12)", border: "1px solid rgba(127,224,64,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>
+                📞
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: "0.68rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7FE040" }}>Antes de publicar</p>
+                <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 900, color: "#111" }}>¿Cómo te contactan?</h2>
+              </div>
+            </div>
+
+            <p style={{ margin: 0, fontSize: "0.88rem", color: "#666", lineHeight: 1.6 }}>
+              Agrega tu número de WhatsApp, teléfono o un link para que los clientes puedan contactarte directamente desde tu tienda.
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "#444", letterSpacing: "0.04em" }}>
+                WhatsApp, teléfono o link de contacto
+              </label>
+              <input
+                type="text"
+                value={contactDraft}
+                onChange={(e) => setContactDraft(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") confirmContact(); }}
+                placeholder="Ej: +57 300 123 4567 o https://wa.me/57..."
+                autoFocus
+                style={{ borderRadius: 12, border: "1.5px solid rgba(0,0,0,0.14)", padding: "12px 16px", fontSize: "0.92rem", color: "#111", outline: "none", transition: "border-color 0.15s" }}
+                onFocus={(e) => { e.target.style.borderColor = "#7FE040"; }}
+                onBlur={(e) => { e.target.style.borderColor = "rgba(0,0,0,0.14)"; }}
+              />
+              <p style={{ margin: 0, fontSize: "0.74rem", color: "#999" }}>
+                Se mostrará en tu tienda para que los visitantes puedan escribirte.
+              </p>
+            </div>
+
+            <div style={{ display: "flex", gap: 10 }}>
+              <button type="button" onClick={() => setShowContactModal(false)}
+                style={{ flex: 1, borderRadius: 13, border: "1px solid rgba(0,0,0,0.12)", background: "#f5f5f5", color: "#555", fontWeight: 700, padding: "12px 0", cursor: "pointer", fontSize: "0.9rem" }}>
+                Cancelar
+              </button>
+              <button type="button" onClick={confirmContact} disabled={!contactDraft.trim()}
+                style={{ flex: 2, borderRadius: 13, border: "none", background: contactDraft.trim() ? "#7FE040" : "#ccc", color: "#fff", fontWeight: 900, padding: "12px 0", cursor: contactDraft.trim() ? "pointer" : "not-allowed", fontSize: "0.9rem", boxShadow: contactDraft.trim() ? "0 8px 24px rgba(127,224,64,0.3)" : "none", transition: "background 0.15s, box-shadow 0.15s" }}>
+                Publicar tienda
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       {publishSuccess && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.18)", backdropFilter: "blur(4px)" }}>
