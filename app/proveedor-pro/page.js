@@ -440,7 +440,10 @@ export default function ProveedorProPage({
   }
 
   async function createLanding(storeOverride = {}) {
-    const finalStore = { ...store, ...storeOverride };
+    // Limpiar textos antes de guardar: quitar \n y espacios dobles de contentEditable
+    const cleanText = (v) => typeof v === "string" ? v.replace(/\n/g, " ").replace(/ {2,}/g, " ").trim() : v;
+    const rawStore = { ...store, ...storeOverride };
+    const finalStore = Object.fromEntries(Object.entries(rawStore).map(([k, v]) => [k, cleanText(v)]));
     const slug = slugify(finalStore.brand) || "mi-tienda";
     const link = `/proveedor-pro/tienda/${slug}`;
 
