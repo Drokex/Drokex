@@ -51,7 +51,11 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
         if (!wrapperRef.current?.contains(e.relatedTarget)) {
           setFocused(false);
           setColorOpen(false);
-          onTextChange?.(ref.current?.innerText || "");
+          // Normalizar: quitar \n y espacios dobles que contentEditable introduce
+          const raw = ref.current?.innerText || "";
+          const clean = raw.replace(/\n/g, " ").replace(/ {2,}/g, " ").trim();
+          if (ref.current) ref.current.innerText = clean;
+          onTextChange?.(clean);
         }
       }}
       style={{ position: "relative", display: inline ? "inline-block" : "block", ...wrapperStyle }}

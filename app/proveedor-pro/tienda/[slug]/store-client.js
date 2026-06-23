@@ -62,11 +62,18 @@ const fallbackProducts = [
   },
 ];
 
+function cleanStoreText(s) {
+  if (!s) return s;
+  return Object.fromEntries(
+    Object.entries(s).map(([k, v]) => [k, typeof v === "string" ? v.replace(/\n/g, " ").replace(/ {2,}/g, " ").trim() : v])
+  );
+}
+
 export default function ProveedorProStoreClient({ slug, fallbackBrand, initialStore, initialProducts }) {
   const [store, setStore] = useState(() => ({
     ...fallbackStore,
     brand: fallbackBrand || fallbackStore.brand,
-    ...(initialStore || {}),
+    ...cleanStoreText(initialStore || {}),
   }));
   const [products, setProducts] = useState(() =>
     initialProducts?.length ? initialProducts : fallbackProducts
@@ -84,7 +91,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand, initialSt
         const localTs = parsed.savedAt || 0;
         const serverTs = initialStore?.__savedAt || 0;
         if (!initialStore || localTs > serverTs) {
-          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(parsed.store || {}) });
+          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...cleanStoreText(parsed.store || {}) });
           setProducts(parsed.products?.length ? parsed.products : fallbackProducts);
           setHasLoaded(true);
           return;
@@ -99,7 +106,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand, initialSt
         const res = await fetch(`/api/proveedor-pro?slug=${encodeURIComponent(slug)}`);
         if (res.ok) {
           const data = await res.json();
-          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(data.store || {}) });
+          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...cleanStoreText(data.store || {}) });
           setProducts(data.products?.length ? data.products : fallbackProducts);
           setHasLoaded(true);
           return;
@@ -109,7 +116,7 @@ export default function ProveedorProStoreClient({ slug, fallbackBrand, initialSt
         const saved = window.localStorage.getItem(`drokex-proveedor-pro:${slug}`);
         if (saved) {
           const parsed = JSON.parse(saved);
-          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...(parsed.store || {}) });
+          setStore({ ...fallbackStore, brand: fallbackBrand || fallbackStore.brand, ...cleanStoreText(parsed.store || {}) });
           setProducts(parsed.products?.length ? parsed.products : fallbackProducts);
         } else {
           setNotFound(true);
