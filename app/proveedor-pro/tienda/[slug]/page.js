@@ -20,7 +20,8 @@ export default async function ProveedorProStorePage({ params }) {
   try {
     const landing = await prisma.proveedorProLanding.findUnique({ where: { slug } });
     if (landing) {
-      initialStore = landing.store;
+      // __savedAt lets store-client.js compare DB freshness vs localStorage freshness
+      initialStore = { ...landing.store, __savedAt: new Date(landing.updatedAt).getTime() };
       initialProducts = landing.products;
     }
   } catch {}

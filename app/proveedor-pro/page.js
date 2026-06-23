@@ -453,7 +453,17 @@ export default function ProveedorProPage({
     setError("");
 
     // Guardar en localStorage de inmediato (la landing es visible incluso si la BD falla)
-    try { window.localStorage.setItem(`drokex-proveedor-pro:${slug}`, JSON.stringify({ store: finalStore, products, savedAt: Date.now() })); } catch {}
+    const lsSavedAt = Date.now();
+    try {
+      window.localStorage.setItem(`drokex-proveedor-pro:${slug}`, JSON.stringify({ store: finalStore, products, savedAt: lsSavedAt }));
+    } catch {
+      // QuotaExceededError: las imágenes base64 son demasiado grandes — guardar sin base64
+      try {
+        const stripBase64 = (v) => (typeof v === "string" && v.startsWith("data:") ? "" : v);
+        const storeSmall = Object.fromEntries(Object.entries(finalStore).map(([k, v]) => [k, stripBase64(v)]));
+        window.localStorage.setItem(`drokex-proveedor-pro:${slug}`, JSON.stringify({ store: storeSmall, products, savedAt: lsSavedAt }));
+      } catch {}
+    }
 
     // Intentar sincronizar con BD (timeout 12s — si Supabase está cálido basta con < 5s)
     let dbOk = false;

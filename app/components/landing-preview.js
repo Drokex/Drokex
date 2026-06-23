@@ -358,10 +358,10 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
   const heroClassName = standalone
     ? "relative bg-cover bg-center px-5 py-12 md:px-8 md:py-20"
     : "relative min-h-[520px] bg-cover bg-center px-8 py-16";
-  const heroTitleSize = Math.min(store.heroTitleSize || 60, standalone ? 42 : 72);
-  const heroSubtitleSize = Math.min(store.heroSubtitleSize || 18, standalone ? 16 : 24);
-  const aboutTitleSize = Math.min(store.aboutTitleSize || 36, standalone ? 28 : 48);
-  const aboutBodySize = Math.min(store.aboutBodySize || 16, standalone ? 15 : 22);
+  const heroTitleSize = Math.min(store.heroTitleSize || 60, 72);
+  const heroSubtitleSize = Math.min(store.heroSubtitleSize || 18, 24);
+  const aboutTitleSize = Math.min(store.aboutTitleSize || 36, 48);
+  const aboutBodySize = Math.min(store.aboutBodySize || 16, 22);
   const standalonePath = basePath.replace(/\/$/, "");
   const layout = store.layout || "overlay";
 
@@ -636,7 +636,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
                     <EditableText tag="span" value={store.promoText} fontColor={textColor("promoTextColor", store.primaryColor)} onTextChange={v => onUpdate?.("promoText", v)} onFontColorChange={v => onUpdate?.("promoTextColor", v)} isEditable={isEditable} inline />
                   </span>
                 )}
-                <EditableText tag="h1" value={store.heroTitle} fontSize={Math.min((heroTitleSize*1.25)|0, standalone?54:80)} fontColor={store.heroTitleColor||"#fff"} onTextChange={v => onUpdate?.("heroTitle", v)} onFontSizeChange={v => onUpdate?.("heroTitleSize", v)} onFontColorChange={v => onUpdate?.("heroTitleColor", v)} isEditable={isEditable} className="font-black leading-none" />
+                <EditableText tag="h1" value={store.heroTitle} fontSize={Math.min((heroTitleSize*1.25)|0, 80)} fontColor={store.heroTitleColor||"#fff"} onTextChange={v => onUpdate?.("heroTitle", v)} onFontSizeChange={v => onUpdate?.("heroTitleSize", v)} onFontColorChange={v => onUpdate?.("heroTitleColor", v)} isEditable={isEditable} className="font-black leading-none" />
                 <div style={{ width: 48, height: 4, borderRadius: 2, background: store.primaryColor, margin: "20px 0" }} />
                 <EditableText tag="p" value={store.heroSubtitle} fontSize={heroSubtitleSize} fontColor={store.heroSubtitleColor||"rgba(255,255,255,0.72)"} onTextChange={v => onUpdate?.("heroSubtitle", v)} onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)} onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)} isEditable={isEditable} className="max-w-md mb-8" />
                 <button className="rounded-2xl px-8 py-4 font-black self-start" style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
