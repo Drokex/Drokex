@@ -15,7 +15,7 @@ const fallbackStore = {
   catalogEyebrow: "Catálogo",
   catalogTitle: "Productos destacados",
   catalogText: "Selecciona, cotiza o compra productos directamente desde la vitrina del proveedor.",
-  productCtaText: "Agregar al carrito",
+  productCtaText: "Contactar",
   logo: "",
 };
 
@@ -116,7 +116,7 @@ export default function ProductosClient({ slug, fallbackBrand }) {
                   Stock: {product.stock || "0"}
                 </p>
                 <button style={{ marginTop: 16, width: "100%", borderRadius: 14, padding: "12px", fontWeight: 900, fontSize: "0.9rem", border: "none", cursor: "pointer", backgroundColor: primary, color: btnText }}>
-                  {store.productCtaText || "Agregar al carrito"}
+                  {store.productCtaText || "Contactar"}
                 </button>
               </div>
             </article>

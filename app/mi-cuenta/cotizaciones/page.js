@@ -1,63 +1,38 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
-import { useQuoteStream } from "@/app/components/use-quote-stream";
+import ProductChat from "@/app/components/product-chat";
 
-const STATUS_LABEL = {
-  PENDING: "Esperando respuesta",
-  QUOTED: "Cotización recibida",
-  ACCEPTED: "Aceptada",
-  REJECTED: "Rechazada",
-};
-
-const STATUS_TONE = {
-  PENDING: "tone-pending",
-  QUOTED: "tone-quoted",
-  ACCEPTED: "tone-accepted",
-  REJECTED: "tone-rejected",
-};
-
-export default function ClientQuotesDashboard() {
-  const [quotes, setQuotes] = useState([]);
+export default function MisChats() {
+  const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [responding, setResponding] = useState(null);
+  const [activeConv, setActiveConv] = useState(null);
 
   async function load() {
-    const res = await fetch("/api/quotes");
+    const res = await fetch("/api/conversations");
     if (res.ok) {
       const data = await res.json();
-      setQuotes(data.quotes);
+      setConversations(data.conversations);
     }
     setLoading(false);
   }
 
   useEffect(() => { load(); }, []);
 
-  const handleStream = useCallback((data) => {
-    setQuotes((prev) => {
-      const idx = prev.findIndex((q) => q.id === data.id);
-      if (idx >= 0) {
-        const next = [...prev];
-        next[idx] = data;
-        return next;
-      }
-      return [data, ...prev];
-    });
-  }, []);
+  function lastMessage(conv) {
+    return conv.messages?.[0];
+  }
 
-  useQuoteStream(handleStream);
-
-  async function handleAction(id, status) {
-    setResponding(id);
-    await fetch(`/api/quotes/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "status", status }),
-    });
-    await load();
-    setResponding(null);
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return "Ahora";
+    if (diff < 3600000) return `Hace ${Math.floor(diff / 60000)} min`;
+    if (diff < 86400000) return d.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleDateString("es-CO", { day: "numeric", month: "short" });
   }
 
   return (
@@ -70,70 +45,60 @@ export default function ClientQuotesDashboard() {
 
         <div className="provider-section-heading provider-section-heading-stack">
           <div>
-            <p className="provider-section-kicker">Mis cotizaciones</p>
-            <h2>Estado de mis solicitudes</h2>
+            <p className="provider-section-kicker">Mensajes</p>
+            <h2>Mis chats con proveedores</h2>
           </div>
           <Link href="/categorias" className="inv-create-btn">Explorar productos</Link>
         </div>
 
         {loading ? (
-          <p className="qd-loading">Cargando cotizaciones...</p>
-        ) : quotes.length === 0 ? (
+          <p className="qd-loading">Cargando chats...</p>
+        ) : conversations.length === 0 ? (
           <div className="provider-empty-block">
-            <strong>Aún no has solicitado cotizaciones.</strong>
-            <p>Busca un producto y haz clic en "Cotizar producto" para empezar.</p>
+            <strong>Aún no tienes chats.</strong>
+            <p>Entra a un producto y haz clic en "Cotizar producto" para chatear con el proveedor.</p>
             <Link href="/categorias" className="provider-text-link">Ver catálogo</Link>
           </div>
         ) : (
-          <div className="qd-list">
-            {quotes.map((q) => (
-              <article key={q.id} className="qd-card">
-                <div className="qd-card-top">
-                  <div className="qd-product-info">
-                    <strong>{q.productName}</strong>
-                    <span>{q.quantity} unidades · {q.destinationCountry}</span>
+          <div className="mch-list">
+            {conversations.map((conv) => {
+              const last = lastMessage(conv);
+              return (
+                <button
+                  key={conv.id}
+                  className="mch-card"
+                  onClick={() => setActiveConv(conv)}
+                >
+                  <div className="mch-avatar">
+                    {conv.product.supplier?.[0]?.toUpperCase() ?? "P"}
                   </div>
-                  <span className={`qd-status ${STATUS_TONE[q.status]}`}>
-                    {STATUS_LABEL[q.status]}
-                  </span>
-                </div>
-
-                {q.message && <p className="qd-message">"{q.message}"</p>}
-
-                {q.status === "QUOTED" && (
-                  <div className="qd-response">
-                    <div className="qd-response-price">
-                      <span>Precio cotizado</span>
-                      <strong>${(q.providerPrice / 100).toFixed(2)} USD</strong>
+                  <div className="mch-info">
+                    <div className="mch-top">
+                      <strong className="mch-supplier">{conv.product.supplier}</strong>
+                      {last && <span className="mch-time">{formatDate(last.createdAt)}</span>}
                     </div>
-                    {q.providerNote && <p className="qd-response-note">{q.providerNote}</p>}
-                    <div className="qd-response-actions">
-                      <button
-                        className="qd-btn qd-btn-accept"
-                        disabled={responding === q.id}
-                        onClick={() => handleAction(q.id, "ACCEPTED")}
-                      >
-                        Aceptar cotización
-                      </button>
-                      <button
-                        className="qd-btn qd-btn-reject"
-                        disabled={responding === q.id}
-                        onClick={() => handleAction(q.id, "REJECTED")}
-                      >
-                        Rechazar
-                      </button>
-                    </div>
+                    <p className="mch-product">{conv.product.name}</p>
+                    {last && <p className="mch-preview">{last.content}</p>}
                   </div>
-                )}
-
-                <small className="qd-date">
-                  {new Date(q.createdAt).toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "numeric" })}
-                </small>
-              </article>
-            ))}
+                </button>
+              );
+            })}
           </div>
         )}
       </section>
+
+      {activeConv && (
+        <div className="qf-overlay" onClick={(e) => e.target === e.currentTarget && setActiveConv(null)}>
+          <div className="qf-modal qf-modal-chat">
+            <button className="qf-close" onClick={() => setActiveConv(null)} aria-label="Cerrar">×</button>
+            <ProductChat
+              productId={activeConv.productId}
+              productName={activeConv.product.name}
+              onClose={() => { setActiveConv(null); load(); }}
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 }

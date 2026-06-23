@@ -1,19 +1,11 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getProducts } from "@/lib/products";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q")?.toLowerCase().trim() || "";
 
-  const products = await prisma.product.findMany({
-    where: { active: true },
-    select: {
-      supplier: true,
-      category: true,
-      originCountry: true,
-      image: true,
-    },
-  });
+  const products = await getProducts();
 
   const suppliersMap = new Map();
 

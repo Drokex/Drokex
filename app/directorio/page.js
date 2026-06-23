@@ -2,9 +2,9 @@ import { prisma } from "@/lib/prisma";
 import DirectorioPage from "./directorio-client";
 import { getProducts, getSampleStoreProducts } from "@/lib/products";
 
-const _dirCache = globalThis.__drokexDirCache ?? { suppliers: null, proLandings: null, ts: 0 };
-if (!globalThis.__drokexDirCache) globalThis.__drokexDirCache = _dirCache;
-const DIR_CACHE_TTL = 60_000;
+const _dirCache = globalThis.__drokexDirCache5 ?? { suppliers: null, proLandings: null, ts: 0 };
+if (!globalThis.__drokexDirCache5) globalThis.__drokexDirCache5 = _dirCache;
+const DIR_CACHE_TTL = 15_000;
 
 function canUseDirectoryFallback(error) {
   return error instanceof Error && /ENOTFOUND|ECONN|tenant\/user|DATABASE/i.test(error.message);
@@ -50,16 +50,30 @@ async function getSuppliers() {
 async function getProLandings() {
   if (!prisma) return [];
 
-  // Solo traer slug — store y products son JSON con imágenes embedidas (hasta 8 MB por fila)
+  // Selecciona solo slug y store (sin products que puede tener imágenes base64 pesadas)
   const landings = await prisma.proveedorProLanding.findMany({
     orderBy: { updatedAt: "desc" },
-    select: { slug: true },
+    select: { slug: true, store: true },
   });
 
-  return landings.map(l => ({
-    slug: l.slug,
-    landing: { store: {}, products: [] },
-  }));
+  return landings.map(({ slug, store }) => {
+    const s = (store && typeof store === "object") ? store : {};
+    const countries = Array.isArray(s.countries) ? s.countries : (s.country ? [s.country] : []);
+    return {
+      slug,
+      landing: {
+        store: {
+          brand: s.brand || null,
+          country: countries[0] || null,
+          countries,
+          primaryColor: s.primaryColor || null,
+          logo: s.logo || null,
+          heroImage: s.heroImage || null,
+        },
+        products: [],
+      },
+    };
+  });
 }
 
 function withTimeout(promise, ms) {

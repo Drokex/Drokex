@@ -16,7 +16,7 @@ const providerQuickActions = [
 const customerQuickActions = [
   { title: "Mi tienda", href: "/mi-cuenta/tienda", icon: "building" },
   { title: "Explorar productos", href: "/categorias", icon: "box" },
-  { title: "Mis cotizaciones", href: "/mi-cuenta/cotizaciones", icon: "chart" },
+  { title: "Mis chats", href: "/mi-cuenta/cotizaciones", icon: "chart" },
   { title: "Mis pedidos", href: "/mi-cuenta/pedidos", icon: "grid" },
 ];
 

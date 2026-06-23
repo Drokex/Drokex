@@ -6,12 +6,12 @@ import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 
 const services = [
-  { icon: "/sp-icon-productos.png",  title: "Gestión de productos",       desc: "Administra tu catálogo, precios, inventario y deja disponibles de forma sencilla." },
-  { icon: "/sp-icon-logistica.png",  title: "Logística internacional",    desc: "Nos encargamos del almacenamiento, envíos y entrega en toda Latinoamérica." },
-  { icon: "/sp-icon-pagos.png",      title: "Pagos y recaudo",            desc: "Recibe tus pagos de forma segura y sin manejo local." },
-  { icon: "/sp-icon-analitica.png",  title: "Analítica y reportes",       desc: "Monitorea tus ventas en tiempo real con reportes claros y métricas avanzadas." },
-  { icon: "/sp-icon-seguridad.png",  title: "Cumplimiento y seguridad",   desc: "Cumplimos con estándares internacionales para proteger tu negocio." },
-  { icon: "/sp-icon-soporte.png",    title: "Soporte especializado",      desc: "Un equipo dedicado para ayudarte en cada paso de tu operación." },
+  { icon: "/sp-icon-productos.png",  title: "Catálogo digital",           desc: "Sube tus productos con fotos y descripción. Tu catálogo queda visible para compradores en toda LATAM." },
+  { icon: "/sp-icon-analitica.png",  title: "Visibilidad en LATAM",       desc: "Tu empresa aparece ante compradores activos en múltiples países sin que tengas que hacer nada extra." },
+  { icon: "/sp-icon-pagos.png",      title: "Chat directo",               desc: "Los compradores interesados te escriben directo desde tu catálogo. Tú decides con quién negociar." },
+  { icon: "/sp-icon-seguridad.png",  title: "Perfil verificado",          desc: "Tu empresa aparece con un sello de verificación que genera confianza en los compradores." },
+  { icon: "/sp-icon-logistica.png",  title: "Historial de contactos",     desc: "Lleva el control de todas las conversaciones, cotizaciones y seguimiento desde un solo lugar." },
+  { icon: "/sp-icon-soporte.png",    title: "Soporte especializado",      desc: "Un equipo dedicado para ayudarte a optimizar tu catálogo y cerrar más negocios." },
 ];
 
 const countries = [
@@ -28,59 +28,47 @@ const countries = [
 const steps = [
   {
     icon: "/sp-step-1.png",
-    title: "Registro",
+    title: "Crea tu cuenta",
     nav: "Registro",
-    desc: "Crea tu cuenta como proveedor y valida tu empresa para comenzar a vender en Drokex.",
+    desc: "Regístrate como proveedor y verifica tu empresa. En minutos tu perfil está listo para recibir compradores.",
   },
   {
     icon: "/sp-step-2.png",
-    title: "Portafolio",
-    nav: "Portafolio",
-    desc: "Carga tus productos con fotos, descripciones y precios para mostrar tu oferta al mercado internacional.",
+    title: "Sube tu catálogo",
+    nav: "Catálogo",
+    desc: "Carga tus productos con fotos y descripción. Sin precios si prefieres — el comprador te contacta para negociar.",
   },
   {
     icon: "/sp-step-3.png",
-    title: "Exportaciones",
-    nav: "Exportaciones",
-    desc: "Drokex coordina documentación y requisitos para conectar tus productos con compradores.",
+    title: "Te encuentran",
+    nav: "Visibilidad",
+    desc: "Tu catálogo queda visible ante compradores activos en toda LATAM. Ellos te buscan, tú no tienes que salir a vender.",
   },
   {
     icon: "/sp-step-4.png",
-    title: "Almacenaje",
-    nav: "Almacenaje",
-    desc: "Integramos inventario y espacios logísticos aliados para optimizar tiempos y disponibilidad.",
+    title: "Recibes mensajes",
+    nav: "Chat",
+    desc: "Los compradores interesados te escriben directo desde tu catálogo. El chat queda en tu panel de Drokex.",
   },
   {
     icon: "/sp-step-5.png",
-    title: "Venta",
-    nav: "Venta",
-    desc: "Tus productos quedan disponibles para compradores activos en los mercados conectados.",
+    title: "Negocias directo",
+    nav: "Negociación",
+    desc: "Tú y el comprador acuerdan condiciones, cantidades y entrega directamente, sin intermediarios.",
   },
   {
     icon: "/sp-step-6.png",
-    title: "Empaque",
-    nav: "Empaque",
-    desc: "Preparamos cada orden con criterios comerciales, protección y presentación para la entrega.",
-  },
-  {
-    icon: "/sp-step-7.png",
-    title: "Envío",
-    nav: "Envío",
-    desc: "Activamos rutas y aliados para llevar tus productos al cliente final de forma confiable.",
-  },
-  {
-    icon: "/sp-step-8.png",
-    title: "Recaudo",
-    nav: "Recaudo",
-    desc: "Centralizamos pagos y reportes para que tengas claridad sobre ventas, cobros y crecimiento.",
+    title: "Cierras el negocio",
+    nav: "Cierre",
+    desc: "Confirmas el trato y coordinas la entrega según tus propias condiciones comerciales.",
   },
 ];
 
 const benefits = [
-  { icon: "/sp-ben-ventas.png",   title: "Más ventas",     desc: "Accede a miles de compradores en toda Latinoamérica." },
-  { icon: "/sp-ben-friccion.png", title: "Sin fricción",   desc: "Nos encargamos de logística, pagos y soporte." },
-  { icon: "/sp-ben-global.png",   title: "Estabilidad",    desc: "Vende en más países sin preocuparte por procesos aduanales." },
-  { icon: "/sp-ben-control.png",  title: "Control Total",  desc: "Gestiona tu negocio desde un solo lugar." },
+  { icon: "/sp-ben-ventas.png",   title: "Más contactos",  desc: "Compradores activos de toda LATAM encuentran tu catálogo y te escriben directo." },
+  { icon: "/sp-ben-friccion.png", title: "Sin intermediarios", desc: "Tú y el comprador negocian directo. Sin comisiones ocultas ni terceros en medio." },
+  { icon: "/sp-ben-global.png",   title: "Presencia global", desc: "Tu catálogo visible en múltiples países sin ferias, viajes ni inversión extra." },
+  { icon: "/sp-ben-control.png",  title: "Control total",  desc: "Tú decides precios, condiciones y con quién cerrar. Drokex solo te conecta." },
 ];
 
 const partnerLogos = [
@@ -93,11 +81,11 @@ const partnerLogos = [
 ];
 
 const faqs = [
-  { q: "¿Cuánto cuesta vender en Drokex?",              a: "Tenemos planes adaptados a cada tipo de proveedor. Puedes comenzar sin costo inicial y escalar según tu volumen de ventas." },
-  { q: "¿En qué países puedo vender mis productos?",    a: "Operamos en Nicaragua, Honduras, Guatemala, El Salvador, República Dominicana, Colombia, Perú y México." },
-  { q: "¿Cómo funcionan los pagos?",                    a: "Recibes tus pagos de forma segura a través de nuestra plataforma, con conversión automática y transferencias directas a tu cuenta." },
-  { q: "¿Quién se encarga de la logística y entrega?",  a: "Drokex gestiona la logística con aliados como DHL, FedEx, UPS y más, para garantizar entregas confiables en cada mercado." },
-  { q: "¿Necesito tener empresa para vender?",          a: "Puedes empezar como persona natural o empresa. Nuestro equipo te guía en el proceso de verificación según tu caso." },
+  { q: "¿Cuánto cuesta publicar mi catálogo en Drokex?", a: "Publicar tu catálogo es gratis. Crea tu cuenta, sube tus productos y empieza a recibir mensajes de compradores sin ningún costo inicial." },
+  { q: "¿En qué países me pueden contactar compradores?", a: "Tenemos compradores activos en Nicaragua, Honduras, Guatemala, El Salvador, República Dominicana, Colombia, Perú y México." },
+  { q: "¿Cómo me contactan los compradores?",            a: "A través del chat integrado de Drokex. El comprador ve tu catálogo, te escribe directamente y tú respondes desde tu panel." },
+  { q: "¿Drokex se encarga de la logística o los pagos?", a: "No. Drokex es el puente de conexión. La logística, el pago y las condiciones de entrega las acuerdas directamente con el comprador." },
+  { q: "¿Necesito tener empresa para publicar?",          a: "Puedes empezar como persona natural o empresa. Nuestro equipo te guía en la verificación según tu caso." },
 ];
 
 function Faq() {
@@ -141,8 +129,8 @@ export default function ProveedorPage() {
             Convierte tus productos en un negocio <span>internacional</span>
           </h1>
           <p className="sp-hero-desc">
-            Conecta con miles de compradores en toda Latinoamérica mientras Drokex gestiona la
-            operación para que tú te enfoques en crecer.
+            Sube tu catálogo, recibe mensajes de compradores reales y cierra negocios directo —
+            sin intermediarios, sin logística de nuestra parte.
           </p>
           <Link href="/registro" className="sp-hero-cta">
             Empezar como proveedor

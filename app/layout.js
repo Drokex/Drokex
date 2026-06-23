@@ -1,5 +1,4 @@
 import "./globals.css";
-import CountryEntryGate from "@/app/components/country-entry-gate";
 import CookieConsent from "@/app/components/cookie-consent";
 import MaintenanceGate from "@/app/components/maintenance-gate";
 
@@ -13,7 +12,7 @@ export default function RootLayout({ children }) {
     <html lang="es" data-scroll-behavior="smooth">
       <body>
         <MaintenanceGate>
-        <CountryEntryGate>{children}</CountryEntryGate>
+        {children}
         <CookieConsent />
         <a
           href="https://wa.me/573209654384"

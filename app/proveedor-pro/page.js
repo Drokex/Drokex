@@ -151,7 +151,7 @@ export default function ProveedorProPage({
     catalogTitle: "Productos destacados",
     catalogText:
       "Selecciona, cotiza o compra productos directamente desde la vitrina del proveedor.",
-    productCtaText: "Agregar al carrito",
+    productCtaText: "Contactar",
     finalEyebrow: "Listo para comprar",
     finalTitle: "Descubre la colección de Muebles del Sur",
     finalCtaText: "Ver catálogo",
@@ -931,7 +931,7 @@ function _LandingPreview_UNUSED({ store, products, fullWidth = false, isEditable
                   color: store.buttonTextColor,
                 }}
               >
-                Agregar al carrito
+                Contactar
               </button>
             </article>
           ))}

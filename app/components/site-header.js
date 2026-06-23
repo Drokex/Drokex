@@ -39,7 +39,7 @@ const menuItemsEs = [
   { label: "Para proveedores", href: "/para-proveedores" },
   { label: "Servicios", submenu: [{ label: "Proveedor", href: "/servicios/proveedor" }, { label: "Cliente", href: "/servicios/cliente" }] },
   { label: "Sobre nosotros", href: "/sobre-nosotros" },
-  { label: "Contacto", href: "/#contacto" },
+  { label: "Ayuda / PQR", href: "/ayuda" },
 ];
 const menuItemsEn = [
   { label: "Products", href: "/productos" },
@@ -47,7 +47,7 @@ const menuItemsEn = [
   { label: "For suppliers", href: "/para-proveedores" },
   { label: "Services", submenu: [{ label: "Supplier", href: "/servicios/proveedor" }, { label: "Buyer", href: "/servicios/cliente" }] },
   { label: "About us", href: "/sobre-nosotros" },
-  { label: "Contact", href: "/#contacto" },
+  { label: "Help / PQR", href: "/ayuda" },
 ];
 
 function NavDropdown({ item }) {
@@ -216,7 +216,7 @@ export default function SiteHeader({ hideCountry = false }) {
           {user ? (
             <>
               <Link href={accountLink} className="text-link header-account-link">
-                {lang === "en" ? "My account" : "Mi cuenta"}
+                <span className="header-user-name">{user.fullName || (lang === "en" ? "My account" : "Mi cuenta")}</span>
               </Link>
               <LogoutButton />
             </>

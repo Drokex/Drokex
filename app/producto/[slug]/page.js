@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getProductBySlug, getProducts } from "@/lib/products";
-import MarketPrice from "@/app/components/market-price";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import QuoteButton from "@/app/components/quote-button";
@@ -63,24 +62,11 @@ export default async function ProductDetailPage({ params }) {
               {product.category}
             </p>
 
-            <div className="pd-price-block">
-              <MarketPrice
-                priceValue={product.priceValue}
-                previousPriceValue={product.previousPriceValue}
-                baseCurrency={product.priceCurrency}
-                originCountry={product.originCountry}
-                className="pd-market-price"
-              />
-            </div>
 
             <div className="pd-tags">
               <span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
                 {product.availability}
-              </span>
-              <span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                Stock {product.stock}
               </span>
               <span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>

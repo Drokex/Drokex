@@ -80,6 +80,9 @@ export async function POST(request) {
           data: { slug, userId: session.userId, store, products },
         });
 
+  // Invalidar caché del directorio para que aparezca de inmediato
+  if (globalThis.__drokexDirCache5) globalThis.__drokexDirCache5.ts = 0;
+
   const updatedUser = await prisma.user.update({
     where: { id: session.userId },
     data: { role: session.role === "ADMIN" ? "ADMIN" : "PROVIDER" },

@@ -7,6 +7,7 @@ import { motion, useInView, animate } from "framer-motion";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import HeroDistortion from "@/app/components/hero-distortion";
+import AmericasMap from "@/app/components/americas-map";
 
 const mapStats = [
   { icon: "/about-icon-providers.png", value: 1000, prefix: "+", suffix: "", label: "Proveedores activos" },
@@ -132,11 +133,10 @@ export default function AboutPage() {
 
       {/* HERO */}
       <section className="about-hero">
-        <Image src="/about-map-banner.png" alt="Mapa de expansión Drokex en Latinoamérica" fill priority sizes="100vw" className="about-hero-image" />
+        <Image src="/about-map-banner-world.png" alt="Mapa de expansión Drokex en el mundo" fill priority sizes="100vw" className="about-hero-image" />
         <div className="about-hero-shade" />
         <div className="about-hero-scanlines" />
         <div className="about-hero-grid" />
-        <HeroDistortion image="/about-map-banner.png" />
 
         <div className="shell about-hero-content">
           <motion.p
@@ -153,7 +153,7 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            Desde Colombia, conectamos con <span>Centroamérica</span>
+            Desde Colombia, conectamos con <span>toda América</span>
           </motion.h1>
 
           <motion.p

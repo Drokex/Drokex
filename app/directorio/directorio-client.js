@@ -1,48 +1,24 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 
-const MOCK_STORES = [
-  { slug: "mock-techzone", brand: "TechZone", country: "México", heroTitle: "Electrónica premium", description: "Gadgets y tecnología de última generación", heroImage: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80", primaryColor: "#00C9FF" },
-  { slug: "mock-moda-latina", brand: "Moda Latina", country: "Colombia", heroTitle: "Ropa mayorista", description: "Tendencias para toda Latinoamérica", heroImage: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&q=80", primaryColor: "#FF6B9D" },
-  { slug: "mock-agromax", brand: "AgroMax", country: "Perú", heroTitle: "Insumos agrícolas", description: "Del campo a tu negocio", heroImage: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&q=80", primaryColor: "#7FE040" },
-  { slug: "mock-ferretotal", brand: "FerreTotal", country: "Guatemala", heroTitle: "Ferretería industrial", description: "Todo para construcción y obra", heroImage: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80", primaryColor: "#FF9500" },
-  { slug: "mock-belleza-pro", brand: "Belleza Pro", country: "República Dominicana", heroTitle: "Cosméticos mayoristas", description: "Productos de belleza certificados", heroImage: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80", primaryColor: "#FF3CAC" },
-  { slug: "mock-sportex", brand: "SportEx", country: "Chile", heroTitle: "Artículos deportivos", description: "Equipamiento para alto rendimiento", heroImage: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80", primaryColor: "#00D4FF" },
-  { slug: "mock-alimentos-del-sur", brand: "Alimentos del Sur", country: "Argentina", heroTitle: "Alimentos gourmet", description: "Sabores únicos de Sudamérica", heroImage: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80", primaryColor: "#FFB800" },
-  { slug: "mock-mueblart", brand: "Mueblart", country: "Honduras", heroTitle: "Muebles artesanales", description: "Diseño y calidad garantizada", heroImage: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80", primaryColor: "#C0A060" },
-  { slug: "mock-electrohogar", brand: "ElectroHogar", country: "El Salvador", heroTitle: "Electrodomésticos", description: "Las mejores marcas al precio justo", heroImage: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80", primaryColor: "#5B5FFF" },
-  { slug: "mock-papeleria-plus", brand: "Papelería Plus", country: "Nicaragua", heroTitle: "Artículos de oficina", description: "Todo para tu empresa o negocio", heroImage: "https://images.unsplash.com/photo-1568667256531-8e2b97e7c9e8?w=800&q=80", primaryColor: "#FF5733" },
-  { slug: "mock-naturaverde", brand: "NaturaVerde", country: "Ecuador", heroTitle: "Productos naturales", description: "Salud y bienestar al por mayor", heroImage: "https://images.unsplash.com/photo-1576426863848-c21f53c60b19?w=800&q=80", primaryColor: "#4CAF50" },
-  { slug: "mock-plastimax", brand: "PlastiMax", country: "Venezuela", heroTitle: "Envases plásticos", description: "Soluciones de empaque para industria", heroImage: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80", primaryColor: "#00BCD4" },
-  { slug: "mock-joyaslatam", brand: "Joyas Latam", country: "Bolivia", heroTitle: "Joyería fina", description: "Bisutería y joyería al por mayor", heroImage: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80", primaryColor: "#FFD700" },
-  { slug: "mock-textil-hn", brand: "Textil HN", country: "Honduras", heroTitle: "Telas y textiles", description: "Fábrica mayorista de textiles", heroImage: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&q=80", primaryColor: "#E040FB" },
-  { slug: "mock-mascotas-felices", brand: "Mascotas Felices", country: "México", heroTitle: "Pet supplies", description: "Todo para tu mascota al precio mayorista", heroImage: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80", primaryColor: "#FF7043" },
-  { slug: "mock-libros-sa", brand: "Libros S.A.", country: "Argentina", heroTitle: "Editorial mayorista", description: "Distribución de libros y papelería", heroImage: "https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=800&q=80", primaryColor: "#8D6E63" },
-  { slug: "mock-automotriz-gt", brand: "Automotriz GT", country: "Guatemala", heroTitle: "Repuestos automotrices", description: "Partes y accesorios para vehículos", heroImage: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80", primaryColor: "#F44336" },
-  { slug: "mock-farmaplus", brand: "FarmaPlus", country: "Colombia", heroTitle: "Insumos médicos", description: "Equipos y medicamentos mayoristas", heroImage: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80", primaryColor: "#26C6DA" },
-  { slug: "mock-constructora-pe", brand: "ConstructoPe", country: "Perú", heroTitle: "Materiales de construcción", description: "Cemento, varillas y más", heroImage: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80", primaryColor: "#A1887F" },
-  { slug: "mock-semillas-sv", brand: "Semillas SV", country: "El Salvador", heroTitle: "Semillas certificadas", description: "Agricultura de precisión", heroImage: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&q=80", primaryColor: "#66BB6A" },
-  { slug: "mock-impresiones-mx", brand: "ImpresionMX", country: "México", heroTitle: "Imprenta industrial", description: "Impresión y packaging al por mayor", heroImage: "https://images.unsplash.com/photo-1588681664899-f142ff2dc9b1?w=800&q=80", primaryColor: "#AB47BC" },
-  { slug: "mock-cafelatam", brand: "CaféLatam", country: "Colombia", heroTitle: "Café premium", description: "Exportación directa de café", heroImage: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&q=80", primaryColor: "#795548" },
-  { slug: "mock-solar-ni", brand: "SolarNi", country: "Nicaragua", heroTitle: "Energía solar", description: "Paneles y sistemas fotovoltaicos", heroImage: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80", primaryColor: "#FFC107" },
-  { slug: "mock-pescados-do", brand: "Pescados DO", country: "República Dominicana", heroTitle: "Mariscos y pescados", description: "Del mar directo al negocio", heroImage: "https://images.unsplash.com/photo-1534482421-64566f976cfa?w=800&q=80", primaryColor: "#0288D1" },
-  { slug: "mock-maderas-cr", brand: "Maderas CR", country: "Costa Rica", heroTitle: "Madera certificada", description: "Maderas finas para carpintería", heroImage: "https://images.unsplash.com/photo-1542621334-a254cf47733d?w=800&q=80", primaryColor: "#8D6E63" },
-  { slug: "mock-logistica-cl", brand: "LogísticaCL", country: "Chile", heroTitle: "Servicios logísticos", description: "Almacenamiento y distribución Latam", heroImage: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80", primaryColor: "#607D8B" },
-  { slug: "mock-quimicos-co", brand: "QuímicosCO", country: "Colombia", heroTitle: "Productos químicos", description: "Insumos industriales certificados", heroImage: "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6?w=800&q=80", primaryColor: "#00BFA5" },
-  { slug: "mock-juguetes-mx", brand: "JuguetesMX", country: "México", heroTitle: "Juguetería mayorista", description: "Importación y distribución de juguetes", heroImage: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80", primaryColor: "#FF5722" },
-  { slug: "mock-calzado-bo", brand: "CalzadoBO", country: "Bolivia", heroTitle: "Calzado artesanal", description: "Cuero genuino boliviano", heroImage: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80", primaryColor: "#795548" },
-  { slug: "mock-pinturas-gt", brand: "PinturasGT", country: "Guatemala", heroTitle: "Pinturas industriales", description: "Para construcción y acabados", heroImage: "https://images.unsplash.com/photo-1562259929-b4e1fd3aef09?w=800&q=80", primaryColor: "#FF7043" },
-].map(s => ({
-  slug: s.slug,
-  landing: {
-    store: { brand: s.brand, country: s.country, heroTitle: s.heroTitle, description: s.description, heroImage: s.heroImage, primaryColor: s.primaryColor },
-    products: Array.from({ length: Math.floor(Math.random() * 80 + 5) }),
-  }
-}));
+
+function useThumbnail(slug, fallback) {
+  const [src, setSrc] = useState(fallback);
+  const fetched = useRef(false);
+  useEffect(() => {
+    if (fetched.current) return;
+    fetched.current = true;
+    fetch(`/api/proveedor-pro/thumbnail?slug=${encodeURIComponent(slug)}`)
+      .then(r => r.json())
+      .then(d => { if (d.heroImage) setSrc(d.heroImage); })
+      .catch(() => {});
+  }, [slug]);
+  return src;
+}
 
 const FALLBACK_BANNERS = [
   "/hero-banner-dark.jpg",
@@ -108,109 +84,46 @@ const HERO_VIDEO =
   "https://f96gfpetvymkefdo.public.blob.vercel-storage.com/drokex%20video%20pro.mp4";
 
 // ── Hero principal (full-width) ──
-function HeroFeatured({ slug, landing, sideItems, featured, setFeatured, allItems }) {
-  const hero    = getHero(landing);
-  const brand   = getBrand(landing);
-  const country = getCountry(landing);
-  const desc    = getDesc(landing);
-  const logo    = getLogo(landing);
-  const count   = getProductCount(landing);
+function HeroFeatured({ lm = false }) {
+  const heroBg     = lm ? "#f5f7f5" : "#050807";
+  const titleGrad  = lm
+    ? "linear-gradient(135deg, #1a3d0f 0%, #2d8a1f 50%, #4db82e 100%)"
+    : "linear-gradient(135deg, #ffffff 0%, #c8f5a0 50%, #7FE040 100%)";
+  const subColor   = lm ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)";
+  const eyeColor   = lm ? "#2d8a1f" : "#7FE040";
+  const badgeBg    = lm ? "rgba(45,138,31,0.08)" : "rgba(127,224,64,0.1)";
+  const badgeBdr   = lm ? "rgba(45,138,31,0.3)" : "rgba(127,224,64,0.25)";
+  const badgeColor = lm ? "#2d8a1f" : "#7FE040";
 
   return (
-    <div style={{ position: "relative", height: "100vh", overflow: "hidden" }}>
-      {/* Video full-width */}
-      <video
-        key={HERO_VIDEO}
-        autoPlay muted loop playsInline preload="auto"
-        src={HERO_VIDEO}
-        crossOrigin="anonymous"
-        onCanPlay={(event) => {
-          const playPromise = event.currentTarget.play();
-          if (playPromise) playPromise.catch(() => {});
-        }}
-        style={{ position: "absolute", inset: 0, zIndex: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }}
-      />
-      {/* Gradiente lateral izquierdo para texto legible */}
-      <div style={{
-        position: "absolute", inset: 0, zIndex: 1,
-        background: "linear-gradient(90deg, rgba(4,8,5,0.85) 0%, rgba(4,8,5,0.4) 50%, rgba(4,8,5,0.05) 100%)",
-      }} />
-      {/* Fade hacia abajo al color de fondo */}
-      <div style={{
-        position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 1,
-        height: "35%",
-        background: "linear-gradient(to bottom, transparent 0%, #040806 100%)",
-      }} />
-
-      {/* Headline centrado arriba */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, zIndex: 2,
-        display: "flex", flexDirection: "column", alignItems: "center",
-        paddingTop: 36, textAlign: "center", pointerEvents: "none",
+    <div style={{ background: heroBg, padding: "56px 24px 48px", textAlign: "center" }}>
+      <p style={{
+        margin: "0 0 12px", fontSize: "clamp(0.65rem, 1.1vw, 0.82rem)",
+        fontWeight: 700, letterSpacing: "0.35em", textTransform: "uppercase",
+        color: eyeColor, opacity: 0.85,
       }}>
-        <div style={{ textAlign: "center" }}>
-          <p style={{
-            margin: 0,
-            fontSize: "clamp(0.65rem, 1.1vw, 0.9rem)",
-            fontWeight: 700,
-            letterSpacing: "0.35em",
-            textTransform: "uppercase",
-            color: "#7FE040",
-            marginBottom: 10,
-            opacity: 0.8,
-          }}>
-            Directorio de tiendas · Drokex
-          </p>
-          <p style={{
-            margin: 0,
-            fontSize: "clamp(1.8rem, 3.8vw, 3.6rem)",
-            fontWeight: 800,
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            lineHeight: 1.1,
-            background: "linear-gradient(135deg, #ffffff 0%, #c8f5a0 50%, #7FE040 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-            textShadow: "none",
-            filter: "drop-shadow(0 0 18px rgba(127,224,64,0.25))",
-          }}>
-            Latam vende Latam
-          </p>
-        </div>
-      </div>
-
-      {/* Contenido overlaid */}
-      <div className="shell" style={{ position: "absolute", inset: 0, zIndex: 2, display: "flex", alignItems: "flex-start", gap: 24, paddingTop: "22vh" }}>
-        {/* Izquierda: info tienda */}
-        <div style={{ flex: 1 }}>
-          <h2 style={{
-            margin: "0 0 20px", lineHeight: 1.15,
-            fontSize: "clamp(1.6rem, 3.5vw, 2.8rem)",
-            fontWeight: 900, color: "#fff",
-            textShadow: "0 2px 30px rgba(0,0,0,0.6)",
-            maxWidth: 580,
-          }}>
-            Compra directo a proveedores.<br />
-            <span style={{ color: "#7FE040" }}>Sin intermediarios. Sin fronteras.</span>
-          </h2>
-
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24 }}>
-            {[
-              "✓ Proveedores verificados",
-              "✓ Envíos a toda Latam",
-              "✓ Precios mayoristas",
-              "✓ Soporte directo",
-            ].map(b => (
-              <span key={b} style={{
-                fontSize: "0.72rem", fontWeight: 700, color: "#7FE040",
-                background: "rgba(127,224,64,0.1)", border: "1px solid rgba(127,224,64,0.25)",
-                borderRadius: 20, padding: "5px 12px",
-              }}>{b}</span>
-            ))}
-          </div>
-        </div>
-
+        Directorio de tiendas · Drokex
+      </p>
+      <h1 style={{
+        margin: "0 0 18px", fontSize: "clamp(2rem, 4vw, 3.8rem)",
+        fontWeight: 900, letterSpacing: "0.04em", textTransform: "uppercase", lineHeight: 1.05,
+        background: titleGrad,
+        WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+      }}>
+        Latam vende Latam
+      </h1>
+      <p style={{ margin: "0 0 24px", fontSize: "clamp(0.9rem, 1.3vw, 1.1rem)", color: subColor, fontWeight: 500 }}>
+        Compra directo a proveedores.{" "}
+        <span style={{ color: badgeColor, fontWeight: 700 }}>Sin intermediarios. Sin fronteras.</span>
+      </p>
+      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 8 }}>
+        {["✓ Proveedores verificados", "✓ Envíos a toda Latam", "✓ Precios mayoristas", "✓ Soporte directo"].map(b => (
+          <span key={b} style={{
+            fontSize: "0.72rem", fontWeight: 700, color: badgeColor,
+            background: badgeBg, border: `1px solid ${badgeBdr}`,
+            borderRadius: 20, padding: "5px 14px",
+          }}>{b}</span>
+        ))}
       </div>
     </div>
   );
@@ -218,7 +131,7 @@ function HeroFeatured({ slug, landing, sideItems, featured, setFeatured, allItem
 
 // ── Card del grid ──
 function StoreCard({ slug, landing, lm = false }) {
-  const hero    = getHero(landing);
+  const hero    = useThumbnail(slug, getHero(landing));
   const brand   = getBrand(landing);
   const country = getCountry(landing);
   const primary = getPrimary(landing);
@@ -252,7 +165,6 @@ function StoreCard({ slug, landing, lm = false }) {
       >
         {/* Poster */}
         <div style={{ height: 170, flexShrink: 0, position: "relative", background: `url(${hero}) center/cover no-repeat` }}>
-          <div style={{ position: "absolute", inset: 0, background: lm ? "linear-gradient(to top, rgba(255,255,255,0.6) 0%, rgba(0,0,0,0.05) 60%)" : "linear-gradient(to top, rgba(5,8,6,0.9) 0%, rgba(0,0,0,0.1) 60%)" }} />
           <span style={{ position: "absolute", top: 8, right: 8, background: "#7FE040", color: "#050505", fontSize: "0.52rem", fontWeight: 900, letterSpacing: "0.1em", padding: "2px 7px", borderRadius: 5, textTransform: "uppercase" }}>PRO</span>
           <div style={{ position: "absolute", bottom: 10, left: 12, width: 36, height: 36, borderRadius: 9, background: logo ? (lm ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.5)") : primary, border: "1.5px solid rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: "0.85rem", color: "#fff", overflow: "hidden" }}>
             {logo ? <img src={logo} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", padding: 3 }} /> : brand.charAt(0)}
@@ -278,7 +190,10 @@ function StoreCard({ slug, landing, lm = false }) {
 export default function DirectorioPage({ initialSuppliers = [], initialProLandings = [] }) {
   const [query, setQuery]           = useState("");
   const [suppliers, setSuppliers]   = useState(initialSuppliers);
-  const [proLandings, setProLandings] = useState([...initialProLandings, ...MOCK_STORES]);
+  const [proLandings, setProLandings] = useState(() => {
+    const seen = new Set();
+    return initialProLandings.filter(({ slug }) => seen.has(slug) ? false : seen.add(slug));
+  });
   const [loading, setLoading]       = useState(false);
   const [featured, setFeatured]     = useState(0);
   const [selCountry, setSelCountry] = useState("");
@@ -297,10 +212,14 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
 
   const fetchSuppliers = useCallback(async (q) => {
     setLoading(true);
-    const res  = await fetch(`/api/directorio?q=${encodeURIComponent(q)}`);
-    const data = await res.json();
-    setSuppliers(data.suppliers || []);
-    setLoading(false);
+    try {
+      const res  = await fetch(`/api/directorio?q=${encodeURIComponent(q)}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setSuppliers(data.suppliers || []);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -323,7 +242,10 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
           if (raw) localOnly.push({ slug, landing: JSON.parse(raw) });
         }
       }
-      if (localOnly.length) setProLandings(c => [...c, ...localOnly]);
+      if (localOnly.length) setProLandings(c => {
+        const known = new Set(c.map(x => x.slug));
+        return [...c, ...localOnly.filter(x => !known.has(x.slug))];
+      });
     } catch {}
   }, []);
 
@@ -419,21 +341,13 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
           </div>
 
           {/* Hero full-width */}
-          {featuredItem && (
-            <HeroFeatured
-              slug={featuredItem.slug}
-              landing={featuredItem.landing}
-              allItems={filteredPro}
-              featured={featured}
-              setFeatured={setFeatured}
-            />
-          )}
+          <HeroFeatured lm={lm} />
 
         </section>
       )}
 
       {/* ── BUSCADOR + GRID ───────────────────────────── */}
-      <section style={{ padding: "0 0 80px", marginTop: "-44vh", position: "relative", zIndex: 10 }}>
+      <section style={{ padding: "0 0 80px" }}>
         <div className="shell">
           {/* Search bar */}
           <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 16 }}>

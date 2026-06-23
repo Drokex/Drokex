@@ -13,6 +13,11 @@ enum UserRole {
   ADMIN
 }
 
+enum PlanType {
+  FREE
+  DIRECT
+}
+
 enum OrderStatus {
   PENDING
   IN_PROGRESS
@@ -44,8 +49,8 @@ model Product {
   id                 String              @id @default(cuid())
   slug               String              @unique
   sku                String?             @unique
-  supplier           String
-  originCountry      String
+  supplier           String             @default("")
+  originCountry      String             @default("")
   category           String
   name               String
   price              Int
@@ -55,7 +60,7 @@ model Product {
   image              String
   galleryImages      String[]            @default([])
   availability       String
-  shortDescription   String
+  shortDescription   String             @default("")
   description        String
   application        String?
   marketFocus        String?
@@ -63,8 +68,11 @@ model Product {
   technicalSpecs     Json?
   featured           Boolean             @default(false)
   active             Boolean             @default(true)
+  providerId         String?
+  provider           User?               @relation("ProductProvider", fields: [providerId], references: [id], onDelete: SetNull)
   inventoryMovements InventoryMovement[]
   quotes             Quote[]
+  conversations      Conversation[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 }
@@ -76,11 +84,15 @@ model User {
   company      String?
   phone        String?
   role         UserRole @default(CUSTOMER)
+  plan         PlanType @default(FREE)
   passwordHash String
   logoUrl      String?
   proveedorProLanding ProveedorProLanding?
   orders       Order[]
   quotes       Quote[]
+  conversations       Conversation[]  @relation("ConversationClient")
+  products     Product[]              @relation("ProductProvider")
+  sentMessages        ChatMessage[]   @relation("ChatMessageSender")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -133,6 +145,29 @@ model Quote {
   client             User        @relation(fields: [clientId], references: [id], onDelete: Cascade)
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
+}
+
+model Conversation {
+  id        String        @id @default(cuid())
+  productId String
+  clientId  String
+  product   Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  client    User          @relation("ConversationClient", fields: [clientId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@unique([productId, clientId])
+}
+
+model ChatMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("ChatMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
 }
 
 model InventoryMovement {

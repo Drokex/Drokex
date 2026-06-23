@@ -256,7 +256,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
   const primaryGlow = hexToRgba(store.primaryColor, 0.35);
   const primarySoft = hexToRgba(store.primaryColor, 0.16);
-  const productButtonText = store.productCtaText || "Agregar al carrito";
+  const productButtonText = store.productCtaText || "Contactar";
   const textColor = (field, fallback) => store[field] || fallback;
   const productTextColor = (product, field, fallback) => product?.[field] || fallback;
   const shellClassName = standalone
