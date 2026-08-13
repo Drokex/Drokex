@@ -1,0 +1,43 @@
+{
+  "name": "drokex",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "postinstall": "prisma generate",
+    "build": "next build",
+    "start": "next start",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "prisma db seed",
+    "test": "node --test lib/**/*.test.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "@splinetool/react-spline": "^4.1.0",
+    "@splinetool/runtime": "^1.12.90",
+    "@tailwindcss/postcss": "^4.2.4",
+    "bcryptjs": "^3.0.3",
+    "framer-motion": "^12.38.0",
+    "jose": "^6.2.2",
+    "lucide-react": "^1.11.0",
+    "next": "16.2.2",
+    "nodemailer": "^8.0.7",
+    "openai": "^6.37.0",
+    "pg": "^8.20.0",
+    "prisma": "^7.7.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-globe.gl": "^2.37.1",
+    "tailwindcss": "^4.2.4",
+    "three": "^0.184.0",
+    "topojson-client": "^3.1.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.22.4"
+  }
+}
