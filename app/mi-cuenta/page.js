@@ -4,6 +4,8 @@ import LogoutButton from "@/app/components/logout-button";
 import AvatarUpload from "@/app/components/avatar-upload";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
 import { getProducts } from "@/lib/products";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
+import authStyles from "@/app/components/auth-account.module.css";
 
 const providerQuickActions = [
   { title: "Mi tienda", href: "/mi-cuenta/tienda", icon: "building" },
@@ -101,7 +103,7 @@ export default async function AccountPage({ searchParams }) {
   if (!user) {
     return (
       <main className="commerce-page">
-        <section className="shell account-shell">
+        <section className={`shell ${authStyles.accountShell}`}>
           <div className="empty-state">
             <h1>No has iniciado sesión.</h1>
             <p>Entra con tu cuenta para ver tu panel y seguir con la experiencia de Drokex.</p>
@@ -220,15 +222,15 @@ export default async function AccountPage({ searchParams }) {
       ];
 
   return (
-    <main className={isCustomer ? "provider-dashboard-page is-customer" : "provider-dashboard-page"}>
+    <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
       <SiteHeader />
 
-      <section className="shell provider-clean-shell">
-        <div className="provider-clean-hero">
+      <section className={`shell ${styles.providerCleanShell}`}>
+        <div className={styles.providerCleanHero}>
           <AvatarUpload initials={initials} logoUrl={user.logoUrl} />
 
-          <div className="provider-clean-copy">
-            <p className="provider-kicker">
+          <div className={styles.providerCleanCopy}>
+            <p className={styles.providerKicker}>
               {isCustomer ? "Dashboard del Cliente" : "Dashboard del Proveedor"}
             </p>
             <h1>{user.company || user.fullName}</h1>
@@ -237,7 +239,7 @@ export default async function AccountPage({ searchParams }) {
                 ? "Bienvenido a tu panel de control. Aquí puedes explorar productos, revisar actividad y gestionar tu experiencia comercial."
                 : "Bienvenido a tu panel de control. Aquí puedes gestionar tus productos y revisar el rendimiento de tu empresa."}
             </p>
-            <div className="provider-inline-meta">
+            <div className={styles.providerInlineMeta}>
               <span>{user.fullName}</span>
               <span>
                 {user.role === "ADMIN"
@@ -249,23 +251,23 @@ export default async function AccountPage({ searchParams }) {
             </div>
           </div>
 
-          <div className="provider-clean-tools">
-            <div className="provider-clean-pill" aria-hidden="true" />
+          <div className={styles.providerCleanTools}>
+            <div className={styles.providerCleanPill} aria-hidden="true" />
             <LogoutButton />
           </div>
         </div>
 
         <nav
-          className="provider-clean-menu"
+          className={styles.providerCleanMenu}
           aria-label={isCustomer ? "Accesos del cliente" : "Accesos del proveedor"}
         >
           {(isCustomer ? customerQuickActions : providerQuickActions).map((action) => (
             <Link
               key={`${isCustomer ? "customer" : "provider"}-${action.title}`}
               href={action.href}
-              className="provider-clean-menu-item"
+              className={styles.providerCleanMenuItem}
             >
-              <span className="provider-clean-menu-icon">
+              <span className={styles.providerCleanMenuIcon}>
                 <DashboardIcon name={action.icon} />
               </span>
               <span>{action.title}</span>
@@ -273,29 +275,29 @@ export default async function AccountPage({ searchParams }) {
           ))}
         </nav>
 
-        <section className="provider-activity-card provider-activity-card-clean">
-          <div className="provider-section-heading provider-section-heading-stack">
+        <section className={`${styles.providerActivityCard} ${styles.providerActivityCardClean}`}>
+          <div className={`${styles.providerSectionHeading} ${styles.providerSectionHeadingStack}`}>
             <div>
-              <p className="provider-section-kicker">Seguimiento</p>
+              <p className={styles.providerSectionKicker}>Seguimiento</p>
               <h2>Actividad Reciente</h2>
             </div>
-            <Link href={isCustomer ? "/categorias" : "/admin"} className="provider-text-link">
+            <Link href={isCustomer ? "/categorias" : "/admin"} className={styles.providerTextLink}>
               {isCustomer ? "Ver catálogo" : "Ver panel completo"}
             </Link>
           </div>
 
-          <div className="provider-activity-list">
+          <div className={styles.providerActivityList}>
             {recentActivity.map((item, index) => (
-              <article key={`${item.type}-${index}`} className="provider-activity-item">
-                <div className={`provider-activity-avatar ${item.badgeTone === "blue" ? "is-lime" : ""}`}>
+              <article key={`${item.type}-${index}`} className={styles.providerActivityItem}>
+                <div className={`${styles.providerActivityAvatar} ${item.badgeTone === "blue" ? styles.isLime : ""}`}>
                   {item.avatar}
                 </div>
-                <div className="provider-activity-copy">
+                <div className={styles.providerActivityCopy}>
                   <strong>{item.type}</strong>
                   <p>{item.detail}</p>
                   <small>{item.date}</small>
                 </div>
-                <span className={item.badgeTone === "blue" ? "provider-badge is-blue" : "provider-badge"}>
+                <span className={item.badgeTone === "blue" ? `${styles.providerBadge} ${styles.isBlue}` : styles.providerBadge}>
                   {item.badge}
                 </span>
               </article>

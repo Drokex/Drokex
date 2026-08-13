@@ -4,9 +4,12 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { useQuoteStream } from "@/app/components/use-quote-stream";
+import qfStyles from "@/app/components/quote-form.module.css";
+import qdStyles from "../quotes-dashboard.module.css";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
 
 const STATUS_LABEL = { PENDING: "Pendiente", QUOTED: "Respondida", ACCEPTED: "Aceptada", REJECTED: "Rechazada" };
-const STATUS_TONE = { PENDING: "tone-pending", QUOTED: "tone-quoted", ACCEPTED: "tone-accepted", REJECTED: "tone-rejected" };
+const STATUS_TONE = { PENDING: "tonePending", QUOTED: "toneQuoted", ACCEPTED: "toneAccepted", REJECTED: "toneRejected" };
 
 function RespondForm({ quote, onDone }) {
   const [price, setPrice] = useState("");
@@ -26,9 +29,9 @@ function RespondForm({ quote, onDone }) {
   }
 
   return (
-    <form className="qd-respond-form" onSubmit={handleSubmit}>
-      <div className="qd-respond-row">
-        <div className="qf-field">
+    <form className={qdStyles.qdRespondForm} onSubmit={handleSubmit}>
+      <div className={qdStyles.qdRespondRow}>
+        <div className={qfStyles.qfField}>
           <label>Precio en USD</label>
           <input
             type="number"
@@ -40,7 +43,7 @@ function RespondForm({ quote, onDone }) {
             required
           />
         </div>
-        <div className="qf-field" style={{ flex: 2 }}>
+        <div className={qfStyles.qfField} style={{ flex: 2 }}>
           <label>Nota para el cliente (opcional)</label>
           <input
             type="text"
@@ -50,9 +53,9 @@ function RespondForm({ quote, onDone }) {
           />
         </div>
       </div>
-      <div className="qf-footer">
-        <button type="button" className="qf-cancel" onClick={onDone}>Cancelar</button>
-        <button type="submit" className="qf-submit" disabled={saving}>
+      <div className={qfStyles.qfFooter}>
+        <button type="button" className={qfStyles.qfCancel} onClick={onDone}>Cancelar</button>
+        <button type="submit" className={qfStyles.qfSubmit} disabled={saving}>
           {saving ? "Enviando..." : "Enviar cotización"}
         </button>
       </div>
@@ -96,28 +99,28 @@ export default function ProviderQuotesDashboard() {
   const filtered = filter === "ALL" ? quotes : quotes.filter((q) => q.status === filter);
 
   return (
-    <main className="provider-dashboard-page">
+    <main className={styles.providerDashboardPage}>
       <SiteHeader />
-      <section className="shell provider-clean-shell provider-subpage-stack">
-        <Link href="/mi-cuenta" className="provider-text-link provider-subpage-back">
+      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+        <Link href="/mi-cuenta" className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>
 
-        <div className="provider-section-heading provider-section-heading-stack">
+        <div className={`${styles.providerSectionHeading} ${styles.providerSectionHeadingStack}`}>
           <div>
-            <p className="provider-section-kicker">Panel proveedor</p>
+            <p className={styles.providerSectionKicker}>Panel proveedor</p>
             <h2>
               Cotizaciones
               {newCount > 0 && (
-                <span className="qd-new-badge" onClick={() => setNewCount(0)}>{newCount} nueva{newCount > 1 ? "s" : ""}</span>
+                <span className={qdStyles.qdNewBadge} onClick={() => setNewCount(0)}>{newCount} nueva{newCount > 1 ? "s" : ""}</span>
               )}
             </h2>
           </div>
-          <div className="qd-filters">
+          <div className={qdStyles.qdFilters}>
             {["ALL", "PENDING", "QUOTED", "ACCEPTED", "REJECTED"].map((f) => (
               <button
                 key={f}
-                className={`qd-filter-btn ${filter === f ? "is-active" : ""}`}
+                className={`${qdStyles.qdFilterBtn} ${filter === f ? qdStyles.isActive : ""}`}
                 onClick={() => setFilter(f)}
               >
                 {f === "ALL" ? "Todas" : STATUS_LABEL[f]}
@@ -127,42 +130,42 @@ export default function ProviderQuotesDashboard() {
         </div>
 
         {loading ? (
-          <p className="qd-loading">Cargando...</p>
+          <p className={qdStyles.qdLoading}>Cargando...</p>
         ) : filtered.length === 0 ? (
-          <div className="provider-empty-block">
+          <div className={styles.providerEmptyBlock}>
             <strong>No hay cotizaciones {filter !== "ALL" ? STATUS_LABEL[filter].toLowerCase() + "s" : "aún"}.</strong>
           </div>
         ) : (
-          <div className="qd-list">
+          <div className={qdStyles.qdList}>
             {filtered.map((q) => (
-              <article key={q.id} className="qd-card">
-                <div className="qd-card-top">
-                  <div className="qd-product-info">
+              <article key={q.id} className={qdStyles.qdCard}>
+                <div className={qdStyles.qdCardTop}>
+                  <div className={qdStyles.qdProductInfo}>
                     <strong>{q.productName}</strong>
                     <span>
                       {q.clientName}{q.clientCompany ? ` · ${q.clientCompany}` : ""} ·{" "}
                       {q.quantity} uds · {q.destinationCountry}
                     </span>
                   </div>
-                  <span className={`qd-status ${STATUS_TONE[q.status]}`}>{STATUS_LABEL[q.status]}</span>
+                  <span className={`${qdStyles.qdStatus} ${qdStyles[STATUS_TONE[q.status]]}`}>{STATUS_LABEL[q.status]}</span>
                 </div>
 
-                {q.message && <p className="qd-message">"{q.message}"</p>}
+                {q.message && <p className={qdStyles.qdMessage}>"{q.message}"</p>}
 
                 {q.status === "QUOTED" && q.providerPrice && (
-                  <p className="qd-response-note">
+                  <p className={qdStyles.qdResponseNote}>
                     Respondiste con <strong>${(q.providerPrice / 100).toFixed(2)} USD</strong>
                     {q.providerNote ? ` — "${q.providerNote}"` : ""}
                   </p>
                 )}
 
-                <div className="qd-card-footer">
-                  <small className="qd-date">
+                <div className={qdStyles.qdCardFooter}>
+                  <small className={qdStyles.qdDate}>
                     {new Date(q.createdAt).toLocaleDateString("es-CO", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                   </small>
                   {q.status === "PENDING" && (
                     <button
-                      className="qd-btn qd-btn-reply"
+                      className={`${qdStyles.qdBtn} ${qdStyles.qdBtnReply}`}
                       onClick={() => setActiveReply(activeReply === q.id ? null : q.id)}
                     >
                       {activeReply === q.id ? "Cancelar" : "Responder"}

@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import ProductChat from "@/app/components/product-chat";
+import styles from "./page.module.css";
+import qfStyles from "@/app/components/quote-form.module.css";
+import qdStyles from "./quotes-dashboard.module.css";
+import providerStyles from "@/app/mi-cuenta/provider-shell.module.css";
+import invStyles from "@/app/mi-cuenta/productos/inventario/inventory.module.css";
 
 export default function MisChats() {
   const [conversations, setConversations] = useState([]);
@@ -36,49 +41,49 @@ export default function MisChats() {
   }
 
   return (
-    <main className="provider-dashboard-page">
+    <main className={providerStyles.providerDashboardPage}>
       <SiteHeader />
-      <section className="shell provider-clean-shell provider-subpage-stack">
-        <Link href="/mi-cuenta" className="provider-text-link provider-subpage-back">
+      <section className={`shell ${providerStyles.providerCleanShell} ${providerStyles.providerSubpageStack}`}>
+        <Link href="/mi-cuenta" className={`${providerStyles.providerTextLink} ${providerStyles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>
 
-        <div className="provider-section-heading provider-section-heading-stack">
+        <div className={`${providerStyles.providerSectionHeading} ${providerStyles.providerSectionHeadingStack}`}>
           <div>
-            <p className="provider-section-kicker">Mensajes</p>
+            <p className={providerStyles.providerSectionKicker}>Mensajes</p>
             <h2>Mis chats con proveedores</h2>
           </div>
-          <Link href="/categorias" className="inv-create-btn">Explorar productos</Link>
+          <Link href="/categorias" className={invStyles.invCreateBtn}>Explorar productos</Link>
         </div>
 
         {loading ? (
-          <p className="qd-loading">Cargando chats...</p>
+          <p className={qdStyles.qdLoading}>Cargando chats...</p>
         ) : conversations.length === 0 ? (
-          <div className="provider-empty-block">
+          <div className={providerStyles.providerEmptyBlock}>
             <strong>Aún no tienes chats.</strong>
             <p>Entra a un producto y haz clic en "Cotizar producto" para chatear con el proveedor.</p>
-            <Link href="/categorias" className="provider-text-link">Ver catálogo</Link>
+            <Link href="/categorias" className={providerStyles.providerTextLink}>Ver catálogo</Link>
           </div>
         ) : (
-          <div className="mch-list">
+          <div className={styles.mchList}>
             {conversations.map((conv) => {
               const last = lastMessage(conv);
               return (
                 <button
                   key={conv.id}
-                  className="mch-card"
+                  className={styles.mchCard}
                   onClick={() => setActiveConv(conv)}
                 >
-                  <div className="mch-avatar">
+                  <div className={styles.mchAvatar}>
                     {conv.product.supplier?.[0]?.toUpperCase() ?? "P"}
                   </div>
-                  <div className="mch-info">
-                    <div className="mch-top">
-                      <strong className="mch-supplier">{conv.product.supplier}</strong>
-                      {last && <span className="mch-time">{formatDate(last.createdAt)}</span>}
+                  <div className={styles.mchInfo}>
+                    <div className={styles.mchTop}>
+                      <strong className={styles.mchSupplier}>{conv.product.supplier}</strong>
+                      {last && <span className={styles.mchTime}>{formatDate(last.createdAt)}</span>}
                     </div>
-                    <p className="mch-product">{conv.product.name}</p>
-                    {last && <p className="mch-preview">{last.content}</p>}
+                    <p className={styles.mchProduct}>{conv.product.name}</p>
+                    {last && <p className={styles.mchPreview}>{last.content}</p>}
                   </div>
                 </button>
               );
@@ -88,9 +93,9 @@ export default function MisChats() {
       </section>
 
       {activeConv && (
-        <div className="qf-overlay" onClick={(e) => e.target === e.currentTarget && setActiveConv(null)}>
-          <div className="qf-modal qf-modal-chat">
-            <button className="qf-close" onClick={() => setActiveConv(null)} aria-label="Cerrar">×</button>
+        <div className={qfStyles.qfOverlay} onClick={(e) => e.target === e.currentTarget && setActiveConv(null)}>
+          <div className={qfStyles.qfModal}>
+            <button className={qfStyles.qfClose} onClick={() => setActiveConv(null)} aria-label="Cerrar">×</button>
             <ProductChat
               productId={activeConv.productId}
               productName={activeConv.product.name}

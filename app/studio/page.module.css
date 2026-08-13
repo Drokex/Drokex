@@ -1,0 +1,117 @@
+/* ─── STUDIO PAGE OVERRIDES ─────────────────────── */
+.studioPage :global(.portal-shell) {
+  padding: 0 0 80px;
+  align-content: center;
+  min-height: 100vh;
+  display: grid;
+  gap: 0;
+}
+
+.studioPage :global(.portal-kicker) {
+  position: static;
+  margin-bottom: 28px;
+  width: fit-content;
+}
+
+.studioPage :global(.portal-copy) {
+  max-width: 640px;
+}
+
+.studioPage :global(.portal-copy) h1 {
+  font-size: clamp(2.4rem, 4.8vw, 5.2rem);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  opacity: 1;
+  -webkit-text-stroke-width: 1.5px;
+}
+
+.studioPage :global(.portal-copy) h1 span {
+  display: inline;
+  text-shadow: 0 0 40px rgba(127, 224, 64, 0.3);
+}
+
+.studioPage :global(.portal-copy) > p:last-child {
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  max-width: 480px;
+  margin-top: 20px;
+}
+
+.studioPage :global(.portal-status) {
+  margin-bottom: 18px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+}
+
+.studioPage :global(.portal-actions) {
+  margin-top: 36px;
+}
+
+.studioPage :global(.portal-action) {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  min-height: 48px;
+  padding: 0 24px;
+}
+
+/* --- Studio: HUD derecho más hacia el centro --- */
+.studioPage :global(.portal-hud-right) {
+  right: auto;
+  left: 58%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 280px;
+  z-index: 10;
+}
+
+/* --- Studio: signal como botón clicable --- */
+@keyframes studio-signal-pulse {
+  0%, 100% {
+    border-color: rgba(127, 224, 64, 0.22);
+    box-shadow: 0 0 0 0 rgba(127, 224, 64, 0);
+  }
+  50% {
+    border-color: rgba(127, 224, 64, 0.7);
+    box-shadow: 0 0 12px 2px rgba(127, 224, 64, 0.18);
+  }
+}
+
+.studioSignalBtn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 300px;
+  padding: 18px 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.88rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+  animation: studio-signal-pulse 2.4s ease-in-out infinite;
+}
+
+.studioSignalBtn:nth-child(2) { animation-delay: 0.8s; }
+.studioSignalBtn:nth-child(3) { animation-delay: 1.6s; }
+
+.studioSignalBtn:hover {
+  border-color: rgba(127, 224, 64, 0.9) !important;
+  background: rgba(127, 224, 64, 0.12) !important;
+  box-shadow: 0 0 20px rgba(127, 224, 64, 0.25) !important;
+  color: #fff;
+  animation: none;
+}
+
+/* --- Studio page: HUD derecho con texto más largo --- */
+.studioPage :global(.portal-hud-right) {
+  width: 300px;
+}
+
+.studioPage :global(.portal-hud-right) strong {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 4px;
+}

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./quote-form.module.css";
 
 const COUNTRIES = [
   "Argentina", "Bolivia", "Brasil", "Chile", "Colombia",
@@ -129,7 +130,7 @@ export default function QuoteForm({ productId, productName, onClose }) {
 
   if (status === "sent") {
     return (
-      <div className="qf-success">
+      <div className={styles.qfSuccess}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="40" height="40">
           <circle cx="12" cy="12" r="10" />
           <path d="M8 12l3 3 5-5" />
@@ -140,13 +141,13 @@ export default function QuoteForm({ productId, productName, onClose }) {
   }
 
   return (
-    <form className="qf-form" onSubmit={handleSubmit}>
-      <div className="qf-header">
+    <form className={styles.qfForm} onSubmit={handleSubmit}>
+      <div className={styles.qfHeader}>
         <h3>Solicitar cotización</h3>
-        <p className="qf-product-name">{productName}</p>
+        <p className={styles.qfProductName}>{productName}</p>
       </div>
 
-      <div className="qf-field">
+      <div className={styles.qfField}>
         <label>Cantidad</label>
         <input
           type="number"
@@ -158,7 +159,7 @@ export default function QuoteForm({ productId, productName, onClose }) {
         />
       </div>
 
-      <div className="qf-field">
+      <div className={styles.qfField}>
         <label>País de destino</label>
         <CountrySelect
           value={form.destinationCountry}
@@ -166,7 +167,7 @@ export default function QuoteForm({ productId, productName, onClose }) {
         />
       </div>
 
-      <div className="qf-field">
+      <div className={styles.qfField}>
         <label>Mensaje adicional (opcional)</label>
         <textarea
           rows={5}
@@ -177,14 +178,14 @@ export default function QuoteForm({ productId, productName, onClose }) {
       </div>
 
       {typeof status === "string" && status !== "sending" && status !== "sent" && (
-        <p className="qf-error">{status}</p>
+        <p className={styles.qfError}>{status}</p>
       )}
 
-      <div className="qf-footer">
+      <div className={styles.qfFooter}>
         {onClose && (
-          <button type="button" className="qf-cancel" onClick={onClose}>Cancelar</button>
+          <button type="button" className={styles.qfCancel} onClick={onClose}>Cancelar</button>
         )}
-        <button type="submit" className="qf-submit" disabled={status === "sending"}>
+        <button type="submit" className={styles.qfSubmit} disabled={status === "sending"}>
           {status === "sending" ? "Enviando..." : "Enviar cotización"}
         </button>
       </div>

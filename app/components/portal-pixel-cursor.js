@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import styles from "@/app/studio/portal.module.css";
 
 export default function PortalPixelCursor() {
   const rootRef = useRef(null);
@@ -52,16 +53,16 @@ export default function PortalPixelCursor() {
   return (
     <div
       ref={rootRef}
-      className={pointer.active ? "portal-distortion is-active" : "portal-distortion"}
+      className={pointer.active ? `${styles.portalDistortion} ${styles.isActive}` : styles.portalDistortion}
       aria-hidden="true"
       style={{
         "--portal-x": `${pointer.x}px`,
         "--portal-y": `${pointer.y}px`,
       }}
     >
-      <div className="portal-distortion-lens" />
-      <div className="portal-distortion-lens portal-distortion-red" />
-      <div className="portal-distortion-lens portal-distortion-blue" />
+      <div className={styles.portalDistortionLens} />
+      <div className={`${styles.portalDistortionLens} ${styles.portalDistortionRed}`} />
+      <div className={`${styles.portalDistortionLens} ${styles.portalDistortionBlue}`} />
     </div>
   );
 }

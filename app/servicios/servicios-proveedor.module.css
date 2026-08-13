@@ -1,0 +1,852 @@
+.spPage {
+  background: #050806;
+  color: #fff;
+  min-height: 100vh;
+}
+
+/* hero */
+.spHero {
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+}
+
+.spHero :global(.shell) {
+  position: relative;
+  z-index: 2;
+}
+
+.spHeroBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center right;
+}
+
+.spHeroContent {
+  position: relative;
+  z-index: 2;
+  max-width: 460px;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.spHeroTag {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #2d8a1f;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.spHero h1 {
+  font-size: clamp(1.3rem, 2vw, 1.9rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.spHero h1 span {
+  color: #2d8a1f;
+}
+
+.spHeroDesc {
+  margin-top: 16px;
+  color: rgba(255,255,255,0.72);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.spHeroCta {
+  display: inline-block;
+  margin-top: 28px;
+  padding: 13px 28px;
+  background: #7FE040;
+  color: #000;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.spHeroCta:hover {
+  background: #7FE040;
+  transform: scale(1.03);
+}
+
+/* servicios cards */
+.spServices {
+  padding: 76px 0 82px;
+  background: #fff;
+  color: #000;
+}
+
+.spServicesTag {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #2d8a1f;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.spServices h2 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.2;
+  max-width: 650px;
+  margin-bottom: 36px;
+}
+
+.spServicesGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+
+.spServiceCard {
+  min-height: 210px;
+  border: 1px solid rgba(0,0,0,0.16);
+  border-radius: 4px;
+  padding: 16px 14px 20px;
+  background: #fff;
+  box-shadow: none;
+  text-align: center;
+}
+
+.spServiceCard img {
+  width: 102px;
+  height: 82px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 12px;
+}
+
+.spServiceCard h4 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #111;
+}
+
+.spServiceCard p {
+  font-size: 0.66rem;
+  color: rgba(0,0,0,0.55);
+  line-height: 1.35;
+}
+
+/* coverage */
+.spCoverage {
+  padding: 80px 0;
+  background-image: url('/servicios-coverage-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: #020403;
+}
+
+.spCoverageGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 64px;
+}
+
+.spCoverage h2 {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.spCoverage h2 span {
+  color: #2d8a1f;
+}
+
+.spCoverageDesc {
+  margin-top: 16px;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.spCountriesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px 24px;
+}
+
+.spCountryCard {
+  min-height: 92px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 4px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.spCountryCard .flagLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.88);
+  margin-bottom: 3px;
+  line-height: 1.15;
+}
+
+.spCountryCard .activos {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.78);
+  margin-bottom: 2px;
+  line-height: 1.1;
+}
+
+.spCountryCard .count {
+  font-size: 1.72rem;
+  font-weight: 800;
+  color: #2d8a1f;
+  line-height: 1;
+}
+
+.spCountryCard:last-child .count {
+  max-width: 130px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.08;
+  color: rgba(255,255,255,0.86);
+}
+
+/* steps */
+.spSteps {
+  padding: 76px 0 88px;
+  background: #fff;
+  color: #000;
+}
+
+.spSteps h2 {
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 48px;
+}
+
+.spSteps h2 span {
+  color: #2d8a1f;
+}
+
+.spStepsShowcase {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 34px;
+  align-items: stretch;
+}
+
+.spStepsIntro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 280px;
+  color: rgba(0,0,0,0.58);
+}
+
+.spStepsIntro > p {
+  max-width: 240px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.spStepsIntroLine {
+  width: 64px;
+  height: 1px;
+  margin: 28px 0;
+  background: #7FE040;
+}
+
+.spStepsNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.spStepsNote > span {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(74,154,26,0.18);
+  color: #2d8a1f;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.spStepsNote strong {
+  color: #2d8a1f;
+  display: block;
+  font-size: 0.82rem;
+  margin-bottom: 4px;
+}
+
+.spStepsNote p {
+  max-width: 220px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(0,0,0,0.56);
+}
+
+.spStepsCarousel {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.spStepsArrow {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(74,154,26,0.22);
+  background: #fff;
+  color: #2d8a1f;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.spStepsArrow:hover {
+  border-color: rgba(74,154,26,0.55);
+  box-shadow: 0 8px 18px rgba(74,154,26,0.16);
+  transform: translateY(-1px);
+}
+
+.spStepCards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(126px, 1fr));
+  gap: 18px;
+  align-items: center;
+  min-width: 0;
+}
+
+.spStepCard {
+  position: relative;
+  min-height: 214px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 18px;
+  padding: 20px 16px 18px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.spStepCard.isActive {
+  min-height: 292px;
+  border-color: rgba(74,154,26,0.42);
+  box-shadow: 0 0 0 2px rgba(74,154,26,0.1), 0 14px 30px rgba(74,154,26,0.2);
+  transform: translateY(-8px);
+}
+
+.spStepBadge {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #7FE040;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.spStepCard img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  display: block;
+  margin: 28px auto 10px;
+}
+
+.spStepCard.isActive img {
+  width: 154px;
+  height: 154px;
+  margin-top: 24px;
+}
+
+.spStepCard h3 {
+  color: #111;
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.spStepCard p {
+  color: rgba(0,0,0,0.5);
+  font-size: 0.62rem;
+  line-height: 1.35;
+  margin: 0 auto;
+  max-width: 150px;
+}
+
+.spStepCard.isActive p {
+  max-width: 190px;
+}
+
+.spStepsProgress {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  margin: 34px auto 0;
+  width: min(920px, 100%);
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 16px;
+  padding: 12px 22px;
+  background: #fff;
+}
+
+.spStepsProgress button {
+  position: relative;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(0,0,0,0.38);
+  font-size: 0.64rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.spStepsProgress button::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: calc(-50% + 14px);
+  right: calc(50% + 14px);
+  border-top: 1px dashed rgba(0,0,0,0.18);
+}
+
+.spStepsProgress button:first-child::before {
+  display: none;
+}
+
+.spStepsProgress span {
+  position: relative;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.2);
+  background: #fff;
+  color: rgba(0,0,0,0.42);
+  display: grid;
+  place-items: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.spStepsProgress button.isActive {
+  color: #2d8a1f;
+}
+
+.spStepsProgress button.isActive span {
+  border-color: #2d8a1f;
+  background: #7FE040;
+  color: #fff;
+}
+
+@media (max-width: 1080px) {
+  .spStepsShowcase {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .spStepsIntro {
+    min-height: 0;
+    max-width: 620px;
+  }
+}
+
+@media (max-width: 760px) {
+  .spSteps {
+    padding: 64px 0 72px;
+  }
+
+  .spSteps h2 {
+    margin-bottom: 32px;
+  }
+
+  .spStepsCarousel {
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    gap: 8px;
+  }
+
+  .spStepCards {
+    grid-template-columns: 1fr;
+  }
+
+  .spStepCard {
+    display: none;
+  }
+
+  .spStepCard.isActive {
+    display: block;
+    min-height: 270px;
+    transform: none;
+  }
+
+  .spStepsProgress {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px 0;
+    padding: 12px;
+  }
+
+  .spStepsProgress button::before {
+    display: none;
+  }
+}
+
+/* benefits dark */
+.spBenefits {
+  padding: 28px 0 32px;
+  background: #020403;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.spBenefitsGrid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  align-items: center;
+  gap: 38px;
+}
+
+.spBenefits h2 {
+  max-width: 230px;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-weight: 800;
+  line-height: 0.98;
+}
+
+.spBenefits h2 span {
+  color: #2d8a1f;
+}
+
+.spBenefitsCards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  gap: 18px;
+}
+
+.spBenefitCard {
+  min-height: 142px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  padding: 17px 14px 15px;
+  text-align: center;
+}
+
+.spBenefitCard img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 9px;
+}
+
+.spBenefitCard h4 {
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 7px;
+  line-height: 1.12;
+}
+
+.spBenefitCard p {
+  max-width: 112px;
+  margin: 0 auto;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.78);
+  line-height: 1.18;
+}
+
+@media (max-width: 1080px) {
+  .spBenefitsGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .spBenefits h2 {
+    max-width: 430px;
+    line-height: 1.08;
+  }
+}
+
+@media (max-width: 760px) {
+  .spBenefitsCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .spBenefitCard {
+    min-height: 136px;
+  }
+}
+
+/* partners */
+.spPartners {
+  padding: 72px 0 78px;
+  background: #fff;
+  color: #000;
+  overflow: hidden;
+}
+
+.spPartners h2 {
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 800;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.spPartners h2 span {
+  color: #2d8a1f;
+}
+
+.spPartnersMarquee {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.spPartnersTrack {
+  display: flex;
+  align-items: center;
+  gap: 70px;
+  width: max-content;
+  animation: sp-partners-scroll 24s linear infinite;
+}
+
+.spPartnersMarquee:hover .spPartnersTrack {
+  animation-play-state: paused;
+}
+
+.spPartnerLogo {
+  width: 190px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  opacity: 0.86;
+}
+
+.spPartnerLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes sp-partners-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spPartnersTrack {
+    animation: none;
+  }
+}
+
+/* faq */
+.spFaq {
+  padding: 96px 0;
+  background: #f8faf6;
+  color: #000;
+}
+
+.spFaq h2 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 800;
+  margin-bottom: 48px;
+}
+
+.spFaq h2 span {
+  color: #2d8a1f;
+}
+
+.spFaqGrid {
+  display: grid;
+  grid-template-columns: minmax(300px, 420px) 1fr;
+  gap: 72px;
+  align-items: center;
+}
+
+.spFaqImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spFaqImage img {
+  width: 100%;
+  max-width: 420px;
+  object-fit: contain;
+  display: block;
+}
+
+.spFaqList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.spFaqItem {
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.spFaqQuestion {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+  padding: 18px 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.spFaqQuestion::after {
+  content: '+';
+  font-size: 1.2rem;
+  color: #2d8a1f;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.spFaqItem.isOpen .spFaqQuestion::after {
+  content: '−';
+}
+
+.spFaqAnswer {
+  font-size: 0.9rem;
+  color: rgba(0,0,0,0.6);
+  line-height: 1.7;
+  padding-bottom: 18px;
+  display: none;
+}
+
+.spFaqItem.isOpen .spFaqAnswer {
+  display: block;
+}
+
+/* cta final */
+.spCta {
+  position: relative;
+  overflow: hidden;
+  color: #fff;
+}
+
+.spCtaBg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.spCtaContent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 8% 0 5%;
+  width: 50%;
+}
+
+.spCta h2 {
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.spCta h2 span {
+  color: #2d8a1f;
+}
+
+.spCta p {
+  margin-top: 12px;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.spCta a {
+  display: inline-block;
+  margin-top: 24px;
+  padding: 12px 28px;
+  background: #7FE040;
+  color: #000;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.2s;
+  align-self: flex-start;
+}
+
+.spCta a:hover {
+  background: #7FE040;
+  transform: scale(1.03);
+}
+
+/* ── Cliente page orange overrides ───────────────────────────────── */
+.spPageCliente .spCountryCard .count      { color: #FF790F; }
+.spPageCliente .spStepBadge               { background: #FF790F; }
+.spPageCliente .spStepsProgress button.isActive { color: #FF790F; }
+.spPageCliente .spStepsProgress button.isActive span { border-color: #FF790F; background: #FF790F; color: #fff; }
+.spPageCliente .spHeroCta                 { background: #FF790F; color: #fff; }
+.spPageCliente .spHeroCta:hover           { background: #e86d00; }
+.spPageCliente .spCta a                   { background: #FF790F; color: #fff; }
+.spPageCliente .spCta a:hover             { background: #e86d00; }
+.spPageCliente .spFaqItem.isOpen .spFaqQuestion { color: #FF790F; }
+.spPageCliente .spFaqQuestion::after      { color: #FF790F; }
+.spPageCliente .spStepsIntroLine          { background: linear-gradient(to bottom, #FF790F, transparent); }
+
+/* Cliente page — shift service card icons from green to orange */
+.spPageCliente .spServiceCard img {
+  filter: hue-rotate(-92deg) saturate(1.6) brightness(1.05);
+}
+.spPageCliente .spBenefitCard img {
+  filter: hue-rotate(-92deg) saturate(1.6) brightness(1.05);
+}
+.spPageCliente .spSteps .spStepCard img {
+  filter: hue-rotate(-92deg) saturate(1.6) brightness(1.05);
+}

@@ -3,6 +3,9 @@ import SiteHeader from "@/app/components/site-header";
 import { getCurrentUser } from "@/lib/current-user";
 import { getAdminProducts } from "@/lib/products";
 import InventoryActions from "@/app/components/inventory-actions";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
+import authStyles from "@/app/components/auth-account.module.css";
+import invStyles from "./inventory.module.css";
 
 export default async function InventarioPage() {
   const user = await getCurrentUser();
@@ -10,7 +13,7 @@ export default async function InventarioPage() {
   if (!user) {
     return (
       <main className="commerce-page">
-        <section className="shell account-shell">
+        <section className={`shell ${authStyles.accountShell}`}>
           <div className="empty-state">
             <h1>No has iniciado sesión.</h1>
             <a href="/login" className="green-link">Ir a iniciar sesión</a>
@@ -23,32 +26,32 @@ export default async function InventarioPage() {
   const products = await getAdminProducts();
 
   return (
-    <main className="provider-dashboard-page">
+    <main className={styles.providerDashboardPage}>
       <SiteHeader />
-      <section className="shell provider-clean-shell provider-subpage-stack">
-        <Link href="/mi-cuenta/productos" className="provider-text-link provider-subpage-back">
+      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+        <Link href="/mi-cuenta/productos" className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver a productos
         </Link>
 
-        <div className="provider-section-heading provider-section-heading-stack">
+        <div className={`${styles.providerSectionHeading} ${styles.providerSectionHeadingStack}`}>
           <div>
-            <p className="provider-section-kicker">Inventario</p>
+            <p className={styles.providerSectionKicker}>Inventario</p>
             <h2>Todos los productos</h2>
           </div>
-          <Link href="/mi-cuenta/productos/crear" className="inv-create-btn">
+          <Link href="/mi-cuenta/productos/crear" className={invStyles.invCreateBtn}>
             + Nuevo producto
           </Link>
         </div>
 
         {products.length === 0 ? (
-          <div className="provider-empty-block">
+          <div className={styles.providerEmptyBlock}>
             <strong>No tienes productos aún.</strong>
             <p>Crea tu primer producto para que aparezca aquí.</p>
-            <Link href="/mi-cuenta/productos/crear" className="provider-text-link">Crear producto</Link>
+            <Link href="/mi-cuenta/productos/crear" className={styles.providerTextLink}>Crear producto</Link>
           </div>
         ) : (
-          <div className="inv-table-wrap">
-            <table className="inv-table">
+          <div className={invStyles.invTableWrap}>
+            <table className={invStyles.invTable}>
               <thead>
                 <tr>
                   <th>Producto</th>
@@ -63,9 +66,9 @@ export default async function InventarioPage() {
                 {products.map((product) => (
                   <tr key={product.id}>
                     <td>
-                      <div className="inv-product-name">
+                      <div className={invStyles.invProductName}>
                         {product.image && (
-                          <img src={product.image} alt="" className="inv-product-thumb" />
+                          <img src={product.image} alt="" className={invStyles.invProductThumb} />
                         )}
                         <div>
                           <strong>{product.name}</strong>
@@ -75,13 +78,13 @@ export default async function InventarioPage() {
                     </td>
                     <td>{product.category}</td>
                     <td>
-                      <span className={`inv-stock-badge inv-stock-${product.inventoryState}`}>
+                      <span className={`${invStyles.invStockBadge} ${invStyles["invStock" + product.inventoryState.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join("")]}`}>
                         {product.stock}
                       </span>
                     </td>
                     <td>{product.price}</td>
                     <td>
-                      <span className={product.active ? "provider-badge" : "provider-badge is-blue"}>
+                      <span className={product.active ? styles.providerBadge : `${styles.providerBadge} ${styles.isBlue}`}>
                         {product.active ? "Activo" : "Inactivo"}
                       </span>
                     </td>

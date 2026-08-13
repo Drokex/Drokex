@@ -1,0 +1,25 @@
+.pwWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pwWrap input {
+  width: 100%;
+  padding-right: 2.75rem !important;
+}
+
+.pwEye {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.pwEye:hover { color: #374151; }

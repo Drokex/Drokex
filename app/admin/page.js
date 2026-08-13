@@ -5,6 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import SiteHeader from "@/app/components/site-header";
 import LogoutButton from "@/app/components/logout-button";
 import { inferCurrencyFromOriginCountry } from "@/lib/market-pricing";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
+import adminStyles from "./page.module.css";
 
 const emptyForm = {
   id: "",
@@ -207,77 +209,77 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="provider-dashboard-page admin-page">
+    <main className={`${styles.providerDashboardPage} ${adminStyles.adminPage}`}>
       <SiteHeader />
-      <section className="shell provider-clean-shell">
-        <div className="provider-clean-hero">
-          <div className="provider-clean-avatar-wrap">
-            <div className="provider-clean-avatar" aria-hidden="true">
+      <section className={`shell ${styles.providerCleanShell}`}>
+        <div className={styles.providerCleanHero}>
+          <div className={styles.providerCleanAvatarWrap}>
+            <div className={styles.providerCleanAvatar} aria-hidden="true">
               {initials}
             </div>
           </div>
 
-          <div className="provider-clean-copy">
-            <p className="provider-kicker">Panel de control</p>
+          <div className={styles.providerCleanCopy}>
+            <p className={styles.providerKicker}>Panel de control</p>
             <h1>Dashboard del Administrador</h1>
             <p>
               Bienvenido a tu panel de control. Aquí puedes administrar el catálogo, revisar la
               base activa y mantener la operación comercial de Drokex.
             </p>
-            <div className="provider-inline-meta">
+            <div className={styles.providerInlineMeta}>
               <span>{user?.company || "Drokex"}</span>
               <span>Administrador activo</span>
             </div>
           </div>
 
-          <div className="provider-clean-tools">
-            <div className="provider-clean-pill" aria-hidden="true" />
+          <div className={styles.providerCleanTools}>
+            <div className={styles.providerCleanPill} aria-hidden="true" />
             <LogoutButton />
           </div>
         </div>
 
-        <nav className="provider-clean-menu" aria-label="Accesos del proveedor">
-          <Link href="/mi-cuenta/tienda" className="provider-clean-menu-item">
+        <nav className={styles.providerCleanMenu} aria-label="Accesos del proveedor">
+          <Link href="/mi-cuenta/tienda" className={styles.providerCleanMenuItem}>
             <span>Mi tienda</span>
           </Link>
-          <Link href="/mi-cuenta/productos" className="provider-clean-menu-item">
+          <Link href="/mi-cuenta/productos" className={styles.providerCleanMenuItem}>
             <span>Mis productos</span>
           </Link>
-          <Link href="/mi-cuenta/ventas" className="provider-clean-menu-item">
+          <Link href="/mi-cuenta/ventas" className={styles.providerCleanMenuItem}>
             <span>Ventas</span>
           </Link>
-          <Link href="/mi-cuenta/logistica" className="provider-clean-menu-item">
+          <Link href="/mi-cuenta/logistica" className={styles.providerCleanMenuItem}>
             <span>Envíos / logística</span>
           </Link>
-          <Link href="/mi-cuenta/ganancias" className="provider-clean-menu-item">
+          <Link href="/mi-cuenta/ganancias" className={styles.providerCleanMenuItem}>
             <span>Ganancias / comisiones</span>
           </Link>
         </nav>
 
-        <section className="provider-activity-card provider-activity-card-clean">
-          <div className="provider-section-heading">
+        <section className={`${styles.providerActivityCard} ${styles.providerActivityCardClean}`}>
+          <div className={styles.providerSectionHeading}>
             <div>
-              <p className="provider-section-kicker">Seguimiento</p>
+              <p className={styles.providerSectionKicker}>Seguimiento</p>
               <h2>Actividad Reciente</h2>
             </div>
-            <span className="provider-text-link">Vista administrador</span>
+            <span className={styles.providerTextLink}>Vista administrador</span>
           </div>
 
-          <div className="provider-activity-list">
+          <div className={styles.providerActivityList}>
             {recentActivity.map((item, index) => (
-              <article key={`${item.type}-${index}`} className="provider-activity-item">
+              <article key={`${item.type}-${index}`} className={styles.providerActivityItem}>
                 <div
-                  className={`provider-activity-avatar ${item.badgeTone === "blue" ? "is-lime" : ""}`}
+                  className={`${styles.providerActivityAvatar} ${item.badgeTone === "blue" ? styles.isLime : ""}`}
                 >
                   {item.avatar}
                 </div>
-                <div className="provider-activity-copy">
+                <div className={styles.providerActivityCopy}>
                   <strong>{item.type}</strong>
                   <p>{item.detail}</p>
                   <small>Panel administrador</small>
                 </div>
                 <span
-                  className={item.badgeTone === "blue" ? "provider-badge is-blue" : "provider-badge"}
+                  className={item.badgeTone === "blue" ? `${styles.providerBadge} ${styles.isBlue}` : styles.providerBadge}
                 >
                   {item.badge}
                 </span>
@@ -287,24 +289,24 @@ export default function AdminPage() {
         </section>
 
         {activePanel ? (
-        <div className="admin-grid">
-          <aside className="admin-list">
-            <div className="admin-panel-card" id="admin-product-list" ref={productListRef}>
-              <div className="admin-panel-heading">
+        <div className={adminStyles.adminGrid}>
+          <aside className={adminStyles.adminList}>
+            <div className={adminStyles.adminPanelCard} id="admin-product-list" ref={productListRef}>
+              <div className={adminStyles.adminPanelHeading}>
                 <h2>Productos</h2>
                 <button type="button" className="green-link-button" onClick={() => setForm(emptyForm)}>
                   Nuevo
                 </button>
               </div>
 
-              {status ? <p className="admin-status">{status}</p> : null}
+              {status ? <p className={adminStyles.adminStatus}>{status}</p> : null}
 
-              <div className="admin-product-stack">
+              <div className={adminStyles.adminProductStack}>
                 {products.map((product) => (
                   <button
                     key={product.id}
                     type="button"
-                    className="admin-product-item"
+                    className={adminStyles.adminProductItem}
                     onClick={() => setForm(toFormState(product))}
                   >
                     <strong>{product.name}</strong>
@@ -321,15 +323,15 @@ export default function AdminPage() {
           <section className="admin-form-wrap">
             <form
               onSubmit={handleSubmit}
-              className="admin-form-card"
+              className={adminStyles.adminFormCard}
               id="admin-product-form"
               ref={productFormRef}
             >
-              <div className="admin-panel-heading">
+              <div className={adminStyles.adminPanelHeading}>
                 <h2>{form.id ? "Editar producto" : "Crear producto"}</h2>
               </div>
 
-              <div className="admin-form-grid">
+              <div className={adminStyles.adminFormGrid}>
                 <label>
                   <span>Nombre</span>
                   <input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
@@ -450,7 +452,7 @@ export default function AdminPage() {
                 <span>Mostrar como producto destacado</span>
               </label>
 
-              <div className="admin-actions">
+              <div className={adminStyles.adminActions}>
                 <button type="submit" className="primary-button" disabled={saving}>
                   {saving ? "Guardando..." : form.id ? "Actualizar producto" : "Crear producto"}
                 </button>

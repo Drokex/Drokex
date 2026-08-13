@@ -1,0 +1,90 @@
+/* ── Auth Wall (chat gate) ── */
+.awModal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem 2rem 2rem;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+.awIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f0ffe6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2d8a1f;
+  margin-bottom: 1.25rem;
+}
+
+.awTitle {
+  margin: 0 0 0.65rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.25;
+}
+
+.awSubtitle {
+  margin: 0 0 1.75rem;
+  font-size: 0.92rem;
+  color: #6b7280;
+  line-height: 1.55;
+  max-width: 320px;
+}
+
+.awActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.awBtnPrimary {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  background: #7FE040;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 0.97rem;
+  border-radius: 12px;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.15s;
+}
+
+.awBtnPrimary:hover { background: #6fd030; }
+
+.awBtnSecondary {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.97rem;
+  border-radius: 12px;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.15s;
+}
+
+.awBtnSecondary:hover { background: #e5e7eb; }
+
+.awFooter {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #9ca3af;
+  letter-spacing: 0.01em;
+}

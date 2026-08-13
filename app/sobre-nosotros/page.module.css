@@ -1,0 +1,665 @@
+
+
+.aboutPage {
+  min-height: 100vh;
+  background: #f6f7f5;
+  color: #121514;
+}
+
+
+
+.aboutPage :global(.site-header) {
+  background: #050808;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+
+
+.aboutHero {
+  position: relative;
+  aspect-ratio: 2400 / 1090;
+  min-height: 0;
+  overflow: hidden;
+  background: #050b0e;
+}
+
+
+
+.aboutCtaImage {
+  object-fit: cover;
+}
+
+
+
+.aboutHeroImage {
+  object-fit: contain;
+  object-position: center;
+}
+
+
+
+.aboutHeroShade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(2, 7, 10, 0.72) 0%, rgba(2, 7, 10, 0.12) 42%, rgba(2, 7, 10, 0.78) 100%),
+    radial-gradient(circle at 22% 46%, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0) 32%);
+}
+
+
+
+.aboutHeroScanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.18;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08) 0,
+    rgba(255, 255, 255, 0.08) 1px,
+    rgba(0, 0, 0, 0) 4px,
+    rgba(0, 0, 0, 0) 8px
+  );
+  mix-blend-mode: overlay;
+}
+
+
+
+.aboutHeroGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(255, 133, 0, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 133, 0, 0.25) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: linear-gradient(180deg, transparent 0%, black 24%, black 72%, transparent 100%);
+}
+
+
+
+.aboutHeroContent {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  min-height: 0;
+  padding-top: 8%;
+  padding-bottom: 6%;
+}
+
+
+
+.aboutEyebrow {
+  margin: 0;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+
+
+.aboutHero h1 {
+  max-width: 560px;
+  margin: 12px 0 0;
+  color: #fff;
+  font-size: clamp(2rem, 3.4vw, 3.7rem);
+  line-height: 1;
+  text-align: left;
+}
+
+
+
+.aboutHero h1 span,
+.aboutSectionHeading h2 span,
+.aboutTeamCopy h2 span,
+.aboutCtaContent h2 span {
+  color: #ff8500;
+}
+
+
+
+.aboutHeroCopy {
+  max-width: 370px;
+  margin: 16px 0 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+
+
+.aboutMapStats {
+  position: absolute;
+  left: 24px;
+  bottom: 120px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: min(430px, calc(100% - 48px));
+}
+
+
+
+.aboutMapStat {
+  min-height: 148px;
+  padding: 18px 12px;
+  border-radius: 6px;
+  background: rgba(7, 12, 13, 0.92);
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+}
+
+
+
+.aboutStatIcon {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+
+
+.aboutMapStat strong {
+  display: block;
+  margin-top: 10px;
+  color: #ff8500;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+
+
+.aboutMapStat span {
+  display: block;
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.69rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+
+
+.aboutSection {
+  padding: 74px 0;
+  background: #fff;
+}
+
+
+
+.aboutPillarsSection {
+  background: #fff;
+}
+
+
+
+.aboutSectionHeading {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+
+
+.aboutSectionHeading h2,
+.aboutTeamCopy h2 {
+  margin: 0;
+  color: #171a18;
+  font-size: clamp(1.4rem, 2.2vw, 2.4rem);
+  line-height: 1.1;
+}
+
+
+
+.aboutSectionHeading p,
+.aboutTeamCopy p {
+  margin: 14px auto 0;
+  color: #414843;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+
+
+.aboutPillars {
+  margin: 42px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px;
+  max-width: 980px;
+}
+
+
+
+.aboutPillarCard {
+  padding: 32px 28px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  background: #f3f4f2;
+  box-shadow: 0 18px 34px rgba(10, 16, 15, 0.08);
+}
+
+
+
+.aboutPillarCard img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+}
+
+
+
+.aboutPillarCard h3,
+.aboutTeamCard h3,
+.aboutValueCard h3 {
+  margin: 0;
+  color: #111;
+}
+
+
+
+.aboutPillarCard p {
+  margin: 6px 0 0;
+  color: #465049;
+  font-size: 0.86rem;
+  font-weight: 650;
+  line-height: 1.45;
+  text-align: center;
+}
+
+
+
+.aboutTeamSection {
+  padding: 74px 0;
+  background: #f2f3f1;
+}
+
+
+
+.aboutTeamGrid {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.82fr) 1.65fr;
+  gap: 42px;
+  align-items: center;
+}
+
+
+
+.aboutTeamCopy {
+  max-width: 360px;
+}
+
+
+
+.aboutTeamCopy p {
+  margin-left: 0;
+}
+
+
+
+.aboutSmallLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  margin-top: 24px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: #fff;
+  color: #101312;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 14px 26px rgba(10, 16, 15, 0.08);
+}
+
+
+
+.aboutTeamList {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+
+
+.aboutTeamCard {
+  text-align: center;
+}
+
+
+
+.aboutTeamCard img {
+  width: 100%;
+  aspect-ratio: 0.82;
+  height: auto;
+  border-radius: 6px;
+  object-fit: cover;
+  box-shadow: 0 18px 34px rgba(10, 16, 15, 0.12);
+}
+
+
+
+.aboutTeamCard h3 {
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+
+
+.aboutTeamCard p {
+  margin: 4px 0 0;
+  color: #ff8500;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+
+
+.aboutValuesSection {
+  background: #fff;
+}
+
+
+
+.aboutValues {
+  margin-top: 44px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 22px;
+}
+
+
+
+.aboutValueCard {
+  text-align: center;
+}
+
+
+
+.aboutValueCard span {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 15px;
+  border: 1px solid rgba(127, 224, 64, 0.46);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #f8fff0;
+}
+
+
+
+.aboutValueCard img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+
+
+.aboutValueCard h3 {
+  font-size: 0.95rem;
+}
+
+
+
+.aboutValueCard p {
+  margin: 7px auto 0;
+  max-width: 18ch;
+  color: #4e574f;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+
+
+.aboutCtaBanner {
+  position: relative;
+  overflow: hidden;
+  background: #050b0d;
+}
+
+
+
+.aboutCtaImage {
+  object-position: center;
+}
+
+
+
+.aboutCtaOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(2, 8, 10, 0.95) 0%, rgba(2, 8, 10, 0.62) 44%, rgba(2, 8, 10, 0.9) 100%),
+    radial-gradient(circle at 54% 52%, rgba(115, 255, 33, 0.16) 0%, rgba(0, 0, 0, 0) 30%);
+}
+
+
+
+.aboutCtaContent {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 40px;
+  align-items: center;
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+
+
+.aboutCtaContent h2 {
+  max-width: 600px;
+  margin: 10px 0 0;
+  color: #fff;
+  font-size: clamp(1.2rem, 2vw, 2rem);
+  line-height: 1.15;
+}
+
+
+
+.aboutCtaContent p:not(.aboutEyebrow) {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 800;
+}
+
+
+
+.aboutCtaActions {
+  display: grid;
+  gap: 14px;
+}
+
+
+
+.aboutCtaPrimary,
+.aboutCtaSecondary {
+  min-height: 64px;
+  padding: 0 24px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #101312;
+  font-size: 1rem;
+  font-weight: 950;
+  text-decoration: none;
+  position: relative;
+}
+
+
+
+.aboutCtaPrimary::after,
+.aboutCtaSecondary::after {
+  content: "→";
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+}
+
+
+
+.aboutCtaPrimary span,
+.aboutCtaSecondary span {
+  margin-top: 2px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+
+
+.aboutCtaPrimary {
+  background: #7FE040;
+}
+
+
+
+.aboutCtaSecondary {
+  background: #ff8500;
+  color: #fff;
+}
+
+
+
+@media (max-width: 1180px)  {
+.aboutHero,
+  .aboutHeroContent {
+    min-height: 620px;
+  }
+
+.aboutHero h1 {
+    max-width: 680px;
+  }
+
+.aboutPillars,
+  .aboutTeamGrid,
+  .aboutCtaContent {
+    grid-template-columns: 1fr;
+  }
+
+.aboutTeamCopy {
+    max-width: 620px;
+    text-align: center;
+    justify-self: center;
+  }
+
+.aboutTeamCopy p {
+    margin-left: auto;
+  }
+
+.aboutTeamList {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+.aboutValues {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+.aboutCtaActions {
+    max-width: 420px;
+  }
+}
+
+
+
+@media (max-width: 760px)  {
+.aboutHero,
+  .aboutHeroContent {
+    min-height: 760px;
+  }
+
+.aboutHeroContent {
+    padding-top: 42px;
+  }
+
+.aboutHero h1 {
+    text-align: left;
+    max-width: 100%;
+    font-size: clamp(2.05rem, 10.5vw, 3.35rem);
+    overflow-wrap: anywhere;
+  }
+
+.aboutHeroCopy {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    max-width: none;
+    margin-top: 22px;
+  }
+
+.aboutMapStats {
+    left: 20px;
+    right: 20px;
+    bottom: 28px;
+    width: auto;
+    grid-template-columns: 1fr;
+  }
+
+.aboutMapStat {
+    min-height: 92px;
+    display: grid;
+    grid-template-columns: 54px 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 12px;
+    align-items: center;
+    text-align: left;
+  }
+
+.aboutStatIcon {
+    grid-row: 1 / 3;
+  }
+
+.aboutMapStat strong,
+  .aboutMapStat span {
+    margin-top: 0;
+  }
+
+.aboutSection,
+  .aboutTeamSection {
+    padding: 56px 0;
+  }
+
+.aboutPillars,
+  .aboutTeamList,
+  .aboutValues {
+    grid-template-columns: 1fr;
+  }
+
+.aboutPillarCard {
+    flex-direction: column;
+  }
+
+.aboutTeamList {
+    max-width: 320px;
+  }
+
+.aboutValueCard p {
+    max-width: 28ch;
+  }
+
+.aboutCtaContent {
+    min-height: 360px;
+    padding-top: 46px;
+    padding-bottom: 46px;
+  }
+}

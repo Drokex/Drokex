@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import styles from "@/app/producto/[slug]/page.module.css";
 
 export default function ProductGallery({ gallery, productName }) {
   const [current, setCurrent] = useState(0);
@@ -15,8 +16,8 @@ export default function ProductGallery({ gallery, productName }) {
   }
 
   return (
-    <div className="product-gallery-panel">
-      <div className="detail-image-main">
+    <div className={styles.productGalleryPanel}>
+      <div className={styles.detailImageMain}>
         <img
           src={gallery[current]}
           alt={productName}
@@ -25,18 +26,18 @@ export default function ProductGallery({ gallery, productName }) {
 
         {gallery.length > 1 && (
           <>
-            <button className="gallery-arrow gallery-arrow-prev" onClick={prev} aria-label="Anterior">
+            <button className={`${styles.galleryArrow} ${styles.galleryArrowPrev}`} onClick={prev} aria-label="Anterior">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <button className="gallery-arrow gallery-arrow-next" onClick={next} aria-label="Siguiente">
+            <button className={`${styles.galleryArrow} ${styles.galleryArrowNext}`} onClick={next} aria-label="Siguiente">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
-            <span className="gallery-counter">{current + 1} / {gallery.length}</span>
+            <span className={styles.galleryCounter}>{current + 1} / {gallery.length}</span>
           </>
         )}
 
         <button
-          className={`gallery-heart${liked ? " gallery-heart--active" : ""}`}
+          className={`${styles.galleryHeart}${liked ? ` ${styles.galleryHeartActive}` : ""}`}
           onClick={() => setLiked((l) => !l)}
           aria-label="Guardar en favoritos"
         >
@@ -44,16 +45,16 @@ export default function ProductGallery({ gallery, productName }) {
         </button>
 
         {gallery[0] && (
-          <span className="gallery-novelos-tag">NOVELOS</span>
+          <span className={styles.galleryNovelosTag}>NOVELOS</span>
         )}
       </div>
 
       {gallery.length > 1 && (
-        <div className="detail-thumb-row">
+        <div className={styles.detailThumbRow}>
           {gallery.map((img, i) => (
             <button
               key={i}
-              className={`detail-thumb-btn${i === current ? " detail-thumb-btn--active" : ""}`}
+              className={`${styles.detailThumbBtn}${i === current ? ` ${styles.detailThumbBtnActive}` : ""}`}
               onClick={() => setCurrent(i)}
               aria-label={`Imagen ${i + 1}`}
             >

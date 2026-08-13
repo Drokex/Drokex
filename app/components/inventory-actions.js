@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import styles from "@/app/mi-cuenta/productos/inventario/inventory.module.css";
 
 export default function InventoryActions({ productId }) {
   const router = useRouter();
@@ -15,12 +16,12 @@ export default function InventoryActions({ productId }) {
   }
 
   return (
-    <div className="inv-actions">
-      <a href={`/mi-cuenta/productos/${productId}/editar`} className="inv-btn inv-btn-edit">
+    <div className={styles.invActions}>
+      <a href={`/mi-cuenta/productos/${productId}/editar`} className={`${styles.invBtn} ${styles.invBtnEdit}`}>
         Editar
       </a>
       <button
-        className="inv-btn inv-btn-delete"
+        className={`${styles.invBtn} ${styles.invBtnDelete}`}
         onClick={handleDelete}
         disabled={deleting}
       >

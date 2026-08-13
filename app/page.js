@@ -8,6 +8,12 @@ import HeroDistortion from "@/app/components/hero-distortion";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import ProductChat from "@/app/components/product-chat";
+import awStyles from "@/app/components/auth-wall.module.css";
+import qfStyles from "@/app/components/quote-form.module.css";
+import styles from "./page.module.css";
+
+// styles[`${base}${Capitalized(id)}`] with graceful fallback when no modifier class exists (e.g. "proveedores" default)
+const variantClass = (base, id) => styles[`${base}${id.charAt(0).toUpperCase()}${id.slice(1)}`] || "";
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 40 },
@@ -633,11 +639,11 @@ function FeatureVideoCarousel({ lang }) {
   }, []);
 
   return (
-    <div className="feature-video-carousel" ref={carouselRef}>
-      <button className="gif-scroll-arrow" onClick={() => goTo(active - 1)} aria-label={t.ariaVideoPrev}>◀</button>
-      <div className="feature-video-frame">
-        <div className="gif-card gif-card-single" key={activeVideo.src}>
-          <div className="gif-card-media">
+    <div className={styles.featureVideoCarousel} ref={carouselRef}>
+      <button className={styles.gifScrollArrow} onClick={() => goTo(active - 1)} aria-label={t.ariaVideoPrev}>◀</button>
+      <div className={styles.featureVideoFrame}>
+        <div className={`${styles.gifCard} ${styles.gifCardSingle}`} key={activeVideo.src}>
+          <div className={styles.gifCardMedia}>
             <video
               src={activeVideo.src}
               aria-label={t[activeVideo.labelKey]}
@@ -648,17 +654,17 @@ function FeatureVideoCarousel({ lang }) {
               preload="auto"
             />
           </div>
-          <div className="gif-card-label">
+          <div className={styles.gifCardLabel}>
             <p>{t[activeVideo.labelKey]}</p>
           </div>
         </div>
       </div>
 
-      <button className="gif-scroll-arrow" onClick={() => goTo(active + 1)} aria-label={t.ariaVideoNext}>▶</button>
+      <button className={styles.gifScrollArrow} onClick={() => goTo(active + 1)} aria-label={t.ariaVideoNext}>▶</button>
 
-      <div className="gif-scroll-dots">
+      <div className={styles.gifScrollDots}>
         {gifItems.map((_, i) => (
-          <button key={i} className={i === active ? "gif-dot is-active" : "gif-dot"} onClick={() => goTo(i)} aria-label={`${t.ariaVideoGoto} ${i + 1}`} />
+          <button key={i} className={i === active ? `${styles.gifDot} ${styles.isActive}` : styles.gifDot} onClick={() => goTo(i)} aria-label={`${t.ariaVideoGoto} ${i + 1}`} />
         ))}
       </div>
     </div>
@@ -671,21 +677,21 @@ function PlatformEditorial({ tabs, platformHighlights, activeIdx }) {
   const stats = tabStats[activeTab.id] || [];
 
   return (
-    <div className="pf-editorial">
-      <div className="pf-grid">
+    <div className={styles.pfEditorial}>
+      <div className={styles.pfGrid}>
         {/* Left: editorial copy */}
-        <div className="pf-copy-wrap">
+        <div className={styles.pfCopyWrap}>
           <motion.div
             key={`copy-${activeIdx}`}
-            className="pf-copy"
+            className={styles.pfCopy}
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className={`pf-editorial-label pf-editorial-label--${activeTab.id}`}>{activeTab.label}</p>
-            <h3 className="pf-title">{activeTab.title}</h3>
-            <p className="pf-desc">{activeTab.description}</p>
-            <ul className="fan-features pf-feats">
+            <p className={`${styles.pfEditorialLabel} ${variantClass("pfEditorialLabel", activeTab.id)}`}>{activeTab.label}</p>
+            <h3 className={styles.pfTitle}>{activeTab.title}</h3>
+            <p className={styles.pfDesc}>{activeTab.description}</p>
+            <ul className={`${styles.fanFeatures} ${styles.pfFeats}`}>
               {highlights.map((h, i) => (
                 <motion.li
                   key={h}
@@ -693,7 +699,7 @@ function PlatformEditorial({ tabs, platformHighlights, activeIdx }) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: 0.15 + i * 0.09, ease: "easeOut" }}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" width="17" height="17" className={`pf-check pf-check--${activeTab.id}`} aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" width="17" height="17" className={`${styles.pfCheck} ${variantClass("pfCheck", activeTab.id)}`} aria-hidden="true">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8" />
                     <polyline points="9 12 11 14 15 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
@@ -705,49 +711,49 @@ function PlatformEditorial({ tabs, platformHighlights, activeIdx }) {
         </div>
 
         {/* Right: dark featured card */}
-        <div className="pf-media">
+        <div className={styles.pfMedia}>
           <motion.div
             key={`video-${activeIdx}`}
-            className={`pf-featured pf-featured--${activeTab.id}`}
+            className={`${styles.pfFeatured} ${variantClass("pfFeatured", activeTab.id)}`}
             initial={{ opacity: 0, scale: 0.9, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
             {/* World map background */}
-            <div className="pf-featured-map" aria-hidden="true">
+            <div className={styles.pfFeaturedMap} aria-hidden="true">
               <img src="/world.svg" alt="" />
             </div>
 
             {/* Stats + video inner layout */}
-            <div className="pf-featured-inner">
-              <div className="pf-stat-chips">
+            <div className={styles.pfFeaturedInner}>
+              <div className={styles.pfStatChips}>
                 {stats.map((stat, i) => (
                   <motion.div
                     key={stat.label}
-                    className={`pf-stat-chip pf-stat-chip--${activeTab.id}`}
+                    className={`${styles.pfStatChip} ${variantClass("pfStatChip", activeTab.id)}`}
                     initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.4, delay: 0.2 + i * 0.1, ease: "easeOut" }}
                   >
-                    <div className="pf-stat-chip-icon" aria-hidden="true">
+                    <div className={styles.pfStatChipIcon} aria-hidden="true">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width="15" height="15">
                         <path d={stat.iconPath} />
                       </svg>
                     </div>
                     <div>
-                      <p className="pf-stat-chip-label">{stat.label}</p>
-                      <p className={`pf-stat-chip-value pf-stat-chip-value--${activeTab.id}`}>{stat.value}</p>
+                      <p className={styles.pfStatChipLabel}>{stat.label}</p>
+                      <p className={`${styles.pfStatChipValue} ${variantClass("pfStatChipValue", activeTab.id)}`}>{stat.value}</p>
                     </div>
                   </motion.div>
                 ))}
               </div>
-              <div className="pf-featured-media">
-                <video src={activeTab.video} autoPlay muted loop playsInline className="pf-featured-video" />
+              <div className={styles.pfFeaturedMedia}>
+                <video src={activeTab.video} autoPlay muted loop playsInline className={styles.pfFeaturedVideo} />
               </div>
             </div>
 
             {/* Bottom glow */}
-            <div className={`pf-featured-glow pf-featured-glow--${activeTab.id}`} aria-hidden="true" />
+            <div className={`${styles.pfFeaturedGlow} ${variantClass("pfFeaturedGlow", activeTab.id)}`} aria-hidden="true" />
           </motion.div>
         </div>
       </div>
@@ -974,24 +980,24 @@ export default function Home() {
     <main className="drokex-home">
       <SiteHeader />
 
-      <section className="hero-section" id="inicio" onMouseLeave={() => setHeroTheme("dark")}>
-        <div className="hero-backgrounds" aria-hidden="true">
+      <section className={styles.heroSection} id="inicio" onMouseLeave={() => setHeroTheme("dark")}>
+        <div className={styles.heroBackgrounds} aria-hidden="true">
           {heroThemes.map((theme) => (
             <img
               key={theme.id}
-              className={heroTheme === theme.id ? "hero-background is-active" : "hero-background"}
+              className={heroTheme === theme.id ? `${styles.heroBackground} ${styles.isActive}` : styles.heroBackground}
               src={theme.image}
               alt=""
               draggable="false"
             />
           ))}
         </div>
-        <div className="hero-overlay" />
-        <div className="hero-grid-overlay" aria-hidden="true" />
+        <div className={styles.heroOverlay} />
+        <div className={styles.heroGridOverlay} aria-hidden="true" />
         <HeroDistortion image={activeHeroTheme.image} />
 
-        <div className="shell hero-shell">
-          <div className="hero-copy hero-copy-compact">
+        <div className={`shell ${styles.heroShell}`}>
+          <div className={`${styles.heroCopy} ${styles.heroCopyCompact}`}>
             <motion.p className="section-tag" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
               {t.heroTag}
             </motion.p>
@@ -1003,23 +1009,23 @@ export default function Home() {
             </motion.p>
           </div>
 
-          <motion.div className="hero-actions hero-actions-split" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.72, ease: [0.22, 1, 0.36, 1] }}>
+          <motion.div className={styles.heroActionsSplit} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.72, ease: [0.22, 1, 0.36, 1] }}>
             {/* Botón verde */}
             <div
-              className="hero-btn-group"
+              className={styles.heroBtnGroup}
               onMouseEnter={() => { setHeroTheme("green"); setHoveredHeroBtn("sell"); }}
               onMouseLeave={() => { setHeroTheme("dark"); setHoveredHeroBtn(null); }}
             >
               <AnimatePresence>
                 {hoveredHeroBtn === "sell" && (
-                  <motion.div className="hero-btn-features-card hero-btn-features-card--green" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.22 }}>
+                  <motion.div className={`${styles.heroBtnFeaturesCard} ${styles.heroBtnFeaturesCardGreen}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.22 }}>
                     {[
                       { icon: <><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></>, title: "Registro gratuito", desc: "Crea tu perfil en minutos, sin costo." },
                       { icon: <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></>, title: "Visibilidad inmediata", desc: "Tu empresa visible al instante." },
                       { icon: <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>, title: "Solicitudes directas", desc: "Compradores te contactan sin filtros." },
                       { icon: <><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></>, title: "Sin comisiones", desc: "Vende con total libertad y sin cobros." },
                     ].map((f, i) => (
-                      <div key={i} className="hero-btn-features-row">
+                      <div key={i} className={styles.heroBtnFeaturesRow}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="20" height="20" aria-hidden="true">{f.icon}</svg>
                         <div><strong>{f.title}</strong><span>{f.desc}</span></div>
                       </div>
@@ -1028,7 +1034,7 @@ export default function Home() {
                 )}
               </AnimatePresence>
               <motion.div whileTap={{ scale: 0.97 }}>
-                <Link href="/para-proveedores" className="hero-option-button hero-option-button-green">
+                <Link href="/para-proveedores" className={`${styles.heroOptionButton} ${styles.heroOptionButtonGreen}`}>
                   <span>{t.heroSellSpan}</span>
                   <strong>{t.heroSellStrong}</strong>
                 </Link>
@@ -1037,20 +1043,20 @@ export default function Home() {
 
             {/* Botón naranja */}
             <div
-              className="hero-btn-group"
+              className={styles.heroBtnGroup}
               onMouseEnter={() => { setHeroTheme("orange"); setHoveredHeroBtn("buy"); }}
               onMouseLeave={() => { setHeroTheme("dark"); setHoveredHeroBtn(null); }}
             >
               <AnimatePresence>
                 {hoveredHeroBtn === "buy" && (
-                  <motion.div className="hero-btn-features-card hero-btn-features-card--orange" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.22 }}>
+                  <motion.div className={`${styles.heroBtnFeaturesCard} ${styles.heroBtnFeaturesCardOrange}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.22 }}>
                     {[
                       { icon: <><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></>, title: "Acceso gratuito", desc: "Explora sin costo ni registro previo." },
                       { icon: <><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></>, title: "100% verificados", desc: "Empresas validadas por Drokex." },
                       { icon: <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></>, title: "Cotización directa", desc: "Habla con el proveedor sin intermediarios." },
                       { icon: <><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></>, title: "Pago seguro", desc: "Transacciones protegidas en todo momento." },
                     ].map((f, i) => (
-                      <div key={i} className="hero-btn-features-row">
+                      <div key={i} className={styles.heroBtnFeaturesRow}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="20" height="20" aria-hidden="true">{f.icon}</svg>
                         <div><strong>{f.title}</strong><span>{f.desc}</span></div>
                       </div>
@@ -1059,7 +1065,7 @@ export default function Home() {
                 )}
               </AnimatePresence>
               <motion.div whileTap={{ scale: 0.97 }}>
-                <Link href="/productos" className="hero-option-button hero-option-button-orange">
+                <Link href="/productos" className={`${styles.heroOptionButton} ${styles.heroOptionButtonOrange}`}>
                   <span>{t.heroBuySpan}</span>
                   <strong>{t.heroBuyStrong}</strong>
                 </Link>
@@ -1071,7 +1077,7 @@ export default function Home() {
           <AnimatePresence>
             {hoveredHeroBtn && (
               <motion.div
-                className={`hero-features-bar hero-features-bar--${hoveredHeroBtn === "sell" ? "green" : "orange"}`}
+                className={`${styles.heroFeaturesBar} ${hoveredHeroBtn === "sell" ? styles.heroFeaturesBarGreen : styles.heroFeaturesBarOrange}`}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 16 }}
@@ -1079,39 +1085,39 @@ export default function Home() {
               >
                 {hoveredHeroBtn === "sell" ? (
                   <>
-                    <div className="hero-feature-item">
-                      <div className="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                    <div className={styles.heroFeatureItem}>
+                      <div className={styles.heroFeatureIcon}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
                       <div><strong>Conecta +25 países</strong><p>Expande tu negocio sin fronteras.</p></div>
                     </div>
-                    <div className="hero-feature-item">
-                      <div className="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+                    <div className={styles.heroFeatureItem}>
+                      <div className={styles.heroFeatureIcon}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
                       <div><strong>Catálogo digital</strong><p>Publica y gestiona tus productos.</p></div>
                     </div>
-                    <div className="hero-feature-item">
-                      <div className="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                    <div className={styles.heroFeatureItem}>
+                      <div className={styles.heroFeatureIcon}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
                       <div><strong>Compradores globales</strong><p>Recibe solicitudes internacionales.</p></div>
                     </div>
-                    <div className="hero-feature-item">
-                      <div className="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                    <div className={styles.heroFeatureItem}>
+                      <div className={styles.heroFeatureIcon}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
                       <div><strong>Plataforma inteligente</strong><p>Tecnología que impulsa tus ventas.</p></div>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="hero-feature-item">
-                      <div className="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                    <div className={styles.heroFeatureItem}>
+                      <div className={styles.heroFeatureIcon}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                       <div><strong>Proveedores verificados</strong><p>Negocia con confianza y seguridad.</p></div>
                     </div>
-                    <div className="hero-feature-item">
-                      <div className="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+                    <div className={styles.heroFeatureItem}>
+                      <div className={styles.heroFeatureIcon}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
                       <div><strong>Miles de productos</strong><p>De múltiples industrias listos para conectar.</p></div>
                     </div>
-                    <div className="hero-feature-item">
-                      <div className="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+                    <div className={styles.heroFeatureItem}>
+                      <div className={styles.heroFeatureIcon}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
                       <div><strong>Búsqueda avanzada</strong><p>Filtra por producto, precio y ubicación.</p></div>
                     </div>
-                    <div className="hero-feature-item">
-                      <div className="hero-feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+                    <div className={styles.heroFeatureItem}>
+                      <div className={styles.heroFeatureIcon}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="22" height="22" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
                       <div><strong>Plataforma inteligente</strong><p>Tecnología que te ayuda a encontrar oportunidades.</p></div>
                     </div>
                   </>
@@ -1122,65 +1128,65 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="system-section">
+      <section className={styles.systemSection}>
         <BackgroundMap side="left" />
         <BackgroundMap side="right" />
 
         <div className="shell">
-          <motion.div className="system-header" {...fadeUp(0)}>
-            <p className="section-tag section-tag-green">{t.systemTag}</p>
+          <motion.div className={styles.systemHeader} {...fadeUp(0)}>
+            <p className={`section-tag ${styles.sectionTagGreen}`}>{t.systemTag}</p>
             <h2>
               <span>{t.systemHeadlineLine1}</span>
               <span>
-                <em className="system-em">{t.systemHeadlineLine2.split(" ")[0]}</em>
+                <em className={styles.systemEm}>{t.systemHeadlineLine2.split(" ")[0]}</em>
                 {" " + t.systemHeadlineLine2.split(" ").slice(1).join(" ")}
               </span>
             </h2>
-            <div className="system-header-line" aria-hidden="true" />
+            <div className={styles.systemHeaderLine} aria-hidden="true" />
             <p>{t.systemBody}</p>
           </motion.div>
 
-          <div className="system-timeline">
-            <div className="system-timeline-line" aria-hidden="true" />
-            <div className="system-steps">
+          <div className={styles.systemTimeline}>
+            <div className={styles.systemTimelineLine} aria-hidden="true" />
+            <div className={styles.systemSteps}>
               {operatingSteps.map((step, i) => (
                 <motion.article
                   key={step.number}
-                  className="system-step"
+                  className={styles.systemStep}
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.3 }}
                   transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <div className="system-step-orb">
+                  <div className={styles.systemStepOrb}>
                     <motion.div
-                      className="system-step-icon"
+                      className={styles.systemStepIcon}
                       whileHover={{ scale: 1.06 }}
                       transition={{ type: "spring", stiffness: 260, damping: 18 }}
                     >
-                      <img src={step.iconSrc} alt={t[step.titleKey]} className="system-step-hologram" />
+                      <img src={step.iconSrc} alt={t[step.titleKey]} className={styles.systemStepHologram} />
                     </motion.div>
                   </div>
                   <h3>{t[step.titleKey]}</h3>
-                  <div className="system-step-accent" aria-hidden="true" />
+                  <div className={styles.systemStepAccent} aria-hidden="true" />
                   <p>{t[step.descKey]}</p>
                 </motion.article>
               ))}
             </div>
           </div>
 
-          <div className="system-highlights">
+          <div className={styles.systemHighlights}>
             {operatingHighlights.map((item, index) => (
               <motion.article
                 key={item.titleKey}
-                className={index < operatingHighlights.length - 1 ? "system-highlight has-divider" : "system-highlight"}
+                className={index < operatingHighlights.length - 1 ? `${styles.systemHighlight} ${styles.hasDivider}` : styles.systemHighlight}
                 initial={{ opacity: 0, x: -24 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.55, delay: index * 0.1 }}
                 whileHover={{ x: 6, transition: { duration: 0.2 } }}
               >
-                <motion.div className="system-highlight-icon" whileHover={{ scale: 1.2, rotate: 10 }} transition={{ type: "spring", stiffness: 300, damping: 15 }}>
+                <motion.div className={styles.systemHighlightIcon} whileHover={{ scale: 1.2, rotate: 10 }} transition={{ type: "spring", stiffness: 300, damping: 15 }}>
                   {item.icon}
                 </motion.div>
                 <div>
@@ -1194,41 +1200,41 @@ export default function Home() {
       </section>
 
 
-      <section className="markets-section">
+      <section className={styles.marketsSection}>
         <div className="shell">
-          <div className="markets-stage">
-            <div className="markets-robot-accent" aria-hidden="true">
+          <div className={styles.marketsStage}>
+            <div className={styles.marketsRobotAccent} aria-hidden="true">
               <Image
                 src="/markets-robot-right.png"
                 alt=""
                 width={538}
                 height={744}
                 sizes="(max-width: 960px) 0px, 280px"
-                className="markets-robot-image"
+                className={styles.marketsRobotImage}
               />
             </div>
 
-            <div className="markets-grid">
-              <div className="markets-content">
-                <div className="markets-brand">
+            <div className={styles.marketsGrid}>
+              <div className={styles.marketsContent}>
+                <div className={styles.marketsBrand}>
                   <Image
                     src="/logo.png"
                     alt="Drokex"
                     width={550}
                     height={144}
                     sizes="(max-width: 720px) 220px, 320px"
-                    className="markets-brand-logo"
+                    className={styles.marketsBrandLogo}
                   />
                   <p>{t.marketsGrow}</p>
                 </div>
 
-                <div className="markets-interactive">
-                  <div className="markets-rail" role="tablist" aria-label={t.ariaMarkets}>
+                <div className={styles.marketsInteractive}>
+                  <div className={styles.marketsRail} role="tablist" aria-label={t.ariaMarkets}>
                     {globalMarkets.map((market, index) => (
                       <button
                         key={market.id}
                         type="button"
-                        className={activeMarket === index ? "market-flag is-active" : "market-flag"}
+                        className={activeMarket === index ? `${styles.marketFlag} ${styles.isActive}` : styles.marketFlag}
                         onClick={() => { setActiveMarket(index); marketPausedRef.current = true; setTimeout(() => { marketPausedRef.current = false; }, 6000); }}
                         aria-selected={activeMarket === index}
                         role="tab"
@@ -1239,11 +1245,11 @@ export default function Home() {
                     ))}
                   </div>
 
-                  <div className="markets-scene">
-                    <div className="markets-glow" aria-hidden="true" />
-                    <div className="markets-pattern" aria-hidden="true" />
+                  <div className={styles.marketsScene}>
+                    <div className={styles.marketsGlow} aria-hidden="true" />
+                    <div className={styles.marketsPattern} aria-hidden="true" />
 
-                    <div className="markets-cards" aria-hidden="true">
+                    <div className={styles.marketsCards} aria-hidden="true">
                       {globalMarkets.map((market, index) => {
                         const offset = getWrappedOffset(index, activeMarket, globalMarkets.length);
                         const hidden = Math.abs(offset) > 1;
@@ -1251,7 +1257,7 @@ export default function Home() {
                         return (
                           <article
                             key={market.id}
-                            className={offset === 0 ? "market-card is-active" : "market-card"}
+                            className={offset === 0 ? `${styles.marketCard} ${styles.isActive}` : styles.marketCard}
                             style={{
                               "--market-accent": market.accent,
                               "--market-accent-soft": market.accentSoft,
@@ -1263,27 +1269,27 @@ export default function Home() {
                               zIndex: offset === 0 ? 3 : offset < 0 ? 2 : 1,
                             }}
                           >
-                            <div className="market-card-frame">
-                              <div className="market-card-photo">
+                            <div className={styles.marketCardFrame}>
+                              <div className={styles.marketCardPhoto}>
                                 <Image
                                   src={market.portrait}
                                   alt={market.seller}
                                   width={736}
                                   height={1103}
                                   sizes="240px"
-                                  className="market-card-portrait"
+                                  className={styles.marketCardPortrait}
                                 />
-                                <div className="market-avatar-ring">
+                                <div className={styles.marketAvatarRing}>
                                   <span>{market.badge}</span>
                                 </div>
-                                <div className="market-card-copy">
+                                <div className={styles.marketCardCopy}>
                                   <strong>{market.seller}</strong>
                                   <span>{market.role}</span>
                                 </div>
                               </div>
                               <button
                                 type="button"
-                                className="market-card-action"
+                                className={styles.marketCardAction}
                                 onClick={() => handleMarketContact(market)}
                               >
                                 Contáctame ahora
@@ -1296,13 +1302,13 @@ export default function Home() {
 
                     <div
                       key={`${currentMarket.id}-pill`}
-                      className="market-order-pill"
+                      className={styles.marketOrderPill}
                       style={{ "--market-pill-accent": currentMarket.accent }}
                     >
-                      <span className="market-order-flag" aria-hidden="true">
+                      <span className={styles.marketOrderFlag} aria-hidden="true">
                         {currentMarket.flag}
                       </span>
-                      <span className="market-order-copy">
+                      <span className={styles.marketOrderCopy}>
                         <strong>{currentMarket.orderLabel}</strong>
                         <span>{currentMarket.orderAmount}</span>
                       </span>
@@ -1311,7 +1317,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div key={`${currentMarket.id}-copy`} className="markets-copy">
+                <div key={`${currentMarket.id}-copy`} className={styles.marketsCopy}>
                   <h3>{currentMarket.headline}</h3>
                   <p>{currentMarket.description}</p>
                 </div>
@@ -1322,29 +1328,29 @@ export default function Home() {
       </section>
 
       {/* Logo ticker strip */}
-      <div className="logo-ticker-strip">
-        <p className="logo-ticker-title">Trabajamos con los mejores para entregar <span>siempre</span></p>
-        <div className="logo-ticker-track-wrap" aria-hidden="true">
-          <div className="logo-ticker-track">
+      <div className={styles.logoTickerStrip}>
+        <p className={styles.logoTickerTitle}>Trabajamos con los mejores para entregar <span>siempre</span></p>
+        <div className={styles.logoTickerTrackWrap} aria-hidden="true">
+          <div className={styles.logoTickerTrack}>
             {["black","green","black","green","black","green","black","green","black","green","black","green","black","green","black","green"].map((variant, i) => (
-              <img key={i} src={`/partner-logo-drokex-${variant}.png`} alt="Drokex" className="logo-ticker-item" />
+              <img key={i} src={`/partner-logo-drokex-${variant}.png`} alt="Drokex" className={styles.logoTickerItem} />
             ))}
           </div>
         </div>
       </div>
 
-      <section className="platform-section" id="plataforma">
+      <section className={styles.platformSection} id="plataforma">
         <div className="shell">
-          <motion.div className="platform-header-center" {...fadeUp(0)}>
-            <p className="section-tag section-tag-dark">{t.platformTag}</p>
+          <motion.div className={styles.platformHeaderCenter} {...fadeUp(0)}>
+            <p className={`section-tag ${styles.sectionTagDark}`}>{t.platformTag}</p>
             <h2>{t.platformHeading}</h2>
           </motion.div>
 
           {/* Drag carousel */}
-          <div className="pf-card-wrap" ref={pfCardRef}>
+          <div className={styles.pfCardWrap} ref={pfCardRef}>
             {/* Left arrow hint */}
             <button
-              className={`pf-drag-arrow pf-drag-arrow--left${platformActive === 0 ? " pf-drag-arrow--hidden" : ""}`}
+              className={`${styles.pfDragArrow} ${styles.pfDragArrowLeft}${platformActive === 0 ? ` ${styles.pfDragArrowHidden}` : ""}`}
               onClick={() => pfGoTo(platformActive - 1)}
               aria-label="Anterior"
             >
@@ -1352,26 +1358,26 @@ export default function Home() {
             </button>
 
             <div
-              className="pf-carousel-viewport"
+              className={styles.pfCarouselViewport}
               ref={pfViewportRef}
             >
-            <div className="pf-carousel-track">
+            <div className={styles.pfCarouselTrack}>
               {tabs.map((tab) => {
                 const highlights = platformHighlights[tab.id] || [];
                 const stats = tabStats[tab.id] || [];
                 return (
-                  <div key={tab.id} className="pf-carousel-slide">
-                    <div className="pf-grid">
+                  <div key={tab.id} className={styles.pfCarouselSlide}>
+                    <div className={styles.pfGrid}>
                       {/* Copy */}
-                      <div className="pf-copy-wrap">
-                        <div className="pf-copy">
-                          <p className={`pf-editorial-label pf-editorial-label--${tab.id}`}>{tab.label}</p>
-                          <h3 className="pf-title">{tab.title}</h3>
-                          <p className="pf-desc">{tab.description}</p>
-                          <ul className="fan-features pf-feats">
+                      <div className={styles.pfCopyWrap}>
+                        <div className={styles.pfCopy}>
+                          <p className={`${styles.pfEditorialLabel} ${variantClass("pfEditorialLabel", tab.id)}`}>{tab.label}</p>
+                          <h3 className={styles.pfTitle}>{tab.title}</h3>
+                          <p className={styles.pfDesc}>{tab.description}</p>
+                          <ul className={`${styles.fanFeatures} ${styles.pfFeats}`}>
                             {highlights.map((h) => (
                               <li key={h}>
-                                <svg viewBox="0 0 24 24" fill="none" width="17" height="17" className={`pf-check pf-check--${tab.id}`} aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" width="17" height="17" className={`${styles.pfCheck} ${variantClass("pfCheck", tab.id)}`} aria-hidden="true">
                                   <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8" />
                                   <polyline points="9 12 11 14 15 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
@@ -1382,32 +1388,32 @@ export default function Home() {
                         </div>
                       </div>
                       {/* Featured card */}
-                      <div className="pf-media">
-                        <div className={`pf-featured pf-featured--${tab.id}`}>
-                          <div className="pf-featured-map" aria-hidden="true">
+                      <div className={styles.pfMedia}>
+                        <div className={`${styles.pfFeatured} ${variantClass("pfFeatured", tab.id)}`}>
+                          <div className={styles.pfFeaturedMap} aria-hidden="true">
                             <img src="/world.svg" alt="" />
                           </div>
-                          <div className="pf-featured-inner">
-                            <div className="pf-stat-chips">
+                          <div className={styles.pfFeaturedInner}>
+                            <div className={styles.pfStatChips}>
                               {stats.map((stat) => (
-                                <div key={stat.label} className={`pf-stat-chip pf-stat-chip--${tab.id}`}>
-                                  <div className="pf-stat-chip-icon" aria-hidden="true">
+                                <div key={stat.label} className={`${styles.pfStatChip} ${variantClass("pfStatChip", tab.id)}`}>
+                                  <div className={styles.pfStatChipIcon} aria-hidden="true">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width="15" height="15">
                                       <path d={stat.iconPath} />
                                     </svg>
                                   </div>
                                   <div>
-                                    <p className="pf-stat-chip-label">{stat.label}</p>
-                                    <p className={`pf-stat-chip-value pf-stat-chip-value--${tab.id}`}>{stat.value}</p>
+                                    <p className={styles.pfStatChipLabel}>{stat.label}</p>
+                                    <p className={`${styles.pfStatChipValue} ${variantClass("pfStatChipValue", tab.id)}`}>{stat.value}</p>
                                   </div>
                                 </div>
                               ))}
                             </div>
-                            <div className="pf-featured-media">
-                              <video src={tab.video} autoPlay muted loop playsInline className="pf-featured-video" />
+                            <div className={styles.pfFeaturedMedia}>
+                              <video src={tab.video} autoPlay muted loop playsInline className={styles.pfFeaturedVideo} />
                             </div>
                           </div>
-                          <div className={`pf-featured-glow pf-featured-glow--${tab.id}`} aria-hidden="true" />
+                          <div className={`${styles.pfFeaturedGlow} ${variantClass("pfFeaturedGlow", tab.id)}`} aria-hidden="true" />
                         </div>
                       </div>
                     </div>
@@ -1419,21 +1425,21 @@ export default function Home() {
 
             {/* Right arrow hint */}
             <button
-              className={`pf-drag-arrow pf-drag-arrow--right${platformActive === tabs.length - 1 ? " pf-drag-arrow--hidden" : ""}`}
+              className={`${styles.pfDragArrow} ${styles.pfDragArrowRight}${platformActive === tabs.length - 1 ? ` ${styles.pfDragArrowHidden}` : ""}`}
               onClick={() => pfGoTo(platformActive + 1)}
               aria-label="Siguiente"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
-          </div>{/* /pf-card-wrap */}
+          </div>{/* /pfCardWrap */}
 
           {/* Navigation dots */}
-          <div className="pf-carousel-dots">
+          <div className={styles.pfCarouselDots}>
             {tabs.map((tab, i) => (
               <button
                 key={i}
                 type="button"
-                className={`pf-carousel-dot${i === platformActive ? ` pf-carousel-dot--active pf-carousel-dot--${tab.id}` : ""}`}
+                className={`${styles.pfCarouselDot}${i === platformActive ? ` ${styles.pfCarouselDotActive} ${variantClass("pfCarouselDot", tab.id)}` : ""}`}
                 onClick={() => pfGoTo(i)}
                 aria-label={tab.label}
               />
@@ -1441,22 +1447,22 @@ export default function Home() {
           </div>
 
           {/* Flow bar */}
-          <div className="pf-flow-bar">
+          <div className={styles.pfFlowBar}>
             {platformFlowSteps.map((step, i) => (
-              <div key={step.num} className="pf-flow-row">
-                <div className="pf-flow-step">
-                  <div className="pf-flow-icon" aria-hidden="true">
+              <div key={step.num} className={styles.pfFlowRow}>
+                <div className={styles.pfFlowStep}>
+                  <div className={styles.pfFlowIcon} aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" width="22" height="22">
                       <path d={step.iconPath} />
                     </svg>
                   </div>
-                  <div className="pf-flow-text">
-                    <span className="pf-flow-num">{step.num} {step.title}</span>
-                    <span className="pf-flow-desc">{step.desc}</span>
+                  <div className={styles.pfFlowText}>
+                    <span className={styles.pfFlowNum}>{step.num} {step.title}</span>
+                    <span className={styles.pfFlowDesc}>{step.desc}</span>
                   </div>
                 </div>
                 {i < platformFlowSteps.length - 1 && (
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16" className="pf-flow-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16" className={styles.pfFlowArrow} aria-hidden="true">
                     <polyline points="9 18 15 12 9 6" />
                   </svg>
                 )}
@@ -1466,9 +1472,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="testimonials-section">
+      <section className={styles.testimonialsSection}>
         <div className="shell">
-          <motion.div className="testimonials-header" {...fadeUp(0)}>
+          <motion.div className={styles.testimonialsHeader} {...fadeUp(0)}>
             <p className="section-tag">{t.testimonialsTag}</p>
             <h2>{t.testimonialsHeadlinePre}<span>Drokex</span></h2>
             <p>{t.testimonialsBody}</p>
@@ -1476,14 +1482,14 @@ export default function Home() {
         </div>
 
         {/* Full-width card stage */}
-        <div className="tc-stage">
-          <button type="button" className="tc-arrow tc-arrow--prev" onClick={previousVideo} aria-label={t.ariaVideoPrev}>
+        <div className={styles.tcStage}>
+          <button type="button" className={styles.tcArrow} onClick={previousVideo} aria-label={t.ariaVideoPrev}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18" aria-hidden="true">
               <polyline points="15 18 9 12 15 6" />
             </svg>
           </button>
 
-          <div className="tc-track">
+          <div className={styles.tcTrack}>
             {videos.map((video, i) => {
               const off = getTestiOffset(i);
               const absOff = Math.abs(off);
@@ -1501,18 +1507,18 @@ export default function Home() {
               return (
                 <motion.div
                   key={video.src}
-                  className={`tc-card${isActive ? " tc-card--active" : ""}`}
+                  className={`${styles.tcCard}${isActive ? " " + styles.tcCardActive : ""}`}
                   animate={{ x: pos.x, scale: pos.scale, opacity: pos.opacity }}
                   transition={{ type: "spring", stiffness: 260, damping: 28 }}
                   style={{ zIndex: pos.zIndex, cursor: isActive ? "default" : "pointer" }}
                   onClick={() => !isActive && setCurrentVideo(i)}
                 >
-                  <img src={video.src} alt={video.name} className="tc-img" />
-                  <div className="tc-overlay" />
+                  <img src={video.src} alt={video.name} className={styles.tcImg} />
+                  <div className={styles.tcOverlay} />
 
                   {/* Icon badge top-left (non-active cards) */}
                   {!isActive && TC_ICONS[i] && (
-                    <div className="tc-icon-wrap" aria-hidden="true">
+                    <div className={styles.tcIconWrap} aria-hidden="true">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="15" height="15">
                         <path d={TC_ICONS[i]} />
                       </svg>
@@ -1520,13 +1526,13 @@ export default function Home() {
                   )}
 
                   {/* DESTACADO badge on active */}
-                  {isActive && <span className="tc-badge">DESTACADO</span>}
+                  {isActive && <span className={styles.tcBadge}>DESTACADO</span>}
 
                   {/* Quote + person info */}
-                  <div className={`tc-content${isActive ? " tc-content--active" : ""}`}>
-                    {isActive && <span className="tc-quote-mark" aria-hidden="true">"</span>}
-                    <p className="tc-quote">{video.quote}</p>
-                    <div className="tc-person">
+                  <div className={`${styles.tcContent}${isActive ? " " + styles.tcContentActive : ""}`}>
+                    {isActive && <span className={styles.tcQuoteMark} aria-hidden="true">"</span>}
+                    <p className={styles.tcQuote}>{video.quote}</p>
+                    <div className={styles.tcPerson}>
                       <strong>{video.name}</strong>
                       <span>{video.role}</span>
                     </div>
@@ -1536,7 +1542,7 @@ export default function Home() {
                   {isActive && (
                     <button
                       type="button"
-                      className="testi-play-btn"
+                      className={styles.testiPlayBtn}
                       onClick={() => setOpenVideo(video)}
                       aria-label={`${t.ariaVideoPlay} ${video.name}`}
                     >
@@ -1550,7 +1556,7 @@ export default function Home() {
             })}
           </div>
 
-          <button type="button" className="tc-arrow tc-arrow--next" onClick={nextVideo} aria-label={t.ariaVideoNext}>
+          <button type="button" className={styles.tcArrow} onClick={nextVideo} aria-label={t.ariaVideoNext}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="18" height="18" aria-hidden="true">
               <polyline points="9 18 15 12 9 6" />
             </svg>
@@ -1558,11 +1564,11 @@ export default function Home() {
         </div>
 
         {/* Progress dots */}
-        <div className="tc-dots">
+        <div className={styles.tcDots}>
           {videos.map((_, i) => (
             <button
               key={i}
-              className={`tc-dot${i === currentVideo ? " tc-dot--active" : ""}`}
+              className={`${styles.tcDot}${i === currentVideo ? " " + styles.tcDotActive : ""}`}
               onClick={() => setCurrentVideo(i)}
               aria-label={videos[i].name}
             />
@@ -1571,35 +1577,35 @@ export default function Home() {
       </section>
 
       {openVideo ? (
-        <div className="video-modal" role="dialog" aria-modal="true" aria-label={`${t.ariaVideoPlay} ${openVideo.name}`}>
-          <button type="button" className="video-modal-backdrop" onClick={() => setOpenVideo(null)} aria-label={t.ariaModalClose} />
-          <div className="video-modal-panel">
-            <button type="button" className="video-modal-close" onClick={() => setOpenVideo(null)} aria-label={t.ariaModalClose}>
+        <div className={styles.videoModal} role="dialog" aria-modal="true" aria-label={`${t.ariaVideoPlay} ${openVideo.name}`}>
+          <button type="button" className={styles.videoModalBackdrop} onClick={() => setOpenVideo(null)} aria-label={t.ariaModalClose} />
+          <div className={styles.videoModalPanel}>
+            <button type="button" className={styles.videoModalClose} onClick={() => setOpenVideo(null)} aria-label={t.ariaModalClose}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" width="18" height="18">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
             <iframe
-              className="video-modal-player"
+              className={styles.videoModalPlayer}
               src={openVideo.embedUrl}
               title={`${t.ariaVideoPlay} ${openVideo.name}`}
               allow="autoplay; fullscreen"
               allowFullScreen
             />
-            <div className="video-modal-footer">
-              <p className="video-modal-name">{openVideo.name}</p>
-              <span className="video-modal-role">{openVideo.role}</span>
+            <div className={styles.videoModalFooter}>
+              <p className={styles.videoModalName}>{openVideo.name}</p>
+              <span className={styles.videoModalRole}>{openVideo.role}</span>
             </div>
           </div>
         </div>
       ) : null}
 
-      {false && <section className="contact-section" id="contacto">
-        <div className="shell contact-grid">
-          <motion.div className="contact-card" {...fadeLeft(0)}>
+      {false && <section className={styles.contactSection} id="contacto">
+        <div className={`shell ${styles.contactGrid}`}>
+          <motion.div className={styles.contactCard} {...fadeLeft(0)}>
             <h3>{t.contactFormHeading}</h3>
 
-            <form className="contact-form" onSubmit={handleContactSubmit}>
+            <form className={styles.contactForm} onSubmit={handleContactSubmit}>
               <input
                 type="text"
                 placeholder={t.contactPlaceholderName}
@@ -1614,7 +1620,7 @@ export default function Home() {
                 onChange={(e) => setContactForm((f) => ({ ...f, email: e.target.value }))}
                 required
               />
-              <div className="contact-select-wrap">
+              <div className={styles.contactSelectWrap}>
                 <select
                   value={contactForm.subject}
                   onChange={(e) => setContactForm((f) => ({ ...f, subject: e.target.value }))}
@@ -1640,20 +1646,20 @@ export default function Home() {
               {contactStatus === "error" && (
                 <p style={{ color: "#ef4444", fontSize: "0.9rem" }}>{t.contactMsgError}</p>
               )}
-              <button type="submit" className="submit-button" disabled={contactStatus === "sending"}>
+              <button type="submit" className={styles.submitButton} disabled={contactStatus === "sending"}>
                 {contactStatus === "sending" ? t.contactBtnSending : t.contactBtnSend}
               </button>
             </form>
           </motion.div>
 
-          <motion.div className="contact-copy" {...fadeRight(0.15)}>
-            <p className="section-tag section-tag-green">{t.contactSectionTag}</p>
+          <motion.div className={styles.contactCopy} {...fadeRight(0.15)}>
+            <p className={`section-tag ${styles.sectionTagGreen}`}>{t.contactSectionTag}</p>
             <h2>
               <span>{t.contactHeadline1}</span>
               <span>{t.contactHeadline2}</span>
               <span>{t.contactHeadline3}</span>
             </h2>
-            <div className="contact-list">
+            <div className={styles.contactList}>
               <p>contacto@drokex.com</p>
               <p>+57 311 531 2623</p>
               <p>Bogota, Colombia</p>
@@ -1662,20 +1668,20 @@ export default function Home() {
               href="https://wa.me/573115312623?text=Hola%2C%20quiero%20hablar%20con%20Drokex"
               target="_blank"
               rel="noopener noreferrer"
-              className="whatsapp-link"
+              className={styles.whatsappLink}
             >
               {t.contactWhatsApp}
             </a>
           </motion.div>
 
-          <div className="contact-robot" aria-hidden="true">
+          <div className={styles.contactRobot} aria-hidden="true">
             <Image
               src="/robot-contact.png"
               alt=""
               width={1344}
               height={1771}
               sizes="(max-width: 1180px) 0px, 22vw"
-              className="contact-robot-image"
+              className={styles.contactRobotImage}
             />
           </div>
         </div>
@@ -1683,25 +1689,25 @@ export default function Home() {
 
       {/* Market contact modals */}
       {marketChatState === "auth-wall" && (
-        <div className="qf-overlay" onClick={e => e.target === e.currentTarget && setMarketChatState("idle")}>
-          <div className="aw-modal">
-            <button className="qf-close" onClick={() => setMarketChatState("idle")} aria-label="Cerrar">×</button>
-            <div className="aw-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-            <h3 className="aw-title">Inicia el chat con el proveedor</h3>
-            <p className="aw-subtitle">Para contactar directamente con el proveedor necesitas una cuenta en Drokex. Es gratis y toma menos de un minuto.</p>
-            <div className="aw-actions">
-              <a href="/registro" className="aw-btn-primary">Crear cuenta gratis</a>
-              <a href="/login" className="aw-btn-secondary">Ya tengo cuenta</a>
+        <div className={qfStyles.qfOverlay} onClick={e => e.target === e.currentTarget && setMarketChatState("idle")}>
+          <div className={awStyles.awModal}>
+            <button className={qfStyles.qfClose} onClick={() => setMarketChatState("idle")} aria-label="Cerrar">×</button>
+            <div className={awStyles.awIcon}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <h3 className={awStyles.awTitle}>Inicia el chat con el proveedor</h3>
+            <p className={awStyles.awSubtitle}>Para contactar directamente con el proveedor necesitas una cuenta en Drokex. Es gratis y toma menos de un minuto.</p>
+            <div className={awStyles.awActions}>
+              <a href="/registro" className={awStyles.awBtnPrimary}>Crear cuenta gratis</a>
+              <a href="/login" className={awStyles.awBtnSecondary}>Ya tengo cuenta</a>
             </div>
-            <p className="aw-footer">Proveedores verificados · Negociación segura · LATAM</p>
+            <p className={awStyles.awFooter}>Proveedores verificados · Negociación segura · LATAM</p>
           </div>
         </div>
       )}
 
 
       {/* Drokex World Banner */}
-      <Link href="/drokex-world" className="dw-banner-img-link">
-        <Image src="/banner-drokex-world.png" alt="Explorar Drokex World" width={1920} height={280} className="dw-banner-img" priority={false} />
+      <Link href="/drokex-world" className={styles.dwBannerImgLink}>
+        <Image src="/banner-drokex-world.png" alt="Explorar Drokex World" width={1920} height={280} className={styles.dwBannerImg} priority={false} />
       </Link>
 
       <SiteFooter />
@@ -1712,7 +1718,7 @@ export default function Home() {
 function BackgroundMap({ side }) {
   return (
     <div
-      className={side === "left" ? "system-map system-map-left" : "system-map system-map-right"}
+      className={side === "left" ? `${styles.systemMap} ${styles.systemMapLeft}` : `${styles.systemMap} ${styles.systemMapRight}`}
       aria-hidden="true"
     >
       <svg

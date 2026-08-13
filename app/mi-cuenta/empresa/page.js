@@ -1,6 +1,8 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
+import authStyles from "@/app/components/auth-account.module.css";
 
 export default async function CompanyPage() {
   const session = await getCurrentSession();
@@ -9,7 +11,7 @@ export default async function CompanyPage() {
   if (!user) {
     return (
       <main className="commerce-page">
-        <section className="shell account-shell">
+        <section className={`shell ${authStyles.accountShell}`}>
           <div className="empty-state">
             <h1>No has iniciado sesión.</h1>
             <p>Entra con tu cuenta para ver la información de tu empresa.</p>
@@ -42,28 +44,28 @@ export default async function CompanyPage() {
   ];
 
   return (
-    <main className={isCustomer ? "provider-dashboard-page is-customer" : "provider-dashboard-page"}>
+    <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
       <SiteHeader />
 
-      <section className="shell provider-clean-shell provider-subpage-stack">
-        <Link href={isCustomer ? "/mi-cuenta?role=cliente" : "/mi-cuenta?role=proveedor"} className="provider-text-link provider-subpage-back">
+      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+        <Link href={isCustomer ? "/mi-cuenta?role=cliente" : "/mi-cuenta?role=proveedor"} className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>
 
-        <section className="provider-content-card provider-content-card-split">
-          <div className="provider-section-heading">
+        <section className={`${styles.providerContentCard} ${styles.providerContentCardSplit}`}>
+          <div className={styles.providerSectionHeading}>
             <div>
-              <p className="provider-section-kicker">{isCustomer ? "Mi cuenta" : "Mi empresa"}</p>
+              <p className={styles.providerSectionKicker}>{isCustomer ? "Mi cuenta" : "Mi empresa"}</p>
               <h2>{isCustomer ? "Información general del cliente" : "Información general del proveedor"}</h2>
             </div>
-            <Link href={isCustomer ? "/categorias" : "/admin"} className="provider-text-link">
+            <Link href={isCustomer ? "/categorias" : "/admin"} className={styles.providerTextLink}>
               {isCustomer ? "Ir al catálogo" : "Ir al catálogo"}
             </Link>
           </div>
 
-          <div className="provider-company-grid">
+          <div className={styles.providerCompanyGrid}>
             {companyCards.map((item) => (
-              <article key={item.label} className="provider-info-block">
+              <article key={item.label} className={styles.providerInfoBlock}>
                 <span>{item.label}</span>
                 <strong>{item.value}</strong>
               </article>

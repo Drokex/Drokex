@@ -4,6 +4,7 @@ import SiteHeader from "@/app/components/site-header";
 import ProveedorProPage from "@/app/proveedor-pro/page";
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
+import authStyles from "@/app/components/auth-account.module.css";
 
 export default async function StorePage() {
   const user = await getCurrentUser();
@@ -12,7 +13,7 @@ export default async function StorePage() {
     return (
       <main className="commerce-page">
         <SiteHeader />
-        <section className="shell account-shell">
+        <section className={`shell ${authStyles.accountShell}`}>
           <div className="empty-state">
             <h1>No has iniciado sesión.</h1>
             <p>Entra con tu cuenta para activar o editar tu tienda Proveedor Pro.</p>

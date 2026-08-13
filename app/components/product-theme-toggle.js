@@ -1,23 +1,24 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import styles from "@/app/producto/[slug]/page.module.css";
 
 export default function ProductThemeToggle() {
   const [light, setLight] = useState(true);
   const pageRef = useRef(null);
 
   useEffect(() => {
-    const page = document.querySelector(".pd-page");
+    const page = document.querySelector(`.${styles.pdPage}`);
     pageRef.current = page;
     const shouldUseLight = localStorage.getItem("pd-theme") !== "dark";
     setLight(shouldUseLight);
-    page?.classList.toggle("pd-light", shouldUseLight);
+    page?.classList.toggle(styles.pdLight, shouldUseLight);
   }, []);
 
   function toggle() {
     const next = !light;
     setLight(next);
-    pageRef.current?.classList.toggle("pd-light", next);
+    pageRef.current?.classList.toggle(styles.pdLight, next);
     localStorage.setItem("pd-theme", next ? "light" : "dark");
   }
 

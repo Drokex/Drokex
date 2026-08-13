@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useCallback } from "react";
+import styles from "@/app/categorias/page.module.css";
 
 const CATEGORY_META = {
   "Automatizacion industrial": { count: 127, icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M22 12a10 10 0 0 1-10 10A10 10 0 0 1 2 12"/></svg> },
@@ -61,72 +62,72 @@ export default function CatalogSidebar() {
   const hasFilters = selectedCategories.length > 0 || selectedAvailability.length > 0 || selectedOrigin.length > 0;
 
   return (
-    <aside className="cdk-sidebar">
-      <div className="cdk-sidebar-header">
+    <aside className={styles.cdkSidebar}>
+      <div className={styles.cdkSidebarHeader}>
         <div>
-          <p className="cdk-sidebar-kicker">FILTRAR POR</p>
-          <p className="cdk-sidebar-desc">Refina por categoría, disponibilidad y accede rápido al panel comercial.</p>
+          <p className={styles.cdkSidebarKicker}>FILTRAR POR</p>
+          <p className={styles.cdkSidebarDesc}>Refina por categoría, disponibilidad y accede rápido al panel comercial.</p>
         </div>
-        <button className="cdk-filter-btn" aria-label="Filtros">
+        <button className={styles.cdkFilterBtn} aria-label="Filtros">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
           </svg>
         </button>
       </div>
 
-      <div className="cdk-sidebar-section">
-        <p className="cdk-section-label">CATEGORÍAS</p>
+      <div className={styles.cdkSidebarSection}>
+        <p className={styles.cdkSectionLabel}>CATEGORÍAS</p>
         {CATEGORIES.map((cat) => {
           const meta = CATEGORY_META[cat];
           const active = selectedCategories.includes(cat);
           return (
-            <label key={cat} className={`cdk-filter-row${active ? " is-active" : ""}`} onClick={() => toggle("categoria", cat)} style={{ cursor: "pointer" }}>
-              <span className="cdk-filter-icon">{meta.icon}</span>
-              <span className="cdk-filter-name">{cat}</span>
-              <span className="cdk-filter-count">{meta.count}</span>
+            <label key={cat} className={`${styles.cdkFilterRow}${active ? ` ${styles.isActive}` : ""}`} onClick={() => toggle("categoria", cat)} style={{ cursor: "pointer" }}>
+              <span className={styles.cdkFilterIcon}>{meta.icon}</span>
+              <span className={styles.cdkFilterName}>{cat}</span>
+              <span className={styles.cdkFilterCount}>{meta.count}</span>
             </label>
           );
         })}
-        <button className="cdk-show-more">
+        <button className={styles.cdkShowMore}>
           Ver todas las categorías
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
 
-      <div className="cdk-sidebar-section">
-        <p className="cdk-section-label">DISPONIBILIDAD</p>
+      <div className={styles.cdkSidebarSection}>
+        <p className={styles.cdkSectionLabel}>DISPONIBILIDAD</p>
         {AVAILABILITIES.map((opt) => {
           const meta = AVAILABILITY_META[opt];
           const active = selectedAvailability.includes(opt);
           return (
-            <label key={opt} className={`cdk-filter-row${active ? " is-active" : ""}`} onClick={() => toggle("disponibilidad", opt)} style={{ cursor: "pointer" }}>
-              <span className="cdk-filter-icon">{meta.icon}</span>
-              <span className="cdk-filter-name">{opt}</span>
-              <span className="cdk-filter-count">{meta.count}</span>
+            <label key={opt} className={`${styles.cdkFilterRow}${active ? ` ${styles.isActive}` : ""}`} onClick={() => toggle("disponibilidad", opt)} style={{ cursor: "pointer" }}>
+              <span className={styles.cdkFilterIcon}>{meta.icon}</span>
+              <span className={styles.cdkFilterName}>{opt}</span>
+              <span className={styles.cdkFilterCount}>{meta.count}</span>
             </label>
           );
         })}
       </div>
 
-      <div className="cdk-sidebar-section">
-        <p className="cdk-section-label">ORIGEN</p>
+      <div className={styles.cdkSidebarSection}>
+        <p className={styles.cdkSectionLabel}>ORIGEN</p>
         {ORIGIN_DATA.map((c) => {
           const active = selectedOrigin.includes(c.name);
           return (
-            <label key={c.name} className={`cdk-filter-row${active ? " is-active" : ""}`} onClick={() => toggle("origen", c.name)} style={{ cursor: "pointer" }}>
-              <span className="cdk-filter-flag">{c.flag}</span>
-              <span className="cdk-filter-name">{c.name}</span>
-              <span className="cdk-filter-count">{c.count}</span>
+            <label key={c.name} className={`${styles.cdkFilterRow}${active ? ` ${styles.isActive}` : ""}`} onClick={() => toggle("origen", c.name)} style={{ cursor: "pointer" }}>
+              <span className={styles.cdkFilterFlag}>{c.flag}</span>
+              <span className={styles.cdkFilterName}>{c.name}</span>
+              <span className={styles.cdkFilterCount}>{c.count}</span>
             </label>
           );
         })}
-        <button className="cdk-show-more">
+        <button className={styles.cdkShowMore}>
           Ver más países
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
 
-      <button className="cdk-clear-btn" onClick={clearAll} disabled={!hasFilters}>
+      <button className={styles.cdkClearBtn} onClick={clearAll} disabled={!hasFilters}>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/>
         </svg>

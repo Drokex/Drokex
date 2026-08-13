@@ -1,6 +1,8 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentUser } from "@/lib/current-user";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
+import authStyles from "@/app/components/auth-account.module.css";
 
 export default async function ProductosPage() {
   const user = await getCurrentUser();
@@ -8,7 +10,7 @@ export default async function ProductosPage() {
   if (!user) {
     return (
       <main className="commerce-page">
-        <section className="shell account-shell">
+        <section className={`shell ${authStyles.accountShell}`}>
           <div className="empty-state">
             <h1>No has iniciado sesión.</h1>
             <a href="/login" className="green-link">Ir a iniciar sesión</a>
@@ -19,16 +21,16 @@ export default async function ProductosPage() {
   }
 
   return (
-    <main className="provider-dashboard-page">
+    <main className={styles.providerDashboardPage}>
       <SiteHeader />
-      <section className="shell provider-clean-shell provider-subpage-stack">
-        <Link href="/mi-cuenta" className="provider-text-link provider-subpage-back">
+      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+        <Link href="/mi-cuenta" className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>
 
-        <div className="provider-section-heading provider-section-heading-stack">
+        <div className={`${styles.providerSectionHeading} ${styles.providerSectionHeadingStack}`}>
           <div>
-            <p className="provider-section-kicker">Mis productos</p>
+            <p className={styles.providerSectionKicker}>Mis productos</p>
             <h2>Gestión de catálogo</h2>
           </div>
         </div>

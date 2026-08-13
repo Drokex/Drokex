@@ -2,6 +2,8 @@ import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
 import { getOrdersForUser } from "@/lib/orders";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
+import authStyles from "@/app/components/auth-account.module.css";
 
 const providerOrders = [
   {
@@ -31,7 +33,7 @@ export default async function ProviderOrdersPage() {
   if (!user) {
     return (
       <main className="commerce-page">
-        <section className="shell account-shell">
+        <section className={`shell ${authStyles.accountShell}`}>
           <div className="empty-state">
             <h1>No has iniciado sesión.</h1>
             <p>Entra con tu cuenta para revisar tus pedidos.</p>
@@ -56,31 +58,31 @@ export default async function ProviderOrdersPage() {
     : providerOrders;
 
   return (
-    <main className={isCustomer ? "provider-dashboard-page is-customer" : "provider-dashboard-page"}>
+    <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
       <SiteHeader />
 
-      <section className="shell provider-clean-shell provider-subpage-stack">
-        <Link href={isCustomer ? "/mi-cuenta?role=cliente" : "/mi-cuenta?role=proveedor"} className="provider-text-link provider-subpage-back">
+      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+        <Link href={isCustomer ? "/mi-cuenta?role=cliente" : "/mi-cuenta?role=proveedor"} className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>
 
-        <section className="provider-content-card">
-          <div className="provider-section-heading">
+        <section className={styles.providerContentCard}>
+          <div className={styles.providerSectionHeading}>
             <div>
-              <p className="provider-section-kicker">Pedidos</p>
+              <p className={styles.providerSectionKicker}>Pedidos</p>
               <h2>{isCustomer ? "Estado de solicitudes y pedidos" : "Estado de pedidos recientes"}</h2>
             </div>
           </div>
 
-          <div className="provider-order-list">
+          <div className={styles.providerOrderList}>
             {orders.map((order) => (
-              <article key={order.id} className="provider-order-row">
+              <article key={order.id} className={styles.providerOrderRow}>
                 <div>
                   <strong>{order.id}</strong>
                   <p>{isCustomer ? `${order.totalItems} productos · ${order.carrier || "Sin transportadora"}` : order.customer}</p>
                 </div>
-                <span className="provider-order-amount">{isCustomer ? order.subtotalLabel : order.amount}</span>
-                <span className="provider-badge is-blue">{isCustomer ? order.statusLabel : order.status}</span>
+                <span className={styles.providerOrderAmount}>{isCustomer ? order.subtotalLabel : order.amount}</span>
+                <span className={`${styles.providerBadge} ${styles.isBlue}`}>{isCustomer ? order.statusLabel : order.status}</span>
               </article>
             ))}
           </div>

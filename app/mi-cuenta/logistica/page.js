@@ -1,6 +1,8 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
+import authStyles from "@/app/components/auth-account.module.css";
 
 const logisticsRows = [
   {
@@ -28,7 +30,7 @@ export default async function LogisticsPage() {
   if (!user) {
     return (
       <main className="commerce-page">
-        <section className="shell account-shell">
+        <section className={`shell ${authStyles.accountShell}`}>
           <div className="empty-state">
             <h1>No has iniciado sesión.</h1>
             <p>Entra con tu cuenta para revisar tu logística.</p>
@@ -47,31 +49,31 @@ export default async function LogisticsPage() {
     session?.audience === "cliente";
 
   return (
-    <main className={isCustomer ? "provider-dashboard-page is-customer" : "provider-dashboard-page"}>
+    <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
       <SiteHeader />
 
-      <section className="shell provider-clean-shell provider-subpage-stack">
-        <Link href="/mi-cuenta?role=proveedor" className="provider-text-link provider-subpage-back">
+      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+        <Link href="/mi-cuenta?role=proveedor" className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>
 
-        <section className="provider-content-card">
-          <div className="provider-section-heading">
+        <section className={styles.providerContentCard}>
+          <div className={styles.providerSectionHeading}>
             <div>
-              <p className="provider-section-kicker">Envíos / logística</p>
+              <p className={styles.providerSectionKicker}>Envíos / logística</p>
               <h2>Operación logística del proveedor</h2>
             </div>
           </div>
 
-          <div className="provider-order-list">
+          <div className={styles.providerOrderList}>
             {logisticsRows.map((item) => (
-              <article key={item.title} className="provider-order-row">
+              <article key={item.title} className={styles.providerOrderRow}>
                 <div>
                   <strong>{item.title}</strong>
                   <p>{item.detail}</p>
                 </div>
-                <span className="provider-order-amount">Activo</span>
-                <span className="provider-badge">OK</span>
+                <span className={styles.providerOrderAmount}>Activo</span>
+                <span className={styles.providerBadge}>OK</span>
               </article>
             ))}
           </div>

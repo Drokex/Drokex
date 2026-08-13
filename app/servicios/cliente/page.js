@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import styles from "../servicios-proveedor.module.css";
 
 const ORG = "#FF790F";
 const ORG_BG = "rgba(255,121,15,0.13)";
@@ -80,13 +81,13 @@ const faqs = [
 function Faq() {
   const [open, setOpen] = useState(null);
   return (
-    <div className="sp-faq-list">
+    <div className={styles.spFaqList}>
       {faqs.map((item, i) => (
-        <div key={i} className={open === i ? "sp-faq-item is-open" : "sp-faq-item"}>
-          <button className="sp-faq-question" onClick={() => setOpen(open === i ? null : i)}>
+        <div key={i} className={open === i ? `${styles.spFaqItem} ${styles.isOpen}` : styles.spFaqItem}>
+          <button className={styles.spFaqQuestion} onClick={() => setOpen(open === i ? null : i)}>
             {item.q}
           </button>
-          <div className="sp-faq-answer">{item.a}</div>
+          <div className={styles.spFaqAnswer}>{item.a}</div>
         </div>
       ))}
     </div>
@@ -108,23 +109,23 @@ export default function ClientePage() {
   }
 
   return (
-    <div className="sp-page sp-page--cliente">
+    <div className={`${styles.spPage} ${styles.spPageCliente}`}>
       <SiteHeader />
 
       {/* HERO */}
-      <section className="sp-hero">
-        <img src="/sp-hero-bga.jpg" alt="" className="sp-hero-bg" aria-hidden="true" />
+      <section className={styles.spHero}>
+        <img src="/sp-hero-bga.jpg" alt="" className={styles.spHeroBg} aria-hidden="true" />
         <div className="shell">
-          <div className="sp-hero-content">
-            <p className="sp-hero-tag" style={{ color: ORG }}>Clientes</p>
+          <div className={styles.spHeroContent}>
+            <p className={styles.spHeroTag} style={{ color: ORG }}>Clientes</p>
             <h1>
               Encuentra los proveedores que necesitas para tu <span style={{ color: ORG }}>negocio</span>
             </h1>
-            <p className="sp-hero-desc">
+            <p className={styles.spHeroDesc}>
               Explora catálogos verificados, contacta directamente y cierra tratos sin intermediarios.
               Con Cliente Pro, mensajes ilimitados sin restricciones.
             </p>
-            <Link href="/productos" className="sp-hero-cta" style={{ background: ORG, color: "#fff" }}>
+            <Link href="/productos" className={styles.spHeroCta} style={{ background: ORG, color: "#fff" }}>
               Explorar catálogos
             </Link>
           </div>
@@ -132,13 +133,13 @@ export default function ClientePage() {
       </section>
 
       {/* SERVICIOS */}
-      <section className="sp-services">
+      <section className={styles.spServices}>
         <div className="shell">
-          <p className="sp-services-tag" style={{ color: ORG }}>Para clientes</p>
+          <p className={styles.spServicesTag} style={{ color: ORG }}>Para clientes</p>
           <h2>Todo lo que necesitas para<br />encontrar tu proveedor ideal</h2>
-          <div className="sp-services-grid">
+          <div className={styles.spServicesGrid}>
             {services.map((s, i) => (
-              <div key={i} className="sp-service-card">
+              <div key={i} className={styles.spServiceCard}>
                 <img src={s.icon} alt={s.title} />
                 <h4>{s.title}</h4>
                 <p>{s.desc}</p>
@@ -167,21 +168,21 @@ export default function ClientePage() {
       </section>
 
       {/* COBERTURA */}
-      <section className="sp-coverage">
-        <div className="shell sp-coverage-grid">
+      <section className={styles.spCoverage}>
+        <div className={`shell ${styles.spCoverageGrid}`}>
           <div>
             <h2>Proveedores en los<br />países donde <span style={{ color: ORG }}>operas</span></h2>
-            <p className="sp-coverage-desc">
+            <p className={styles.spCoverageDesc}>
               Tenemos proveedores verificados en los principales mercados de Latinoamérica
               para que encuentres exactamente lo que necesitas.
             </p>
           </div>
-          <div className="sp-countries-grid">
+          <div className={styles.spCountriesGrid}>
             {countries.map((c, i) => (
-              <div key={i} className="sp-country-card">
-                <p className="flag-label">{c.flag} {c.label}</p>
-                <p className="activos">Proveedores</p>
-                <p className="count">{c.count}</p>
+              <div key={i} className={styles.spCountryCard}>
+                <p className={styles.flagLabel}>{c.flag} {c.label}</p>
+                <p className={styles.activos}>Proveedores</p>
+                <p className={styles.count}>{c.count}</p>
               </div>
             ))}
           </div>
@@ -189,16 +190,16 @@ export default function ClientePage() {
       </section>
 
       {/* PASOS */}
-      <section className="sp-steps">
+      <section className={styles.spSteps}>
         <div className="shell">
           <h2>Empieza a encontrar proveedores en <span style={{ color: ORG }}>5 pasos</span></h2>
-          <div className="sp-steps-showcase">
-            <aside className="sp-steps-intro">
+          <div className={styles.spStepsShowcase}>
+            <aside className={styles.spStepsIntro}>
               <p>
                 Busca, contacta y negocia con proveedores reales de toda LATAM — directo, sin intermediarios.
               </p>
-              <div className="sp-steps-intro-line" />
-              <div className="sp-steps-note">
+              <div className={styles.spStepsIntroLine} />
+              <div className={styles.spStepsNote}>
                 <span>+</span>
                 <div>
                   <strong>Rápido y sin complicaciones</strong>
@@ -207,30 +208,30 @@ export default function ClientePage() {
               </div>
             </aside>
 
-            <div className="sp-steps-carousel" aria-live="polite">
-              <button type="button" className="sp-steps-arrow" aria-label="Paso anterior" onClick={() => moveStep(-1)}>&lt;</button>
-              <div className="sp-step-cards">
+            <div className={styles.spStepsCarousel} aria-live="polite">
+              <button type="button" className={styles.spStepsArrow} aria-label="Paso anterior" onClick={() => moveStep(-1)}>&lt;</button>
+              <div className={styles.spStepCards}>
                 {visibleSteps.map((step) => (
                   <article
                     key={step.index}
-                    className={step.index === activeStep ? "sp-step-card is-active" : "sp-step-card"}
+                    className={step.index === activeStep ? `${styles.spStepCard} ${styles.isActive}` : styles.spStepCard}
                   >
-                    <span className="sp-step-badge" style={step.index === activeStep ? { background: ORG_BG, borderColor: ORG_BORDER, color: ORG } : {}}>{step.index + 1}</span>
+                    <span className={styles.spStepBadge} style={step.index === activeStep ? { background: ORG_BG, borderColor: ORG_BORDER, color: ORG } : {}}>{step.index + 1}</span>
                     <img src={step.icon} alt="" aria-hidden="true" />
                     <h3>{step.title}</h3>
                     <p>{step.desc}</p>
                   </article>
                 ))}
               </div>
-              <button type="button" className="sp-steps-arrow" aria-label="Paso siguiente" onClick={() => moveStep(1)}>&gt;</button>
+              <button type="button" className={styles.spStepsArrow} aria-label="Paso siguiente" onClick={() => moveStep(1)}>&gt;</button>
             </div>
 
-            <div className="sp-steps-progress" aria-label="Seleccionar paso">
+            <div className={styles.spStepsProgress} aria-label="Seleccionar paso">
               {steps.map((step, i) => (
                 <button
                   key={step.nav}
                   type="button"
-                  className={i === activeStep ? "is-active" : ""}
+                  className={i === activeStep ? styles.isActive : ""}
                   style={i === activeStep ? { color: ORG } : {}}
                   onClick={() => setActiveStep(i)}
                 >
@@ -244,8 +245,8 @@ export default function ClientePage() {
       </section>
 
       {/* BENEFICIOS */}
-      <section className="sp-benefits">
-        <div className="shell sp-benefits-grid">
+      <section className={styles.spBenefits}>
+        <div className={`shell ${styles.spBenefitsGrid}`}>
           <div>
             <h2>
               Más que un directorio,<br />
@@ -253,9 +254,9 @@ export default function ClientePage() {
               con <span style={{ color: ORG }}>proveedores reales</span>
             </h2>
           </div>
-          <div className="sp-benefits-cards">
+          <div className={styles.spBenefitsCards}>
             {benefits.map((b, i) => (
-              <div key={i} className="sp-benefit-card">
+              <div key={i} className={styles.spBenefitCard}>
                 <img src={b.icon} alt={b.title} />
                 <h4>{b.title}</h4>
                 <p>{b.desc}</p>
@@ -266,11 +267,11 @@ export default function ClientePage() {
       </section>
 
       {/* FAQ */}
-      <section className="sp-faq">
+      <section className={styles.spFaq}>
         <div className="shell">
           <h2>Resolvemos tus <span style={{ color: ORG }}>dudas</span> más comunes</h2>
-          <div className="sp-faq-grid">
-            <div className="sp-faq-image">
+          <div className={styles.spFaqGrid}>
+            <div className={styles.spFaqImage}>
               <img src="/sp-faq-image.png" alt="Soporte Drokex" />
             </div>
             <Faq />
@@ -279,9 +280,9 @@ export default function ClientePage() {
       </section>
 
       {/* CTA FINAL */}
-      <section className="sp-cta">
-        <img src="/banner venta final.jpg" alt="" className="sp-cta-bg" aria-hidden="true" />
-        <div className="sp-cta-content">
+      <section className={styles.spCta}>
+        <img src="/banner venta final.jpg" alt="" className={styles.spCtaBg} aria-hidden="true" />
+        <div className={styles.spCtaContent}>
           <h2>¿Listo para encontrar<br /><span style={{ color: ORG }}>tu proveedor ideal?</span></h2>
           <p>Explora catálogos verificados y empieza a negociar directo con proveedores reales en toda LATAM.</p>
           <Link href="/productos" style={{ background: ORG, color: "#fff" }}>Explorar catálogos</Link>

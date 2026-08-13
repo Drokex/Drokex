@@ -1,0 +1,220 @@
+/* ── Quotes dashboard ── */
+.qdLoading {
+  color: #9ca3af;
+  font-size: 1rem;
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.qdList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.qdCard {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: box-shadow 0.18s;
+}
+
+.qdCard:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.qdCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.qdProductInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.qdProductInfo strong {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.qdProductInfo span {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.qdStatus {
+  padding: 0.35rem 0.9rem;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tonePending { background: #fef9c3; color: #854d0e; }
+.toneQuoted { background: #dbeafe; color: #1d4ed8; }
+.toneAccepted { background: #7FE040; color: #2d8a1f; }
+.toneRejected { background: #fee2e2; color: #b91c1c; }
+
+.qdMessage {
+  font-size: 0.93rem;
+  color: #4b5563;
+  font-style: italic;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 3px solid #d1d5db;
+  line-height: 1.5;
+}
+
+.qdResponse {
+  background: #f0fdf4;
+  border: 1.5px solid #7FE040;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.qdResponsePrice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qdResponsePrice span {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.qdResponsePrice strong {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d8a1f;
+}
+
+.qdResponseNote {
+  font-size: 0.92rem;
+  color: #374151;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.qdResponseActions {
+  display: flex;
+  gap: 0.85rem;
+}
+
+.qdCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.25rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.qdDate {
+  color: #9ca3af;
+  font-size: 0.84rem;
+}
+
+.qdBtn {
+  padding: 0.6rem 1.25rem;
+  border-radius: 9px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.12s;
+}
+
+.qdBtn:hover { transform: translateY(-1px); }
+.qdBtn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.qdBtnAccept  { background: #7FE040; color: #1a1a1a; }
+.qdBtnAccept:hover  { background: #7FE040; }
+.qdBtnReject  { background: #fee2e2; color: #b91c1c; }
+.qdBtnReject:hover  { background: #fecaca; }
+.qdBtnReply   { background: #1a1a1a; color: #fff; }
+.qdBtnReply:hover   { background: #374151; }
+
+.qdRespondForm {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1.5px solid #e5e7eb;
+}
+
+.qdRespondRow {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .qdRespondRow { grid-template-columns: 1fr; }
+}
+
+.qdFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.qdFilterBtn {
+  padding: 0.45rem 1rem;
+  border-radius: 99px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #374151;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.qdFilterBtn:hover {
+  border-color: #2d8a1f;
+  color: #1a1a1a;
+}
+
+.qdFilterBtn.isActive {
+  background: #1a1a1a;
+  color: #fff;
+  border-color: #1a1a1a;
+}
+
+.qdNewBadge {
+  display: inline-block;
+  margin-left: 0.65rem;
+  padding: 0.2rem 0.7rem;
+  background: #7FE040;
+  color: #1a1a1a;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 99px;
+  cursor: pointer;
+  vertical-align: middle;
+  animation: pulse-badge 1.5s ease infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}

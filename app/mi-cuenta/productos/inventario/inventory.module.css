@@ -1,0 +1,112 @@
+.invTableWrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  margin-top: 1rem;
+}
+
+.invTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.invTable th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.invTable td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+
+.invTable tr:last-child td {
+  border-bottom: none;
+}
+
+.invProductName {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.invProductThumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.invProductName small {
+  display: block;
+  color: #9ca3af;
+  font-size: 0.78rem;
+}
+
+.invStockBadge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.invStockInStock { background: #7FE040; color: #2d8a1f; }
+.invStockLowStock { background: #fef9c3; color: #92400e; }
+.invStockOutOfStock { background: #fee2e2; color: #b91c1c; }
+
+.invActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.invBtn {
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.invBtnEdit {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.invBtnEdit:hover { background: #e5e7eb; }
+
+.invBtnDelete {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.invBtnDelete:hover { background: #fecaca; }
+.invBtnDelete:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.invCreateBtn {
+  padding: 0.55rem 1.25rem;
+  background: #7FE040;
+  color: #1a1a1a;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.invCreateBtn:hover { background: #7FE040; }
+

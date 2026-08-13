@@ -3,6 +3,8 @@
 import { useState } from "react";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import styles from "./page.module.css";
+import spStyles from "@/app/servicios/servicios-proveedor.module.css";
 
 const CATEGORIES = [
   {
@@ -59,13 +61,16 @@ const PQR_TYPES = ["Petición", "Queja", "Reclamo", "Sugerencia", "Otro"];
 function FaqAccordion() {
   const [open, setOpen] = useState(null);
   return (
-    <div className="sp-faq-list">
+    <div className={spStyles.spFaqList}>
       {FAQS.map((item, i) => (
-        <div key={i} className={open === i ? "sp-faq-item is-open" : "sp-faq-item"}>
-          <button className="sp-faq-question" onClick={() => setOpen(open === i ? null : i)}>
+        <div
+          key={i}
+          className={`${spStyles.spFaqItem} ${styles.ayudaFaqItem} ${open === i ? spStyles.isOpen : ""}`}
+        >
+          <button className={`${spStyles.spFaqQuestion} ${styles.ayudaFaqQuestion}`} onClick={() => setOpen(open === i ? null : i)}>
             {item.q}
           </button>
-          <div className="sp-faq-answer">{item.a}</div>
+          <div className={`${spStyles.spFaqAnswer} ${styles.ayudaFaqAnswer}`}>{item.a}</div>
         </div>
       ))}
     </div>
@@ -91,8 +96,8 @@ function PqrForm() {
 
   if (sent) {
     return (
-      <div className="ayuda-form-success">
-        <span className="ayuda-form-success-icon">✓</span>
+      <div className={styles.ayudaFormSuccess}>
+        <span className={styles.ayudaFormSuccessIcon}>✓</span>
         <h3>Recibimos tu mensaje</h3>
         <p>Te responderemos en un plazo de 24 a 48 horas hábiles al correo <strong>{form.email}</strong>.</p>
       </div>
@@ -100,29 +105,29 @@ function PqrForm() {
   }
 
   return (
-    <form className="ayuda-form" onSubmit={submit}>
-      <div className="ayuda-form-row">
-        <div className="ayuda-form-field">
+    <form className={styles.ayudaForm} onSubmit={submit}>
+      <div className={styles.ayudaFormRow}>
+        <div className={styles.ayudaFormField}>
           <label htmlFor="pqr-name">Nombre completo</label>
           <input id="pqr-name" name="name" type="text" placeholder="Tu nombre" required value={form.name} onChange={handle} />
         </div>
-        <div className="ayuda-form-field">
+        <div className={styles.ayudaFormField}>
           <label htmlFor="pqr-email">Correo electrónico</label>
           <input id="pqr-email" name="email" type="email" placeholder="correo@empresa.com" required value={form.email} onChange={handle} />
         </div>
       </div>
-      <div className="ayuda-form-field">
+      <div className={styles.ayudaFormField}>
         <label htmlFor="pqr-type">Tipo de solicitud</label>
         <select id="pqr-type" name="type" required value={form.type} onChange={handle}>
           <option value="">Selecciona una opción</option>
           {PQR_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
-      <div className="ayuda-form-field">
+      <div className={styles.ayudaFormField}>
         <label htmlFor="pqr-message">Describe tu caso</label>
         <textarea id="pqr-message" name="message" rows={5} placeholder="Cuéntanos con detalle qué necesitas o qué ocurrió..." required value={form.message} onChange={handle} />
       </div>
-      <button type="submit" className="ayuda-form-submit" disabled={loading}>
+      <button type="submit" className={styles.ayudaFormSubmit} disabled={loading}>
         {loading ? "Enviando..." : "Enviar solicitud"}
       </button>
     </form>
@@ -131,27 +136,27 @@ function PqrForm() {
 
 export default function AyudaPage() {
   return (
-    <div className="ayuda-page">
+    <div className={styles.ayudaPage}>
       <SiteHeader />
 
       {/* HERO */}
-      <section className="ayuda-hero">
+      <section className={styles.ayudaHero}>
         <div className="shell">
-          <p className="ayuda-hero-tag">Centro de ayuda</p>
+          <p className={styles.ayudaHeroTag}>Centro de ayuda</p>
           <h1>¿En qué podemos <span>ayudarte?</span></h1>
-          <p className="ayuda-hero-desc">
+          <p className={styles.ayudaHeroDesc}>
             Encuentra respuestas rápidas en nuestras preguntas frecuentes o envíanos una solicitud y te respondemos en 24–48 h.
           </p>
         </div>
       </section>
 
       {/* CATEGORÍAS */}
-      <section className="ayuda-categories">
+      <section className={styles.ayudaCategories}>
         <div className="shell">
-          <div className="ayuda-categories-grid">
+          <div className={styles.ayudaCategoriesGrid}>
             {CATEGORIES.map((cat) => (
-              <div key={cat.label} className="ayuda-cat-card">
-                <span className="ayuda-cat-icon">{cat.icon}</span>
+              <div key={cat.label} className={styles.ayudaCatCard}>
+                <span className={styles.ayudaCatIcon}>{cat.icon}</span>
                 <h3>{cat.label}</h3>
                 <ul>
                   {cat.topics.map((t) => <li key={t}>{t}</li>)}
@@ -163,7 +168,7 @@ export default function AyudaPage() {
       </section>
 
       {/* FAQ */}
-      <section className="ayuda-faq">
+      <section className={styles.ayudaFaq}>
         <div className="shell">
           <h2>Preguntas <span>frecuentes</span></h2>
           <FaqAccordion />

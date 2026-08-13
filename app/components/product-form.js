@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import styles from "./product-form.module.css";
 
 const CATEGORIES = [
   "Automatizacion industrial",
@@ -30,11 +31,11 @@ function ImageUploadBox({ label, value, onChange }) {
   }
 
   return (
-    <div className="pf-img-box" onClick={() => ref.current?.click()} title={label}>
+    <div className={styles.pfImgBox} onClick={() => ref.current?.click()} title={label}>
       {value ? (
-        <img src={value} alt={label} className="pf-img-preview" />
+        <img src={value} alt={label} className={styles.pfImgPreview} />
       ) : (
-        <span className="pf-img-placeholder">
+        <span className={styles.pfImgPlaceholder}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="24" height="24">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="17 8 12 3 7 8" />
@@ -126,123 +127,123 @@ export default function ProductForm({ initial = {}, productId = null }) {
   }
 
   return (
-    <form className="pf-form" onSubmit={handleSubmit}>
-      <div className="pf-section">
+    <form className={styles.pfForm} onSubmit={handleSubmit}>
+      <div className={styles.pfSection}>
         <h3>Imágenes</h3>
-        <div className="pf-images-row">
+        <div className={styles.pfImagesRow}>
           <div>
-            <p className="pf-label">Imagen principal</p>
+            <p className={styles.pfLabel}>Imagen principal</p>
             <ImageUploadBox
               label="Subir imagen"
               value={form.image}
               onChange={(v) => set("image", v)}
             />
           </div>
-          <div className="pf-gallery">
-            <p className="pf-label">Galería adicional</p>
-            <div className="pf-gallery-row">
+          <div className={styles.pfGallery}>
+            <p className={styles.pfLabel}>Galería adicional</p>
+            <div className={styles.pfGalleryRow}>
               {form.galleryImages.map((img, i) => (
-                <div key={i} className="pf-gallery-slot">
+                <div key={i} className={styles.pfGallerySlot}>
                   <ImageUploadBox
                     label={`Foto ${i + 1}`}
                     value={img}
                     onChange={(v) => setGallery(i, v)}
                   />
-                  <button type="button" className="pf-gallery-remove" onClick={() => removeGallery(i)}>×</button>
+                  <button type="button" className={styles.pfGalleryRemove} onClick={() => removeGallery(i)}>×</button>
                 </div>
               ))}
               {form.galleryImages.length < 5 && (
-                <button type="button" className="pf-gallery-add" onClick={addGallerySlot}>+ Foto</button>
+                <button type="button" className={styles.pfGalleryAdd} onClick={addGallerySlot}>+ Foto</button>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="pf-section">
+      <div className={styles.pfSection}>
         <h3>Información básica</h3>
-        <div className="pf-grid-2">
-          <div className="pf-field">
+        <div className={styles.pfGrid2}>
+          <div className={styles.pfField}>
             <label>Nombre del producto *</label>
             <input value={form.name} onChange={(e) => set("name", e.target.value)} required placeholder="Ej. Módulo IoT Trazabilidad" />
           </div>
-          <div className="pf-field">
+          <div className={styles.pfField}>
             <label>SKU</label>
             <input value={form.sku} onChange={(e) => set("sku", e.target.value)} placeholder="Ej. DRK-001" />
           </div>
-          <div className="pf-field">
+          <div className={styles.pfField}>
             <label>Categoría</label>
             <select value={form.category} onChange={(e) => set("category", e.target.value)}>
               {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <div className="pf-field">
+          <div className={styles.pfField}>
             <label>Disponibilidad</label>
             <select value={form.availability} onChange={(e) => set("availability", e.target.value)}>
               {AVAILABILITY.map((a) => <option key={a} value={a}>{a}</option>)}
             </select>
           </div>
-          <div className="pf-field">
+          <div className={styles.pfField}>
             <label>Proveedor / Empresa</label>
             <input value={form.supplier} onChange={(e) => set("supplier", e.target.value)} placeholder="Ej. Nova Tracking Labs" />
           </div>
-          <div className="pf-field">
+          <div className={styles.pfField}>
             <label>País de origen</label>
             <input value={form.originCountry} onChange={(e) => set("originCountry", e.target.value)} placeholder="Colombia" />
           </div>
         </div>
       </div>
 
-      <div className="pf-section">
+      <div className={styles.pfSection}>
         <h3>Precio e inventario</h3>
-        <div className="pf-grid-3">
-          <div className="pf-field">
+        <div className={styles.pfGrid3}>
+          <div className={styles.pfField}>
             <label>Precio (USD cents) *</label>
             <input type="number" min="0" value={form.priceValue} onChange={(e) => set("priceValue", e.target.value)} required placeholder="150000" />
           </div>
-          <div className="pf-field">
+          <div className={styles.pfField}>
             <label>Stock disponible</label>
             <input type="number" min="0" value={form.stock} onChange={(e) => set("stock", e.target.value)} placeholder="0" />
           </div>
-          <div className="pf-field">
+          <div className={styles.pfField}>
             <label>Stock mínimo</label>
             <input type="number" min="0" value={form.minimumStock} onChange={(e) => set("minimumStock", e.target.value)} placeholder="3" />
           </div>
         </div>
       </div>
 
-      <div className="pf-section">
+      <div className={styles.pfSection}>
         <h3>Descripción</h3>
-        <div className="pf-field">
+        <div className={styles.pfField}>
           <label>Descripción corta *</label>
           <input value={form.shortDescription} onChange={(e) => set("shortDescription", e.target.value)} required placeholder="Una línea que resume el producto" />
         </div>
-        <div className="pf-field">
+        <div className={styles.pfField}>
           <label>Descripción completa</label>
           <textarea rows={5} value={form.description} onChange={(e) => set("description", e.target.value)} placeholder="Detalle técnico, usos, ventajas..." />
         </div>
-        <div className="pf-field">
+        <div className={styles.pfField}>
           <label>Aplicación / Uso principal</label>
           <input value={form.application} onChange={(e) => set("application", e.target.value)} placeholder="Ej. Monitoreo de cadena de frío" />
         </div>
       </div>
 
-      <div className="pf-section pf-section-row">
-        <label className="pf-toggle">
+      <div className={`${styles.pfSection} ${styles.pfSectionRow}`}>
+        <label className={styles.pfToggle}>
           <input type="checkbox" checked={form.featured} onChange={(e) => set("featured", e.target.checked)} />
           <span>Producto destacado</span>
         </label>
-        <label className="pf-toggle">
+        <label className={styles.pfToggle}>
           <input type="checkbox" checked={form.active} onChange={(e) => set("active", e.target.checked)} />
           <span>Producto activo</span>
         </label>
       </div>
 
-      {error && <p className="pf-error">{error}</p>}
+      {error && <p className={styles.pfError}>{error}</p>}
 
-      <div className="pf-footer">
-        <a href="/mi-cuenta/productos/inventario" className="pf-cancel">Cancelar</a>
-        <button type="submit" className="pf-submit" disabled={saving}>
+      <div className={styles.pfFooter}>
+        <a href="/mi-cuenta/productos/inventario" className={styles.pfCancel}>Cancelar</a>
+        <button type="submit" className={styles.pfSubmit} disabled={saving}>
           {saving ? "Guardando..." : productId ? "Guardar cambios" : "Crear producto"}
         </button>
       </div>

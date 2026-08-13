@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import styles from "../servicios-proveedor.module.css";
 
 const services = [
   { icon: "/sp-icon-productos.png",  title: "Catálogo digital",           desc: "Sube tus productos con fotos y descripción. Tu catálogo queda visible para compradores en toda LATAM." },
@@ -91,13 +92,13 @@ const faqs = [
 function Faq() {
   const [open, setOpen] = useState(null);
   return (
-    <div className="sp-faq-list">
+    <div className={styles.spFaqList}>
       {faqs.map((item, i) => (
-        <div key={i} className={open === i ? "sp-faq-item is-open" : "sp-faq-item"}>
-          <button className="sp-faq-question" onClick={() => setOpen(open === i ? null : i)}>
+        <div key={i} className={open === i ? `${styles.spFaqItem} ${styles.isOpen}` : styles.spFaqItem}>
+          <button className={styles.spFaqQuestion} onClick={() => setOpen(open === i ? null : i)}>
             {item.q}
           </button>
-          <div className="sp-faq-answer">{item.a}</div>
+          <div className={styles.spFaqAnswer}>{item.a}</div>
         </div>
       ))}
     </div>
@@ -116,23 +117,23 @@ export default function ProveedorPage() {
   };
 
   return (
-    <div className="sp-page">
+    <div className={styles.spPage}>
       <SiteHeader />
 
       {/* HERO */}
-      <section className="sp-hero">
-        <img src="/sp-hero-bga.jpg" alt="" className="sp-hero-bg" aria-hidden="true" />
+      <section className={styles.spHero}>
+        <img src="/sp-hero-bga.jpg" alt="" className={styles.spHeroBg} aria-hidden="true" />
         <div className="shell">
-        <div className="sp-hero-content">
-          <p className="sp-hero-tag">Proveedores</p>
+        <div className={styles.spHeroContent}>
+          <p className={styles.spHeroTag}>Proveedores</p>
           <h1>
             Convierte tus productos en un negocio <span>internacional</span>
           </h1>
-          <p className="sp-hero-desc">
+          <p className={styles.spHeroDesc}>
             Sube tu catálogo, recibe mensajes de compradores reales y cierra negocios directo —
             sin intermediarios, sin logística de nuestra parte.
           </p>
-          <Link href="/registro" className="sp-hero-cta">
+          <Link href="/registro" className={styles.spHeroCta}>
             Empezar como proveedor
           </Link>
         </div>
@@ -140,13 +141,13 @@ export default function ProveedorPage() {
       </section>
 
       {/* SERVICIOS */}
-      <section className="sp-services">
+      <section className={styles.spServices}>
         <div className="shell">
-          <p className="sp-services-tag">Servicios</p>
+          <p className={styles.spServicesTag}>Servicios</p>
           <h2>Todo lo que necesitas <br />para vender sin límites</h2>
-          <div className="sp-services-grid">
+          <div className={styles.spServicesGrid}>
             {services.map((s, i) => (
-              <div key={i} className="sp-service-card">
+              <div key={i} className={styles.spServiceCard}>
                 <img src={s.icon} alt={s.title} />
                 <h4>{s.title}</h4>
                 <p>{s.desc}</p>
@@ -157,21 +158,21 @@ export default function ProveedorPage() {
       </section>
 
       {/* COBERTURA */}
-      <section className="sp-coverage">
-        <div className="shell sp-coverage-grid">
+      <section className={styles.spCoverage}>
+        <div className={`shell ${styles.spCoverageGrid}`}>
           <div>
             <h2>Llegamos a donde<br />están tus <span>clientes</span></h2>
-            <p className="sp-coverage-desc">
+            <p className={styles.spCoverageDesc}>
               Tenemos presencia en los principales países de Latinoamérica
               para que tus productos lleguen más lejos.
             </p>
           </div>
-          <div className="sp-countries-grid">
+          <div className={styles.spCountriesGrid}>
             {countries.map((c, i) => (
-              <div key={i} className="sp-country-card">
-                <p className="flag-label">{c.flag} {c.label}</p>
-                <p className="activos">Activos</p>
-                <p className="count">{c.count}</p>
+              <div key={i} className={styles.spCountryCard}>
+                <p className={styles.flagLabel}>{c.flag} {c.label}</p>
+                <p className={styles.activos}>Activos</p>
+                <p className={styles.count}>{c.count}</p>
               </div>
             ))}
           </div>
@@ -179,17 +180,17 @@ export default function ProveedorPage() {
       </section>
 
       {/* PASOS */}
-      <section className="sp-steps">
+      <section className={styles.spSteps}>
         <div className="shell">
           <h2>Empieza a vender en <span>8 simples pasos</span></h2>
-          <div className="sp-steps-showcase">
-            <aside className="sp-steps-intro">
+          <div className={styles.spStepsShowcase}>
+            <aside className={styles.spStepsIntro}>
               <p>
                 Creamos el puente entre tu tienda y tus clientes. Nosotros nos encargamos del
                 resto.
               </p>
-              <div className="sp-steps-intro-line" />
-              <div className="sp-steps-note">
+              <div className={styles.spStepsIntroLine} />
+              <div className={styles.spStepsNote}>
                 <span>+</span>
                 <div>
                   <strong>Fácil, rápido y sin complicaciones</strong>
@@ -198,22 +199,22 @@ export default function ProveedorPage() {
               </div>
             </aside>
 
-            <div className="sp-steps-carousel" aria-live="polite">
+            <div className={styles.spStepsCarousel} aria-live="polite">
               <button
                 type="button"
-                className="sp-steps-arrow"
+                className={styles.spStepsArrow}
                 aria-label="Paso anterior"
                 onClick={() => moveStep(-1)}
               >
                 &lt;
               </button>
-              <div className="sp-step-cards">
+              <div className={styles.spStepCards}>
                 {visibleSteps.map((step) => (
                   <article
                     key={step.index}
-                    className={step.index === activeStep ? "sp-step-card is-active" : "sp-step-card"}
+                    className={step.index === activeStep ? `${styles.spStepCard} ${styles.isActive}` : styles.spStepCard}
                   >
-                    <span className="sp-step-badge">{step.index + 1}</span>
+                    <span className={styles.spStepBadge}>{step.index + 1}</span>
                     <img src={step.icon} alt="" aria-hidden="true" />
                     <h3>{step.title}</h3>
                     <p>{step.desc}</p>
@@ -222,7 +223,7 @@ export default function ProveedorPage() {
               </div>
               <button
                 type="button"
-                className="sp-steps-arrow"
+                className={styles.spStepsArrow}
                 aria-label="Paso siguiente"
                 onClick={() => moveStep(1)}
               >
@@ -230,12 +231,12 @@ export default function ProveedorPage() {
               </button>
             </div>
 
-            <div className="sp-steps-progress" aria-label="Seleccionar paso">
+            <div className={styles.spStepsProgress} aria-label="Seleccionar paso">
               {steps.map((step, i) => (
                 <button
                   key={step.nav}
                   type="button"
-                  className={i === activeStep ? "is-active" : ""}
+                  className={i === activeStep ? styles.isActive : ""}
                   onClick={() => setActiveStep(i)}
                 >
                   <span>{i + 1}</span>
@@ -248,8 +249,8 @@ export default function ProveedorPage() {
       </section>
 
       {/* BENEFICIOS */}
-      <section className="sp-benefits">
-        <div className="shell sp-benefits-grid">
+      <section className={styles.spBenefits}>
+        <div className={`shell ${styles.spBenefitsGrid}`}>
           <div>
             <h2>
               Más que una plataforma<br />
@@ -257,9 +258,9 @@ export default function ProveedorPage() {
               de <span>crecimiento</span>
             </h2>
           </div>
-          <div className="sp-benefits-cards">
+          <div className={styles.spBenefitsCards}>
             {benefits.map((b, i) => (
-              <div key={i} className="sp-benefit-card">
+              <div key={i} className={styles.spBenefitCard}>
                 <img src={b.icon} alt={b.title} />
                 <h4>{b.title}</h4>
                 <p>{b.desc}</p>
@@ -270,13 +271,13 @@ export default function ProveedorPage() {
       </section>
 
       {/* ALIADOS LOGÍSTICOS */}
-      <section className="sp-partners">
+      <section className={styles.spPartners}>
         <div className="shell">
           <h2>Trabajamos con los mejores para entregar <span>siempre</span></h2>
-          <div className="sp-partners-marquee" aria-label="Aliados Drokex">
-            <div className="sp-partners-track">
+          <div className={styles.spPartnersMarquee} aria-label="Aliados Drokex">
+            <div className={styles.spPartnersTrack}>
               {[...partnerLogos, ...partnerLogos].map((logo, i) => (
-                <div key={`${logo.src}-${i}`} className="sp-partner-logo">
+                <div key={`${logo.src}-${i}`} className={styles.spPartnerLogo}>
                   <img src={logo.src} alt={logo.alt} />
                 </div>
               ))}
@@ -286,11 +287,11 @@ export default function ProveedorPage() {
       </section>
 
       {/* FAQ */}
-      <section className="sp-faq">
+      <section className={styles.spFaq}>
         <div className="shell">
           <h2>Resolvemos tus <span>dudas</span> más comunes</h2>
-          <div className="sp-faq-grid">
-            <div className="sp-faq-image">
+          <div className={styles.spFaqGrid}>
+            <div className={styles.spFaqImage}>
               <img src="/sp-faq-image.png" alt="Soporte Drokex" />
             </div>
             <Faq />
@@ -299,9 +300,9 @@ export default function ProveedorPage() {
       </section>
 
       {/* CTA FINAL */}
-      <section className="sp-cta">
-        <img src="/banner venta final.jpg" alt="" className="sp-cta-bg" aria-hidden="true" />
-        <div className="sp-cta-content">
+      <section className={styles.spCta}>
+        <img src="/banner venta final.jpg" alt="" className={styles.spCtaBg} aria-hidden="true" />
+        <div className={styles.spCtaContent}>
           <h2>¿Listo para llevar tus productos<br /><span>al siguiente nivel?</span></h2>
           <p>Únete a cientos de proveedores que ya están vendiendo en toda Latinoamérica con Drokex.</p>
           <Link href="/registro">Empezar como proveedor</Link>

@@ -8,6 +8,7 @@ import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import HeroDistortion from "@/app/components/hero-distortion";
 import AmericasMap from "@/app/components/americas-map";
+import styles from "./page.module.css";
 
 const mapStats = [
   { icon: "/about-icon-providers.png", value: 1000, prefix: "+", suffix: "", label: "Proveedores activos" },
@@ -82,7 +83,7 @@ function AnimatedStat({ stat }) {
   return (
     <motion.article
       ref={ref}
-      className="about-map-stat"
+      className={styles.aboutMapStat}
       initial={{ opacity: 0, y: 30, scale: 0.9 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, amount: 0.5 }}
@@ -93,7 +94,7 @@ function AnimatedStat({ stat }) {
         animate={{ y: [0, -5, 0] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       >
-        <Image src={stat.icon} alt="" width={72} height={72} className="about-stat-icon" />
+        <Image src={stat.icon} alt="" width={72} height={72} className={styles.aboutStatIcon} />
       </motion.div>
       <strong ref={spanRef}>{stat.prefix}0{stat.suffix}</strong>
       <span>{stat.label}</span>
@@ -105,7 +106,7 @@ export default function AboutPage() {
   const [selectedPerson, setSelectedPerson] = useState(null);
 
   return (
-    <main className="about-page">
+    <main className={styles.aboutPage}>
 
       {/* POPUP */}
       {selectedPerson && (
@@ -132,15 +133,15 @@ export default function AboutPage() {
       <SiteHeader />
 
       {/* HERO */}
-      <section className="about-hero">
-        <Image src="/about-map-banner-world.png" alt="Mapa de expansión Drokex en el mundo" fill priority sizes="100vw" className="about-hero-image" />
-        <div className="about-hero-shade" />
-        <div className="about-hero-scanlines" />
-        <div className="about-hero-grid" />
+      <section className={styles.aboutHero}>
+        <Image src="/about-map-banner-world.png" alt="Mapa de expansión Drokex en el mundo" fill priority sizes="100vw" className={styles.aboutHeroImage} />
+        <div className={styles.aboutHeroShade} />
+        <div className={styles.aboutHeroScanlines} />
+        <div className={styles.aboutHeroGrid} />
 
-        <div className="shell about-hero-content">
+        <div className={`shell ${styles.aboutHeroContent}`}>
           <motion.p
-            className="about-eyebrow"
+            className={styles.aboutEyebrow}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -157,7 +158,7 @@ export default function AboutPage() {
           </motion.h1>
 
           <motion.p
-            className="about-hero-copy"
+            className={styles.aboutHeroCopy}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.55 }}
@@ -165,7 +166,7 @@ export default function AboutPage() {
             Drokex está diseñado específicamente para empresas latinoamericanas que buscan crecer internacionalmente.
           </motion.p>
 
-          <div className="about-map-stats">
+          <div className={styles.aboutMapStats}>
             {mapStats.map((stat, i) => (
               <AnimatedStat key={stat.label} stat={stat} />
             ))}
@@ -174,18 +175,18 @@ export default function AboutPage() {
       </section>
 
       {/* PILLARS */}
-      <section className="about-section about-pillars-section">
+      <section className={`${styles.aboutSection} ${styles.aboutPillarsSection}`}>
         <div className="shell">
-          <motion.div className="about-section-heading" {...fadeUp(0)}>
+          <motion.div className={styles.aboutSectionHeading} {...fadeUp(0)}>
             <h2>Impulsamos el comercio <span>sin fronteras</span></h2>
             <p>En Drokex conectamos empresas, logística y tecnología para transformar la forma en que los negocios crecen en Latinoamérica.</p>
           </motion.div>
 
-          <div className="about-pillars">
+          <div className={styles.aboutPillars}>
             {pillars.map((pillar, i) => (
               <motion.article
                 key={pillar.title}
-                className="about-pillar-card"
+                className={styles.aboutPillarCard}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
@@ -209,19 +210,19 @@ export default function AboutPage() {
       </section>
 
       {/* TEAM */}
-      <section className="about-team-section">
-        <div className="shell about-team-grid">
-          <motion.div className="about-team-copy" {...fadeLeft(0)}>
+      <section className={styles.aboutTeamSection}>
+        <div className={`shell ${styles.aboutTeamGrid}`}>
+          <motion.div className={styles.aboutTeamCopy} {...fadeLeft(0)}>
             <h2>Nuestro <span>Equipo</span></h2>
             <p>Un grupo de personas apasionadas por transformar el comercio entre empresas de la región.</p>
-            <Link href="/registro" className="about-small-link">Conoce más sobre nosotros</Link>
+            <Link href="/registro" className={styles.aboutSmallLink}>Conoce más sobre nosotros</Link>
           </motion.div>
 
-          <div className="about-team-list">
+          <div className={styles.aboutTeamList}>
             {team.map((person, i) => (
               <motion.article
                 key={person.name}
-                className="about-team-card"
+                className={styles.aboutTeamCard}
                 onClick={() => setSelectedPerson(person)}
                 style={{ cursor: "pointer" }}
                 initial={{ opacity: 0, y: 50 }}
@@ -246,18 +247,18 @@ export default function AboutPage() {
       </section>
 
       {/* VALUES */}
-      <section className="about-section about-values-section">
+      <section className={`${styles.aboutSection} ${styles.aboutValuesSection}`}>
         <div className="shell">
-          <motion.div className="about-section-heading" {...fadeUp(0)}>
+          <motion.div className={styles.aboutSectionHeading} {...fadeUp(0)}>
             <h2>Nuestros <span>valores</span></h2>
             <p>Cada acción en Drokex está diseñada para generar confianza, eficiencia y crecimiento real para nuestros usuarios.</p>
           </motion.div>
 
-          <div className="about-values">
+          <div className={styles.aboutValues}>
             {values.map((value, i) => (
               <motion.article
                 key={value.title}
-                className="about-value-card"
+                className={styles.aboutValueCard}
                 initial={{ opacity: 0, scale: 0.85 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true, amount: 0.2 }}
@@ -280,24 +281,24 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="about-cta-banner">
-        <Image src="/about-sale-banner.jpg" alt="" fill sizes="100vw" className="about-cta-image" />
-        <div className="about-cta-overlay" />
-        <div className="shell about-cta-content">
+      <section className={styles.aboutCtaBanner}>
+        <Image src="/about-sale-banner.jpg" alt="" fill sizes="100vw" className={styles.aboutCtaImage} />
+        <div className={styles.aboutCtaOverlay} />
+        <div className={`shell ${styles.aboutCtaContent}`}>
           <motion.div {...fadeLeft(0.1)}>
-            <p className="about-eyebrow">Únete</p>
+            <p className={styles.aboutEyebrow}>Únete</p>
             <h2>Estamos construyendo el futuro del comercio en <span>LATAM</span></h2>
             <p>Y tú puedes ser parte.</p>
           </motion.div>
-          <motion.div className="about-cta-actions" {...fadeRight(0.25)}>
+          <motion.div className={styles.aboutCtaActions} {...fadeRight(0.25)}>
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-              <Link href="/registro" className="about-cta-primary">
+              <Link href="/registro" className={styles.aboutCtaPrimary}>
                 Soy proveedor
                 <span>Quiero publicar productos</span>
               </Link>
             </motion.div>
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-              <Link href="/registro" className="about-cta-secondary">
+              <Link href="/registro" className={styles.aboutCtaSecondary}>
                 Soy cliente
                 <span>Quiero comprar</span>
               </Link>

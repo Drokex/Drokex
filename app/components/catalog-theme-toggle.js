@@ -1,23 +1,24 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import styles from "@/app/categorias/page.module.css";
 
 export default function CatalogThemeToggle() {
   const [light, setLight] = useState(true);
   const pageRef = useRef(null);
 
   useEffect(() => {
-    const page = document.querySelector(".cdk-page");
+    const page = document.querySelector(`.${styles.cdkPage}`);
     pageRef.current = page;
     const shouldUseLight = localStorage.getItem("cdk-theme") !== "dark";
     setLight(shouldUseLight);
-    page?.classList.toggle("cdk-light", shouldUseLight);
+    page?.classList.toggle(styles.cdkLight, shouldUseLight);
   }, []);
 
   function toggle() {
     const next = !light;
     setLight(next);
-    pageRef.current?.classList.toggle("cdk-light", next);
+    pageRef.current?.classList.toggle(styles.cdkLight, next);
     localStorage.setItem("cdk-theme", next ? "light" : "dark");
   }
 

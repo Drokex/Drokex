@@ -1,0 +1,373 @@
+/* ── Product Chat ── */
+.pcChat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.pcChatHeader {
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+}
+
+.pcChatHeaderInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.pcOnlineDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7FE040;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(127,224,64,0.2);
+}
+
+.pcChatProduct {
+  margin: 0;
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.pcChatStatus {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #2d8a1f;
+  font-weight: 500;
+}
+
+.pcMessages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f9fafb;
+}
+
+.pcEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.pcEmpty p {
+  color: #9ca3af;
+  font-size: 0.9rem;
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+.pcMsg {
+  display: flex;
+  flex-direction: column;
+  max-width: 78%;
+  gap: 0.2rem;
+}
+
+.pcMsgMine {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.pcMsgTheirs {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.pcMsgName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  padding: 0 0.5rem;
+}
+
+.pcBubble {
+  padding: 0.65rem 1rem;
+  border-radius: 16px;
+  font-size: 0.93rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.pcMsgMine .pcBubble {
+  background: #7FE040;
+  color: #1a1a1a;
+  border-bottom-right-radius: 4px;
+}
+
+.pcMsgTheirs .pcBubble {
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid #e5e7eb;
+  border-bottom-left-radius: 4px;
+}
+
+.pcMsgTime {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  padding: 0 0.5rem;
+}
+
+.pcInputRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #f0f0f0;
+  background: #fff;
+  border-radius: 0 0 20px 20px;
+}
+
+.pcInput {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 24px;
+  font-size: 0.93rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  background: #f9fafb;
+  color: #1a1a1a;
+}
+
+.pcInput:focus {
+  border-color: #2d8a1f;
+  background: #fff;
+}
+
+.pcSendBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #7FE040;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.pcSendBtn:hover { background: #6fd030; }
+.pcSendBtn:active { transform: scale(0.93); }
+.pcSendBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.pcLoading, .pcError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.pcSpinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #2d8a1f;
+  border-radius: 50%;
+  animation: pc-spin 0.75s linear infinite;
+}
+
+@keyframes pc-spin { to { transform: rotate(360deg); } }
+
+.pcError p { color: #6b7280; font-size: 0.95rem; }
+
+.pcLoginBtn {
+  padding: 0.65rem 1.5rem;
+  background: #7FE040;
+  color: #1a1a1a;
+  font-weight: 700;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+
+.pcLoginBtn:hover { background: #6fd030; }
+
+.pcSendError {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  padding: 0.6rem 1.25rem;
+  background: #fff8f0;
+  border-top: 1px solid #fed7aa;
+  font-size: 0.82rem;
+  color: #c2410c;
+  line-height: 1.4;
+}
+
+/* ── Upgrade Modal ── */
+.upgOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.upgModal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+}
+
+.upgHeader { text-align: center; margin-bottom: 1.25rem; }
+
+.upgBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #f0ffe6;
+  color: #2d8a1f;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: 99px;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.upgPrice {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.upgPrice strong {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+.upgPrice span { color: #6b7280; font-size: 0.95rem; }
+
+.upgDesc {
+  color: #6b7280;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.upgFeatures {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1.5px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.upgFeatures li {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.upgForm { display: flex; flex-direction: column; gap: 0.65rem; }
+
+.upgLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.upgInput {
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.15s;
+  letter-spacing: 0.1em;
+}
+
+.upgInput:focus { border-color: #2d8a1f; }
+
+.upgError {
+  font-size: 0.83rem;
+  color: #dc2626;
+  margin: 0;
+}
+
+.upgBtn {
+  padding: 0.85rem;
+  background: #7FE040;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 0.97rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.upgBtn:hover { background: #6fd030; }
+.upgBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.upgSuccess {
+  text-align: center;
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.upgSuccessIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #7FE040;
+  color: #1a1a1a;
+  font-size: 1.5rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upgSuccess h3 { margin: 0; font-size: 1.2rem; }
+.upgSuccess p { margin: 0; color: #6b7280; font-size: 0.9rem; }
+
+.pcUpgradeLink {
+  background: none;
+  border: none;
+  color: #c2410c;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  white-space: nowrap;
+}

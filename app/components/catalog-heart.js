@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import styles from "@/app/categorias/page.module.css";
 
 export default function CatalogHeart() {
   const [liked, setLiked] = useState(false);
 
   return (
     <button
-      className="cdk-heart"
+      className={styles.cdkHeart}
       aria-label="Guardar"
       onClick={(e) => { e.preventDefault(); setLiked((l) => !l); }}
     >

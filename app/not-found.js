@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Compass } from "lucide-react";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import styles from "./not-found.module.css";
 
 export const metadata = {
   title: "Página no encontrada — Drokex",
@@ -10,11 +11,11 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <main className="drokex-404">
+    <main className={styles.drokex404}>
       <SiteHeader />
 
-      <section className="shell drokex-404-shell">
-        <div className="drokex-404-copy">
+      <section className={`shell ${styles.drokex404Shell}`}>
+        <div className={styles.drokex404Copy}>
           <span className="section-tag">
             <Compass size={14} aria-hidden="true" /> Te perdiste en la ruta
           </span>
@@ -24,7 +25,7 @@ export default function NotFound() {
             El enlace que seguiste puede estar roto, movido o nunca existió. Volvamos a
             terreno conocido.
           </p>
-          <div className="drokex-404-actions">
+          <div className={styles.drokex404Actions}>
             <Link href="/" className="primary-button">
               Ir al inicio
             </Link>
@@ -34,14 +35,14 @@ export default function NotFound() {
           </div>
         </div>
 
-        <div className="drokex-404-visual" aria-hidden="true">
+        <div className={styles.drokex404Visual} aria-hidden="true">
           <Image
             src="/robot-contact.png"
             alt=""
             width={1344}
             height={1771}
             sizes="(max-width: 900px) 60vw, 360px"
-            className="drokex-404-robot"
+            className={styles.drokex404Robot}
             priority={false}
           />
         </div>

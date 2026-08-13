@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import styles from "@/app/mi-cuenta/provider-shell.module.css";
 
 export default function AvatarUpload({ initials, logoUrl }) {
   const [preview, setPreview] = useState(logoUrl || null);
@@ -32,8 +33,8 @@ export default function AvatarUpload({ initials, logoUrl }) {
   }
 
   return (
-    <div className="provider-clean-avatar-wrap" style={{ cursor: "pointer" }} title="Cambiar logo" onClick={() => fileRef.current?.click()}>
-      <div className="provider-clean-avatar" aria-hidden="true">
+    <div className={styles.providerCleanAvatarWrap} style={{ cursor: "pointer" }} title="Cambiar logo" onClick={() => fileRef.current?.click()}>
+      <div className={styles.providerCleanAvatar} aria-hidden="true">
         {preview ? (
           <img src={preview} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
         ) : (

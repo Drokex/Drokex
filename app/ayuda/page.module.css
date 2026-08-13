@@ -1,0 +1,99 @@
+/* ─── AYUDA / PQR PAGE ─────────────────────────────────────────── */
+.ayudaPage { background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+/* Hero */
+.ayudaHero { padding: 120px 0 72px; text-align: center; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(127,224,64,0.07) 0%, transparent 70%); }
+.ayudaHeroTag { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lime); margin-bottom: 16px; }
+.ayudaHero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900; margin: 0 0 20px; line-height: 1.1; }
+.ayudaHero h1 span { color: var(--lime); }
+.ayudaHeroDesc { font-size: 1.05rem; color: rgba(255,255,255,0.6); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+/* Categories */
+.ayudaCategories { padding: 64px 0; }
+.ayudaCategoriesGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.ayudaCatCard {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-top: 2px solid var(--lime);
+  border-radius: 16px;
+  padding: 32px 26px;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.ayudaCatCard:hover {
+  background: rgba(255,255,255,0.055);
+  border-color: rgba(127,224,64,0.5);
+  border-top-color: var(--lime);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+}
+.ayudaCatIcon {
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: rgba(127,224,64,0.1);
+  border: 1px solid rgba(127,224,64,0.2);
+  margin-bottom: 20px;
+}
+.ayudaCatCard h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 16px; color: #fff; letter-spacing: -0.01em; }
+.ayudaCatCard ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.ayudaCatCard ul li { font-size: 0.83rem; color: rgba(255,255,255,0.5); cursor: default; transition: color 0.15s; display: flex; align-items: center; gap: 6px; }
+.ayudaCatCard ul li::before { content: "→"; color: var(--lime); font-size: 0.75rem; opacity: 0.7; }
+.ayudaCatCard ul li:hover { color: rgba(255,255,255,0.85); }
+
+/* FAQ */
+.ayudaFaq { padding: 72px 0; border-top: 1px solid rgba(255,255,255,0.06); }
+.ayudaFaq h2 { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 40px; color: #fff; }
+.ayudaFaq h2 span { color: var(--lime); }
+.ayudaFaqItem { border-bottom-color: rgba(255,255,255,0.08) !important; }
+.ayudaFaqQuestion { color: #ffffff !important; }
+.ayudaFaqAnswer { color: rgba(255,255,255,0.65) !important; display: block; max-height: 0; overflow: hidden; padding-bottom: 0; }
+
+/* PQR Form */
+.ayudaPqr { padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.06); }
+.ayudaPqrGrid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 64px; align-items: start; }
+.ayudaPqrTag { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lime); margin-bottom: 14px; }
+.ayudaPqrInfo h2 { font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 800; margin: 0 0 16px; line-height: 1.2; }
+.ayudaPqrInfo > p { color: rgba(255,255,255,0.55); line-height: 1.7; margin: 0 0 36px; }
+.ayudaPqrMeta { display: flex; flex-direction: column; gap: 20px; }
+.ayudaMetaItem { display: flex; align-items: flex-start; gap: 14px; }
+.ayudaMetaItem > span { font-size: 1.4rem; margin-top: 2px; }
+.ayudaMetaItem strong { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; }
+.ayudaMetaItem p { margin: 0; font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+
+/* Form fields */
+.ayudaForm { display: flex; flex-direction: column; gap: 18px; }
+.ayudaFormRow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ayudaFormField { display: flex; flex-direction: column; gap: 7px; }
+.ayudaFormField label { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
+.ayudaFormField input,
+.ayudaFormField select,
+.ayudaFormField textarea { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s; resize: vertical; }
+.ayudaFormField input::placeholder,
+.ayudaFormField textarea::placeholder { color: rgba(255,255,255,0.28); }
+.ayudaFormField input:focus,
+.ayudaFormField select:focus,
+.ayudaFormField textarea:focus { border-color: var(--lime); }
+.ayudaFormField select option { background: #1a1a1a; color: #fff; }
+.ayudaFormSubmit { margin-top: 6px; padding: 14px 28px; background: var(--lime); color: #111; font-weight: 800; font-size: 0.95rem; border-radius: 10px; border: none; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
+.ayudaFormSubmit:hover { background: #6dd436; }
+.ayudaFormSubmit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* Success state */
+.ayudaFormSuccess { text-align: center; padding: 48px 24px; border: 1px solid rgba(127,224,64,0.25); border-radius: 16px; background: rgba(127,224,64,0.06); }
+.ayudaFormSuccessIcon { display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: var(--lime); color: #111; font-size: 1.4rem; font-weight: 900; margin-bottom: 18px; }
+.ayudaFormSuccess h3 { font-size: 1.3rem; font-weight: 800; margin: 0 0 10px; }
+.ayudaFormSuccess p { color: rgba(255,255,255,0.6); margin: 0; line-height: 1.6; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .ayudaCategoriesGrid { grid-template-columns: repeat(2, 1fr); }
+  .ayudaPqrGrid { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 560px) {
+  .ayudaCategoriesGrid { grid-template-columns: 1fr; }
+  .ayudaFormRow { grid-template-columns: 1fr; }
+}

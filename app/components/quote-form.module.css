@@ -1,0 +1,167 @@
+/* ── Quote form modal ── */
+.qfOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.qfModal {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 560px;
+  padding: 2.5rem;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+}
+
+.qfClose {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.qfClose:hover { background: #e5e7eb; color: #1a1a1a; }
+
+.qfForm { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.qfHeader { margin-bottom: 0.5rem; }
+
+.qfHeader h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.qfProductName {
+  color: #6b7280;
+  font-size: 0.92rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.qfProductName::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7FE040;
+}
+
+.qfField { display: flex; flex-direction: column; gap: 0.45rem; }
+
+.qfField label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.01em;
+}
+
+.qfField input,
+.qfField select,
+.qfField textarea {
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.97rem;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: #fafafa;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.qfField input:focus,
+.qfField select:focus,
+.qfField textarea:focus {
+  border-color: #2d8a1f;
+  background: #fff;
+}
+
+.qfFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.qfCancel {
+  padding: 0.75rem 1.4rem;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.qfCancel:hover { background: #f9fafb; }
+
+.qfSubmit {
+  padding: 0.75rem 1.75rem;
+  border-radius: 10px;
+  background: #7FE040;
+  border: none;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 0.97rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.qfSubmit:hover { background: #7FE040; }
+.qfSubmit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.qfError {
+  color: #b91c1c;
+  font-size: 0.9rem;
+  background: #fff1f1;
+  border: 1px solid #fecaca;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+}
+
+.qfSuccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #2d8a1f;
+}
+
+.qfSuccess p {
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 0;
+}
+

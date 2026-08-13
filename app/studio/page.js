@@ -6,6 +6,8 @@ import SiteHeader from "@/app/components/site-header";
 import AiImageWizard from "@/app/components/ai-image-wizard";
 import PortalPixelCursor from "@/app/components/portal-pixel-cursor";
 import Personaje360 from "@/app/components/personaje-360";
+import styles from "./page.module.css";
+import portalStyles from "./portal.module.css";
 
 const hudLeft = [
   {
@@ -164,24 +166,24 @@ export default function StudioPage() {
   const [activeInfo, setActiveInfo] = useState(null);
 
   return (
-    <main className="portal-page studio-page">
+    <main className={`${portalStyles.portalPage} ${styles.studioPage}`}>
       <SiteHeader />
 
-      <section className="portal-stage" aria-label="Drokex Studio">
-        <video src="/portal-gateway.mp4" autoPlay loop muted playsInline aria-label="Drokex Studio" className="portal-gif" />
-        <div className="portal-vignette" />
-        <div className="portal-scanlines" />
-        <div className="portal-grid" />
+      <section className={portalStyles.portalStage} aria-label="Drokex Studio">
+        <video src="/portal-gateway.mp4" autoPlay loop muted playsInline aria-label="Drokex Studio" className={portalStyles.portalGif} />
+        <div className={portalStyles.portalVignette} />
+        <div className={portalStyles.portalScanlines} />
+        <div className={portalStyles.portalGrid} />
         <PortalPixelCursor />
 
-        <div className="portal-shell">
-          <div className="portal-kicker">
+        <div className={portalStyles.portalShell}>
+          <div className={portalStyles.portalKicker}>
             <span />
             Drokex Studio — IA Creativa
           </div>
 
-          <div className="portal-copy">
-            <p className="portal-status">Módulo activo / Banners con IA</p>
+          <div className={portalStyles.portalCopy}>
+            <p className={portalStyles.portalStatus}>Módulo activo / Banners con IA</p>
             <h1>
               Diseño profesional, <span>generado por IA.</span>
             </h1>
@@ -191,8 +193,8 @@ export default function StudioPage() {
             </p>
           </div>
 
-          <div className="portal-actions">
-            <Link href="/proveedor-pro" className="portal-action portal-action-primary">
+          <div className={portalStyles.portalActions}>
+            <Link href="/proveedor-pro" className={`${portalStyles.portalAction} ${portalStyles.portalActionPrimary}`}>
               Crea tu página con Proveedor Pro
             </Link>
           </div>
@@ -211,12 +213,12 @@ export default function StudioPage() {
         </div>
 
         {/* HUD izquierdo — clicable */}
-        <aside className="portal-hud portal-hud-right" aria-label="Funciones Studio">
+        <aside className={`${portalStyles.portalHud} ${portalStyles.portalHudRight}`} aria-label="Funciones Studio">
           {hudLeft.map((item) => (
             <button
               key={item.num}
               onClick={() => setActiveInfo(item)}
-              className="portal-signal studio-signal-btn"
+              className={`${portalStyles.portalSignal} ${styles.studioSignalBtn}`}
               style={{
                 cursor: "pointer", background: "rgba(2,8,6,0.42)", fontFamily: "inherit",
                 border: "1px solid rgba(127,224,64,0.22)", width: "100%", textAlign: "left",
@@ -232,7 +234,7 @@ export default function StudioPage() {
           ))}
         </aside>
 
-        <div className="portal-bottom-bar">
+        <div className={portalStyles.portalBottomBar}>
           <span>DROKEX STUDIO</span>
           <span>IA GENERATIVA</span>
           <span>BANNERS 4K</span>
@@ -277,14 +279,14 @@ export default function StudioPage() {
             <a
               href={generatedImg}
               download="banner-drokex.png"
-              className="portal-action portal-action-primary"
+              className={`${portalStyles.portalAction} ${portalStyles.portalActionPrimary}`}
               style={{ textDecoration: "none" }}
             >
               Descargar →
             </a>
             <button
               onClick={() => setGeneratedImg(null)}
-              className="portal-action"
+              className={portalStyles.portalAction}
               style={{ cursor: "pointer", fontFamily: "inherit" }}
             >
               Cerrar

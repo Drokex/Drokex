@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import styles from "./product-chat.module.css";
+import qfStyles from "./quote-form.module.css";
 
 function UpgradeModal({ onSuccess, onClose }) {
   const [code, setCode] = useState("");
@@ -30,38 +32,38 @@ function UpgradeModal({ onSuccess, onClose }) {
   }
 
   return (
-    <div className="upg-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="upg-modal">
-        <button className="qf-close" onClick={onClose} aria-label="Cerrar">×</button>
+    <div className={styles.upgOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className={styles.upgModal}>
+        <button className={qfStyles.qfClose} onClick={onClose} aria-label="Cerrar">×</button>
 
         {success ? (
-          <div className="upg-success">
-            <div className="upg-success-icon">✓</div>
+          <div className={styles.upgSuccess}>
+            <div className={styles.upgSuccessIcon}>✓</div>
             <h3>¡Plan activado!</h3>
             <p>Ya puedes compartir tus datos de contacto directamente.</p>
           </div>
         ) : (
           <>
-            <div className="upg-header">
-              <span className="upg-badge">Plan Directo</span>
-              <div className="upg-price">
+            <div className={styles.upgHeader}>
+              <span className={styles.upgBadge}>Plan Directo</span>
+              <div className={styles.upgPrice}>
                 <strong>$10</strong>
                 <span>/mes</span>
               </div>
-              <p className="upg-desc">Contacto directo con el proveedor — comparte teléfono, correo y redes sin restricciones.</p>
+              <p className={styles.upgDesc}>Contacto directo con el proveedor — comparte teléfono, correo y redes sin restricciones.</p>
             </div>
 
-            <ul className="upg-features">
+            <ul className={styles.upgFeatures}>
               <li>✓ Comparte teléfono y correo</li>
               <li>✓ Links y redes sociales</li>
               <li>✓ Contacto directo sin intermediarios</li>
               <li>✓ Datos completos del proveedor</li>
             </ul>
 
-            <form className="upg-form" onSubmit={handleSubmit}>
-              <label className="upg-label">Código de pago</label>
+            <form className={styles.upgForm} onSubmit={handleSubmit}>
+              <label className={styles.upgLabel}>Código de pago</label>
               <input
-                className="upg-input"
+                className={styles.upgInput}
                 type="text"
                 placeholder="Ingresa tu código"
                 value={code}
@@ -69,8 +71,8 @@ function UpgradeModal({ onSuccess, onClose }) {
                 disabled={loading}
                 autoFocus
               />
-              {error && <p className="upg-error">{error}</p>}
-              <button className="upg-btn" type="submit" disabled={loading || !code.trim()}>
+              {error && <p className={styles.upgError}>{error}</p>}
+              <button className={styles.upgBtn} type="submit" disabled={loading || !code.trim()}>
                 {loading ? "Verificando..." : "Activar plan · $10/mes"}
               </button>
             </form>
@@ -184,8 +186,8 @@ export default function ProductChat({ productId, productName, onClose }) {
 
   if (loading) {
     return (
-      <div className="pc-loading">
-        <div className="pc-spinner" />
+      <div className={styles.pcLoading}>
+        <div className={styles.pcSpinner} />
         <p>Conectando con el proveedor...</p>
       </div>
     );
@@ -193,39 +195,39 @@ export default function ProductChat({ productId, productName, onClose }) {
 
   if (error) {
     return (
-      <div className="pc-error">
+      <div className={styles.pcError}>
         <p>{error}</p>
-        <a href="/login" className="pc-login-btn">Iniciar sesión</a>
+        <a href="/login" className={styles.pcLoginBtn}>Iniciar sesión</a>
       </div>
     );
   }
 
   return (
     <>
-      <div className="pc-chat">
-        <div className="pc-chat-header">
-          <div className="pc-chat-header-info">
-            <span className="pc-online-dot" />
+      <div className={styles.pcChat}>
+        <div className={styles.pcChatHeader}>
+          <div className={styles.pcChatHeaderInfo}>
+            <span className={styles.pcOnlineDot} />
             <div>
-              <p className="pc-chat-product">{productName}</p>
-              <p className="pc-chat-status">Chat con proveedor</p>
+              <p className={styles.pcChatProduct}>{productName}</p>
+              <p className={styles.pcChatStatus}>Chat con proveedor</p>
             </div>
           </div>
         </div>
 
-        <div className="pc-messages">
+        <div className={styles.pcMessages}>
           {messages.length === 0 && (
-            <div className="pc-empty">
+            <div className={styles.pcEmpty}>
               <p>Envía un mensaje para empezar la conversación con el proveedor.</p>
             </div>
           )}
           {messages.map((msg) => {
             const isMine = msg.sender.id === currentUserId;
             return (
-              <div key={msg.id} className={`pc-msg ${isMine ? "pc-msg-mine" : "pc-msg-theirs"}`}>
-                {!isMine && <span className="pc-msg-name">{msg.sender.fullName}</span>}
-                <div className="pc-bubble">{msg.content}</div>
-                <span className="pc-msg-time">{formatTime(msg.createdAt)}</span>
+              <div key={msg.id} className={`${styles.pcMsg} ${isMine ? styles.pcMsgMine : styles.pcMsgTheirs}`}>
+                {!isMine && <span className={styles.pcMsgName}>{msg.sender.fullName}</span>}
+                <div className={styles.pcBubble}>{msg.content}</div>
+                <span className={styles.pcMsgTime}>{formatTime(msg.createdAt)}</span>
               </div>
             );
           })}
@@ -233,12 +235,12 @@ export default function ProductChat({ productId, productName, onClose }) {
         </div>
 
         {sendError && (
-          <div className="pc-send-error">
+          <div className={styles.pcSendError}>
             {sendError === "plan_required" ? (
               <>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <span>No puedes compartir datos en el plan gratuito.&nbsp;</span>
-                <button className="pc-upgrade-link" onClick={() => { setSendError(null); setShowUpgrade(true); }}>
+                <button className={styles.pcUpgradeLink} onClick={() => { setSendError(null); setShowUpgrade(true); }}>
                   Activar Plan Directo · $10/mes →
                 </button>
               </>
@@ -251,10 +253,10 @@ export default function ProductChat({ productId, productName, onClose }) {
           </div>
         )}
 
-        <form className="pc-input-row" onSubmit={sendMessage}>
+        <form className={styles.pcInputRow} onSubmit={sendMessage}>
           <input
             ref={inputRef}
-            className="pc-input"
+            className={styles.pcInput}
             type="text"
             placeholder="Escribe un mensaje..."
             value={input}
@@ -262,7 +264,7 @@ export default function ProductChat({ productId, productName, onClose }) {
             disabled={sending}
             autoFocus
           />
-          <button className="pc-send-btn" type="submit" disabled={sending || !input.trim()}>
+          <button className={styles.pcSendBtn} type="submit" disabled={sending || !input.trim()}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13" />
               <polygon points="22 2 15 22 11 13 2 9 22 2" />

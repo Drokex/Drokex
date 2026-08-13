@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import styles from "@/app/page.module.css";
 
 const GIF_ASPECT_RATIO = 16 / 9;
 const LENS_SIZE = 520;
@@ -97,7 +98,7 @@ export default function HeroDistortion({ image }) {
   return (
     <div
       ref={rootRef}
-      className={pointer.active ? "hero-distortion is-active" : "hero-distortion"}
+      className={pointer.active ? `${styles.heroDistortion} ${styles.isActive}` : styles.heroDistortion}
       aria-hidden="true"
       style={{
         "--hero-bg-height": `${pointer.bgHeight}px`,
@@ -110,9 +111,9 @@ export default function HeroDistortion({ image }) {
         "--hero-y": `${pointer.y}px`,
       }}
     >
-      <div className="hero-distortion-lens" />
-      <div className="hero-distortion-lens hero-distortion-red" />
-      <div className="hero-distortion-lens hero-distortion-blue" />
+      <div className={styles.heroDistortionLens} />
+      <div className={`${styles.heroDistortionLens} ${styles.heroDistortionRed}`} />
+      <div className={`${styles.heroDistortionLens} ${styles.heroDistortionBlue}`} />
     </div>
   );
 }

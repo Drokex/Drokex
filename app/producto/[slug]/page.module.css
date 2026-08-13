@@ -1,0 +1,468 @@
+/* ── Product Detail (dark) ── */
+.pdPage {
+  background: #111111;
+  color: #f0f0f0;
+  min-height: 100vh;
+}
+
+.pdShell {
+  padding-top: 28px;
+  padding-bottom: 72px;
+}
+
+.pdBreadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.88rem;
+}
+
+.pdBreadcrumbs a {
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.pdBreadcrumbs a:hover {
+  color: #2d8a1f;
+}
+
+.pdGrid {
+  margin-top: 24px;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr);
+}
+
+/* Gallery */
+.productGalleryPanel {
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.pdPage .detailImageMain {
+  position: relative;
+  aspect-ratio: 1.05 / 1;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #1e1e1e;
+}
+
+.galleryArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.15s;
+}
+
+.galleryArrow:hover {
+  background: rgba(40, 40, 40, 0.9);
+}
+
+.galleryArrowPrev { left: 12px; }
+.galleryArrowNext { right: 12px; }
+
+.galleryCounter {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.galleryHeart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(20, 20, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.15s, background 0.15s;
+}
+
+.galleryHeartActive {
+  color: #ef4444;
+}
+
+.galleryNovelosTag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(20, 20, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.detailThumbRow {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.detailThumbBtn {
+  flex: 0 0 80px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: #1e1e1e;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.15s;
+}
+
+.detailThumbBtnActive {
+  border-color: #2d8a1f;
+}
+
+/* Info panel */
+.pdInfoPanel {
+  padding: 4px 0;
+}
+
+.pdOfferBadge {
+  display: inline-block;
+  margin: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid #7FE040;
+  color: #2d8a1f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.pdTitle {
+  margin: 14px 0 0;
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #fff;
+}
+
+.pdSubline {
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+}
+
+.pdSupplier {
+  color: #2d8a1f;
+  font-weight: 600;
+}
+
+/* Price in dark mode */
+.pdPriceBlock {
+  margin-top: 20px;
+}
+
+.pdMarketPrice strong {
+  font-size: 2.4rem;
+  color: #2d8a1f;
+  display: block;
+  line-height: 1;
+}
+
+.pdMarketPrice small {
+  display: block;
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: line-through;
+  margin-top: 4px;
+}
+
+.pdMarketPrice :global(.market-price-note) {
+  display: block;
+  margin-top: 4px;
+  color: #2d8a1f;
+  font-size: 0.88rem;
+}
+
+.pdMarketPrice :global(.market-price-origin) {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.88rem;
+}
+
+/* Tags */
+.pdTags {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pdTags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.88rem;
+}
+
+/* CTA button in dark mode */
+.pdPage :global(.quote-cta-btn) {
+  background: #7FE040;
+  color: #0d1a0d;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  margin: 20px 0 0;
+  border: none;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s;
+}
+
+.pdPage :global(.quote-cta-btn):hover {
+  background: #7FE040;
+  transform: translateY(-1px);
+}
+
+/* Trust row */
+.pdTrustRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
+}
+
+.pdTrustRow span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Accordion */
+.accordionStack {
+  margin-top: 10px;
+}
+
+.accordionSection {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.accordionTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.accordionTriggerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.accordionIcon {
+  color: #2d8a1f;
+  display: flex;
+  align-items: center;
+}
+
+.accordionTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #2d8a1f;
+}
+
+.accordionChevron {
+  color: rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.accordionChevronOpen {
+  transform: rotate(90deg);
+}
+
+.accordionBody {
+  padding-bottom: 18px;
+}
+
+.accordionText {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.75;
+  font-size: 0.92rem;
+}
+
+.accordionTagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.accordionTag {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.88rem;
+}
+
+.accordionSpecGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.accordionSpecCard {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.accordionSpecCard span {
+  display: block;
+  color: #2d8a1f;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.accordionSpecCard strong {
+  display: block;
+  margin-top: 6px;
+  color: #f0f0f0;
+  line-height: 1.4;
+}
+
+/* Features bar */
+.pdFeaturesBar {
+  background: #161616;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 40px 0;
+}
+
+.pdFeaturesInner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.pdFeature {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.pdFeature svg {
+  flex-shrink: 0;
+  color: #2d8a1f;
+  margin-top: 2px;
+}
+
+.pdFeature strong {
+  display: block;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.pdFeature p {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+/* ── Modo claro producto ── */
+.pdLight { background: #f2f4f7; color: #111; }
+.pdLight .pdBreadcrumbs { color: rgba(0,0,0,0.4); }
+.pdLight .pdBreadcrumbs a { color: rgba(0,0,0,0.55); }
+.pdLight .pdTitle { color: #111; }
+.pdLight .pdSubline { color: rgba(0,0,0,0.55); }
+.pdLight .pdMarketPrice small { color: rgba(0,0,0,0.35); }
+.pdLight .pdMarketPrice :global(.market-price-origin) { color: rgba(0,0,0,0.5); }
+.pdLight .pdTags span { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.75); }
+.pdLight .pdTrustRow { color: rgba(0,0,0,0.45); }
+.pdLight .pdTrustRow span:first-child { color: rgba(0,0,0,0.55); }
+.pdLight .accordionSection { border-color: rgba(0,0,0,0.1); }
+.pdLight .accordionChevron { color: rgba(0,0,0,0.4); }
+.pdLight .accordionText { color: rgba(0,0,0,0.6); }
+.pdLight .accordionTag { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.7); }
+.pdLight .accordionSpecCard { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); }
+.pdLight .accordionSpecCard strong { color: #111; }
+.pdLight .pdFeaturesBar { background: #e8eaed; border-color: rgba(0,0,0,0.08); }
+.pdLight .pdFeature strong { color: #111; }
+.pdLight .pdFeature p { color: rgba(0,0,0,0.5); }
+
+/* Responsive */
+@media (max-width: 1080px) {
+  .pdGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pdFeaturesInner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .pdFeaturesInner {
+    grid-template-columns: 1fr;
+  }
+
+  .accordionSpecGrid {
+    grid-template-columns: 1fr;
+  }
+}
