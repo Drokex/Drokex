@@ -1,14 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import DirectorioPage from "./directorio-client";
 import { getProducts, getSampleStoreProducts } from "@/lib/products";
+import { getProLandingsLite } from "@/lib/proveedor-pro-landings";
 
 const _dirCache = globalThis.__drokexDirCache6 ?? { suppliers: null, proLandings: null, ts: 0 };
 if (!globalThis.__drokexDirCache6) globalThis.__drokexDirCache6 = _dirCache;
 const DIR_CACHE_TTL = 15_000;
-
-function canUseDirectoryFallback(error) {
-  return error instanceof Error && /ENOTFOUND|ECONN|tenant\/user|DATABASE/i.test(error.message);
-}
 
 function getSuppliersFromProducts(products) {
   const map = new Map();
@@ -47,35 +44,6 @@ async function getSuppliers() {
   return getSuppliersFromProducts(products);
 }
 
-async function getProLandings() {
-  if (!prisma) return [];
-
-  // Selecciona solo slug y store (sin products que puede tener imágenes base64 pesadas)
-  const landings = await prisma.proveedorProLanding.findMany({
-    orderBy: { updatedAt: "desc" },
-    select: { slug: true, store: true },
-  });
-
-  return landings.map(({ slug, store }) => {
-    const s = (store && typeof store === "object") ? store : {};
-    const countries = Array.isArray(s.countries) ? s.countries : (s.country ? [s.country] : []);
-    return {
-      slug,
-      landing: {
-        store: {
-          brand: s.brand || null,
-          country: countries[0] || null,
-          countries,
-          primaryColor: s.primaryColor || null,
-          logo: s.logo || null,
-          heroImage: s.heroImage || null,
-        },
-        products: [],
-      },
-    };
-  });
-}
-
 function withTimeout(promise, ms) {
   return Promise.race([
     promise,
@@ -97,7 +65,7 @@ export default async function DirectorioServerPage() {
   // Queries independientes: si uno falla/timeout el otro no se pierde
   const [suppliersResult, landingsResult] = await Promise.allSettled([
     withTimeout(getSuppliers(), 10000),
-    withTimeout(getProLandings(), 10000),
+    withTimeout(getProLandingsLite(), 10000),
   ]);
 
   if (suppliersResult.status === "fulfilled") {

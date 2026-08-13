@@ -8,13 +8,14 @@ export async function GET(request) {
 
   if (!prisma) return NextResponse.json({ heroImage: null });
 
-  const landing = await prisma.proveedorProLanding.findUnique({
-    where: { slug },
-    select: { store: true },
-  });
+  const rows = await prisma.$queryRaw`
+    SELECT store->>'heroImage' AS "heroImage"
+    FROM "ProveedorProLanding"
+    WHERE slug = ${slug}
+    LIMIT 1
+  `;
 
-  if (!landing) return NextResponse.json({ heroImage: null }, { status: 404 });
+  if (!rows.length) return NextResponse.json({ heroImage: null }, { status: 404 });
 
-  const store = landing.store || {};
-  return NextResponse.json({ heroImage: store.heroImage || null });
+  return NextResponse.json({ heroImage: rows[0].heroImage || null });
 }
