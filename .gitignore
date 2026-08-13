@@ -26,8 +26,13 @@ out
 dist
 generated
 
-# Large local media assets
+# Large local media assets — bloqueado por default, whitelist abajo los que sí usa el sitio
 *.mp4
+!public/hero-banner-dark-anim.mp4
+!public/home-feature-globe.mp4
+!public/home-feature-laptop.mp4
+!public/home-feature-products.mp4
+!public/portal-gateway.mp4
 public/INFOGRAFIA PROVEEDORES.gif
 public/country-entry-bg.gif
 public/hero-banner-green.gif
