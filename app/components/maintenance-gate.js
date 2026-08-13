@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 const STORAGE_KEY = "drokex-maint-v1";
 const PASSWORD = "15472007";
@@ -33,10 +34,13 @@ export default function MaintenanceGate({ children }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, overflow: "hidden" }}>
-      <img
+      <Image
         src="/banner-mantenimiento.png"
         alt="Sitio en mantenimiento"
-        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        fill
+        priority
+        sizes="100vw"
+        style={{ objectFit: "cover" }}
       />
 
       {/* Hidden trigger — bottom-right corner */}

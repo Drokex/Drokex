@@ -927,7 +927,7 @@ button {
   width: 540px;
   height: 540px;
   overflow: hidden;
-  background-image: url("/portal-gateway.gif");
+  background-image: url("/portal-gateway-poster.webp");
   background-repeat: no-repeat;
   background-size: max(103vw, 183vh) max(57.94vw, 103vh);
   background-position: calc(50% - (var(--portal-x) - 50vw) * 1.07) calc(50% - (var(--portal-y) - 50vh) * 1.07);

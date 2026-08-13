@@ -334,7 +334,7 @@ export default async function AccountPage({ searchParams }) {
             <div
               style={{
                 minHeight: 150,
-                backgroundImage: "linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.64)), url('/hero-banner-dark.gif')",
+                backgroundImage: "linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.64)), url('/hero-banner-dark-poster.webp')",
                 backgroundPosition: "center",
                 backgroundSize: "cover",
               }}

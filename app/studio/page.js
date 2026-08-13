@@ -168,7 +168,7 @@ export default function StudioPage() {
       <SiteHeader />
 
       <section className="portal-stage" aria-label="Drokex Studio">
-        <img src="/portal-gateway.gif" alt="Drokex Studio" className="portal-gif" />
+        <video src="/portal-gateway.mp4" autoPlay loop muted playsInline aria-label="Drokex Studio" className="portal-gif" />
         <div className="portal-vignette" />
         <div className="portal-scanlines" />
         <div className="portal-grid" />

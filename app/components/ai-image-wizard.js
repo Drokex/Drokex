@@ -202,7 +202,7 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
 
             {/* Preview visual de banners generados */}
             <div style={{ display: "flex", gap: 8, marginBottom: 20, borderRadius: 14, overflow: "hidden", height: 90 }}>
-              <img src="/hero-banner-dark.gif" alt="" style={{ flex: 1, minWidth: 0, objectFit: "cover", borderRadius: 10 }} />
+              <video src="/hero-banner-dark-anim.mp4" autoPlay loop muted playsInline style={{ flex: 1, minWidth: 0, objectFit: "cover", borderRadius: 10 }} />
               <img src="/catalog-banner-orange.jpg" alt="" style={{ flex: 1, minWidth: 0, objectFit: "cover", borderRadius: 10 }} />
               <img src="/banner tiendas drokex virtual .jpg" alt="" style={{ flex: 1, minWidth: 0, objectFit: "cover", borderRadius: 10 }} />
             </div>

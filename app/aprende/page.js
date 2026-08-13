@@ -2390,8 +2390,8 @@ export default function AprendePage() {
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               padding: "32px 40px", gap: 0, overflow: "hidden",
             }}>
-              {/* GIF background */}
-              <img src="/portal-gateway.gif" alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.45 }} />
+              {/* Video background */}
+              <video src="/portal-gateway.mp4" autoPlay loop muted playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.45 }} />
               {/* Dark overlay */}
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, rgba(2,8,2,0.88) 0%, rgba(3,18,3,0.82) 100%)" }} />
               {/* Green radial glow */}
