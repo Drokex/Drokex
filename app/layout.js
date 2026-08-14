@@ -1,6 +1,7 @@
 import "./globals.css";
 import CookieConsent from "@/app/components/cookie-consent";
 import MaintenanceGate from "@/app/components/maintenance-gate";
+import AdPopup from "@/app/components/ad-popup";
 
 export const metadata = {
   title: "Drokex",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
         <MaintenanceGate>
         {children}
         <CookieConsent />
+        <AdPopup />
         <a
           href="https://wa.me/573209654384"
           target="_blank"

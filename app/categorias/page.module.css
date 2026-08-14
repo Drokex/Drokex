@@ -16,8 +16,6 @@
 
 /* Sidebar */
 .cdkSidebar {
-  position: sticky;
-  top: 24px;
   display: flex;
   flex-direction: column;
   gap: 0;

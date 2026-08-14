@@ -967,3 +967,110 @@ button {
 @keyframes spin {
 to { transform: rotate(360deg); }
 }
+/* ── Popup publicitario (ad-popup.js) ───────────────────────────── */
+.ad-popup {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(4, 6, 5, 0.72);
+  backdrop-filter: blur(4px);
+  animation: ad-popup-fade 0.25s ease both;
+}
+
+.ad-popup.is-closing {
+  animation: ad-popup-fade 0.2s ease both reverse;
+}
+
+.ad-popup__card {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  animation: ad-popup-rise 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  line-height: 0;
+}
+
+.ad-popup__image {
+  display: block;
+  width: min(300px, 78vw);
+  height: auto;
+}
+
+/* Los banners cuadrados necesitan más ancho para leerse igual de bien. */
+.ad-popup__image--wide {
+  width: min(620px, 90vw);
+}
+
+.ad-popup__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: rgba(5, 5, 5, 0.55);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.ad-popup__close:hover {
+  background: rgba(5, 5, 5, 0.85);
+  transform: scale(1.08);
+}
+
+@keyframes ad-popup-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ad-popup-rise {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-popup,
+  .ad-popup__card {
+    animation: none;
+  }
+}
+
+/* ── Banner publicitario en sidebars (sidebar-ad.js) ─────────────── */
+.sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: start;
+  position: sticky;
+  top: 24px;
+}
+
+.sidebar-ad {
+  display: block;
+  border-radius: 14px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.sidebar-ad__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Hueco mientras se resuelve la sesión (site-header.js): reserva el ancho de
+   los botones de auth para que el header no salte al aparecer el usuario. */
+.header-session-placeholder {
+  display: inline-block;
+  width: 168px;
+  height: 44px;
+}

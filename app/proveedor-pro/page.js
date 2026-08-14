@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/app/components/site-header";
 import LandingPreview, { hexToRgba as _hexToRgba } from "@/app/components/landing-preview";
+import { uploadImage } from "@/app/proveedor-pro/upload-image";
 
 const VALID_CODE = "15472007";
 
@@ -211,6 +212,7 @@ export default function ProveedorProPage({
   const [publishSuccess, setPublishSuccess] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishSlow, setPublishSlow] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [showContactModal, setShowContactModal] = useState(false);
   const [contactDraft, setContactDraft] = useState("");
   const [templateChosen, setTemplateChosen] = useState(!!(initialStore || initialSlug));
@@ -793,12 +795,14 @@ export default function ProveedorProPage({
                   type="file"
                   accept="image/*"
                   style={{ display: "none" }}
-                  onChange={e => {
+                  onChange={async e => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = ev => updateStore("logo", ev.target.result);
-                    reader.readAsDataURL(file);
+                    try {
+                      updateStore("logo", await uploadImage(file));
+                    } catch (error) {
+                      setUploadError(error.message);
+                    }
                   }}
                 />
                 <button
@@ -1045,6 +1049,13 @@ export default function ProveedorProPage({
             }}
           />
         </section>
+      )}
+
+      {uploadError && (
+        <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 210, background: "#2a0f0f", border: "1px solid #c0392b", borderRadius: 12, padding: "12px 18px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 12px 30px rgba(0,0,0,0.35)" }}>
+          <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "#ffd9d4" }}>{uploadError}</span>
+          <button type="button" onClick={() => setUploadError("")} style={{ background: "transparent", border: "none", color: "#ffd9d4", cursor: "pointer", fontWeight: 900 }}>✕</button>
+        </div>
       )}
 
       {isPublishing && (
@@ -1459,12 +1470,14 @@ function ClickableImageZone({ value, onUpload, isEditable, className, style, pla
   const [hovered, setHovered] = useState(false);
   const fileRef = useRef(null);
 
-  function handleFile(event) {
+  async function handleFile(event) {
     const file = event.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => onUpload(e.target.result);
-    reader.readAsDataURL(file);
+    try {
+      onUpload(await uploadImage(file));
+    } catch (error) {
+      console.error("[landing] subida fallida:", error.message);
+    }
   }
 
   if (!isEditable) return <div className={className} style={style}>{children}</div>;
@@ -1626,7 +1639,7 @@ function ColorInput({ label, value, onChange }) {
         <input
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#7FE040]"
+          className="w-full rounded-xl border border-white/15 bg-white/[0.07] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#7FE040] focus:bg-white/[0.1]"
         />
       </div>
     </label>
@@ -1642,7 +1655,7 @@ function Input({ label, value, onChange }) {
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#7FE040]"
+        className="w-full rounded-xl border border-white/15 bg-white/[0.07] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#7FE040] focus:bg-white/[0.1]"
       />
     </label>
   );
@@ -1657,7 +1670,7 @@ function Textarea({ label, value, onChange }) {
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="min-h-24 w-full resize-none rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#7FE040]"
+        className="min-h-24 w-full resize-none rounded-xl border border-white/15 bg-white/[0.07] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#7FE040] focus:bg-white/[0.1]"
       />
     </label>
   );
@@ -1667,15 +1680,14 @@ function ImageUploader({ label, value, onChange }) {
   const fileRef = useRef(null);
   const [hovered, setHovered] = useState(false);
 
-  function handleFile(event) {
+  async function handleFile(event) {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (readerEvent) => {
-      onChange(readerEvent.target.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      onChange(await uploadImage(file));
+    } catch (error) {
+      console.error("[landing] subida fallida:", error.message);
+    }
   }
 
   return (
@@ -1730,7 +1742,7 @@ function ImageUploader({ label, value, onChange }) {
         value={value?.startsWith("data:") ? "" : value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="O pegar URL de imagen"
-        className="mt-3 w-full rounded-xl border border-white/10 bg-black px-4 py-3 text-sm outline-none focus:border-[#7FE040]"
+        className="mt-3 w-full rounded-xl border border-white/15 bg-white/[0.07] px-4 py-3 text-sm text-white outline-none placeholder:text-white/35 focus:border-[#7FE040] focus:bg-white/[0.1]"
       />
     </div>
   );

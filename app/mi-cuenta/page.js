@@ -252,7 +252,6 @@ export default async function AccountPage({ searchParams }) {
           </div>
 
           <div className={styles.providerCleanTools}>
-            <div className={styles.providerCleanPill} aria-hidden="true" />
             <LogoutButton />
           </div>
         </div>
@@ -394,7 +393,7 @@ export default async function AccountPage({ searchParams }) {
               >
                 <p style={{ margin: 0, color: "#777", fontSize: "0.8rem" }}>Plan demo</p>
                 <strong style={{ display: "block", marginTop: 5, color: "#7FE040", fontSize: "1.95rem", fontWeight: 950, lineHeight: 1 }}>
-                  $99.000 COP
+                  $25 USD
                 </strong>
                 <p style={{ margin: "8px 0 0", color: "#777", fontSize: "0.8rem" }}>
                   Crea y edita tu tienda premium dentro de Drokex.

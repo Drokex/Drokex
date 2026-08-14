@@ -24,7 +24,7 @@ const pillars = [
 
 const team = [
   { photo: "/andres-carrillo.jpeg", popup: "/popup-andres-carrillo.png", name: "Andrés Carrillo", role: "Dirección Comercial" },
-  { photo: "/javier-hurtado.jpeg",  popup: "/popup-javier-hurtado.png",  name: "Javier Hurtado",  role: "Expansión LATAM" },
+  { photo: "/javier-hurtado.jpeg",  popup: "/popup-javier-hurtado-v2.png",  name: "Javier Hurtado",  role: "Expansión LATAM" },
   { photo: "/luis-urdaneta.jpeg",   popup: "/popup-luis-urdaneta.png",   name: "Luis Urdaneta",   role: "Alianzas Estratégicas" },
   { photo: "/mauren-blandon.jpeg",  popup: "/popup-maureen-blandon.png", name: "Mauren Blandón",  role: "Operaciones" },
 ];
@@ -134,7 +134,7 @@ export default function AboutPage() {
 
       {/* HERO */}
       <section className={styles.aboutHero}>
-        <Image src="/about-map-banner-world.png" alt="Mapa de expansión Drokex en el mundo" fill priority sizes="100vw" className={styles.aboutHeroImage} />
+        <Image src="/about-map-banner.png" alt="Mapa de presencia Drokex en Latinoamérica" fill priority sizes="100vw" className={styles.aboutHeroImage} />
         <div className={styles.aboutHeroShade} />
         <div className={styles.aboutHeroScanlines} />
         <div className={styles.aboutHeroGrid} />

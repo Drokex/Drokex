@@ -4,19 +4,35 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import SidebarAd from "@/app/components/sidebar-ad";
 
+
+// Cada thumbnail es base64 pesado (hasta ~750KB): se piden una sola vez por slug en toda
+// la página (aunque varios componentes usen el mismo) y solo cuando la card entra en pantalla.
+const thumbCache = new Map();
+
+function fetchThumbnail(slug) {
+  if (!thumbCache.has(slug)) {
+    thumbCache.set(
+      slug,
+      fetch(`/api/proveedor-pro/thumbnail?slug=${encodeURIComponent(slug)}`)
+        .then(r => r.json())
+        .then(d => d.heroImage || null)
+        .catch(() => null)
+    );
+  }
+  return thumbCache.get(slug);
+}
 
 function useThumbnail(slug, fallback) {
   const [src, setSrc] = useState(fallback);
-  const fetched = useRef(false);
+
   useEffect(() => {
-    if (fetched.current) return;
-    fetched.current = true;
-    fetch(`/api/proveedor-pro/thumbnail?slug=${encodeURIComponent(slug)}`)
-      .then(r => r.json())
-      .then(d => { if (d.heroImage) setSrc(d.heroImage); })
-      .catch(() => {});
+    let alive = true;
+    fetchThumbnail(slug).then(hero => { if (alive && hero) setSrc(hero); });
+    return () => { alive = false; };
   }, [slug]);
+
   return src;
 }
 
@@ -107,10 +123,12 @@ function HeroFeatured({ lm = false }) {
       <h1 style={{
         margin: "0 0 18px", fontSize: "clamp(2rem, 4vw, 3.8rem)",
         fontWeight: 900, letterSpacing: "0.04em", textTransform: "uppercase", lineHeight: 1.05,
-        background: titleGrad,
+        // backgroundImage (no el shorthand `background`): al cambiar de tema React actualiza
+        // solo esta prop y el shorthand reseteaba background-clip → el título salía como barra
+        backgroundImage: titleGrad,
         WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
       }}>
-        Latam vende Latam
+        Latam vende al mundo
       </h1>
       <p style={{ margin: "0 0 24px", fontSize: "clamp(0.9rem, 1.3vw, 1.1rem)", color: subColor, fontWeight: 500 }}>
         Compra directo a proveedores.{" "}
@@ -230,7 +248,13 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
     }
   }, []);
 
+  // El primer render ya trae los suppliers del server: no repetir la query vacía al montar.
+  const skipFirstFetch = useRef(initialSuppliers.length > 0);
   useEffect(() => {
+    if (skipFirstFetch.current) {
+      skipFirstFetch.current = false;
+      if (!query) return;
+    }
     const timer = setTimeout(() => fetchSuppliers(query), 300);
     return () => clearTimeout(timer);
   }, [query, fetchSuppliers]);
@@ -381,6 +405,23 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
         </section>
       )}
 
+      {/* ── BANNER PATROCINADO ────────────────────────── */}
+      <section style={{ padding: "0 0 32px" }}>
+        <div className="shell">
+          <div style={{
+            borderRadius: 14, overflow: "hidden", lineHeight: 0,
+            border: lm ? "1px solid rgba(0,0,0,0.09)" : "1px solid rgba(255,255,255,0.07)",
+            boxShadow: lm ? "0 2px 12px rgba(0,0,0,0.06)" : "0 18px 48px rgba(0,0,0,0.45)",
+          }}>
+            <img
+              src="/banner-geu-caucho.png"
+              alt="GEU — Resistencia que mueve industrias. Rollos, láminas, espumas y soluciones en caucho"
+              style={{ display: "block", width: "100%", height: "auto" }}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* ── BUSCADOR + GRID ───────────────────────────── */}
       <section style={{ padding: "0 0 80px" }}>
         <div className="shell">
@@ -416,7 +457,8 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
           <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 24, alignItems: "start" }}>
 
             {/* ── Sidebar filtros ── */}
-            <div style={{ background: lm ? "#fff" : "rgba(255,255,255,0.03)", border: `1px solid ${brd}`, borderRadius: 14, padding: "20px 16px", position: "sticky", top: 90, boxShadow: lm ? "0 2px 16px rgba(0,0,0,0.07)" : "none" }}>
+            <div className="sidebar-col">
+            <div style={{ background: lm ? "#fff" : "rgba(255,255,255,0.03)", border: `1px solid ${brd}`, borderRadius: 14, padding: "20px 16px", boxShadow: lm ? "0 2px 16px rgba(0,0,0,0.07)" : "none" }}>
 
               {/* País */}
               <p style={{ margin: "0 0 10px", fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: w(0.35) }}>País</p>
@@ -463,6 +505,9 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
                   Limpiar filtros ✕
                 </button>
               )}
+            </div>
+
+              <SidebarAd />
             </div>
 
             {/* ── Grid ── */}

@@ -281,9 +281,11 @@
   color: #9f2424;
 }
 
+/* Verde fijo, no el acento del rol: en la variante cliente el acento es
+   naranja y el mensaje de éxito se leía como un error. */
 .authMessage.isSuccess {
-  background: var(--auth-accent-soft);
-  color: var(--auth-accent-ink);
+  background: rgba(127, 224, 64, 0.16);
+  color: #3d6b00;
 }
 
 .authSubmitButton.isProvider {
@@ -358,4 +360,15 @@
   .authBackLink {
     white-space: normal;
   }
+}
+
+/* Icono de carga del botón "Ingresando..." */
+.authSpinner {
+  animation: authSpinnerRotate 0.8s linear infinite;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+@keyframes authSpinnerRotate {
+  to { transform: rotate(360deg); }
 }

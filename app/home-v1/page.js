@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import HeroDistortion from "@/app/components/hero-distortion";
-import { DrokexWorldSection, MarketsSection } from "@/app/components/drokex-world-experience";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import ProductChat from "@/app/components/product-chat";
@@ -312,20 +311,6 @@ const T = {
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Cinta de logos: se duplica en el render para que el bucle no deje huecos.
-const PARTNER_LOGOS = [
-  { src: "/logo-aws.png", alt: "AWS", square: true },
-  { src: "/partner-logo-drokex-green.png", alt: "Drokex" },
-  { src: "/logo-google-pay.png", alt: "Google Pay", square: true },
-  { src: "/partner-logo-drokex-black.png", alt: "Drokex" },
-  { src: "/logo-disney-plus.png", alt: "Disney+", square: true },
-  { src: "/partner-logo-drokex-green.png", alt: "Drokex" },
-  { src: "/logo-arch.png", alt: "Arch Linux", square: true },
-  { src: "/partner-logo-drokex-black.png", alt: "Drokex" },
-  { src: "/logo-gc-international.png", alt: "GC International", square: true },
-  { src: "/partner-logo-drokex-green.png", alt: "Drokex" },
-];
-
 const videos = [
   {
     src: "/mauren-blandon.jpeg",
@@ -369,6 +354,139 @@ const heroThemes = [
   { id: "green", image: "/hero-banner-green.jpg" },
   { id: "orange", image: "/hero-banner-orange.jpg" },
 ];
+
+const globalMarkets = [
+  {
+    id: "ni",
+    label: "Nicaragua",
+    flag: "🇳🇮",
+    seller: "Camila Rivas",
+    role: "Aliada comercial",
+    badge: "CR",
+    portrait: "/market-person-3.jpg",
+    accent: "#7FE040",
+    accentSoft: "rgba(127, 224, 64, 0.22)",
+    orderLabel: "Pedido para NI",
+    orderAmount: "US$ 125,00",
+    headline: "Activa oportunidades comerciales para Nicaragua con una catálogo más clara.",
+    description:
+      "Adapta tu catálogo a mercados clave y muestra una propuesta mas confiable para compradores que necesitan velocidad, contexto y seguimiento.",
+  },
+  {
+    id: "hn",
+    label: "Honduras",
+    flag: "🇭🇳",
+    seller: "Sofia Ramirez",
+    role: "Aliada comercial",
+    badge: "SR",
+    portrait: "/market-person-2.jpg",
+    accent: "#6e87ff",
+    accentSoft: "rgba(110, 135, 255, 0.2)",
+    orderLabel: "Pedido para HN",
+    orderAmount: "US$ 110,00",
+    headline: "Convierte expansión regional en una experiencia más visual y más ágil.",
+    description:
+      "Desde el interes inicial hasta el pedido, Drokex puede mostrar una narrativa comercial distinta para cada pais objetivo.",
+  },
+  {
+    id: "gt",
+    label: "Guatemala",
+    flag: "🇬🇹",
+    seller: "Andrea Solis",
+    role: "Proveedor exportador",
+    badge: "AS",
+    portrait: "/market-person-1.jpg",
+    accent: "#7FE040",
+    accentSoft: "rgba(127, 224, 64, 0.2)",
+    orderLabel: "Pedido para GT",
+    orderAmount: "US$ 94,00",
+    headline: "Haz que tu oferta se sienta lista para crecer en Centroamerica.",
+    description:
+      "Con vistas comerciales mas ordenadas y mensajes mas claros, tus productos pueden generar confianza desde el primer contacto.",
+  },
+  {
+    id: "sv",
+    label: "El Salvador",
+    flag: "🇸🇻",
+    seller: "Mariana Perez",
+    role: "Compradora mayorista",
+    badge: "MP",
+    portrait: "/market-person-3.jpg",
+    accent: "#ff7a66",
+    accentSoft: "rgba(255, 122, 102, 0.2)",
+    orderLabel: "Pedido para SV",
+    orderAmount: "US$ 138,00",
+    headline: "Presenta una experiencia comercial pensada para El Salvador.",
+    description:
+      "Cada bandera puede activar otra catálogo, otra historia y otro ritmo de conversión para una expansión más inteligente.",
+  },
+  {
+    id: "do",
+    label: "República Dominicana",
+    flag: "🇩🇴",
+    seller: "Daniela Cruz",
+    role: "Compradora mayorista",
+    badge: "DC",
+    portrait: "/market-person-1.jpg",
+    accent: "#f97316",
+    accentSoft: "rgba(249, 115, 22, 0.2)",
+    orderLabel: "Pedido para DO",
+    orderAmount: "US$ 142,00",
+    headline: "Abre una entrada comercial mas directa para República Dominicana.",
+    description:
+      "La experiencia adapta mensajes, precios y contexto para que cada oportunidad internacional se sienta mas cercana.",
+  },
+  {
+    id: "co",
+    label: "Colombia",
+    flag: "🇨🇴",
+    seller: "Laura Torres",
+    role: "Marca de consumo",
+    badge: "LT",
+    portrait: "/market-person-2.jpg",
+    accent: "#18c4d9",
+    accentSoft: "rgba(24, 196, 217, 0.2)",
+    orderLabel: "Pedido para CO",
+    orderAmount: "US$ 82,00",
+    headline: "Activa mercados cercanos con una experiencia mas local y mas directa.",
+    description:
+      "Drokex ayuda a presentar catalogo, origen y oportunidad comercial con una capa visual lista para hablarle a cada mercado.",
+  },
+  {
+    id: "pe",
+    label: "Perú",
+    flag: "🇵🇪",
+    seller: "Renata Salas",
+    role: "Distribuidora retail",
+    badge: "RS",
+    portrait: "/market-person-3.jpg",
+    accent: "#ef4444",
+    accentSoft: "rgba(239, 68, 68, 0.18)",
+    orderLabel: "Pedido para PE",
+    orderAmount: "US$ 118,00",
+    headline: "Conecta productos y compradores en Perú con una catálogo mas confiable.",
+    description:
+      "Drokex ordena el contenido comercial para que el mercado vea disponibilidad, origen y propuesta con rapidez.",
+  },
+  {
+    id: "mx",
+    label: "México",
+    flag: "🇲🇽",
+    seller: "Valeria Mendez",
+    role: "Distribuidora industrial",
+    badge: "VM",
+    portrait: "/market-person-3.jpg",
+    accent: "#7FE040",
+    accentSoft: "rgba(127, 224, 64, 0.2)",
+    orderLabel: "Pedido para MX",
+    orderAmount: "US$ 125,00",
+    headline: "Vende y realiza envios a México con mas claridad comercial.",
+    description:
+      "Adapta tu catálogo a mercados clave y muestra una propuesta mas confiable para compradores que necesitan velocidad, contexto y seguimiento.",
+  },
+];
+
+const COUNTRY_PREFERENCE_STORAGE_KEY = "drokex-selected-country";
 
 const platformFlowSteps = [
   { num: "1.", title: "PUBLICAS", desc: "Creas tu perfil y publicas tu catálogo de productos.", iconPath: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8" },
@@ -451,6 +569,16 @@ const operatingHighlights = [
     icon: <SystemHeadsetIcon />,
   },
 ];
+
+function getWrappedOffset(index, activeIndex, total) {
+  const direct = index - activeIndex;
+  const forward = direct > 0 ? direct - total : direct + total;
+  const candidates = [direct, forward];
+
+  return candidates.reduce((best, current) =>
+    Math.abs(current) < Math.abs(best) ? current : best,
+  );
+}
 
 const gifItems = [
   { src: "/home-feature-globe.mp4", labelKey: "gifLabel1" },
@@ -643,6 +771,12 @@ export default function Home() {
   const [marketChatState, setMarketChatState] = useState("idle"); // idle | auth-wall | chat
   const [marketChatTarget, setMarketChatTarget] = useState(null);
 
+  function handleMarketContact(market) {
+    const msg = encodeURIComponent(`Hola, estoy interesado en conectar con el mercado de ${market.label} a través de Drokex. ¿Me puedes ayudar?`);
+    window.open(`https://wa.me/573209654384?text=${msg}`, "_blank");
+  }
+  const [activeMarket, setActiveMarket] = useState(0);
+  const marketPausedRef = useRef(false);
   const [platformActive, setPlatformActive] = useState(0);
   const pfViewportRef = useRef(null);
   const pfCardRef = useRef(null);
@@ -773,6 +907,8 @@ export default function Home() {
     () => heroThemes.find((theme) => theme.id === heroTheme) || heroThemes[0],
     [heroTheme],
   );
+  const currentMarket = useMemo(() => globalMarkets[activeMarket], [activeMarket]);
+
   // Read lang from localStorage on mount and listen for changes
   useEffect(() => {
     const stored = localStorage.getItem("drokex-lang") || "es";
@@ -785,6 +921,27 @@ export default function Home() {
 
     window.addEventListener("drokex-lang-change", handleLangChange);
     return () => window.removeEventListener("drokex-lang-change", handleLangChange);
+  }, []);
+
+  useEffect(() => {
+    const savedCountry = window.localStorage.getItem(COUNTRY_PREFERENCE_STORAGE_KEY) || "";
+
+    if (!savedCountry) return;
+
+    const savedIndex = globalMarkets.findIndex((market) => market.id === savedCountry);
+
+    if (savedIndex < 0) return;
+
+    setActiveMarket(savedIndex);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!marketPausedRef.current) {
+        setActiveMarket(prev => (prev + 1) % globalMarkets.length);
+      }
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -1043,38 +1200,140 @@ export default function Home() {
       </section>
 
 
-      <section className={styles.adBannerSection}>
+      <section className={styles.marketsSection}>
         <div className="shell">
-          <motion.div className={styles.adBanner} {...fadeUp()}>
-            <Image
-              src="/banner-lego-dragon.png"
-              alt="LEGO — Cada pieza despierta una aventura"
-              width={2400}
-              height={800}
-              sizes="(max-width: 1200px) 100vw, 1200px"
-              className={styles.adBannerImage}
-              priority={false}
-            />
-          </motion.div>
+          <div className={styles.marketsStage}>
+            <div className={styles.marketsRobotAccent} aria-hidden="true">
+              <Image
+                src="/markets-robot-right.png"
+                alt=""
+                width={538}
+                height={744}
+                sizes="(max-width: 960px) 0px, 280px"
+                className={styles.marketsRobotImage}
+              />
+            </div>
+
+            <div className={styles.marketsGrid}>
+              <div className={styles.marketsContent}>
+                <div className={styles.marketsBrand}>
+                  <Image
+                    src="/logo.png"
+                    alt="Drokex"
+                    width={550}
+                    height={144}
+                    sizes="(max-width: 720px) 220px, 320px"
+                    className={styles.marketsBrandLogo}
+                  />
+                  <p>{t.marketsGrow}</p>
+                </div>
+
+                <div className={styles.marketsInteractive}>
+                  <div className={styles.marketsRail} role="tablist" aria-label={t.ariaMarkets}>
+                    {globalMarkets.map((market, index) => (
+                      <button
+                        key={market.id}
+                        type="button"
+                        className={activeMarket === index ? `${styles.marketFlag} ${styles.isActive}` : styles.marketFlag}
+                        onClick={() => { setActiveMarket(index); marketPausedRef.current = true; setTimeout(() => { marketPausedRef.current = false; }, 6000); }}
+                        aria-selected={activeMarket === index}
+                        role="tab"
+                      >
+                        <span aria-hidden="true">{market.flag}</span>
+                        <span className="sr-only">{market.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className={styles.marketsScene}>
+                    <div className={styles.marketsGlow} aria-hidden="true" />
+                    <div className={styles.marketsPattern} aria-hidden="true" />
+
+                    <div className={styles.marketsCards} aria-hidden="true">
+                      {globalMarkets.map((market, index) => {
+                        const offset = getWrappedOffset(index, activeMarket, globalMarkets.length);
+                        const hidden = Math.abs(offset) > 1;
+
+                        return (
+                          <article
+                            key={market.id}
+                            className={offset === 0 ? `${styles.marketCard} ${styles.isActive}` : styles.marketCard}
+                            style={{
+                              "--market-accent": market.accent,
+                              "--market-accent-soft": market.accentSoft,
+                              "--market-offset": offset,
+                              "--market-shift-y": `${Math.abs(offset) * 12}px`,
+                              "--market-opacity": hidden ? 0 : offset === 0 ? 1 : 0.24,
+                              "--market-scale": offset === 0 ? 1 : 0.84,
+                              "--market-rotate": `${offset * 4}deg`,
+                              zIndex: offset === 0 ? 3 : offset < 0 ? 2 : 1,
+                            }}
+                          >
+                            <div className={styles.marketCardFrame}>
+                              <div className={styles.marketCardPhoto}>
+                                <Image
+                                  src={market.portrait}
+                                  alt={market.seller}
+                                  width={736}
+                                  height={1103}
+                                  sizes="240px"
+                                  className={styles.marketCardPortrait}
+                                />
+                                <div className={styles.marketAvatarRing}>
+                                  <span>{market.badge}</span>
+                                </div>
+                                <div className={styles.marketCardCopy}>
+                                  <strong>{market.seller}</strong>
+                                  <span>{market.role}</span>
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                className={styles.marketCardAction}
+                                onClick={() => handleMarketContact(market)}
+                              >
+                                Contáctame ahora
+                              </button>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+
+                    <div
+                      key={`${currentMarket.id}-pill`}
+                      className={styles.marketOrderPill}
+                      style={{ "--market-pill-accent": currentMarket.accent }}
+                    >
+                      <span className={styles.marketOrderFlag} aria-hidden="true">
+                        {currentMarket.flag}
+                      </span>
+                      <span className={styles.marketOrderCopy}>
+                        <strong>{currentMarket.orderLabel}</strong>
+                        <span>{currentMarket.orderAmount}</span>
+                      </span>
+                    </div>
+
+                  </div>
+                </div>
+
+                <div key={`${currentMarket.id}-copy`} className={styles.marketsCopy}>
+                  <h3>{currentMarket.headline}</h3>
+                  <p>{currentMarket.description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
-
-
-      <DrokexWorldSection />
-      <MarketsSection />
 
       {/* Logo ticker strip */}
       <div className={styles.logoTickerStrip}>
         <p className={styles.logoTickerTitle}>Trabajamos con los mejores para entregar <span>siempre</span></p>
         <div className={styles.logoTickerTrackWrap} aria-hidden="true">
           <div className={styles.logoTickerTrack}>
-            {[...PARTNER_LOGOS, ...PARTNER_LOGOS].map((logo, i) => (
-              <img
-                key={i}
-                src={logo.src}
-                alt={logo.alt}
-                className={`${styles.logoTickerItem}${logo.square ? ` ${styles.logoTickerItemSquare}` : ""}`}
-              />
+            {["black","green","black","green","black","green","black","green","black","green","black","green","black","green","black","green"].map((variant, i) => (
+              <img key={i} src={`/partner-logo-drokex-${variant}.png`} alt="Drokex" className={styles.logoTickerItem} />
             ))}
           </div>
         </div>

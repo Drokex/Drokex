@@ -233,7 +233,6 @@ export default function AdminPage() {
           </div>
 
           <div className={styles.providerCleanTools}>
-            <div className={styles.providerCleanPill} aria-hidden="true" />
             <LogoutButton />
           </div>
         </div>

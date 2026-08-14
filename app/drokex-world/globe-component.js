@@ -67,7 +67,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
 
     const ctrl = globeRef.current.controls();
     ctrl.autoRotate = false;
-    ctrl.enableZoom = true;
+    ctrl.enableZoom = false;
     ctrl.minDistance = 150;
     ctrl.maxDistance = 700;
     globeRef.current.pointOfView({ lat: 12, lng: -78, altitude: 2.6 });
@@ -81,8 +81,21 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
     }
   }, [ready, selectedCountry]);
 
+  function zoomBy(factor) {
+    const globe = globeRef.current;
+    if (!globe) return;
+    const camera = globe.camera();
+    const controls = globe.controls();
+    const dir = camera.position.clone().sub(controls.target);
+    const dist = dir.length();
+    const newDist = Math.max(controls.minDistance, Math.min(controls.maxDistance, dist * factor));
+    dir.setLength(newDist);
+    camera.position.copy(controls.target).add(dir);
+    controls.update();
+  }
+
   return (
-    <div ref={containerRef} style={{ width: "100%", height: "100%", background: "radial-gradient(ellipse at 50% 50%, #001a08 0%, #000 70%)" }}>
+    <div ref={containerRef} style={{ position: "relative", width: "100%", height: "100%", background: "radial-gradient(ellipse at 50% 50%, #001a08 0%, #000 70%)" }}>
       <Globe
         ref={globeRef}
         width={size.w}
@@ -163,6 +176,25 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         ringPropagationSpeed={2.5}
         ringRepeatPeriod={1000}
       />
+
+      <div style={{ position: "absolute", right: 16, bottom: 90, zIndex: 60, display: "flex", flexDirection: "column", gap: 6 }}>
+        <button
+          type="button"
+          onClick={() => zoomBy(0.8)}
+          aria-label="Acercar"
+          style={{ width: 34, height: 34, borderRadius: 10, border: "1px solid rgba(127,224,64,0.25)", background: "rgba(0,0,0,0.6)", color: "#7FE040", fontSize: 18, fontWeight: 900, cursor: "pointer", backdropFilter: "blur(8px)" }}
+        >
+          +
+        </button>
+        <button
+          type="button"
+          onClick={() => zoomBy(1.25)}
+          aria-label="Alejar"
+          style={{ width: 34, height: 34, borderRadius: 10, border: "1px solid rgba(127,224,64,0.25)", background: "rgba(0,0,0,0.6)", color: "#7FE040", fontSize: 18, fontWeight: 900, cursor: "pointer", backdropFilter: "blur(8px)" }}
+        >
+          −
+        </button>
+      </div>
     </div>
   );
 }

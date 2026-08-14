@@ -41,6 +41,7 @@ const menuItemsEs = [
   { label: "Servicios", submenu: [{ label: "Proveedor", href: "/servicios/proveedor" }, { label: "Cliente", href: "/servicios/cliente" }] },
   { label: "Sobre nosotros", href: "/sobre-nosotros" },
   { label: "Ayuda / PQR", href: "/ayuda" },
+  { label: "Home V1", href: "/home-v1" },
 ];
 const menuItemsEn = [
   { label: "Products", href: "/productos" },
@@ -49,6 +50,7 @@ const menuItemsEn = [
   { label: "Services", submenu: [{ label: "Supplier", href: "/servicios/proveedor" }, { label: "Buyer", href: "/servicios/cliente" }] },
   { label: "About us", href: "/sobre-nosotros" },
   { label: "Help / PQR", href: "/ayuda" },
+  { label: "Home V1", href: "/home-v1" },
 ];
 
 function NavDropdown({ item }) {
@@ -86,6 +88,9 @@ function NavDropdown({ item }) {
 
 export default function SiteHeader({ hideCountry = false }) {
   const [user, setUser] = useState(null);
+  // Hasta que /api/account responda no sabemos si hay sesión. Pintar
+  // "Iniciar sesión" mientras tanto provoca un parpadeo en cada carga.
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [accountLink, setAccountLink] = useState("/mi-cuenta");
   const [countryFlag, setCountryFlag] = useState("");
   const [countryLabel, setCountryLabel] = useState("");
@@ -119,12 +124,16 @@ export default function SiteHeader({ hideCountry = false }) {
         if (!isMounted) return;
 
         if (!response.ok) {
-          if (shouldClearSession(response.status)) setUser(null);
+          if (shouldClearSession(response.status)) {
+            setUser(null);
+            setSessionChecked(true);
+          }
           return;
         }
 
         const payload = await response.json();
         setUser(payload.user ?? null);
+        setSessionChecked(true);
         setAccountLink(
           payload.user?.role === "ADMIN"
             ? "/admin"
@@ -211,7 +220,10 @@ export default function SiteHeader({ hideCountry = false }) {
             </button>
           ) : null}
 
-          {user ? (
+          {!sessionChecked ? (
+            // Espacio reservado: evita el salto "Iniciar sesión" → nombre del usuario.
+            <span className="header-session-placeholder" aria-hidden="true" />
+          ) : user ? (
             <>
               <Link href={accountLink} className="text-link header-account-link">
                 <span className="header-user-name">{user.fullName || (lang === "en" ? "My account" : "Mi cuenta")}</span>

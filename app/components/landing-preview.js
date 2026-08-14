@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { buildMarketPrice, inferCurrencyFromOriginCountry, COUNTRY_PREFERENCE_STORAGE_KEY } from "@/lib/market-pricing";
 import AiImageWizard from "@/app/components/ai-image-wizard";
 
@@ -60,7 +61,11 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
       }}
       style={{ position: "relative", display: inline ? "inline-block" : "block", ...wrapperStyle }}
     >
-      {focused && (
+      {/* Portal a document.body: este bloque puede quedar dentro del <button> del
+          CTA (ej. tarjeta de producto). Con position:fixed sigue siendo hijo del
+          DOM, y <button> dentro de <button> es HTML inválido — provoca el warning
+          de hidratación "cannot be a descendant of". Fuera del árbol, no aplica. */}
+      {focused && typeof document !== "undefined" && createPortal(
         <div onMouseDown={e => e.preventDefault()}
           style={{ position: "fixed", top: toolbarPos.top, left: toolbarPos.left, zIndex: 9999, background: "#0c140c", border: "1px solid rgba(127, 224, 64, 0.5)", borderRadius: 10, padding: "7px 10px", display: "flex", gap: 6, alignItems: "center", boxShadow: "0 8px 24px rgba(0,0,0,0.6)", whiteSpace: "nowrap" }}>
           <button style={btnStyle} onMouseDown={e => { e.preventDefault(); onFontSizeChange?.(Math.max(10, (fontSize || 16) - 2)); }}>A−</button>
@@ -181,7 +186,8 @@ function EditableText({ tag: Tag = "p", value, fontSize, fontColor, onTextChange
               </button>
             </div>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
       <Tag
         ref={ref}

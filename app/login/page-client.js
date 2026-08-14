@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import SiteHeader from "@/app/components/site-header";
 import authFieldStyles from "@/app/components/auth-fields.module.css";
 import styles from "@/app/components/auth-account.module.css";
@@ -85,9 +86,9 @@ export default function LoginClient() {
     });
 
     const payload = await response.json();
-    setIsSubmitting(false);
 
     if (response.status === 202 && payload.requiresAdminPin) {
+      setIsSubmitting(false);
       setRequiresAdminPin(true);
       setTone("success");
       setMessage(payload.message || "Confirma el PIN del administrador.");
@@ -95,10 +96,14 @@ export default function LoginClient() {
     }
 
     if (!response.ok) {
+      setIsSubmitting(false);
       setTone("error");
       setMessage(payload.error || "No fue posible iniciar sesión.");
       return;
     }
+
+    // En caso de éxito no reactivamos el botón: el spinner sigue hasta que
+    // la navegación al panel se complete.
 
     const nextPath = searchParams.get("next");
     const redirectTo =
@@ -233,7 +238,14 @@ export default function LoginClient() {
                   className={isProvider ? `primary-button ${styles.authSubmitButton} ${styles.isProvider}` : `primary-button ${styles.authSubmitButton} ${styles.isClient}`}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={17} strokeWidth={2.6} className={styles.authSpinner} aria-hidden="true" />
+                      Ingresando...
+                    </>
+                  ) : (
+                    "Iniciar sesión"
+                  )}
                 </button>
                 <Link
                   href={isProvider ? "/registro?role=proveedor" : "/registro?role=cliente"}
