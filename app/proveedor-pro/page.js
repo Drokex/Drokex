@@ -552,7 +552,7 @@ export default function ProveedorProPage({
           </div>
         </section>
       ) : !isPro ? (
-        <section style={{ display: "grid", gridTemplateColumns: "420px 1fr", minHeight: "calc(100vh - 80px)", background: "#ffffff" }}>
+        <section className="grid grid-cols-1 md:grid-cols-[420px_1fr]" style={{ minHeight: "calc(100vh - 80px)", background: "#ffffff" }}>
           {/* Left: text + plan + form */}
           <div style={{ padding: "64px 40px", display: "flex", flexDirection: "column", justifyContent: "center", gap: 24, background: "#ffffff" }}>
             <span style={{ display: "inline-block", background: "rgba(127, 224, 64, 0.1)", color: "#7FE040", fontSize: "0.7rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", padding: "5px 14px", borderRadius: 6, border: "1px solid rgba(127, 224, 64, 0.25)", alignSelf: "flex-start" }}>
@@ -616,7 +616,7 @@ export default function ProveedorProPage({
           <h1 style={{ margin: "0 0 8px", fontSize: "clamp(1.6rem, 3vw, 2.4rem)", fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", textAlign: "center" }}>Elige tu plantilla</h1>
           <p style={{ margin: "0 0 48px", fontSize: "0.95rem", color: "rgba(255,255,255,0.45)", textAlign: "center" }}>Puedes cambiar colores y textos después desde el editor.</p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 220px)", gap: 18, maxWidth: 1200 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 18, maxWidth: 1200, width: "100%" }}>
             {TEMPLATES.map(tpl => (
               <button key={tpl.id} onClick={() => applyTemplate(tpl)} type="button"
                 style={{ textAlign: "left", background: "none", border: "none", padding: 0, cursor: "pointer", borderRadius: 20, outline: "none" }}
@@ -954,7 +954,7 @@ export default function ProveedorProPage({
           </div>
 
           {landingLink && (
-            <div style={{ position: "fixed", left: 22, bottom: 22, zIndex: 80, width: 300, borderRadius: 18, border: "1px solid rgba(127, 224, 64, 0.3)", background: "rgba(255,255,255,0.92)", boxShadow: "0 18px 50px rgba(0,0,0,0.16)", padding: 14, backdropFilter: "blur(14px)" }}>
+            <div style={{ position: "fixed", left: 22, bottom: 22, zIndex: 80, width: "min(300px, calc(100vw - 44px))", borderRadius: 18, border: "1px solid rgba(127, 224, 64, 0.3)", background: "rgba(255,255,255,0.92)", boxShadow: "0 18px 50px rgba(0,0,0,0.16)", padding: 14, backdropFilter: "blur(14px)" }}>
               <p style={{ margin: "0 0 6px", color: "#7FE040", fontSize: "0.68rem", fontWeight: 950, letterSpacing: "0.14em", textTransform: "uppercase" }}>Landing publicada</p>
               <a href={landingLink} style={{ display: "block", color: "#555", fontSize: "0.74rem", wordBreak: "break-all", marginBottom: 8 }}>{landingLink}</a>
               <button type="button" onClick={copyLandingLink} style={{ width: "100%", borderRadius: 11, border: "1px solid rgba(127, 224, 64, 0.35)", background: "rgba(127, 224, 64, 0.08)", color: "#7FE040", fontWeight: 950, padding: "8px 10px", cursor: "pointer" }}>
@@ -1075,7 +1075,7 @@ export default function ProveedorProPage({
       {showContactModal && (
         <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setShowContactModal(false); }}>
-          <div style={{ background: "#fff", borderRadius: 24, padding: "36px 40px", width: 420, boxShadow: "0 32px 80px rgba(0,0,0,0.22)", display: "flex", flexDirection: "column", gap: 20 }}>
+          <div style={{ background: "#fff", borderRadius: 24, padding: "36px 40px", width: "min(420px, calc(100vw - 32px))", maxHeight: "calc(100vh - 32px)", overflowY: "auto", boxShadow: "0 32px 80px rgba(0,0,0,0.22)", display: "flex", flexDirection: "column", gap: 20, boxSizing: "border-box" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{ width: 46, height: 46, borderRadius: 14, background: "rgba(127,224,64,0.12)", border: "1px solid rgba(127,224,64,0.25)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>
                 📞
