@@ -56,16 +56,24 @@ export async function POST(request, { params }) {
   const conversation = await prisma.conversation.findUnique({
     where: { id },
     include: {
-      product: { select: { name: true, slug: true, provider: { select: { email: true, fullName: true } } } },
+      product: {
+        select: {
+          name: true,
+          slug: true,
+          providerId: true,
+          provider: { select: { email: true, fullName: true } },
+        },
+      },
       client: { select: { fullName: true, company: true } },
       _count: { select: { messages: true } },
     },
   });
   if (!conversation) return Response.json({ error: "Conversación no encontrada." }, { status: 404 });
 
-  const isProvider = session.role === "PROVIDER" || session.role === "ADMIN";
+  const isAdmin = session.role === "ADMIN";
+  const isOwnerProvider = session.role === "PROVIDER" && conversation.product?.providerId === session.userId;
   const isClient = conversation.clientId === session.userId;
-  if (!isClient && !isProvider) return Response.json({ error: "Sin acceso." }, { status: 403 });
+  if (!isClient && !isOwnerProvider && !isAdmin) return Response.json({ error: "Sin acceso." }, { status: 403 });
 
   const isFirstMessage = conversation._count.messages === 0;
 

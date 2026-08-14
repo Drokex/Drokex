@@ -5,9 +5,10 @@ export async function GET() {
   const session = await getCurrentSession();
   if (!session?.userId) return Response.json({ error: "No autorizado." }, { status: 401 });
 
-  const isProvider = session.role === "ADMIN" || session.role === "PROVIDER";
+  const isAdmin = session.role === "ADMIN";
+  const isProvider = isAdmin || session.role === "PROVIDER";
   const quotes = isProvider
-    ? await getQuotesForProvider()
+    ? await getQuotesForProvider(isAdmin ? null : session.userId)
     : await getQuotesForClient(session.userId);
 
   return Response.json({ quotes });

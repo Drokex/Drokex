@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
   const conversation = await prisma.conversation.findUnique({
     where: { id },
     include: {
-      product: { select: { name: true, supplier: true, slug: true } },
+      product: { select: { name: true, supplier: true, slug: true, providerId: true } },
       client: { select: { id: true, fullName: true, company: true } },
       messages: {
         orderBy: { createdAt: "asc" },
@@ -21,9 +21,10 @@ export async function GET(request, { params }) {
 
   if (!conversation) return Response.json({ error: "Conversación no encontrada." }, { status: 404 });
 
-  const isProvider = session.role === "PROVIDER" || session.role === "ADMIN";
+  const isAdmin = session.role === "ADMIN";
+  const isOwnerProvider = session.role === "PROVIDER" && conversation.product?.providerId === session.userId;
   const isClient = conversation.clientId === session.userId;
-  if (!isClient && !isProvider) return Response.json({ error: "Sin acceso." }, { status: 403 });
+  if (!isClient && !isOwnerProvider && !isAdmin) return Response.json({ error: "Sin acceso." }, { status: 403 });
 
   return Response.json({ conversation });
 }

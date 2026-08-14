@@ -2,6 +2,10 @@ import { getCurrentUser } from "@/lib/current-user";
 import { createProduct, getAdminProducts } from "@/lib/products";
 
 export async function GET() {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "ADMIN") {
+    return Response.json({ error: "No autorizado." }, { status: 401 });
+  }
   const products = await getAdminProducts();
   return Response.json({ products });
 }

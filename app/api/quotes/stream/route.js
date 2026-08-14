@@ -13,7 +13,7 @@ export async function GET() {
   const session = await getCurrentSession();
   if (!session?.userId) return new Response("No autorizado.", { status: 401 });
 
-  const key = session.role === "ADMIN" || session.role === "PROVIDER" ? "__all__" : session.userId;
+  const key = session.role === "ADMIN" ? "__all__" : session.userId;
 
   const stream = new ReadableStream({
     start(controller) {

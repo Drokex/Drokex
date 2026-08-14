@@ -46,10 +46,18 @@ export async function GET() {
   const session = await getCurrentSession();
   if (!session?.userId) return Response.json({ error: "No autorizado." }, { status: 401 });
 
-  const isProvider = session.role === "PROVIDER" || session.role === "ADMIN";
+  const isAdmin = session.role === "ADMIN";
+  const isProvider = session.role === "PROVIDER";
 
-  const conversations = isProvider
+  const where = isAdmin
+    ? undefined
+    : isProvider
+      ? { product: { providerId: session.userId } }
+      : { clientId: session.userId };
+
+  const conversations = isAdmin || isProvider
     ? await prisma.conversation.findMany({
+        where,
         orderBy: { updatedAt: "desc" },
         include: {
           product: { select: { name: true, slug: true, supplier: true } },
@@ -58,7 +66,7 @@ export async function GET() {
         },
       })
     : await prisma.conversation.findMany({
-        where: { clientId: session.userId },
+        where,
         orderBy: { updatedAt: "desc" },
         include: {
           product: { select: { name: true, slug: true, supplier: true } },
