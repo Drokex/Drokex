@@ -725,7 +725,7 @@
     grid-template-columns: 1fr;
   }
 
-  .cdkHeroImage {
+  .cdkHeroBg {
     display: none;
   }
 }
