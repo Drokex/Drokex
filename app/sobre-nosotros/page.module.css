@@ -546,6 +546,10 @@
     min-height: 620px;
   }
 
+.aboutHero {
+    aspect-ratio: auto;
+  }
+
 .aboutHero h1 {
     max-width: 680px;
   }
@@ -587,6 +591,7 @@
   .aboutHeroContent {
     min-height: 760px;
   }
+
 
 .aboutHeroContent {
     padding-top: 42px;
