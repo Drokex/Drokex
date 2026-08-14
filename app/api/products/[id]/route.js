@@ -1,8 +1,22 @@
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/current-user";
 import { updateProduct, deleteProduct } from "@/lib/products";
+
+async function assertOwnership(id, user) {
+  if (!user) return false;
+  if (user.role === "ADMIN") return true;
+  if (!prisma) return true;
+  const product = await prisma.product.findUnique({ where: { id }, select: { providerId: true } });
+  return Boolean(product) && product.providerId === user.id;
+}
 
 export async function PATCH(request, context) {
   try {
     const { id } = await context.params;
+    const user = await getCurrentUser();
+    if (!(await assertOwnership(id, user))) {
+      return Response.json({ error: "No autorizado." }, { status: 403 });
+    }
     const body = await request.json();
     const product = await updateProduct(id, body);
     return Response.json({ product });
@@ -17,6 +31,10 @@ export async function PATCH(request, context) {
 export async function DELETE(request, context) {
   try {
     const { id } = await context.params;
+    const user = await getCurrentUser();
+    if (!(await assertOwnership(id, user))) {
+      return Response.json({ error: "No autorizado." }, { status: 403 });
+    }
     await deleteProduct(id);
     return Response.json({ success: true });
   } catch (error) {

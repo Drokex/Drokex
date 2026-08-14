@@ -2,7 +2,7 @@ import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import ProductForm from "@/app/components/product-form";
 import { getCurrentUser } from "@/lib/current-user";
-import { getAdminProducts } from "@/lib/products";
+import { getProductsByProvider } from "@/lib/products";
 import { notFound } from "next/navigation";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
@@ -24,7 +24,7 @@ export default async function EditarProductoPage({ params }) {
     );
   }
 
-  const products = await getAdminProducts();
+  const products = await getProductsByProvider(user.id);
   const product = products.find((p) => p.id === id);
   if (!product) notFound();
 

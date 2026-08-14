@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentUser } from "@/lib/current-user";
-import { getAdminProducts } from "@/lib/products";
+import { getProductsByProvider } from "@/lib/products";
 import InventoryActions from "@/app/components/inventory-actions";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
@@ -23,7 +23,7 @@ export default async function InventarioPage() {
     );
   }
 
-  const products = await getAdminProducts();
+  const products = await getProductsByProvider(user.id);
 
   return (
     <main className={styles.providerDashboardPage}>
