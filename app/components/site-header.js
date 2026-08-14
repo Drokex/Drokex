@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 import LogoutButton from "@/app/components/logout-button";
 import { shouldClearSession } from "@/lib/session-status";
 
@@ -86,6 +88,51 @@ function NavDropdown({ item }) {
   );
 }
 
+function MobileNavPanel({ items, top, onClose, panelRef }) {
+  const [openSub, setOpenSub] = useState(null);
+
+  return (
+    <div
+      id="mobile-nav-panel"
+      className="mobile-nav-panel"
+      style={{ top }}
+      ref={panelRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menú"
+    >
+      {items.map((item) =>
+        item.submenu ? (
+          <div key={item.label} className="mobile-nav-group">
+            <button
+              type="button"
+              className="mobile-nav-toggle"
+              onClick={() => setOpenSub((v) => (v === item.label ? null : item.label))}
+              aria-expanded={openSub === item.label}
+            >
+              {item.label}
+              <span className={openSub === item.label ? "nav-dropdown-chevron is-open" : "nav-dropdown-chevron"}>▾</span>
+            </button>
+            {openSub === item.label && (
+              <div className="mobile-nav-submenu">
+                {item.submenu.map((sub) => (
+                  <Link key={sub.href} href={sub.href} className="mobile-nav-link" onClick={onClose}>
+                    {sub.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <Link key={item.label} href={item.href} className="mobile-nav-link" onClick={onClose}>
+            {item.label}
+          </Link>
+        )
+      )}
+    </div>
+  );
+}
+
 export default function SiteHeader({ hideCountry = false }) {
   const [user, setUser] = useState(null);
   // Hasta que /api/account responda no sabemos si hay sesión. Pintar
@@ -96,6 +143,47 @@ export default function SiteHeader({ hideCountry = false }) {
   const [countryLabel, setCountryLabel] = useState("");
   const [isCountryDialogOpen, setIsCountryDialogOpen] = useState(false);
   const [lang, setLang] = useState("es");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [panelTop, setPanelTop] = useState(0);
+  const headerRef = useRef(null);
+  const panelRef = useRef(null);
+  const toggleRef = useRef(null);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function updateTop() {
+      if (headerRef.current) setPanelTop(headerRef.current.offsetHeight);
+    }
+    updateTop();
+
+    function handleKeyDown(e) {
+      if (e.key === "Escape") setMobileOpen(false);
+    }
+    function handleResize() {
+      if (window.innerWidth > 720) setMobileOpen(false);
+      else updateTop();
+    }
+    function handleClickOutside(e) {
+      if (panelRef.current?.contains(e.target)) return;
+      if (toggleRef.current?.contains(e.target)) return;
+      setMobileOpen(false);
+    }
+
+    window.addEventListener("resize", handleResize);
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [mobileOpen]);
 
   function handleCountryFlagClick() {
     setIsCountryDialogOpen(true);
@@ -178,8 +266,10 @@ export default function SiteHeader({ hideCountry = false }) {
     };
   }, []);
 
+  const menuItems = lang === "en" ? menuItemsEn : menuItemsEs;
+
   return (
-    <header className="site-header">
+    <header className="site-header" ref={headerRef}>
       <div className="shell header-row">
         <Link href="/" className="brand-link" aria-label="Drokex">
           <Image
@@ -194,7 +284,7 @@ export default function SiteHeader({ hideCountry = false }) {
         </Link>
 
         <nav className="main-nav" aria-label="Principal">
-          {(lang === "en" ? menuItemsEn : menuItemsEs).map((item) =>
+          {menuItems.map((item) =>
             item.submenu ? (
               <NavDropdown key={item.label} item={item} />
             ) : (
@@ -240,8 +330,27 @@ export default function SiteHeader({ hideCountry = false }) {
               </Link>
             </>
           )}
+
+          <button
+            type="button"
+            className="mobile-menu-trigger"
+            ref={toggleRef}
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-panel"
+            aria-label={mobileOpen ? (lang === "en" ? "Close menu" : "Cerrar menú") : (lang === "en" ? "Open menu" : "Abrir menú")}
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </div>
+
+      {mobileOpen && typeof document !== "undefined"
+        ? createPortal(
+            <MobileNavPanel items={menuItems} top={panelTop} onClose={() => setMobileOpen(false)} panelRef={panelRef} />,
+            document.body
+          )
+        : null}
 
       {isCountryDialogOpen ? (
         <div className="header-country-modal-backdrop" onClick={handleCountryDialogClose}>
