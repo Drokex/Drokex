@@ -1054,14 +1054,14 @@ to { transform: rotate(360deg); }
   top: 24px;
 }
 
-.sidebar-ad {
+.catalog-banner {
   display: block;
   border-radius: 14px;
   overflow: hidden;
   line-height: 0;
 }
 
-.sidebar-ad__image {
+.catalog-banner__image {
   display: block;
   width: 100%;
   height: auto;

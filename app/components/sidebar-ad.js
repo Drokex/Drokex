@@ -21,14 +21,14 @@ export default function SidebarAd() {
   if (!banner) return null;
 
   return (
-    <div className="sidebar-ad">
+    <div className="catalog-banner">
       <Image
         src={banner.src}
         alt={banner.alt}
         width={300}
         height={600}
         sizes="280px"
-        className="sidebar-ad__image"
+        className="catalog-banner__image"
       />
     </div>
   );
