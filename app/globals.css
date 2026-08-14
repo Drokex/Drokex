@@ -613,38 +613,24 @@ button {
   gap: 26px;
 }
 
-@media (max-width: 960px)  {
-.shell {
-    width: min(1460px, calc(100% - 72px));
-  }
-
-.header-row
-{
-    grid-template-columns: 1fr;
-  }
-
-.site-footer-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
+/* Header: el nav (7 links) no cabe junto a logo + acciones por debajo de
+   ~1600px de viewport — sin este breakpoint el logo se aplasta contra su
+   propio max-width:100% (a veces hasta 0px) porque el track del medio
+   (auto) no cede espacio. Mismo hamburguesa/panel que <720px. */
+@media (max-width: 1600px)  {
 .header-row {
+    grid-template-columns: 1fr;
     min-height: auto;
     padding: 18px 0;
+  }
+
+.main-nav {
+    display: none;
   }
 
 .main-nav,
   .header-actions {
     justify-content: flex-start;
-  }
-}
-
-@media (max-width: 720px)  {
-.shell {
-    width: min(1460px, calc(100% - 32px));
-  }
-
-.main-nav {
-    display: none;
   }
 
 .header-actions {
@@ -654,6 +640,22 @@ button {
 
 .mobile-menu-trigger {
     display: inline-flex;
+  }
+}
+
+@media (max-width: 960px)  {
+.shell {
+    width: min(1460px, calc(100% - 72px));
+  }
+
+.site-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px)  {
+.shell {
+    width: min(1460px, calc(100% - 32px));
   }
 
 .site-footer-shell {
