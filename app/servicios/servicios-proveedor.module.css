@@ -106,7 +106,7 @@
 
 .spServicesGrid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 14px;
 }
 
@@ -157,6 +157,13 @@
   gap: 64px;
 }
 
+@media (max-width: 1080px) {
+  .spCoverageGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
 .spCoverage h2 {
   font-size: clamp(1.8rem, 3vw, 2.6rem);
   font-weight: 800;
@@ -176,8 +183,14 @@
 
 .spCountriesGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px 24px;
+}
+
+@media (max-width: 640px) {
+  .spCountriesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .spCountryCard {
@@ -702,6 +715,13 @@
   grid-template-columns: minmax(300px, 420px) 1fr;
   gap: 72px;
   align-items: center;
+}
+
+@media (max-width: 1080px) {
+  .spFaqGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }
 
 .spFaqImage {
