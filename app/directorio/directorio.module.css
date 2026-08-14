@@ -1,0 +1,12 @@
+.dirLayout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .dirLayout {
+    grid-template-columns: 1fr;
+  }
+}

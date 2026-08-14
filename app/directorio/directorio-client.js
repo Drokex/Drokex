@@ -5,6 +5,7 @@ import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import SidebarAd from "@/app/components/sidebar-ad";
+import styles from "./directorio.module.css";
 
 
 // Cada thumbnail es base64 pesado (hasta ~750KB): se piden una sola vez por slug en toda
@@ -454,7 +455,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
           </div>
 
           {/* Sidebar + Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: 24, alignItems: "start" }}>
+          <div className={styles.dirLayout}>
 
             {/* ── Sidebar filtros ── */}
             <div className="sidebar-col">
@@ -513,7 +514,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
             {/* ── Grid ── */}
             <div id="directorio-grid">
               {pagedPro.length > 0 ? (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 14 }}>
                   {pagedPro.map(({ slug, landing }) => (
                     <StoreCard key={slug} slug={slug} landing={landing} lm={lm} isLocal={localSlugs.has(slug)} onDelete={deleteLocalLanding} />
                   ))}
