@@ -67,7 +67,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
 
     const ctrl = globeRef.current.controls();
     ctrl.autoRotate = false;
-    ctrl.enableZoom = false;
+    ctrl.enableZoom = true;
     ctrl.minDistance = 150;
     ctrl.maxDistance = 700;
     globeRef.current.pointOfView({ lat: 12, lng: -78, altitude: 2.6 });
@@ -177,12 +177,12 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
         ringRepeatPeriod={1000}
       />
 
-      <div style={{ position: "absolute", right: 16, bottom: 90, zIndex: 60, display: "flex", flexDirection: "column", gap: 6 }}>
+      <div style={{ position: "absolute", right: 16, bottom: 16, zIndex: 60, display: "flex", flexDirection: "column", gap: 8 }}>
         <button
           type="button"
           onClick={() => zoomBy(0.8)}
           aria-label="Acercar"
-          style={{ width: 34, height: 34, borderRadius: 10, border: "1px solid rgba(127,224,64,0.25)", background: "rgba(0,0,0,0.6)", color: "#7FE040", fontSize: 18, fontWeight: 900, cursor: "pointer", backdropFilter: "blur(8px)" }}
+          style={{ width: 48, height: 48, borderRadius: 14, border: "1px solid rgba(127,224,64,0.25)", background: "rgba(0,0,0,0.6)", color: "#7FE040", fontSize: 26, fontWeight: 900, cursor: "pointer", backdropFilter: "blur(8px)" }}
         >
           +
         </button>
@@ -190,7 +190,7 @@ export default function DrokexGlobe({ onCountrySelect, selectedCountry }) {
           type="button"
           onClick={() => zoomBy(1.25)}
           aria-label="Alejar"
-          style={{ width: 34, height: 34, borderRadius: 10, border: "1px solid rgba(127,224,64,0.25)", background: "rgba(0,0,0,0.6)", color: "#7FE040", fontSize: 18, fontWeight: 900, cursor: "pointer", backdropFilter: "blur(8px)" }}
+          style={{ width: 48, height: 48, borderRadius: 14, border: "1px solid rgba(127,224,64,0.25)", background: "rgba(0,0,0,0.6)", color: "#7FE040", fontSize: 26, fontWeight: 900, cursor: "pointer", backdropFilter: "blur(8px)" }}
         >
           −
         </button>
