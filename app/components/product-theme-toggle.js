@@ -1,30 +1,23 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styles from "@/app/producto/[slug]/page.module.css";
+import { useGlobalTheme } from "@/app/components/global-theme";
 
 export default function ProductThemeToggle() {
-  const [light, setLight] = useState(true);
+  const [theme, toggleTheme] = useGlobalTheme();
+  const light = theme === "light";
   const pageRef = useRef(null);
 
   useEffect(() => {
     const page = document.querySelector(`.${styles.pdPage}`);
     pageRef.current = page;
-    const shouldUseLight = localStorage.getItem("pd-theme") !== "dark";
-    setLight(shouldUseLight);
-    page?.classList.toggle(styles.pdLight, shouldUseLight);
-  }, []);
-
-  function toggle() {
-    const next = !light;
-    setLight(next);
-    pageRef.current?.classList.toggle(styles.pdLight, next);
-    localStorage.setItem("pd-theme", next ? "light" : "dark");
-  }
+    page?.classList.toggle(styles.pdLight, light);
+  }, [light]);
 
   return (
     <button
-      onClick={toggle}
+      onClick={toggleTheme}
       title={light ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
       style={{
         position: "fixed",

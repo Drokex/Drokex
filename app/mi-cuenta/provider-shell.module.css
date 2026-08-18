@@ -1106,3 +1106,35 @@
   0%   { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
+
+/* Public provider page: inline desktop grids need explicit mobile fallbacks. */
+@media (max-width: 900px) {
+  .providerCardsGrid { grid-template-columns: 1fr !important; }
+  .providerComparisonLayout, .providerStudioLayout { grid-template-columns: 1fr !important; }
+  .providerSideCardAnimated { max-width: none !important; margin-top: 0 !important; }
+  .providerStatsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
+@media (max-width: 760px) {
+  .providerCardsGrid .providerCardAnimated { grid-template-columns: 1fr !important; }
+  .providerCardsGrid .providerCardAnimated > :first-child { min-height: 180px; }
+  .providerCardsGrid .providerCardPro > :last-child { min-height: 180px; }
+  .providerTableScroll { overflow-x: auto !important; }
+  .providerTableScroll > * { min-width: 480px; }
+  .providerStudioPanel { grid-template-columns: 1fr !important; }
+  .providerStudioPanel > :first-child, .providerStudioPanel > :last-child { display: none !important; }
+}
+
+@media (max-width: 560px) {
+  .providerFinalCta { padding: 32px 22px !important; flex-direction: column; align-items: stretch !important; }
+  .providerFinalCta a { width: 100%; justify-content: center; box-sizing: border-box; white-space: normal !important; text-align: center; }
+  .providerStatsGrid { grid-template-columns: 1fr !important; }
+  .providerTableScroll { overflow: visible !important; }
+  .providerTableScroll > div { grid-template-columns: minmax(0, 1fr) 70px 70px !important; min-width: 0; padding: 14px 12px !important; }
+  .providerTableScroll > div span { overflow-wrap: anywhere; }
+  .providerComparePlanName { font-size: 0 !important; text-align: center; }
+  .providerComparePlanName::after { content: attr(data-mobile-label); font-size: 0.66rem; line-height: 1.15; }
+  .providerExperienceSteps { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px !important; }
+  .providerExperienceSteps > div { min-width: 0; }
+  .providerFloatingTag { display: none; }
+}

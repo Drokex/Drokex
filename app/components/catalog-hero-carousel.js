@@ -35,7 +35,7 @@ export default function CatalogHeroCarousel() {
   };
 
   return (
-    <div className={styles.cdkCarousel}>
+    <div className={`${styles.cdkCarousel}${active > 0 ? ` ${styles.hasImageSlide}` : ""}`}>
       <div className={styles.cdkCarouselTrack}>
         {SLIDES.map((slide, i) =>
           slide.type === "drokex" ? (

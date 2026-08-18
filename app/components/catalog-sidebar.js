@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import styles from "@/app/categorias/page.module.css";
 import SidebarAd from "@/app/components/sidebar-ad";
 
@@ -37,6 +37,7 @@ export default function CatalogSidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isOpen, setIsOpen] = useState(false);
 
   const getArray = (key) => {
     const val = searchParams.getAll(key);
@@ -66,20 +67,22 @@ export default function CatalogSidebar() {
   const hasFilters = selectedCategories.length > 0 || selectedAvailability.length > 0 || selectedOrigin.length > 0;
 
   return (
-    <div className="sidebar-col">
-    <aside className={styles.cdkSidebar}>
+    <div className={`sidebar-col ${styles.cdkSidebarCol}${isOpen ? ` ${styles.isOpen}` : ""}`}>
+    {isOpen && <button type="button" className={styles.cdkFiltersBackdrop} aria-label="Cerrar filtros" onClick={() => setIsOpen(false)} />}
+    <aside className={`${styles.cdkSidebar}${isOpen ? ` ${styles.isOpen}` : ""}`} aria-label="Filtros de productos">
       <div className={styles.cdkSidebarHeader}>
         <div>
           <p className={styles.cdkSidebarKicker}>FILTRAR POR</p>
           <p className={styles.cdkSidebarDesc}>Refina por categoría, disponibilidad y accede rápido al panel comercial.</p>
         </div>
-        <button className={styles.cdkFilterBtn} aria-label="Filtros">
+        <button className={styles.cdkFilterBtn} type="button" aria-label={isOpen ? "Cerrar filtros" : "Mostrar filtros"} aria-expanded={isOpen} onClick={() => setIsOpen((open) => !open)}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
           </svg>
         </button>
       </div>
 
+      <div className={`${styles.cdkSidebarContent}${isOpen ? ` ${styles.isOpen}` : ""}`}>
       <div className={styles.cdkSidebarSection}>
         <p className={styles.cdkSectionLabel}>CATEGORÍAS</p>
         {CATEGORIES.map((cat) => {
@@ -138,6 +141,7 @@ export default function CatalogSidebar() {
         </svg>
         Limpiar filtros
       </button>
+      </div>
     </aside>
 
       <SidebarAd />

@@ -201,6 +201,7 @@ export default function AprendePage() {
   const audioRef = useRef(null);
 
   const [screen, setScreen] = useState("start");
+  const [isCompact, setIsCompact] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hudCoins, setHudCoins] = useState(0);
   const [hudLives, setHudLives] = useState(3);
@@ -238,6 +239,14 @@ export default function AprendePage() {
   }
 
   useEffect(() => { fetchScores(); }, []);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 640px)");
+    const sync = () => setIsCompact(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
 
   useEffect(() => {
     function syncFullscreen() {
@@ -2388,7 +2397,7 @@ export default function AprendePage() {
             <div style={{
               position: "absolute", inset: 0,
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              padding: "32px 40px", gap: 0, overflow: "hidden",
+              padding: isCompact ? "14px 16px" : "32px 40px", gap: 0, overflow: "hidden",
             }}>
               {/* Video background */}
               <video src="/portal-gateway.mp4" autoPlay loop muted playsInline style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", opacity: 0.45 }} />
@@ -2403,22 +2412,22 @@ export default function AprendePage() {
                 <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#7FE040", boxShadow: "0 0 8px #7FE040", display: "inline-block" }} />
                 <span style={{ color: "#7FE040", fontSize: "0.68rem", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase" }}>Portal Drokex</span>
               </div>
-              <p style={{ color: "rgba(127, 224, 64, 0.6)", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.18em", margin: "0 0 28px", textTransform: "uppercase" }}>
+              {!isCompact && <p style={{ color: "rgba(127, 224, 64, 0.6)", fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.18em", margin: "0 0 28px", textTransform: "uppercase" }}>
                 GATEWAY ACTIVO / MODO JUEGO
-              </p>
+              </p>}
 
               {/* Big title */}
-              <div style={{ textAlign: "center", marginBottom: 32, lineHeight: 0.9 }}>
-                <div style={{ fontSize: "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "rgba(255,255,255,0.08)", fontFamily: "monospace", lineHeight: 0.88 }}>
+              <div style={{ textAlign: "center", marginBottom: isCompact ? 16 : 32, lineHeight: 0.9 }}>
+                <div style={{ fontSize: isCompact ? "1.65rem" : "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "rgba(255,255,255,0.08)", fontFamily: "monospace", lineHeight: 0.88 }}>
                   DROKEX
                 </div>
-                <div style={{ fontSize: "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "#7FE040", fontFamily: "monospace", lineHeight: 0.88 }}>
+                <div style={{ fontSize: isCompact ? "1.65rem" : "clamp(3rem, 7vw, 5.5rem)", fontWeight: 900, letterSpacing: "-0.02em", color: "#7FE040", fontFamily: "monospace", lineHeight: 0.88 }}>
                   PLATFORM
                 </div>
               </div>
 
               {/* Top 3 scores */}
-              <div style={{ width: "min(420px, 100%)", marginBottom: 32 }}>
+              {!isCompact && <div style={{ width: "min(420px, 100%)", marginBottom: 32 }}>
                 <p style={{ color: "rgba(127, 224, 64, 0.55)", fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.2em", textTransform: "uppercase", margin: "0 0 10px", textAlign: "center" }}>
                   — Top agentes —
                 </p>
@@ -2448,12 +2457,12 @@ export default function AprendePage() {
                     ))}
                   </div>
                 )}
-              </div>
+              </div>}
 
               {/* CTA */}
               <button onClick={startGame} style={{
                 background: "#7FE040", color: "#050505", border: "none",
-                borderRadius: 10, padding: "15px 48px",
+                borderRadius: 10, padding: isCompact ? "12px 24px" : "15px 48px",
                 fontSize: "0.9rem", fontWeight: 900, cursor: "pointer",
                 letterSpacing: "0.12em", textTransform: "uppercase",
                 boxShadow: "0 0 32px rgba(127, 224, 64, 0.4)",
@@ -2461,7 +2470,7 @@ export default function AprendePage() {
               }}>
                 Iniciar misión →
               </button>
-              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.68rem", marginTop: 14, letterSpacing: "0.08em" }}>
+              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.68rem", marginTop: 14, letterSpacing: "0.08em", textAlign: "center" }}>
                 15 niveles · jefe final · doble salto · sprint
               </p>
               </div>{/* end content wrapper */}
@@ -2474,9 +2483,9 @@ export default function AprendePage() {
               <p style={subStyle}>Puntaje: {finalScore} pts · Monedas: {hudCoins}</p>
               <form onSubmit={saveHighScore} style={{ ...scoreFormStyle, marginBottom: 14 }}>
                 <input value={playerName} onChange={(e) => setPlayerName(e.target.value)}
-                  placeholder="Tu nombre (opcional)" maxLength={18} style={scoreInputStyle} autoFocus disabled={savingScore} />
+                  placeholder="Tu nombre (opcional)" maxLength={18} style={scoreInputStyle} disabled={savingScore} />
                 <button type="submit" style={{ ...btnStyle, opacity: savingScore ? 0.6 : 1 }} disabled={savingScore}>
-                  {savingScore ? "Guardando..." : "Guardar puntaje"}
+                  {savingScore ? "Guardando…" : "Guardar puntaje"}
                 </button>
               </form>
               <button onClick={startGame} style={{ ...btnStyle, background: "rgba(255,255,255,0.1)", fontSize: "0.85rem", padding: "10px 28px" }}>
@@ -2491,9 +2500,9 @@ export default function AprendePage() {
               <p style={subStyle}>Derrotaste al Jefe Final · {finalScore} pts · {hudCoins} monedas</p>
               <form onSubmit={saveHighScore} style={{ ...scoreFormStyle, marginBottom: 14 }}>
                 <input value={playerName} onChange={(e) => setPlayerName(e.target.value)}
-                  placeholder="Tu nombre (opcional)" maxLength={18} style={scoreInputStyle} autoFocus disabled={savingScore} />
+                  placeholder="Tu nombre (opcional)" maxLength={18} style={scoreInputStyle} disabled={savingScore} />
                 <button type="submit" style={{ ...btnStyle, background: "#7FE040", color: "#050505", opacity: savingScore ? 0.6 : 1 }} disabled={savingScore}>
-                  {savingScore ? "Guardando..." : "Guardar puntaje"}
+                  {savingScore ? "Guardando…" : "Guardar puntaje"}
                 </button>
               </form>
               <button onClick={startGame} style={{ ...btnStyle, background: "rgba(255,255,255,0.1)", fontSize: "0.85rem", padding: "10px 28px" }}>

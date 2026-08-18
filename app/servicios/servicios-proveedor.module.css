@@ -847,6 +847,17 @@
   transform: scale(1.03);
 }
 
+@media (max-width: 640px) {
+  .spCta { display: flex; flex-direction: column; background: #090d0a; }
+  .spCtaBg { min-height: 160px; object-fit: cover; opacity: 0.35; }
+  .spCtaContent { position: relative; inset: auto; width: auto; padding: 32px 20px; }
+  .spCta a { align-self: stretch; text-align: center; white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spPage *, .spPage *::before, .spPage *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
 /* ── Cliente page orange overrides ───────────────────────────────── */
 .spPageCliente .spCountryCard .count      { color: #FF790F; }
 .spPageCliente .spStepBadge               { background: #FF790F; }

@@ -6,6 +6,7 @@ import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import SidebarAd from "@/app/components/sidebar-ad";
 import styles from "./directorio.module.css";
+import { useGlobalTheme } from "@/app/components/global-theme";
 
 
 // Cada thumbnail es base64 pesado (hasta ~750KB): se piden una sola vez por slug en toda
@@ -226,7 +227,9 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
   const [selCountry, setSelCountry] = useState("");
   const [selCategory, setSelCategory] = useState("");
   const [page, setPage] = useState(1);
-  const [lm, setLm]     = useState(false);
+  const [theme, toggleTheme] = useGlobalTheme();
+  const lm = theme === "light";
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const PER_PAGE = 24;
 
   // Helpers de tema
@@ -356,7 +359,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
 
       {/* Toggle modo claro/oscuro */}
       <button
-        onClick={() => setLm(v => !v)}
+        onClick={toggleTheme}
         title={lm ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
         style={{
           position: "fixed", top: 88, right: 20, zIndex: 999,
@@ -427,18 +430,22 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
       <section style={{ padding: "0 0 80px" }}>
         <div className="shell">
           {/* Search bar */}
-          <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{ position: "relative", flex: 1, maxWidth: 480 }}>
+          <div className={styles.dirSearchRow}>
+            <div className={styles.dirSearchField}>
               <svg style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.3)", pointerEvents: "none" }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
               </svg>
               <input
+                className={styles.dirSearchInput}
                 type="search"
+                aria-label="Buscar proveedores"
+                name="supplier-search"
+                autoComplete="off"
                 placeholder="Buscar proveedor, categoría o país..."
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 style={{
-                  width: "100%", padding: "12px 14px 12px 40px",
+                  padding: "12px 14px 12px 40px",
                   background: lm ? "#fff" : "rgba(255,255,255,0.05)",
                   border: `1px solid ${brd}`,
                   borderRadius: 10, color: txt, fontSize: "0.85rem",
@@ -452,13 +459,14 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
             <span style={{ fontSize: "0.78rem", color: w(0.3), fontWeight: 600 }}>
               {filteredPro.length} tienda{filteredPro.length !== 1 ? "s" : ""}
             </span>
+            <button type="button" className={styles.dirFiltersToggle} aria-expanded={filtersOpen} onClick={() => setFiltersOpen((open) => !open)}>Filtros</button>
           </div>
 
           {/* Sidebar + Grid */}
           <div className={styles.dirLayout}>
 
             {/* ── Sidebar filtros ── */}
-            <div className="sidebar-col">
+            <div className={`sidebar-col ${styles.dirSidebar}${filtersOpen ? ` ${styles.isOpen}` : ""}`}>
             <div style={{ background: lm ? "#fff" : "rgba(255,255,255,0.03)", border: `1px solid ${brd}`, borderRadius: 14, padding: "20px 16px", boxShadow: lm ? "0 2px 16px rgba(0,0,0,0.07)" : "none" }}>
 
               {/* País */}
@@ -468,7 +476,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
                   <button key={c || "__all__"} onClick={() => setSelCountry(c)} style={{
                     textAlign: "left", background: selCountry === c ? "rgba(127,224,64,0.12)" : "transparent",
                     border: `1px solid ${selCountry === c ? "rgba(127,224,64,0.35)" : "transparent"}`,
-                    borderRadius: 7, padding: "6px 10px", cursor: "pointer", fontFamily: "inherit",
+                    borderRadius: 7, padding: "6px 10px", minHeight: 44, cursor: "pointer", fontFamily: "inherit",
                     fontSize: "0.78rem", fontWeight: 600,
                     color: selCountry === c ? "#5aaa20" : w(0.55),
                     transition: "all 0.15s",
@@ -485,7 +493,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
                   <button key={c || "__all__"} onClick={() => setSelCategory(c)} style={{
                     textAlign: "left", background: selCategory === c ? "rgba(127,224,64,0.12)" : "transparent",
                     border: `1px solid ${selCategory === c ? "rgba(127,224,64,0.35)" : "transparent"}`,
-                    borderRadius: 7, padding: "6px 10px", cursor: "pointer", fontFamily: "inherit",
+                    borderRadius: 7, padding: "6px 10px", minHeight: 44, cursor: "pointer", fontFamily: "inherit",
                     fontSize: "0.78rem", fontWeight: 600,
                     color: selCategory === c ? "#5aaa20" : w(0.55),
                     transition: "all 0.15s",
@@ -500,7 +508,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
                 <button onClick={() => { setSelCountry(""); setSelCategory(""); }} style={{
                   marginTop: 18, width: "100%", background: "transparent",
                   border: `1px solid ${brd}`, borderRadius: 7,
-                  padding: "7px 10px", cursor: "pointer", fontFamily: "inherit",
+                  padding: "7px 10px", minHeight: 44, cursor: "pointer", fontFamily: "inherit",
                   fontSize: "0.72rem", fontWeight: 700, color: w(0.4),
                 }}>
                   Limpiar filtros ✕
@@ -514,7 +522,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
             {/* ── Grid ── */}
             <div id="directorio-grid">
               {pagedPro.length > 0 ? (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 14 }}>
+                <div className={styles.dirGrid}>
                   {pagedPro.map(({ slug, landing }) => (
                     <StoreCard key={slug} slug={slug} landing={landing} lm={lm} isLocal={localSlugs.has(slug)} onDelete={deleteLocalLanding} />
                   ))}
@@ -527,7 +535,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
 
               {/* Paginación */}
               {totalPages > 1 && (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 40 }}>
+                <div className={styles.dirPagination}>
                   <button onClick={() => changePage(page - 1)} disabled={page === 1} style={{
                     padding: "8px 16px", borderRadius: 8, border: `1px solid ${brd}`,
                     background: lm ? "#fff" : "rgba(255,255,255,0.05)", color: page === 1 ? w(0.2) : txt,

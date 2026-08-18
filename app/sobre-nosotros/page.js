@@ -115,6 +115,7 @@ export default function AboutPage() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={() => setSelectedPerson(null)}
+          role="presentation"
           style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.8)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center" }}
         >
           <motion.div
@@ -122,9 +123,12 @@ export default function AboutPage() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            style={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh" }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Perfil de ${selectedPerson.name}`}
+            style={{ position: "relative", maxWidth: "90vw", maxHeight: "90vh", overflow: "auto", overscrollBehavior: "contain", padding: 16 }}
           >
-            <button onClick={() => setSelectedPerson(null)} style={{ position: "absolute", top: -16, right: -16, background: "#fff", border: "none", borderRadius: "50%", width: 36, height: 36, fontSize: 20, cursor: "pointer", zIndex: 1001, lineHeight: "36px", textAlign: "center" }}>×</button>
+            <button type="button" aria-label="Cerrar perfil" onClick={() => setSelectedPerson(null)} style={{ position: "absolute", top: 12, right: 12, background: "#fff", border: "none", borderRadius: "50%", width: 44, height: 44, fontSize: 20, cursor: "pointer", zIndex: 1001, lineHeight: "36px", textAlign: "center" }}>×</button>
             <Image src={selectedPerson.popup} alt={selectedPerson.name} width={1200} height={900} style={{ borderRadius: 16, objectFit: "contain", maxHeight: "90vh", maxWidth: "90vw", width: "auto" }} />
           </motion.div>
         </motion.div>
@@ -220,11 +224,12 @@ export default function AboutPage() {
 
           <div className={styles.aboutTeamList}>
             {team.map((person, i) => (
-              <motion.article
+              <motion.button
                 key={person.name}
                 className={styles.aboutTeamCard}
+                type="button"
                 onClick={() => setSelectedPerson(person)}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", textAlign: "left", fontFamily: "inherit" }}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
@@ -240,7 +245,7 @@ export default function AboutPage() {
                 </motion.div>
                 <h3>{person.name}</h3>
                 <p>{person.role}</p>
-              </motion.article>
+              </motion.button>
             ))}
           </div>
         </div>

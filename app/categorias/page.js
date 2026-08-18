@@ -42,7 +42,7 @@ export default async function CategoriasPage({ searchParams }) {
     products = products.filter(p => selectedOrigin.includes(p.originCountry));
 
   return (
-    <main className={`${styles.cdkPage} ${styles.cdkLight}`}>
+    <main className={styles.cdkPage}>
       <SiteHeader />
       <CatalogThemeToggle />
 

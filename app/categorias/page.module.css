@@ -24,6 +24,9 @@
   border-radius: 16px;
   overflow: hidden;
 }
+.cdkSidebarContent { display: contents; }
+.cdkFiltersBackdrop { display: none; }
+.cdkSidebarCol.isOpen { z-index: 1002; }
 
 .cdkSidebarHeader {
   display: flex;
@@ -51,8 +54,8 @@
 
 .cdkFilterBtn {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 8px;
   background: rgba(45, 138, 31, 0.10);
   border: 1px solid rgba(127, 224, 64, 0.2);
@@ -83,7 +86,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 36px;
+  min-height: 44px;
   cursor: pointer;
   border-radius: 8px;
   padding: 0 6px;
@@ -218,8 +221,8 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   background: rgba(0,0,0,0.35);
@@ -247,19 +250,32 @@
   z-index: 10;
 }
 .cdkCarouselDot {
-  width: 8px;
-  height: 8px;
+  width: 44px;
+  height: 44px;
+  position: relative;
+  background: transparent;
   border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,0.45);
   cursor: pointer;
   padding: 0;
   transition: background 0.3s, transform 0.3s;
 }
 .cdkCarouselDot.isActive {
-  background: #fff;
-  transform: scale(1.35);
+  transform: none;
 }
+
+.cdkCarouselDot::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.45);
+  inset: 0;
+  margin: auto;
+}
+
+.cdkCarouselDot.isActive::after { background: #fff; transform: scale(1.35); }
 
 /* Hero */
 .cdkCarouselSlide .cdkHero {
@@ -434,8 +450,8 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(15, 15, 15, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -491,6 +507,7 @@
 .cdkCardName a {
   color: #fff;
   text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
 .cdkCardName a:hover {
@@ -570,7 +587,7 @@
 
 .cdkBtnOutline {
   flex: 1;
-  min-height: 38px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -592,7 +609,7 @@
 
 .cdkBtnPrimary {
   flex: 1;
-  min-height: 38px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -716,7 +733,53 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
+  .cdkThemeToggle {
+    position: static !important;
+    z-index: auto !important;
+    width: fit-content;
+    margin: 12px 16px 0 auto !important;
+    transition: background 0.2s, color 0.2s, border-color 0.2s !important;
+  }
+  .cdkLayout { gap: 16px; padding-top: 16px; }
+  .cdkSidebarHeader { align-items: center; padding: 12px 14px; border-bottom: 0; }
+  .cdkSidebarDesc { display: none; }
+  .cdkSidebarContent { display: none; }
+  .cdkSidebar.isOpen {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 1001;
+    width: min(100%, 520px);
+    max-height: min(78dvh, 680px);
+    margin: 0 auto;
+    overflow-y: auto;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -18px 56px rgba(0,0,0,0.32);
+  }
+  .cdkSidebar.isOpen .cdkSidebarHeader { position: sticky; top: 0; z-index: 1; background: #fff; border-bottom: 1px solid rgba(0,0,0,0.08); }
+  .cdkSidebar.isOpen .cdkSidebarContent { display: block; border-top: 0; }
+  .cdkFiltersBackdrop { display: block; position: fixed; inset: 0; z-index: 1000; border: 0; background: rgba(3,8,5,0.56); cursor: default; }
+  .cdkSidebarSection { padding: 10px 14px; }
+  .cdkSidebar .cdkClearBtn { min-height: 44px; }
+  .cdkLayout :global(.catalog-banner) { display: none; }
+  .cdkCarousel { height: 180px; }
+  .cdkCarousel .cdkHero { min-height: 0; }
+  .cdkHeroContent { padding: 16px 22px; }
+  .cdkHeroEyebrow { font-size: 0.6rem; }
+  .cdkHeroTitle { margin-top: 6px; font-size: 1.18rem; }
+  .cdkHeroCta { margin-top: 12px; min-height: 40px; padding: 0 16px; font-size: 0.82rem; }
+  .cdkHeroTrust { display: none; }
+
+  .cdkCarousel.hasImageSlide {
+    height: 180px;
+    min-height: 0;
+    aspect-ratio: auto;
+    background: transparent;
+  }
+  .cdkCarousel.hasImageSlide .cdkCarouselBannerImg { object-fit: cover; object-position: center; }
+  .cdkCarousel.hasImageSlide .cdkCarouselArrow { width: 36px; height: 36px; }
+  .cdkCarousel.hasImageSlide .cdkCarouselDots { bottom: -4px; }
+
   .cdkGrid {
     grid-template-columns: 1fr;
   }

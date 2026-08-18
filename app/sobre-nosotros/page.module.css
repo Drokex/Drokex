@@ -337,6 +337,10 @@
 
 .aboutTeamCard {
   text-align: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
 }
 
 
@@ -589,12 +593,14 @@
 @media (max-width: 760px)  {
 .aboutHero,
   .aboutHeroContent {
-    min-height: 760px;
+    min-height: 0;
   }
 
 
 .aboutHeroContent {
+    height: auto;
     padding-top: 42px;
+    padding-bottom: 28px;
   }
 
 .aboutHero h1 {
@@ -613,10 +619,12 @@
   }
 
 .aboutMapStats {
-    left: 20px;
-    right: 20px;
-    bottom: 28px;
-    width: auto;
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    margin-top: 26px;
     grid-template-columns: 1fr;
   }
 
@@ -667,4 +675,8 @@
     padding-top: 46px;
     padding-bottom: 46px;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aboutPage *, .aboutPage *::before, .aboutPage *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

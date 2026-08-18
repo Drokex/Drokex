@@ -6,6 +6,7 @@ import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
+import { useGlobalTheme } from "@/app/components/global-theme";
 
 const checkIcon = (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0 }}>
@@ -258,7 +259,8 @@ const footerStatsIcons = [
 ];
 
 export default function ParaProveedoresPage() {
-  const [lightMode, setLightMode] = useState(false);
+  const [theme, toggleTheme] = useGlobalTheme();
+  const lightMode = theme === "light";
   const [lang, setLang] = useState("es");
   const [providerLink, setProviderLink] = useState("/registro?role=proveedor");
 
@@ -322,7 +324,7 @@ export default function ParaProveedoresPage() {
 
       {/* Toggle button */}
       <button
-        onClick={() => setLightMode((v) => !v)}
+        onClick={toggleTheme}
         title={lightMode ? t.toggleTitleToDark : t.toggleTitleToLight}
         style={{
           position: "fixed", top: 88, right: 20, zIndex: 999,
@@ -590,12 +592,12 @@ export default function ParaProveedoresPage() {
 
       {/* ── TABLA COMPARATIVA ───────────────────────────── */}
       <section className={`${styles.providerSectionRise} ${styles.providerDelay2}`} style={{ padding: "0 0 80px" }}>
-        <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, alignItems: "start" }}>
+        <div className={`shell ${styles.providerComparisonLayout}`} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, alignItems: "start" }}>
           <div>
             <h2 style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.7rem)", fontWeight: 800, margin: "0 0 28px" }}>
               {t.compareTitle} <span style={{ color: "#7FE040" }}>{t.compareTitleHighlight}</span>{t.compareTitleEnd}
             </h2>
-            <div className={styles.providerTableAnimated} style={{
+            <div className={`${styles.providerTableAnimated} ${styles.providerTableScroll}`} style={{
               background: card, border: `1px solid ${w(0.08)}`,
               borderRadius: 16, overflow: "hidden",
             }}>
@@ -611,7 +613,7 @@ export default function ParaProveedoresPage() {
                     background: "#7FE040", display: "flex", alignItems: "center", justifyContent: "center",
                     fontWeight: 800, color: "#050505", fontSize: "0.85rem",
                   }}>1</div>
-                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: txt }}>{t.explorerTitle}</span>
+                  <span className={styles.providerComparePlanName} data-mobile-label="Catálogo" style={{ fontSize: "0.88rem", fontWeight: 700, color: txt }}>{t.explorerTitle}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
                   <div style={{
@@ -619,7 +621,7 @@ export default function ParaProveedoresPage() {
                     background: "#7FE040", display: "flex", alignItems: "center", justifyContent: "center",
                     fontWeight: 800, color: "#050505", fontSize: "0.85rem",
                   }}>2</div>
-                  <span style={{ fontSize: "0.88rem", fontWeight: 700, color: txt }}>{t.proTitle}</span>
+                  <span className={styles.providerComparePlanName} data-mobile-label="Mensajes" style={{ fontSize: "0.88rem", fontWeight: 700, color: txt }}>{t.proTitle}</span>
                 </div>
               </div>
               {compareRows.map((row, i) => (
@@ -692,7 +694,7 @@ export default function ParaProveedoresPage() {
                 {t.experienceBody1}<br />
                 <strong style={{ color: "rgba(255,255,255,0.85)" }}>{t.experienceBody2}</strong>
               </p>
-              <div style={{ display: "flex", gap: 28 }}>
+              <div className={styles.providerExperienceSteps} style={{ display: "flex", gap: 28 }}>
                 {[
                   { label: t.experienceSteps[0], icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
                   { label: t.experienceSteps[1], icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
@@ -729,7 +731,7 @@ export default function ParaProveedoresPage() {
 
       {/* ── DROKEX STUDIO ───────────────────────────────── */}
       <section className={`${styles.providerSectionRise} ${styles.providerDelay4}`} style={{ padding: "80px 0" }}>
-        <div className="shell" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center" }}>
+        <div className={`shell ${styles.providerStudioLayout}`} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "center" }}>
 
           <div className={styles.providerStudioPanel} style={{
             background: cardDark, border: `1px solid ${w(0.1)}`,
@@ -859,7 +861,7 @@ export default function ParaProveedoresPage() {
         borderBottom: `1px solid ${w(0.06)}`,
         padding: "28px 0",
       }}>
-        <div className="shell" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
+        <div className={`shell ${styles.providerStatsGrid}`} style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
           {t.stats.map((s, i) => (
             <div className={styles.providerStatItem} key={s.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <div style={{

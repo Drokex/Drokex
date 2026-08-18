@@ -26,6 +26,14 @@
   --line-dark: rgba(17, 17, 17, 0.12);
 }
 
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f4f2;
+  --ink: #111111;
+  --muted: rgba(17, 17, 17, 0.66);
+  --line: rgba(17, 17, 17, 0.12);
+}
+
 * {
   box-sizing: border-box;
 }

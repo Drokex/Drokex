@@ -67,10 +67,15 @@ function FaqAccordion() {
           key={i}
           className={`${spStyles.spFaqItem} ${styles.ayudaFaqItem} ${open === i ? spStyles.isOpen : ""}`}
         >
-          <button className={`${spStyles.spFaqQuestion} ${styles.ayudaFaqQuestion}`} onClick={() => setOpen(open === i ? null : i)}>
+          <button
+            className={`${spStyles.spFaqQuestion} ${styles.ayudaFaqQuestion}`}
+            onClick={() => setOpen(open === i ? null : i)}
+            aria-expanded={open === i}
+            aria-controls={`ayuda-faq-${i}`}
+          >
             {item.q}
           </button>
-          <div className={`${spStyles.spFaqAnswer} ${styles.ayudaFaqAnswer}`}>{item.a}</div>
+          <div id={`ayuda-faq-${i}`} className={`${spStyles.spFaqAnswer} ${styles.ayudaFaqAnswer}`} hidden={open !== i}>{item.a}</div>
         </div>
       ))}
     </div>
@@ -109,11 +114,11 @@ function PqrForm() {
       <div className={styles.ayudaFormRow}>
         <div className={styles.ayudaFormField}>
           <label htmlFor="pqr-name">Nombre completo</label>
-          <input id="pqr-name" name="name" type="text" placeholder="Tu nombre" required value={form.name} onChange={handle} />
+          <input id="pqr-name" name="name" type="text" autoComplete="name" placeholder="Tu nombre" required value={form.name} onChange={handle} />
         </div>
         <div className={styles.ayudaFormField}>
           <label htmlFor="pqr-email">Correo electrónico</label>
-          <input id="pqr-email" name="email" type="email" placeholder="correo@empresa.com" required value={form.email} onChange={handle} />
+          <input id="pqr-email" name="email" type="email" autoComplete="email" placeholder="correo@empresa.com" required value={form.email} onChange={handle} />
         </div>
       </div>
       <div className={styles.ayudaFormField}>
@@ -128,7 +133,7 @@ function PqrForm() {
         <textarea id="pqr-message" name="message" rows={5} placeholder="Cuéntanos con detalle qué necesitas o qué ocurrió..." required value={form.message} onChange={handle} />
       </div>
       <button type="submit" className={styles.ayudaFormSubmit} disabled={loading}>
-        {loading ? "Enviando..." : "Enviar solicitud"}
+        {loading ? "Enviando…" : "Enviar solicitud"}
       </button>
     </form>
   );
@@ -172,6 +177,17 @@ export default function AyudaPage() {
         <div className="shell">
           <h2>Preguntas <span>frecuentes</span></h2>
           <FaqAccordion />
+        </div>
+      </section>
+
+      <section className={styles.ayudaPqr}>
+        <div className={`shell ${styles.ayudaPqrGrid}`}>
+          <div className={styles.ayudaPqrInfo}>
+            <p className={styles.ayudaPqrTag}>PQR</p>
+            <h2>¿Necesitas ayuda con un caso específico?</h2>
+            <p>Cuéntanos qué ocurrió y nuestro equipo te responderá por correo.</p>
+          </div>
+          <PqrForm />
         </div>
       </section>
 

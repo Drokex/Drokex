@@ -2,6 +2,7 @@ import "./globals.css";
 import CookieConsent from "@/app/components/cookie-consent";
 import MaintenanceGate from "@/app/components/maintenance-gate";
 import AdPopup from "@/app/components/ad-popup";
+import GlobalTheme from "@/app/components/global-theme";
 
 export const metadata = {
   title: "Drokex",
@@ -10,8 +11,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" data-scroll-behavior="smooth">
+    <html lang="es" data-scroll-behavior="smooth" data-theme="dark">
       <body>
+        <GlobalTheme />
         <MaintenanceGate>
         {children}
         <CookieConsent />

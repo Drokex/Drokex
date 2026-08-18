@@ -1,30 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styles from "@/app/categorias/page.module.css";
+import { useGlobalTheme } from "@/app/components/global-theme";
 
 export default function CatalogThemeToggle() {
-  const [light, setLight] = useState(true);
+  const [theme, toggleTheme] = useGlobalTheme();
+  const light = theme === "light";
   const pageRef = useRef(null);
 
   useEffect(() => {
     const page = document.querySelector(`.${styles.cdkPage}`);
     pageRef.current = page;
-    const shouldUseLight = localStorage.getItem("cdk-theme") !== "dark";
-    setLight(shouldUseLight);
-    page?.classList.toggle(styles.cdkLight, shouldUseLight);
-  }, []);
-
-  function toggle() {
-    const next = !light;
-    setLight(next);
-    pageRef.current?.classList.toggle(styles.cdkLight, next);
-    localStorage.setItem("cdk-theme", next ? "light" : "dark");
-  }
+    page?.classList.toggle(styles.cdkLight, light);
+  }, [light]);
 
   return (
     <button
-      onClick={toggle}
+      onClick={toggleTheme}
+      className={styles.cdkThemeToggle}
       title={light ? "Cambiar a modo oscuro" : "Cambiar a modo claro"}
       style={{
         position: "fixed",
