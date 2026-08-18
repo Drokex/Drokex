@@ -174,9 +174,9 @@ function buildLevel(index) {
 
 const LEVELS = Array.from({ length: TOTAL_LEVELS }, (_, i) => buildLevel(i));
 
-function newState() {
+function newState(startLevel = 0) {
   return {
-    stopped: false, currentLevel: 0, coins: 0, lives: 3,
+    stopped: false, currentLevel: startLevel, coins: 0, lives: 3,
     cameraX: 0, frame: 0, projectiles: [], enemyProjectiles: [],
     impacts: [], particles: [], screenShake: 0,
     powerCooldown: 0, megaPower: 0, bossAnnounce: 0, levelAnnounce: 90,
@@ -187,8 +187,8 @@ function newState() {
       speed: 0.9, maxSpeed: 8, jumpPower: 16,
       grounded: false, facing: 1, jumpsLeft: 2,
     },
-    levelCoins: LEVELS[0].coins.map((c) => ({ ...c, collected: false })),
-    levelEnemies: LEVELS[0].enemies.map((e) => ({ ...e })),
+    levelCoins: LEVELS[startLevel].coins.map((c) => ({ ...c, collected: false })),
+    levelEnemies: LEVELS[startLevel].enemies.map((e) => ({ ...e })),
   };
 }
 
@@ -257,6 +257,20 @@ export default function AprendePage() {
     return () => document.removeEventListener("fullscreenchange", syncFullscreen);
   }, []);
 
+  // Comando secreto: escribir "drokex" en la pantalla de inicio abre el selector de niveles.
+  useEffect(() => {
+    if (screen !== "start") return;
+    let buffer = "";
+    const code = "drokex";
+    function onKeyDown(e) {
+      if (e.key.length !== 1) return;
+      buffer = (buffer + e.key.toLowerCase()).slice(-code.length);
+      if (buffer === code) { buffer = ""; setScreen("levels"); }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [screen]);
+
   function calculateScore(game) {
     return game.coins * 25 + game.lives * 150 + (game.currentLevel + 1) * 120 + (game.killScore || 0);
   }
@@ -268,9 +282,19 @@ export default function AprendePage() {
     return audioRef.current;
   }
 
-  function startGame() {
+  function resetKeys() {
+    const k = keysRef.current;
+    k.left = false; k.right = false; k.jump = false;
+    k.jumpPressed = false; k.sprint = false; k.power = false;
+  }
+
+  function startGame(startLevel) {
+    // varios botones hacen onClick={startGame}: React les pasa el evento del click,
+    // no un número, así que solo se acepta un entero válido como nivel
+    startLevel = Number.isInteger(startLevel) ? startLevel : 0;
     ensureAudio();
-    gRef.current = newState();
+    resetKeys(); // si moría con una tecla pulsada, el muñeco arrancaba solo
+    gRef.current = newState(startLevel);
     setHudCoins(0); setHudLives(3); setFinalScore(0); setPlayerName("");
     setScreen("playing");
   }
@@ -319,7 +343,11 @@ export default function AprendePage() {
   useEffect(() => {
     if (screen !== "playing") return;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: false });
+    // ¿está el rect [x, x+w] dentro de la cámara? (culling: el nivel mide hasta 8000px)
+    function onScreen(x, w, camX, margin = 80) {
+      return x + w + margin > camX && x - margin < camX + W;
+    }
     const sprite = new Image();
     sprite.src = "/game-sprite.png";
     const bgImages = [
@@ -343,6 +371,50 @@ export default function AprendePage() {
       (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) ||
       (navigator.deviceMemory && navigator.deviceMemory <= 4);
     const visualBudget = isChrome || constrainedDevice ? "balanced" : "full";
+
+    // ─── Rendimiento ───────────────────────────────────────────────
+    // Lo que hundía los FPS era el raster: shadowBlur (desenfoque gaussiano)
+    // decenas de veces por frame y gradientes recreados en cada dibujo.
+    // Aquí: todo lo estático se hornea una vez por mundo en un canvas aparte,
+    // y si los FPS caen se apaga el blur automáticamente.
+    let fxBlur = visualBudget === "full";
+    let fpsAvg = 60;
+
+    // Interruptor global del desenfoque: en vez de tocar los 20 sitios que
+    // asignan shadowBlur, se intercepta la propiedad del contexto. Las capas
+    // horneadas usan su propio contexto, así que conservan su halo.
+    {
+      const proto = Object.getPrototypeOf(ctx);
+      const desc = Object.getOwnPropertyDescriptor(proto, "shadowBlur");
+      let blurValue = 0;
+      Object.defineProperty(ctx, "shadowBlur", {
+        configurable: true,
+        get: () => blurValue,
+        set: (v) => { blurValue = v; desc.set.call(ctx, fxBlur ? v : 0); },
+      });
+    }
+
+    const layerCache = new Map();
+    function layer(key, w, h, draw) {
+      const hit = layerCache.get(key);
+      if (hit) return hit;
+      const c = document.createElement("canvas");
+      c.width = Math.max(1, Math.ceil(w));
+      c.height = Math.max(1, Math.ceil(h));
+      draw(c.getContext("2d"), c.width, c.height);
+      layerCache.set(key, c);
+      return c;
+    }
+
+    function radialLayer(key, color) {
+      return layer(key, 128, 128, (c) => {
+        const gr = c.createRadialGradient(64, 64, 1, 64, 64, 64);
+        gr.addColorStop(0, color);
+        gr.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = gr;
+        c.fillRect(0, 0, 128, 128);
+      });
+    }
 
     function playSound(type) {
       const audio = audioRef.current;
@@ -381,6 +453,7 @@ export default function AprendePage() {
       g.screenShake = Math.max(g.screenShake, type === "boss" ? 14 : 8);
       g.impacts.push({ x, y, age: 0, maxAge: type === "boss" ? 26 : 18, type });
       const count = type === "boss" ? 22 : 12;
+      if (g.particles.length > 180) g.particles.splice(0, g.particles.length - 180); // techo duro
       for (let i = 0; i < count; i++) {
         const a = (Math.PI * 2 * i) / count + g.frame * 0.03;
         const speed = 1.6 + (i % 5) * 0.75;
@@ -418,6 +491,7 @@ export default function AprendePage() {
 
     function loadLevel(idx) {
       const g = gRef.current;
+      if (worldOf(idx) !== worldOf(g.currentLevel)) layerCache.clear(); // capas de otro mundo
       g.currentLevel = idx;
       g.cameraX = 0;
       g.levelCoins = LEVELS[idx].coins.map((c) => ({ ...c, collected: false }));
@@ -441,7 +515,7 @@ export default function AprendePage() {
       const g = gRef.current;
       g.hasPower = false;
       g.lives--;
-      if (g.lives <= 0) { g.stopped = true; setHudLives(0); setFinalScore(calculateScore(g)); setScreen("dead"); }
+      if (g.lives <= 0) { g.stopped = true; resetKeys(); setHudLives(0); setFinalScore(calculateScore(g)); setScreen("dead"); }
       else {
         setHudLives(g.lives);
         g.projectiles = [];
@@ -478,17 +552,23 @@ export default function AprendePage() {
 
     function spawnDropCoins(e) {
       const g = gRef.current;
+      const lev = LEVELS[g.currentLevel];
       const count = (e.isFinalBoss || e.isBosse) ? 10 : 5;
       const cx = e.x + e.w / 2;
       const cy = e.y + e.h / 2;
       for (let i = 0; i < count; i++) {
         const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
         const dist = 22 + Math.random() * 48;
-        g.levelCoins.push({
-          x: cx + Math.cos(angle) * dist,
-          y: Math.max(32, cy + Math.sin(angle) * dist - 18),
-          collected: false,
-        });
+        let x = Math.max(24, Math.min(cx + Math.cos(angle) * dist, lev.width - 24));
+        let y = Math.min(Math.max(32, cy + Math.sin(angle) * dist - 18), 452);
+        // nunca dejar la moneda dentro de una plataforma ni bajo el suelo
+        for (const pl of lev.platforms) {
+          if (x > pl.x - 18 && x < pl.x + pl.w + 18 && y > pl.y - 18 && y < pl.y + pl.h + 60) {
+            y = pl.y - 26;
+            break;
+          }
+        }
+        g.levelCoins.push({ x, y, collected: false });
       }
       // extra explosion flash on death
       spawnImpact(cx, cy, e.isBosse || e.isFinalBoss ? "boss" : "hit");
@@ -611,15 +691,10 @@ export default function AprendePage() {
     }
 
     function drawCastShadow(cx, cy, rw, rh, alpha = 0.36) {
+      const spr = radialLayer("shadow", "rgba(0,0,0,1)");
       ctx.save();
-      const shadow = ctx.createRadialGradient(cx, cy, 1, cx, cy, rw);
-      shadow.addColorStop(0, `rgba(0,0,0,${alpha})`);
-      shadow.addColorStop(0.65, `rgba(0,0,0,${alpha * 0.34})`);
-      shadow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = shadow;
-      ctx.beginPath();
-      ctx.ellipse(cx, cy, rw, rh, 0, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(spr, cx - rw, cy - rh, rw * 2, rh * 2);
       ctx.restore();
     }
 
@@ -675,23 +750,29 @@ export default function AprendePage() {
       const scenicBg = bgImages[w];
       const hasScenicBg = scenicBg?.complete && scenicBg.naturalWidth > 0;
 
-      // Base gradient sky
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-      bgGrad.addColorStop(0, theme.bg1);
-      bgGrad.addColorStop(0.55, theme.bg2);
-      bgGrad.addColorStop(1, theme.bg1);
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, W, H);
-
       if (hasScenicBg) {
+        // fondo escénico + sombreado, ya escalados y fusionados en una capa:
+        // antes era reescalar un PNG de 1280x720 y pintar un gradiente cada frame
         const offset = -(g.cameraX * 0.035) % 80;
-        ctx.drawImage(scenicBg, offset - 80, 0, W + 160, H);
-        const scenicShade = ctx.createLinearGradient(0, 0, 0, H);
-        scenicShade.addColorStop(0, "rgba(0,0,0,0.12)");
-        scenicShade.addColorStop(0.58, "rgba(0,0,0,0.18)");
-        scenicShade.addColorStop(1, "rgba(0,0,0,0.42)");
-        ctx.fillStyle = scenicShade;
-        ctx.fillRect(0, 0, W, H);
+        ctx.drawImage(layer(`bg${w}`, W + 160, H, (c) => {
+          c.drawImage(scenicBg, 0, 0, W + 160, H);
+          const scenicShade = c.createLinearGradient(0, 0, 0, H);
+          scenicShade.addColorStop(0, "rgba(0,0,0,0.12)");
+          scenicShade.addColorStop(0.58, "rgba(0,0,0,0.18)");
+          scenicShade.addColorStop(1, "rgba(0,0,0,0.42)");
+          c.fillStyle = scenicShade;
+          c.fillRect(0, 0, W + 160, H);
+        }), offset - 80, 0);
+      } else {
+        // Cielo base — gradiente horneado por mundo
+        ctx.drawImage(layer(`sky${w}`, W, H, (c) => {
+          const bgGrad = c.createLinearGradient(0, 0, 0, H);
+          bgGrad.addColorStop(0, theme.bg1);
+          bgGrad.addColorStop(0.55, theme.bg2);
+          bgGrad.addColorStop(1, theme.bg1);
+          c.fillStyle = bgGrad;
+          c.fillRect(0, 0, W, H);
+        }), 0, 0);
       }
 
       // Stars / data points
@@ -789,12 +870,14 @@ export default function AprendePage() {
 
       // Holographic scan line (slow sweep)
       const scanY = ((frame * 0.55) % (H + 80)) - 40;
-      const scanGrad = ctx.createLinearGradient(0, scanY - 18, 0, scanY + 18);
-      scanGrad.addColorStop(0, "rgba(0,0,0,0)");
-      scanGrad.addColorStop(0.5, theme.glowSoft);
-      scanGrad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = scanGrad;
-      ctx.fillRect(0, scanY - 18, W, 36);
+      ctx.drawImage(layer(`scan${w}`, W, 36, (c) => {
+        const scanGrad = c.createLinearGradient(0, 0, 0, 36);
+        scanGrad.addColorStop(0, "rgba(0,0,0,0)");
+        scanGrad.addColorStop(0.5, theme.glowSoft);
+        scanGrad.addColorStop(1, "rgba(0,0,0,0)");
+        c.fillStyle = scanGrad;
+        c.fillRect(0, 0, W, 36);
+      }), 0, scanY - 18);
 
       // Background holographic distribution hubs and warehouse blocks.
       if (!lev.isBoss && !hasScenicBg) {
@@ -836,7 +919,12 @@ export default function AprendePage() {
       const skin = platformSkin(gRef.current.currentLevel, theme);
 
       for (const p of lev.platforms) {
+        if (!onScreen(p.x, p.w, camX)) continue;
+        // los suelos miden miles de px: recorta los bucles de detalle al tramo visible
+        const dl = Math.max(p.x, camX - 90);
+        const dr = Math.min(p.x + p.w, camX + W + 90);
         const ground = p.y >= 455;
+        const startAt = (base, step) => base + Math.max(0, Math.ceil((dl - base) / step)) * step;
         const slabDepth = ground ? 62 : 32;
         const isoDepth = ground ? 34 : 22;
         const skew = isoDepth * 0.72;
@@ -895,7 +983,7 @@ export default function AprendePage() {
         ctx.globalAlpha = ground ? 0.16 : 0.24;
         ctx.strokeStyle = theme.glow;
         ctx.lineWidth = 1;
-        for (let rx = p.x + 22; rx < p.x + p.w - 18; rx += 54) {
+        for (let rx = startAt(p.x + 22, 54); rx < Math.min(p.x + p.w - 18, dr); rx += 54) {
           ctx.beginPath();
           ctx.moveTo(rx, p.y + 8);
           ctx.lineTo(rx, p.y + slabDepth - 9);
@@ -903,7 +991,7 @@ export default function AprendePage() {
         }
         ctx.globalAlpha = ground ? 0.11 : 0.18;
         ctx.fillStyle = theme.glow;
-        for (let px = p.x + 42; px < p.x + p.w - 42; px += 118) {
+        for (let px = startAt(p.x + 42, 118); px < Math.min(p.x + p.w - 42, dr); px += 118) {
           roundRect(px, p.y + slabDepth * 0.34, 34, 8, 4);
           ctx.fill();
         }
@@ -921,13 +1009,21 @@ export default function AprendePage() {
         ctx.lineTo(p.x + p.w + skew, p.y - isoDepth);
         ctx.lineTo(p.x + p.w, p.y);
         ctx.lineTo(p.x, p.y);
+        if (!fxBlur) {
+          // halo falso: un trazo ancho translúcido cuesta una fracción del blur
+          ctx.globalAlpha = 0.22;
+          ctx.lineWidth = (ground ? 1.4 : 1.1) + 4;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+          ctx.lineWidth = ground ? 1.4 : 1.1;
+        }
         ctx.stroke();
         ctx.restore();
 
         ctx.globalAlpha = ground ? 0.2 : 0.25;
         ctx.strokeStyle = theme.glow;
         ctx.lineWidth = 0.8;
-        for (let sx = p.x + 34; sx < p.x + p.w; sx += 64) {
+        for (let sx = startAt(p.x + 34, 64); sx < Math.min(p.x + p.w, dr); sx += 64) {
           ctx.beginPath();
           ctx.moveTo(sx, p.y);
           ctx.lineTo(sx + skew, p.y - isoDepth);
@@ -935,13 +1031,13 @@ export default function AprendePage() {
         }
         for (let gy = 8; gy < isoDepth; gy += 10) {
           ctx.beginPath();
-          ctx.moveTo(p.x + gy * 0.72, p.y - gy);
-          ctx.lineTo(p.x + p.w + gy * 0.72, p.y - gy);
+          ctx.moveTo(dl + gy * 0.72, p.y - gy);
+          ctx.lineTo(dr + gy * 0.72, p.y - gy);
           ctx.stroke();
         }
         ctx.globalAlpha = 0.12;
         ctx.fillStyle = skin.detail;
-        for (let sx = p.x + 28; sx < p.x + p.w - 14; sx += 74) {
+        for (let sx = startAt(p.x + 28, 74); sx < Math.min(p.x + p.w - 14, dr); sx += 74) {
           isoDiamond(sx + skew * 0.5, p.y - isoDepth * 0.5, 20, 9);
           ctx.fill();
         }
@@ -957,10 +1053,10 @@ export default function AprendePage() {
           ctx.lineWidth = 1.3;
           ctx.globalAlpha = ground ? 0.28 : 0.5;
           ctx.beginPath();
-          ctx.moveTo(p.x + skew + 8, p.y - isoDepth - 5);
-          ctx.lineTo(p.x + p.w + skew - 8, p.y - isoDepth - 5);
+          ctx.moveTo(Math.max(p.x + 8, dl) + skew, p.y - isoDepth - 5);
+          ctx.lineTo(Math.min(p.x + p.w - 8, dr) + skew, p.y - isoDepth - 5);
           ctx.stroke();
-          for (let post = p.x + skew + 18; post < p.x + p.w + skew - 12; post += 58) {
+          for (let post = startAt(p.x + 18, 58) + skew; post < Math.min(p.x + p.w - 12, dr) + skew; post += 58) {
             ctx.beginPath();
             ctx.moveTo(post, p.y - isoDepth - 5);
             ctx.lineTo(post - skew * 0.16, p.y - isoDepth + 9);
@@ -972,7 +1068,7 @@ export default function AprendePage() {
         // Subtle warehouse crate modules on wider ground segments.
         if (ground && p.w > 320) {
           const crateStep = visualBudget === "full" ? 380 : 560;
-          for (let bx = p.x + 170; bx < p.x + p.w - 180; bx += crateStep) {
+          for (let bx = startAt(p.x + 170, crateStep); bx < Math.min(p.x + p.w - 180, dr); bx += crateStep) {
             drawIsoBox(bx, p.y - 8, 64, 28, 34, theme, 0.42);
           }
         }
@@ -986,9 +1082,31 @@ export default function AprendePage() {
       ctx.translate(-camX, 0);
       const theme = worldTheme(gRef.current.currentLevel);
       const frame = gRef.current.frame;
+      // la moneda entera (disco + anillo + "D") se hornea una vez por mundo
+      const coinSpr = layer(`coin${worldOf(gRef.current.currentLevel)}`, 48, 48, (c) => {
+        c.translate(24, 24);
+        c.scale(2, 2);
+        const cg = c.createRadialGradient(-3, -4, 1, 0, 0, 11);
+        cg.addColorStop(0, "#ffffff");
+        cg.addColorStop(0.25, theme.accent);
+        cg.addColorStop(0.65, theme.glow);
+        cg.addColorStop(1, theme.edge);
+        c.fillStyle = cg;
+        c.beginPath();
+        c.arc(0, 0, 11, 0, Math.PI * 2);
+        c.fill();
+        c.strokeStyle = theme.accent;
+        c.lineWidth = 1.5;
+        c.stroke();
+        c.fillStyle = "#030f03";
+        c.font = "bold 8px monospace";
+        c.textAlign = "center";
+        c.fillText("D", 0, 3);
+      });
 
       for (const c of coins) {
         if (c.collected) continue;
+        if (!onScreen(c.x - 20, 40, camX, 20)) continue;
         const bob = Math.sin(frame * 0.08 + c.x * 0.02) * 4;
         const spin = 0.6 + 0.4 * Math.abs(Math.cos(frame * 0.09 + c.x * 0.04));
 
@@ -1006,31 +1124,8 @@ export default function AprendePage() {
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = "source-over";
 
-        // Holographic disc (spins)
-        ctx.scale(spin, 1);
-        ctx.shadowColor = theme.glow;
-        ctx.shadowBlur = 14;
-        const cg = ctx.createRadialGradient(-3, -4, 1, 0, 0, 11);
-        cg.addColorStop(0, "#ffffff");
-        cg.addColorStop(0.25, theme.accent);
-        cg.addColorStop(0.65, theme.glow);
-        cg.addColorStop(1, theme.edge);
-        ctx.fillStyle = cg;
-        ctx.beginPath();
-        ctx.arc(0, 0, 11, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Neon ring
-        ctx.shadowBlur = 0;
-        ctx.strokeStyle = theme.accent;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Center D mark
-        ctx.fillStyle = "#030f03";
-        ctx.font = "bold 8px monospace";
-        ctx.textAlign = "center";
-        ctx.fillText("D", 0, 3);
+        // Holographic disc (spins) — un solo drawImage del sprite horneado
+        ctx.drawImage(coinSpr, -12 * spin, -12, 24 * spin, 24);
 
         ctx.restore();
       }
@@ -1066,12 +1161,19 @@ export default function AprendePage() {
       const dx = e.x + e.w / 2 - dw / 2;
       const dy = e.y + e.h / 2 - dh / 2 + bob;
       const theme = worldTheme(gRef.current.currentLevel);
+      const boss = !!(e.isBosse || e.isFinalBoss);
       ctx.save();
-      ctx.imageSmoothingEnabled = false;
-      drawCastShadow(e.x + e.w / 2, e.y + e.h + 8, e.w * 0.74, 7, e.isBosse || e.isFinalBoss ? 0.38 : 0.28);
-      ctx.shadowColor = e.isBosse || e.isFinalBoss ? theme.glow : "rgba(255,255,255,0.28)";
-      ctx.shadowBlur = e.isBosse || e.isFinalBoss ? 22 : 10;
-      ctx.drawImage(enemySheet, idx * 128, 0, 128, 128, dx, dy, dw, dh);
+      drawCastShadow(e.x + e.w / 2, e.y + e.h + 8, e.w * 0.74, 7, boss ? 0.38 : 0.28);
+      // sprite + halo horneados juntos: el shadowBlur se pagaba por enemigo y frame
+      const pad = boss ? 44 : 24;
+      const key = `enemy${idx}_${Math.round(dw)}x${Math.round(dh)}_${worldOf(gRef.current.currentLevel)}_${boss ? 1 : 0}`;
+      const spr = layer(key, dw + pad * 2, dh + pad * 2, (c) => {
+        c.imageSmoothingEnabled = false;
+        c.shadowColor = boss ? theme.glow : "rgba(255,255,255,0.28)";
+        c.shadowBlur = boss ? 22 : 10;
+        c.drawImage(enemySheet, idx * 128, 0, 128, 128, pad, pad, dw, dh);
+      });
+      ctx.drawImage(spr, dx - pad, dy - pad);
       ctx.restore();
       return true;
     }
@@ -1102,13 +1204,8 @@ export default function AprendePage() {
       const cx = e.x + e.w / 2;
       const cy = e.y + e.h / 2;
       const radius = Math.max(e.w, e.h) * (e.isBosse || e.isFinalBoss ? 0.85 : 0.62);
-      const glow = ctx.createRadialGradient(cx, cy, radius * 0.22, cx, cy, radius);
-      glow.addColorStop(0, wTh.glowSoft);
-      glow.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = glow;
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-      ctx.fill();
+      const glowSpr = radialLayer(`glow${worldOf(gRef.current.currentLevel)}`, wTh.glowSoft);
+      ctx.drawImage(glowSpr, cx - radius, cy - radius, radius * 2, radius * 2);
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = "source-over";
       ctx.restore();
@@ -1119,6 +1216,7 @@ export default function AprendePage() {
       ctx.translate(-camX, 0);
       for (const e of enemies) {
         if (e.dead) continue;
+        if (!onScreen(e.x, e.w, camX, 120)) continue;
         if (!(enemySheet.complete && enemySheet.naturalWidth > 0)) {
           drawCastShadow(e.x + e.w / 2, e.y + e.h + 8, e.w * 0.72, 7, e.isBosse || e.isFinalBoss ? 0.38 : 0.28);
         }
@@ -1589,6 +1687,7 @@ export default function AprendePage() {
       ctx.translate(-camX, 0);
       const theme = worldTheme(gRef.current.currentLevel);
       for (const impact of impacts) {
+        if (!onScreen(impact.x - 60, 120, camX, 20)) continue;
         const progress = impact.age / impact.maxAge;
         const frame = Math.min(5, Math.floor(progress * 6));
         const size = impact.type === "boss" ? 118 : impact.type === "coin" ? 52 : 82;
@@ -1615,18 +1714,24 @@ export default function AprendePage() {
       ctx.save();
       ctx.translate(-camX, 0);
       ctx.globalCompositeOperation = "lighter";
+      const camR = camX + W + 40;
       for (const part of particles) {
+        if (part.x < camX - 40 || part.x > camR) continue;
         const fade = 1 - part.age / part.life;
         ctx.globalAlpha = fade;
         ctx.fillStyle = part.color;
-        ctx.shadowColor = part.color;
-        ctx.shadowBlur = 12;
+        // sin shadowBlur: 40 sombras gaussianas por frame era el lag al matar un bicho.
+        // El halo lo da el composite "lighter" + el círculo suave de debajo.
+        ctx.beginPath();
+        ctx.arc(part.x, part.y, part.size * fade * 1.9, 0, Math.PI * 2);
+        ctx.globalAlpha = fade * 0.22;
+        ctx.fill();
+        ctx.globalAlpha = fade;
         ctx.beginPath();
         ctx.arc(part.x, part.y, part.size * fade, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
       ctx.restore();
     }
 
@@ -1701,7 +1806,13 @@ export default function AprendePage() {
       ctx.shadowBlur = sprinting ? 18 : 8;
       if (sprite.complete && sprite.naturalWidth > 0) {
         const animFrame = p.grounded ? Math.floor(frame / 5) % SPRITE_FRAMES : 2;
-        ctx.drawImage(sprite, animFrame * SPRITE_SRC_W, 0, SPRITE_SRC_W, SPRITE_SRC_H, -p.w / 2, -p.h / 2, p.w, p.h);
+        // cada pose pre-escalada a su tamaño final (antes: reescalar 237x510 → 46x62 por frame)
+        ctx.drawImage(
+          layer(`char${animFrame}`, p.w * 2, p.h * 2, (c) => {
+            c.drawImage(sprite, animFrame * SPRITE_SRC_W, 0, SPRITE_SRC_W, SPRITE_SRC_H, 0, 0, p.w * 2, p.h * 2);
+          }),
+          -p.w / 2, -p.h / 2, p.w, p.h
+        );
       } else {
         ctx.fillStyle = "#7FE040"; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
       }
@@ -1771,7 +1882,7 @@ export default function AprendePage() {
 
       // Floating tech particles
       ctx.globalCompositeOperation = "lighter";
-      const particleCount = visualBudget === "full" ? 30 : 18;
+      const particleCount = !fxBlur ? 12 : visualBudget === "full" ? 30 : 18;
       for (let i = 0; i < particleCount; i++) {
         const drift = (frame * (0.13 + (i % 5) * 0.025) + i * 117) % (W + 200);
         const px = drift - 100;
@@ -1786,60 +1897,80 @@ export default function AprendePage() {
       ctx.globalCompositeOperation = "source-over";
       ctx.globalAlpha = 1;
 
-      // Floor fog — neon tinted
-      const floorFog = ctx.createLinearGradient(0, H - 120, 0, H);
-      floorFog.addColorStop(0, "rgba(0,0,0,0)");
-      floorFog.addColorStop(0.45, theme.fog);
-      floorFog.addColorStop(1, "rgba(0,0,0,0.32)");
-      ctx.fillStyle = floorFog;
-      ctx.fillRect(0, H - 120, W, 120);
+      // Niebla + scanlines + viñeta: todo estático, horneado una vez por mundo
+      // (eran 180 fillRect y 2 gradientes por frame)
+      const atmos = layer(`atmos${worldOf(gRef.current.currentLevel)}`, W, H, (c) => {
+        const floorFog = c.createLinearGradient(0, H - 120, 0, H);
+        floorFog.addColorStop(0, "rgba(0,0,0,0)");
+        floorFog.addColorStop(0.45, theme.fog);
+        floorFog.addColorStop(1, "rgba(0,0,0,0.32)");
+        c.fillStyle = floorFog;
+        c.fillRect(0, H - 120, W, 120);
 
-      // Subtle scanlines
-      ctx.globalAlpha = 0.035;
-      ctx.fillStyle = "#000";
-      for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
+        c.globalAlpha = 0.035;
+        c.fillStyle = "#000";
+        for (let y = 0; y < H; y += 3) c.fillRect(0, y, W, 1);
+        c.globalAlpha = 1;
 
-      // Vignette
-      const vig = ctx.createRadialGradient(W / 2, H / 2, W * 0.15, W / 2, H / 2, W * 0.72);
-      vig.addColorStop(0, "rgba(0,0,0,0)");
-      vig.addColorStop(0.72, "rgba(0,0,0,0.06)");
-      vig.addColorStop(1, "rgba(0,0,0,0.55)");
-      ctx.fillStyle = vig;
+        const vig = c.createRadialGradient(W / 2, H / 2, W * 0.15, W / 2, H / 2, W * 0.72);
+        vig.addColorStop(0, "rgba(0,0,0,0)");
+        vig.addColorStop(0.72, "rgba(0,0,0,0.06)");
+        vig.addColorStop(1, "rgba(0,0,0,0.55)");
+        c.fillStyle = vig;
+        c.fillRect(0, 0, W, H);
+      });
       ctx.globalAlpha = 1;
-      ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(atmos, 0, 0);
 
+      ctx.restore();
+    }
+
+    function drawHeart(cx, cy, r, filled) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + r * 1.15);
+      ctx.bezierCurveTo(cx - r * 1.6, cy + r * 0.1, cx - r * 0.75, cy - r * 1.1, cx, cy - r * 0.3);
+      ctx.bezierCurveTo(cx + r * 0.75, cy - r * 1.1, cx + r * 1.6, cy + r * 0.1, cx, cy + r * 1.15);
+      ctx.closePath();
+      if (filled) {
+        ctx.fillStyle = "#ff4444";
+        ctx.fill();
+      } else {
+        ctx.strokeStyle = "rgba(255,255,255,0.28)";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
       ctx.restore();
     }
 
     function drawHUD(g) {
       const theme = worldTheme(g.currentLevel);
 
-      // HUD panel background
-      const hudGrad = ctx.createLinearGradient(0, 0, W, 50);
-      hudGrad.addColorStop(0, "rgba(2,8,2,0.93)");
-      hudGrad.addColorStop(0.5, "rgba(4,12,4,0.88)");
-      hudGrad.addColorStop(1, "rgba(2,8,2,0.93)");
-      ctx.fillStyle = hudGrad;
-      ctx.fillRect(0, 0, W, 50);
+      // Panel del HUD (fondo + borde + scanlines): estático, horneado por mundo
+      const hudPanel = layer(`hud${worldOf(g.currentLevel)}`, W, 52, (c) => {
+        const hudGrad = c.createLinearGradient(0, 0, W, 50);
+        hudGrad.addColorStop(0, "rgba(2,8,2,0.93)");
+        hudGrad.addColorStop(0.5, "rgba(4,12,4,0.88)");
+        hudGrad.addColorStop(1, "rgba(2,8,2,0.93)");
+        c.fillStyle = hudGrad;
+        c.fillRect(0, 0, W, 50);
 
-      // Bottom border glow
-      ctx.save();
-      ctx.shadowColor = theme.glow;
-      ctx.shadowBlur = 7;
-      ctx.strokeStyle = theme.glow;
-      ctx.lineWidth = 1.2;
-      ctx.globalAlpha = 0.55;
-      ctx.beginPath();
-      ctx.moveTo(0, 49.5);
-      ctx.lineTo(W, 49.5);
-      ctx.stroke();
-      ctx.restore();
+        c.shadowColor = theme.glow;
+        c.shadowBlur = 7;
+        c.strokeStyle = theme.glow;
+        c.lineWidth = 1.2;
+        c.globalAlpha = 0.55;
+        c.beginPath();
+        c.moveTo(0, 49.5);
+        c.lineTo(W, 49.5);
+        c.stroke();
+        c.shadowBlur = 0;
 
-      // Scanlines on HUD
-      ctx.globalAlpha = 0.055;
-      ctx.fillStyle = theme.glow;
-      for (let y = 2; y < 50; y += 4) ctx.fillRect(0, y, W, 1);
-      ctx.globalAlpha = 1;
+        c.globalAlpha = 0.055;
+        c.fillStyle = theme.glow;
+        for (let y = 2; y < 50; y += 4) c.fillRect(0, y, W, 1);
+      });
+      ctx.drawImage(hudPanel, 0, 0);
 
       ctx.font = "bold 12px monospace";
 
@@ -1851,6 +1982,18 @@ export default function AprendePage() {
       ctx.textAlign = "left";
       ctx.fillText("▸ " + LEVELS[g.currentLevel].name.toUpperCase(), 14, 30);
       ctx.restore();
+
+      // Progreso de niveles — bajo el nombre
+      const left = TOTAL_LEVELS - 1 - g.currentLevel;
+      ctx.font = "bold 10px monospace";
+      ctx.textAlign = "left";
+      ctx.fillStyle = "rgba(232,255,232,0.62)";
+      ctx.fillText(
+        `NIVEL ${g.currentLevel + 1}/${TOTAL_LEVELS}` + (left > 0 ? ` · FALTAN ${left}` : " · ÚLTIMO"),
+        14,
+        44
+      );
+      ctx.font = "bold 12px monospace";
 
       // Coins + score — center
       ctx.fillStyle = "#e8ffe8";
@@ -1873,14 +2016,26 @@ export default function AprendePage() {
         ctx.fillText(`ENERGIA: ${g.coins}/10`, 640, 30);
       }
 
-      // Lives — right, red
-      ctx.save();
-      ctx.shadowColor = "#ff4444";
-      ctx.shadowBlur = 7;
-      ctx.fillStyle = "#ff4444";
+      // Vidas — corazones dibujados a mano (el glifo ♥ salía como cuadro vacío
+      // en la fuente monospace del canvas)
+      const MAX_LIVES = 5;
+      const heartStep = 17;
+      const heartsX = W - 14 - heartStep * (MAX_LIVES - 1);
+      for (let i = 0; i < MAX_LIVES; i++) {
+        drawHeart(heartsX + i * heartStep, 24, 6.5, i < g.lives);
+      }
+      ctx.font = "bold 10px monospace";
       ctx.textAlign = "right";
-      ctx.fillText(`♥ ${g.lives}`, W - 14, 30);
-      ctx.restore();
+      ctx.fillStyle = "rgba(255,140,140,0.8)";
+      ctx.fillText(`VIDAS ${g.lives}/${MAX_LIVES}`, W - 14, 44);
+      ctx.font = "bold 12px monospace";
+
+      // FPS — para ver de un vistazo si el juego va fino
+      ctx.textAlign = "left";
+      ctx.font = "bold 10px monospace";
+      ctx.fillStyle = fpsAvg >= 55 ? "rgba(127,224,64,0.7)" : fpsAvg >= 40 ? "rgba(255,190,60,0.85)" : "rgba(255,90,90,0.9)";
+      ctx.fillText(`${Math.round(fpsAvg)} FPS`, 250, 44);
+      ctx.font = "bold 12px monospace";
 
       // Auto play indicator
       if (g.autoPlay) {
@@ -1888,18 +2043,16 @@ export default function AprendePage() {
         ctx.shadowColor = theme.glow;
         ctx.shadowBlur = 10;
         ctx.fillStyle = theme.glow;
-        ctx.textAlign = "left";
+        ctx.textAlign = "center";
         ctx.font = "bold 10px monospace";
-        ctx.fillText("⚡ AUTO", 14, 44);
+        ctx.fillText("⚡ AUTO", W / 2, 44);
         ctx.restore();
       }
     }
 
     // ─── Game loop ─────────────────────────────────────────────────
-    function loop() {
+    function step() {
       const g = gRef.current;
-      if (!g || g.stopped) return;
-      try {
       g.frame++;
       const k = keysRef.current;
       const p = g.player;
@@ -2186,7 +2339,15 @@ export default function AprendePage() {
       for (const impact of g.impacts) impact.age++;
       g.impacts = g.impacts.filter((impact) => impact.age < impact.maxAge);
 
-      // ── Draw ──
+    }
+
+    function render() {
+      const g = gRef.current;
+      const k = keysRef.current;
+      const p = g.player;
+      const lev = LEVELS[g.currentLevel];
+      const bossAlive = lev.isBoss && g.levelEnemies.some((e) => e.isBosse);
+
       ctx.clearRect(0, 0, W, H);
       ctx.save();
       if (g.screenShake > 0) {
@@ -2257,6 +2418,33 @@ export default function AprendePage() {
         ctx.globalAlpha = 1;
       }
 
+    }
+
+    // Paso fijo a 60 Hz. Antes la física iba atada al refresco de la pantalla:
+    // a 120/144 Hz el juego corría al doble y al caer frames se ralentizaba.
+    const STEP_MS = 1000 / 60;
+    let lastTs = 0;
+    let acc = 0;
+    function loop(ts) {
+      const g = gRef.current;
+      if (!g || g.stopped) return;
+      if (!lastTs) lastTs = ts;
+      const delta = Math.max(1, ts - lastTs);
+      fpsAvg = fpsAvg * 0.92 + (1000 / delta) * 0.08;
+      // calidad adaptativa: si no se llega a 60fps se apaga el desenfoque,
+      // que es lo más caro del raster. No se vuelve a activar en la partida.
+      if (fxBlur && fpsAvg < 50) fxBlur = false;
+      acc += Math.min(delta, 200); // tras un parón no recuperar más de 12 pasos
+      lastTs = ts;
+      try {
+        let steps = 0;
+        while (acc >= STEP_MS && steps < 5) {
+          acc -= STEP_MS;
+          steps++;
+          step();
+          if (g.stopped) return;
+        }
+        if (steps > 0) render();
       } catch (err) { console.error("[game]", err); }
       rafRef.current = requestAnimationFrame(loop);
     }
@@ -2265,7 +2453,10 @@ export default function AprendePage() {
       const k = keysRef.current;
       if ((e.metaKey || e.ctrlKey) && e.key === "2") {
         e.preventDefault();
-        if (gRef.current) gRef.current.autoPlay = !gRef.current.autoPlay;
+        if (gRef.current) {
+          gRef.current.autoPlay = !gRef.current.autoPlay;
+          if (!gRef.current.autoPlay) resetKeys(); // el autoplay dejaba k.right pulsado
+        }
         return;
       }
       if (e.key.toLowerCase() === "f") {
@@ -2289,9 +2480,7 @@ export default function AprendePage() {
       if (e.key.toLowerCase() === "z") k.sprint = false;
     }
     function onBlur() {
-      const k = keysRef.current;
-      k.left = false; k.right = false; k.jump = false;
-      k.jumpPressed = false; k.sprint = false; k.power = false;
+      resetKeys();
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -2507,6 +2696,29 @@ export default function AprendePage() {
               </form>
               <button onClick={startGame} style={{ ...btnStyle, background: "rgba(255,255,255,0.1)", fontSize: "0.85rem", padding: "10px 28px" }}>
                 Jugar de nuevo
+              </button>
+            </div>
+          )}
+          {screen === "levels" && (
+            <div style={overlayStyle}>
+              <p style={{ ...tagStyle, color: "#7FE040" }}>Comando secreto</p>
+              <h2 style={titleStyle}>Selecciona nivel</h2>
+              <div style={{
+                display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10,
+                width: "min(520px, 100%)", margin: "0 0 24px",
+              }}>
+                {LEVEL_NAMES.map((name, i) => (
+                  <button key={i} onClick={() => startGame(i)} title={name} style={{
+                    background: "rgba(127, 224, 64, 0.1)", border: "1px solid rgba(127, 224, 64, 0.3)",
+                    borderRadius: 10, padding: "10px 4px", color: "#7FE040", fontWeight: 800,
+                    fontSize: "0.85rem", cursor: "pointer", fontFamily: "monospace",
+                  }}>
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+              <button onClick={() => setScreen("start")} style={{ ...btnStyle, background: "rgba(255,255,255,0.1)", fontSize: "0.85rem", padding: "10px 28px" }}>
+                Volver
               </button>
             </div>
           )}
