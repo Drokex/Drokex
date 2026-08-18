@@ -194,6 +194,8 @@ button {
   white-space: nowrap;
   font-size: 0.88rem;
   font-weight: 600;
+  /* el header siempre es oscuro; sin esto heredaba --ink y se volvía negro en modo claro */
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .header-country-trigger {
