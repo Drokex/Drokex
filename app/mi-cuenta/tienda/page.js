@@ -50,6 +50,7 @@ export default async function StorePage() {
       initialSlug={landing?.slug || ""}
       initialStore={initialStore}
       initialProducts={Array.isArray(landing?.products) ? landing.products : null}
+      initialPublished={Boolean(landing?.published)}
     />
   );
 }

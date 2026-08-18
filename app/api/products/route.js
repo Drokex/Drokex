@@ -13,7 +13,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const user = await getCurrentUser();
-    if (!user) {
+    if (!user || (user.role !== "PROVIDER" && user.role !== "ADMIN")) {
       return Response.json({ error: "No autorizado." }, { status: 401 });
     }
     const body = await request.json();

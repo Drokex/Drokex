@@ -391,7 +391,7 @@ export default function ParaProveedoresPage() {
             {t.heroBody}
           </p>
           <div className={`${styles.providerReveal} ${styles.providerDelay4}`} style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <Link className={`${styles.providerCtaPulse} ${styles.providerHoverLift}`} href="/registro" style={{
+            <Link className={`${styles.providerCtaPulse} ${styles.providerHoverLift}`} href={providerLink} style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               background: "#7FE040", color: "#050505", fontWeight: 700,
               padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
@@ -658,7 +658,7 @@ export default function ParaProveedoresPage() {
             <p style={{ color: w(0.85), fontSize: "1rem", lineHeight: 1.6, margin: "0 0 22px", fontWeight: 600 }}>
               {t.sideCardBody}
             </p>
-            <Link className={styles.providerHoverLift} href="/registro" style={{
+            <Link className={styles.providerHoverLift} href={providerLink} style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
               background: "transparent", color: txt, fontWeight: 700,
               padding: "12px 18px", borderRadius: 10, fontSize: "0.92rem",
@@ -842,7 +842,7 @@ export default function ParaProveedoresPage() {
               {t.finalCtaTitle1} <span style={{ color: "#7FE040" }}>{t.finalCtaTitle2}</span><br />
               {t.finalCtaTitle3}
             </h2>
-            <Link className={`${styles.providerCtaPulse} ${styles.providerHoverLift}`} href="/registro" style={{
+            <Link className={`${styles.providerCtaPulse} ${styles.providerHoverLift}`} href={providerLink} style={{
               display: "inline-flex", alignItems: "center", gap: 10,
               background: "#7FE040", color: "#050505", fontWeight: 800,
               padding: "16px 36px", borderRadius: 12, fontSize: "1rem",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentUser } from "@/lib/current-user";
+import { getProductsByProvider } from "@/lib/products";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
 
@@ -20,6 +21,8 @@ export default async function ProductosPage() {
     );
   }
 
+  const products = await getProductsByProvider(user.id);
+
   return (
     <main className={styles.providerDashboardPage}>
       <SiteHeader />
@@ -35,31 +38,46 @@ export default async function ProductosPage() {
           </div>
         </div>
 
-        <div className="prod-menu-grid">
-          <Link href="/mi-cuenta/productos/inventario" className="prod-menu-card">
-            <div className="prod-menu-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="32" height="32">
-                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-                <rect x="9" y="3" width="6" height="4" rx="1" />
-                <path d="M9 12h6M9 16h4" />
+        <div className="prod-menu-list">
+          <Link href="/mi-cuenta/productos/inventario" className="prod-menu-row">
+            <div className="prod-menu-row-inner">
+              <div className="prod-menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="20" height="20">
+                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                  <rect x="9" y="3" width="6" height="4" rx="1" />
+                  <path d="M9 12h6M9 16h4" />
+                </svg>
+              </div>
+              <div className="prod-menu-row-body">
+                <strong>Inventario</strong>
+                <p>Ver, editar y eliminar tus productos existentes.</p>
+              </div>
+              <span className="prod-menu-count">
+                {products.length} producto{products.length === 1 ? "" : "s"}
+              </span>
+              <svg className="prod-menu-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                <polyline points="9 18 15 12 9 6" />
               </svg>
-            </div>
-            <div>
-              <strong>Inventario</strong>
-              <p>Ver, editar y eliminar tus productos existentes.</p>
             </div>
           </Link>
 
-          <Link href="/mi-cuenta/productos/crear" className="prod-menu-card prod-menu-card-highlight">
-            <div className="prod-menu-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="32" height="32">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 8v8M8 12h8" />
+          <div className="prod-menu-divider" />
+
+          <Link href="/mi-cuenta/productos/crear" className="prod-menu-row prod-menu-row-highlight">
+            <div className="prod-menu-row-inner">
+              <div className="prod-menu-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </div>
+              <div className="prod-menu-row-body">
+                <strong>Crear producto</strong>
+                <p>Añade un nuevo producto con imágenes, precio y detalles.</p>
+              </div>
+              <svg className="prod-menu-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                <polyline points="9 18 15 12 9 6" />
               </svg>
-            </div>
-            <div>
-              <strong>Crear producto</strong>
-              <p>Añade un nuevo producto con imágenes, precio y detalles.</p>
             </div>
           </Link>
         </div>

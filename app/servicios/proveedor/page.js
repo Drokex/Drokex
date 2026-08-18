@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import { useAccountCta } from "@/app/components/use-account-cta";
 import styles from "../servicios-proveedor.module.css";
 
 const services = [
@@ -106,6 +107,7 @@ function Faq() {
 }
 
 export default function ProveedorPage() {
+  const accountCta = useAccountCta("/registro?role=proveedor");
   const [activeStep, setActiveStep] = useState(1);
   const visibleSteps = [-1, 0, 1, 2].map((offset) => {
     const index = (activeStep + offset + steps.length) % steps.length;
@@ -133,7 +135,7 @@ export default function ProveedorPage() {
             Sube tu catálogo, recibe mensajes de compradores reales y cierra negocios directo —
             sin intermediarios, sin logística de nuestra parte.
           </p>
-          <Link href="/registro" className={styles.spHeroCta}>
+          <Link href={accountCta} className={styles.spHeroCta}>
             Empezar como proveedor
           </Link>
         </div>
@@ -305,7 +307,7 @@ export default function ProveedorPage() {
         <div className={styles.spCtaContent}>
           <h2>¿Listo para llevar tus productos<br /><span>al siguiente nivel?</span></h2>
           <p>Únete a cientos de proveedores que ya están vendiendo en toda Latinoamérica con Drokex.</p>
-          <Link href="/registro">Empezar como proveedor</Link>
+          <Link href={accountCta}>Empezar como proveedor</Link>
         </div>
       </section>
 

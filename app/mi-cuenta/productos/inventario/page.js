@@ -38,16 +38,28 @@ export default async function InventarioPage() {
             <p className={styles.providerSectionKicker}>Inventario</p>
             <h2>Todos los productos</h2>
           </div>
-          <Link href="/mi-cuenta/productos/crear" className={invStyles.invCreateBtn}>
-            + Nuevo producto
-          </Link>
+          {products.length > 0 && (
+            <Link href="/mi-cuenta/productos/crear" className={invStyles.invCreateBtn}>
+              + Nuevo producto
+            </Link>
+          )}
         </div>
 
         {products.length === 0 ? (
-          <div className={styles.providerEmptyBlock}>
-            <strong>No tienes productos aún.</strong>
-            <p>Crea tu primer producto para que aparezca aquí.</p>
-            <Link href="/mi-cuenta/productos/crear" className={styles.providerTextLink}>Crear producto</Link>
+          <div className={invStyles.invEmpty}>
+            <div className={invStyles.invEmptyIcon}>
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 8l-9-5-9 5 9 5 9-5z" /><path d="M3 8v8l9 5 9-5V8" /><path d="M12 13v8" />
+              </svg>
+            </div>
+            <strong>No tienes productos aún</strong>
+            <p>Crea tu primer producto para que aparezca en tu inventario y en el catálogo público.</p>
+            <Link href="/mi-cuenta/productos/crear" className={invStyles.invEmptyBtn}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Crear producto
+            </Link>
           </div>
         ) : (
           <div className={invStyles.invTableWrap}>

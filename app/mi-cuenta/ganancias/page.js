@@ -1,15 +1,15 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
+import { getOrdersForProvider } from "@/lib/orders";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
 
-const earningsCards = [
-  { label: "Total vendido", value: "US$ 14.820" },
-  { label: "Comisión Drokex", value: "US$ 1.334" },
-  { label: "Ganancia neta", value: "US$ 13.486" },
-  { label: "Historial de pagos", value: "4 pagos liquidados este mes" },
-];
+const currencyFormatter = new Intl.NumberFormat("es-CO", {
+  style: "currency",
+  currency: "COP",
+  maximumFractionDigits: 0,
+});
 
 export default async function EarningsPage() {
   const session = await getCurrentSession();
@@ -35,6 +35,26 @@ export default async function EarningsPage() {
     user.role === "CUSTOMER" ||
     session?.role === "CUSTOMER" ||
     session?.audience === "cliente";
+
+  const orders = isCustomer ? [] : await getOrdersForProvider(user.id);
+  const paidOrders = orders.filter((order) => order.paymentStatus === "PAID");
+  const totalVendido = paidOrders.reduce((sum, order) => sum + order.providerSubtotal, 0);
+  const lastPaidOrder = paidOrders[0];
+
+  const earningsCards = [
+    { label: "Total vendido", value: currencyFormatter.format(totalVendido) },
+    { label: "Pedidos pagados", value: String(paidOrders.length) },
+    {
+      label: "Ticket promedio",
+      value: paidOrders.length ? currencyFormatter.format(totalVendido / paidOrders.length) : "Sin datos",
+    },
+    {
+      label: "Último pago",
+      value: lastPaidOrder
+        ? new Date(lastPaidOrder.updatedAt).toLocaleDateString("es-CO", { day: "2-digit", month: "short", year: "numeric" })
+        : "Sin datos",
+    },
+  ];
 
   return (
     <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>

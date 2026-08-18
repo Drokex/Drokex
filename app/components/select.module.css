@@ -1,0 +1,121 @@
+.selectRoot {
+  position: relative;
+}
+
+.selectTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.selectTrigger:hover { border-color: #b8bfc9; }
+
+.selectChevron {
+  flex-shrink: 0;
+  color: #6b7280;
+  transition: transform 0.15s;
+}
+
+.selectChevron.isOpen { transform: rotate(180deg); }
+
+.selectPanel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.selectOption {
+  text-align: left;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.selectOption:hover { background: #f3f4f6; }
+
+.selectOption.isSelected {
+  background: rgba(127, 224, 64, 0.16);
+  color: #1f5c10;
+  font-weight: 600;
+}
+
+.selectCreateBtn {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 600;
+  color: #2d8a1f;
+  cursor: pointer;
+}
+
+.selectCreateBtn:hover { background: #f3f4f6; }
+
+.selectCreateRow {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.selectCreateInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+}
+
+.selectCreateInput:focus { border-color: #2d8a1f; }
+
+.selectCreateConfirm {
+  padding: 0.45rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  background: #7FE040;
+  color: #1a1a1a;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}

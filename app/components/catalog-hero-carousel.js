@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useAccountCta } from "@/app/components/use-account-cta";
 import styles from "@/app/categorias/page.module.css";
 
 const SLIDES = [
@@ -14,6 +15,7 @@ const SLIDES = [
 const INTERVAL = 5000;
 
 export default function CatalogHeroCarousel() {
+  const accountCta = useAccountCta("/registro");
   const [active, setActive] = useState(0);
   const timerRef = useRef(null);
 
@@ -46,7 +48,7 @@ export default function CatalogHeroCarousel() {
                   <h2 className={styles.cdkHeroTitle}>
                     Lleva tu portafolio al siguiente nivel con oferta internacional lista para <span>escalar.</span>
                   </h2>
-                  <Link href="/registro" className={styles.cdkHeroCta}>
+                  <Link href={accountCta} className={styles.cdkHeroCta}>
                     Explorar ofertas
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                   </Link>

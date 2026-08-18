@@ -6,7 +6,7 @@
   --provider-accent-ink: #6d7b52;
   --provider-avatar-dark: #111;
   --provider-copy-accent: #4f7a70;
-  --provider-link: #6b756f;
+  --provider-link: #3a423d;
   --provider-badge-green-start: #7FE040;
   --provider-badge-green-end: #7FE040;
   --provider-badge-blue-start: #42a8ff;
@@ -28,7 +28,7 @@
   --provider-accent-ink: #a35c1d;
   --provider-avatar-dark: #fff;
   --provider-copy-accent: #9a5d28;
-  --provider-link: #8c5c34;
+  --provider-link: #603c1f;
   --provider-badge-green-start: #ff9a45;
   --provider-badge-green-end: #f07a1e;
   --provider-badge-blue-start: #ffb26c;
@@ -238,7 +238,23 @@
 .providerSubpageBack {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   width: fit-content;
+  padding: 8px 14px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  text-decoration: none !important;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.providerSubpageBack::before {
+  content: "←";
+}
+
+.providerSubpageBack:hover {
+  background: #f3f4f2;
+  border-color: rgba(0, 0, 0, 0.2);
 }
 
 
@@ -561,6 +577,31 @@
   color: var(--provider-link);
   font-weight: 600;
   font-size: 0.9rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(0, 0, 0, 0.25);
+}
+
+.providerTextLink:hover {
+  text-decoration-color: currentColor;
+}
+
+.providerTextLinkBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--provider-accent-strong) 0%, var(--provider-accent-mid) 100%);
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none !important;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--provider-accent-mid) 28%, transparent);
+  transition: transform 0.15s;
+}
+
+.providerTextLinkBtn:hover {
+  transform: translateY(-1px);
 }
 
 
@@ -649,6 +690,11 @@
 
 .providerBadge.isBlue {
   background: linear-gradient(180deg, var(--provider-badge-blue-start) 0%, var(--provider-badge-blue-end) 100%);
+}
+
+.providerBadge.isMuted {
+  background: #e5e7eb;
+  color: #6b7280;
 }
 
 

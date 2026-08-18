@@ -1,30 +1,9 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
-import { getOrdersForUser } from "@/lib/orders";
+import { getOrdersForProvider, getOrdersForUser } from "@/lib/orders";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
-
-const providerOrders = [
-  {
-    id: "DX-2401",
-    customer: "European Traders",
-    status: "Pendiente",
-    amount: "US$ 1.240",
-  },
-  {
-    id: "DX-2402",
-    customer: "BioNordic Foods",
-    status: "En preparación",
-    amount: "US$ 860",
-  },
-  {
-    id: "DX-2403",
-    customer: "Atlas Components",
-    status: "Despachado",
-    amount: "US$ 2.110",
-  },
-];
 
 export default async function ProviderOrdersPage() {
   const session = await getCurrentSession();
@@ -55,7 +34,7 @@ export default async function ProviderOrdersPage() {
 
   const orders = isCustomer
     ? await getOrdersForUser(user)
-    : providerOrders;
+    : await getOrdersForProvider(user.id);
 
   return (
     <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
@@ -74,18 +53,25 @@ export default async function ProviderOrdersPage() {
             </div>
           </div>
 
-          <div className={styles.providerOrderList}>
-            {orders.map((order) => (
-              <article key={order.id} className={styles.providerOrderRow}>
-                <div>
-                  <strong>{order.id}</strong>
-                  <p>{isCustomer ? `${order.totalItems} productos · ${order.carrier || "Sin transportadora"}` : order.customer}</p>
-                </div>
-                <span className={styles.providerOrderAmount}>{isCustomer ? order.subtotalLabel : order.amount}</span>
-                <span className={`${styles.providerBadge} ${styles.isBlue}`}>{isCustomer ? order.statusLabel : order.status}</span>
-              </article>
-            ))}
-          </div>
+          {orders.length === 0 ? (
+            <div className={styles.providerEmptyBlock}>
+              <strong>{isCustomer ? "No tienes pedidos aún." : "No tienes pedidos aún."}</strong>
+              <p>{isCustomer ? "Cuando hagas una compra, aparecerá aquí." : "Cuando recibas un pedido de tus productos, aparecerá aquí."}</p>
+            </div>
+          ) : (
+            <div className={styles.providerOrderList}>
+              {orders.map((order) => (
+                <article key={order.id} className={styles.providerOrderRow}>
+                  <div>
+                    <strong>{order.id}</strong>
+                    <p>{isCustomer ? `${order.totalItems} productos · ${order.carrier || "Sin transportadora"}` : (order.company || order.customerName)}</p>
+                  </div>
+                  <span className={styles.providerOrderAmount}>{isCustomer ? order.subtotalLabel : order.providerSubtotalLabel}</span>
+                  <span className={`${styles.providerBadge} ${styles.isBlue}`}>{order.statusLabel}</span>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       </section>
     </main>

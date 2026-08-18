@@ -1,27 +1,13 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
+import { getOrdersForProvider } from "@/lib/orders";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
 
-const logisticsRows = [
-  {
-    title: "Guías activas",
-    detail: "4 despachos con guía lista para impresión y seguimiento.",
-  },
-  {
-    title: "Transportadoras",
-    detail: "DHL, Coordinadora y FedEx activas para tu operación.",
-  },
-  {
-    title: "Tracking",
-    detail: "3 envíos en movimiento y 1 con entrega hoy.",
-  },
-  {
-    title: "Costos de envío",
-    detail: "Promedio actual de despacho: US$ 28 por orden.",
-  },
-];
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
 
 export default async function LogisticsPage() {
   const session = await getCurrentSession();
@@ -48,6 +34,41 @@ export default async function LogisticsPage() {
     session?.role === "CUSTOMER" ||
     session?.audience === "cliente";
 
+  const orders = isCustomer ? [] : await getOrdersForProvider(user.id);
+  const activeGuides = orders.filter((order) => order.trackingNumber && order.status !== "DELIVERED" && order.status !== "CANCELLED");
+  const carriers = Array.from(new Set(orders.map((order) => order.carrier).filter(Boolean)));
+  const inTransit = orders.filter((order) => order.status === "SHIPPED");
+  const today = new Date();
+  const deliveredToday = orders.filter((order) => order.status === "DELIVERED" && isSameDay(new Date(order.updatedAt), today));
+  const delivered = orders.filter((order) => order.status === "DELIVERED");
+
+  const logisticsRows = [
+    {
+      title: "Guías activas",
+      detail: activeGuides.length
+        ? `${activeGuides.length} despacho${activeGuides.length === 1 ? "" : "s"} con guía lista para seguimiento.`
+        : "No tienes despachos con guía activa.",
+      status: activeGuides.length ? "Activo" : "Sin datos",
+    },
+    {
+      title: "Transportadoras",
+      detail: carriers.length ? `${carriers.join(", ")} usadas en tu operación.` : "Aún no has despachado con ninguna transportadora.",
+      status: carriers.length ? "Activo" : "Sin datos",
+    },
+    {
+      title: "Tracking",
+      detail: inTransit.length || deliveredToday.length
+        ? `${inTransit.length} envío${inTransit.length === 1 ? "" : "s"} en movimiento y ${deliveredToday.length} con entrega hoy.`
+        : "No hay envíos en movimiento.",
+      status: inTransit.length || deliveredToday.length ? "Activo" : "Sin datos",
+    },
+    {
+      title: "Entregas completadas",
+      detail: delivered.length ? `${delivered.length} pedido${delivered.length === 1 ? "" : "s"} entregado${delivered.length === 1 ? "" : "s"} en total.` : "Aún no tienes entregas completadas.",
+      status: delivered.length ? "Activo" : "Sin datos",
+    },
+  ];
+
   return (
     <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
       <SiteHeader />
@@ -72,8 +93,10 @@ export default async function LogisticsPage() {
                   <strong>{item.title}</strong>
                   <p>{item.detail}</p>
                 </div>
-                <span className={styles.providerOrderAmount}>Activo</span>
-                <span className={styles.providerBadge}>OK</span>
+                <span className={styles.providerOrderAmount}>{item.status}</span>
+                <span className={item.status === "Activo" ? styles.providerBadge : `${styles.providerBadge} ${styles.isMuted}`}>
+                  {item.status === "Activo" ? "OK" : "—"}
+                </span>
               </article>
             ))}
           </div>

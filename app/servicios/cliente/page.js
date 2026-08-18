@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import { useAccountCta } from "@/app/components/use-account-cta";
 import styles from "../servicios-proveedor.module.css";
 
 const ORG = "#FF790F";
@@ -95,6 +96,7 @@ function Faq() {
 }
 
 export default function ClientePage() {
+  const accountCta = useAccountCta("/registro?role=cliente");
   const [activeStep, setActiveStep] = useState(0);
 
   const visibleSteps = steps.map((step, index) => ({ ...step, index })).filter((step) => {
@@ -161,7 +163,7 @@ export default function ClientePage() {
               La cuenta básica incluye mensajes limitados. Con Cliente Pro desbloqueas contacto ilimitado, historial completo y acceso a proveedores exclusivos.
             </p>
           </div>
-          <Link href="/registro" style={{ flexShrink: 0, display: "inline-block", padding: "14px 32px", background: ORG, color: "#fff", fontWeight: 800, borderRadius: 12, fontSize: "0.95rem", whiteSpace: "nowrap" }}>
+          <Link href={accountCta} style={{ flexShrink: 0, display: "inline-block", padding: "14px 32px", background: ORG, color: "#fff", fontWeight: 800, borderRadius: 12, fontSize: "0.95rem", whiteSpace: "nowrap" }}>
             Activar Cliente Pro
           </Link>
         </div>

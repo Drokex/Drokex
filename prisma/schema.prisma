@@ -195,6 +195,7 @@ model ProveedorProLanding {
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   store     Json
   products  Json
+  published Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

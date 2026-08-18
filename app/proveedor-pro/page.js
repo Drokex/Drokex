@@ -191,6 +191,7 @@ export default function ProveedorProPage({
   initialStore = null,
   initialProducts = null,
   initialSlug = "",
+  initialPublished = false,
   accountMode = false,
 }) {
   const router = useRouter();
@@ -217,6 +218,11 @@ export default function ProveedorProPage({
   const [contactDraft, setContactDraft] = useState("");
   const [templateChosen, setTemplateChosen] = useState(!!(initialStore || initialSlug));
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [isPublished, setIsPublished] = useState(initialPublished);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showPublishChecklist, setShowPublishChecklist] = useState(false);
+  const autosaveTimerRef = useRef(null);
+  const autosaveSkipRef = useRef(true);
   const addMenuRef = useRef(null);
 
   const [store, setStore] = useState({
@@ -304,10 +310,10 @@ export default function ProveedorProPage({
       setProducts(initialProducts);
     }
 
-    if (initialSlug && typeof window !== "undefined") {
+    if (initialSlug && initialPublished && typeof window !== "undefined") {
       setLandingLink(`${window.location.origin}/proveedor-pro/tienda/${initialSlug}`);
     }
-  }, [initialStore, initialProducts, initialSlug]);
+  }, [initialStore, initialProducts, initialSlug, initialPublished]);
 
   useEffect(() => {
     if (accountMode) return;
@@ -424,13 +430,21 @@ export default function ProveedorProPage({
     setTemplateChosen(true);
   }
 
+  const publishSteps = [
+    { key: "template", label: "Elegir una plantilla", done: templateChosen, fix: () => setTemplateChosen(false) },
+    { key: "country", label: "Elegir al menos un país", done: (store.countries?.length || 0) > 0, fix: () => countryBtnRef.current?.click() },
+    { key: "products", label: "Agregar al menos un producto", done: products.length > 0, fix: () => { addProduct(); setShowProductsDrawer(true); } },
+    { key: "contact", label: "Agregar un contacto", done: !!store.contactLink, fix: () => { setContactDraft(store.contactLink || ""); setShowContactModal(true); } },
+  ];
+  const missingSteps = publishSteps.filter((s) => !s.done);
+
   function handlePublishClick() {
-    if (!store.contactLink) {
-      setContactDraft("");
-      setShowContactModal(true);
-    } else {
-      createLanding();
+    if (missingSteps.length > 0) {
+      setShowPublishChecklist((open) => !open);
+      return;
     }
+    setShowPublishChecklist(false);
+    createLanding(true);
   }
 
   function confirmContact() {
@@ -438,10 +452,9 @@ export default function ProveedorProPage({
     if (!val) return;
     updateStore("contactLink", val);
     setShowContactModal(false);
-    createLanding({ contactLink: val });
   }
 
-  async function createLanding(storeOverride = {}) {
+  async function createLanding(publish, storeOverride = {}) {
     // Limpiar textos antes de guardar: quitar \n y espacios dobles de contentEditable
     const cleanText = (v) => typeof v === "string" ? v.replace(/ /g, " ").replace(/\n/g, " ").replace(/\s{2,}/g, " ").trim() : v;
     const rawStore = { ...store, ...storeOverride };
@@ -449,11 +462,11 @@ export default function ProveedorProPage({
     const slug = slugify(finalStore.brand) || "mi-tienda";
     const link = `/proveedor-pro/tienda/${slug}`;
 
-    if (!finalStore.countries?.length) {
-      setError("Selecciona al menos un país antes de publicar.");
-      return;
+    if (publish) {
+      setIsPublishing(true);
+    } else {
+      setIsSaving(true);
     }
-    setIsPublishing(true);
     setPublishSlow(false);
     setError("");
 
@@ -471,49 +484,55 @@ export default function ProveedorProPage({
     }
 
     // Intentar sincronizar con BD (timeout 12s — si Supabase está cálido basta con < 5s)
-    let dbOk = false;
     try {
       const ctrl = new AbortController();
-      const slowTimer = setTimeout(() => setPublishSlow(true), 6000);
+      const slowTimer = publish ? setTimeout(() => setPublishSlow(true), 6000) : null;
       const timeoutId = setTimeout(() => ctrl.abort(), 12000);
       try {
         const res = await fetch("/api/proveedor-pro", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slug, store: finalStore, products }),
+          body: JSON.stringify({ slug, store: finalStore, products, publish: Boolean(publish) }),
           signal: ctrl.signal,
         });
-        if (res.ok) dbOk = true;
-        else {
+        if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           throw new Error(data.error || `Error ${res.status}`);
         }
+        const data = await res.json().catch(() => ({}));
+        if (typeof data.published === "boolean") setIsPublished(data.published);
       } finally {
-        clearTimeout(slowTimer);
+        if (slowTimer) clearTimeout(slowTimer);
         clearTimeout(timeoutId);
         setPublishSlow(false);
       }
     } catch (err) {
       const msg = err.message || "";
       if (err.name !== "AbortError" && !msg.includes("AbortError")) {
-        // Error real (no timeout): mostrar al usuario
-        if (msg.includes("autorizado") || msg.includes("401")) {
-          setIsPublishing(false);
-          setError("Tu sesión expiró. Recarga la página e inicia sesión de nuevo.");
-          return;
-        }
-        if (msg.includes("uso")) {
+        if (publish) {
+          if (msg.includes("autorizado") || msg.includes("401")) {
+            setIsPublishing(false);
+            setError("Tu sesión expiró. Recarga la página e inicia sesión de nuevo.");
+            return;
+          }
           setIsPublishing(false);
           setError(msg);
           return;
         }
+        // Autoguardado silencioso: no interrumpir al usuario, solo reintentar en background.
+        fetch("/api/proveedor-pro", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug, store: finalStore, products, publish: false }),
+        }).catch(() => {});
+        setIsSaving(false);
+        return;
       }
-      // Timeout o error de red: continuar optimistamente y reintentar en background
-      fetch("/api/proveedor-pro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, store: finalStore, products }),
-      }).catch(() => {});
+    }
+
+    if (!publish) {
+      setIsSaving(false);
+      return;
     }
 
     // Inyectar en caché del directorio
@@ -529,6 +548,22 @@ export default function ProveedorProPage({
     setPublishSuccess(true);
     setTimeout(() => { setPublishSuccess(false); router.push(link); }, 1500);
   }
+
+  // Autoguardado de borrador: cada cambio en store/products se guarda solo (published:false
+  // salvo que ya estuviera publicada), sin bloquear ni mostrar el modal de publicar.
+  useEffect(() => {
+    if (!isPro || !templateChosen) return;
+    if (autosaveSkipRef.current) {
+      autosaveSkipRef.current = false;
+      return;
+    }
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    autosaveTimerRef.current = setTimeout(() => {
+      createLanding(false);
+    }, 1500);
+    return () => clearTimeout(autosaveTimerRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store, products, isPro, templateChosen]);
 
   async function copyLandingLink() {
     if (!landingLink) return;
@@ -822,7 +857,10 @@ export default function ProveedorProPage({
                 </button>
                 <div style={{ minWidth: 0 }}>
                   <p style={{ margin: 0, color: "#111", fontSize: "0.86rem", fontWeight: 950, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{store.brand}</p>
-                  <p style={{ margin: 0, color: "#777", fontSize: "0.72rem" }}>Editando landing Pro</p>
+                  <p style={{ margin: 0, color: isPublished ? "#2d8a1f" : "#a15c00", fontSize: "0.72rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: isPublished ? "#7FE040" : "#f0a83c", flexShrink: 0 }} />
+                    {isSaving ? "Guardando borrador…" : isPublished ? "Publicada" : "Borrador sin publicar"}
+                  </p>
                 </div>
               </div>
 
@@ -945,10 +983,45 @@ export default function ProveedorProPage({
                   )}
                 </div>
 
-                <button type="button" onClick={handlePublishClick} disabled={isPublishing}
-                  style={{ borderRadius: 13, border: "none", background: isPublishing ? "#aaa" : "#7FE040", color: "#fff", fontWeight: 950, padding: "10px 16px", boxShadow: isPublishing ? "none" : "0 12px 28px rgba(127, 224, 64, 0.28)", cursor: isPublishing ? "not-allowed" : "pointer", transition: "background 0.2s" }}>
-                  {isPublishing ? "Publicando..." : "Publicar"}
-                </button>
+                <div style={{ position: "relative" }}>
+                  <button type="button" onClick={handlePublishClick} disabled={isPublishing}
+                    style={{ borderRadius: 13, border: "none", background: isPublishing ? "#aaa" : "#7FE040", color: "#fff", fontWeight: 950, padding: "10px 16px", boxShadow: isPublishing ? "none" : "0 12px 28px rgba(127, 224, 64, 0.28)", cursor: isPublishing ? "not-allowed" : "pointer", transition: "background 0.2s", display: "flex", alignItems: "center", gap: 6 }}>
+                    {isPublishing ? "Publicando..." : isPublished ? "Actualizar" : "Publicar"}
+                    {!isPublishing && missingSteps.length > 0 && (
+                      <span style={{ background: "rgba(0,0,0,0.18)", borderRadius: 999, fontSize: "0.68rem", fontWeight: 900, padding: "1px 7px" }}>
+                        {publishSteps.length - missingSteps.length}/{publishSteps.length}
+                      </span>
+                    )}
+                  </button>
+
+                  {showPublishChecklist && (
+                    <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 150, background: "#fff", borderRadius: 16, border: "1px solid rgba(0,0,0,0.1)", boxShadow: "0 16px 40px rgba(0,0,0,0.16)", padding: 16, width: 260 }}>
+                      <p style={{ margin: "0 0 4px", fontSize: "0.68rem", fontWeight: 900, letterSpacing: "0.1em", textTransform: "uppercase", color: "#a15c00" }}>Antes de publicar</p>
+                      <p style={{ margin: "0 0 12px", fontSize: "0.78rem", color: "#888" }}>Te falta completar esto:</p>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                        {publishSteps.map((step) => (
+                          <button key={step.key} type="button"
+                            onClick={step.done ? undefined : () => { setShowPublishChecklist(false); step.fix(); }}
+                            style={{ display: "flex", alignItems: "center", gap: 9, background: "none", border: "none", padding: 0, textAlign: "left", cursor: step.done ? "default" : "pointer", width: "100%" }}>
+                            <span style={{ width: 18, height: 18, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: step.done ? "#7FE040" : "#f1f1f1", border: step.done ? "none" : "1.5px solid #ddd" }}>
+                              {step.done && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
+                            </span>
+                            <span style={{ fontSize: "0.84rem", fontWeight: step.done ? 500 : 700, color: step.done ? "#999" : "#111", textDecoration: step.done ? "line-through" : "none" }}>
+                              {step.label}
+                            </span>
+                            {!step.done && (
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: "auto", flexShrink: 0 }}><polyline points="9 18 15 12 9 6" /></svg>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                      <button type="button" onClick={() => setShowPublishChecklist(false)}
+                        style={{ marginTop: 14, width: "100%", borderRadius: 10, border: "1px solid rgba(0,0,0,0.1)", background: "#f5f5f5", color: "#555", fontWeight: 700, padding: "8px 0", cursor: "pointer", fontSize: "0.82rem" }}>
+                        Entendido
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1081,7 +1154,7 @@ export default function ProveedorProPage({
                 📞
               </div>
               <div>
-                <p style={{ margin: 0, fontSize: "0.68rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7FE040" }}>Antes de publicar</p>
+                <p style={{ margin: 0, fontSize: "0.68rem", fontWeight: 900, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7FE040" }}>Contacto</p>
                 <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 900, color: "#111" }}>¿Cómo te contactan?</h2>
               </div>
             </div>
@@ -1117,7 +1190,7 @@ export default function ProveedorProPage({
               </button>
               <button type="button" onClick={confirmContact} disabled={!contactDraft.trim()}
                 style={{ flex: 2, borderRadius: 13, border: "none", background: contactDraft.trim() ? "#7FE040" : "#ccc", color: "#fff", fontWeight: 900, padding: "12px 0", cursor: contactDraft.trim() ? "pointer" : "not-allowed", fontSize: "0.9rem", boxShadow: contactDraft.trim() ? "0 8px 24px rgba(127,224,64,0.3)" : "none", transition: "background 0.15s, box-shadow 0.15s" }}>
-                Publicar tienda
+                Guardar contacto
               </button>
             </div>
           </div>

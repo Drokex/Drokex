@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
-import { getAllOrders } from "@/lib/orders";
+import { getOrdersForProvider, getOrdersForUser } from "@/lib/orders";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
 
@@ -29,7 +29,9 @@ export default async function SalesPage() {
     user.role === "CUSTOMER" ||
     session?.role === "CUSTOMER" ||
     session?.audience === "cliente";
-  const salesOrders = await getAllOrders();
+  const salesOrders = isCustomer
+    ? await getOrdersForUser(user)
+    : await getOrdersForProvider(user.id);
 
   return (
     <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
@@ -48,18 +50,27 @@ export default async function SalesPage() {
             </div>
           </div>
 
-          <div className={styles.providerOrderList}>
-            {salesOrders.map((order) => (
-              <article key={order.id} className={styles.providerOrderRow}>
-                <div>
-                  <strong>{order.id}</strong>
-                  <p>{order.company || order.customerName}</p>
-                </div>
-                <span className={styles.providerOrderAmount}>{order.subtotalLabel}</span>
-                <span className={`${styles.providerBadge} ${styles.isBlue}`}>{order.statusLabel}</span>
-              </article>
-            ))}
-          </div>
+          {salesOrders.length === 0 ? (
+            <div className={styles.providerEmptyBlock}>
+              <strong>No tienes ventas aún.</strong>
+              <p>Cuando recibas un pedido de tus productos, aparecerá aquí.</p>
+            </div>
+          ) : (
+            <div className={styles.providerOrderList}>
+              {salesOrders.map((order) => (
+                <article key={order.id} className={styles.providerOrderRow}>
+                  <div>
+                    <strong>{order.id}</strong>
+                    <p>{order.company || order.customerName}</p>
+                  </div>
+                  <span className={styles.providerOrderAmount}>
+                    {isCustomer ? order.subtotalLabel : order.providerSubtotalLabel}
+                  </span>
+                  <span className={`${styles.providerBadge} ${styles.isBlue}`}>{order.statusLabel}</span>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       </section>
     </main>

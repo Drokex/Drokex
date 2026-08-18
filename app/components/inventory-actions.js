@@ -7,9 +7,10 @@ import styles from "@/app/mi-cuenta/productos/inventario/inventory.module.css";
 export default function InventoryActions({ productId }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   async function handleDelete() {
-    if (!confirm("¿Eliminar este producto? Esta acción no se puede deshacer.")) return;
+    setConfirming(false);
     setDeleting(true);
     await fetch(`/api/products/${productId}`, { method: "DELETE" });
     router.refresh();
@@ -22,11 +23,24 @@ export default function InventoryActions({ productId }) {
       </a>
       <button
         className={`${styles.invBtn} ${styles.invBtnDelete}`}
-        onClick={handleDelete}
+        onClick={() => setConfirming(true)}
         disabled={deleting}
       >
         {deleting ? "..." : "Eliminar"}
       </button>
+
+      {confirming && (
+        <div className={styles.invConfirmOverlay} onClick={() => setConfirming(false)}>
+          <div className={styles.invConfirmCard} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.invConfirmTitle}>¿Eliminar este producto?</p>
+            <p className={styles.invConfirmDesc}>Esta acción no se puede deshacer.</p>
+            <div className={styles.invConfirmActions}>
+              <button className={styles.invConfirmCancel} onClick={() => setConfirming(false)}>Cancelar</button>
+              <button className={styles.invConfirmDelete} onClick={handleDelete}>Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 /* ─── AYUDA / PQR PAGE ─────────────────────────────────────────── */
-.ayudaPage { background: var(--bg); color: var(--ink); min-height: 100vh; }
+.ayudaPage { --bg: #050505; --ink: #ffffff; background: var(--bg); color: var(--ink); min-height: 100vh; }
 
 /* Hero */
 .ayudaHero { padding: 120px 0 72px; text-align: center; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(127,224,64,0.07) 0%, transparent 70%); }

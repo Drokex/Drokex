@@ -126,6 +126,65 @@ button {
 .header-account-link {
   display: inline-flex;
   align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  transition: border-color 160ms ease, background 160ms ease;
+  cursor: pointer;
+}
+
+.header-account-menu {
+  left: auto;
+  right: 0;
+  transform: none;
+  min-width: 180px;
+}
+
+.nav-dropdown-logout {
+  padding: 4px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-dropdown-logout button {
+  width: 100%;
+  min-height: unset;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nav-dropdown-logout button:hover {
+  background: rgba(255, 90, 90, 0.12);
+  color: #ff8a8a;
+}
+
+.header-account-link:hover,
+.header-account-link:focus-visible {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.header-account-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: #111;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.82rem;
+  flex-shrink: 0;
 }
 
 .header-user-name {
@@ -133,6 +192,8 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 0.88rem;
+  font-weight: 600;
 }
 
 .header-country-trigger {
@@ -263,6 +324,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   border-radius: 10px;
   font-weight: 700;
 }
@@ -987,63 +1049,91 @@ button {
 }
 
 /* ── Productos menu ── */
-.prod-menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
+.prod-menu-list {
   margin-top: 1.5rem;
+  background: #fff;
+  border: 1.5px solid rgba(17, 17, 17, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
 }
 
-.prod-menu-card {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  padding: 1.75rem;
-  border-radius: 14px;
-  border: 1.5px solid #e5e7eb;
-  background: #fff;
+.prod-menu-row {
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.18s, box-shadow 0.18s;
+  display: block;
 }
 
-.prod-menu-card:hover {
-  border-color: #2d8a1f;
-  box-shadow: 0 4px 18px rgba(127, 224, 64, 0.13);
+.prod-menu-row-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1.375rem 1.625rem;
+  transition: background 0.12s;
 }
 
-.prod-menu-card-highlight {
-  border-color: #2d8a1f;
-  background: #f7ffe8;
+.prod-menu-row:hover .prod-menu-row-inner {
+  background: #f1f2ee;
+}
+
+.prod-menu-row:hover .prod-menu-chev {
+  transform: translateX(2px);
+}
+
+.prod-menu-divider {
+  height: 1px;
+  background: rgba(17, 17, 17, 0.07);
 }
 
 .prod-menu-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  background: #f3f4f6;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #f1f2ee;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #374151;
+  color: #4a4d47;
 }
 
-.prod-menu-card-highlight .prod-menu-icon {
-  background: #ddf7a8;
-  color: #3a6600;
+.prod-menu-row-highlight .prod-menu-icon {
+  background: #7FE040;
+  color: #1a1a1a;
 }
 
-.prod-menu-card strong {
+.prod-menu-row-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.prod-menu-row-body strong {
   display: block;
-  font-size: 1.05rem;
-  margin-bottom: 0.2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #111;
 }
 
-.prod-menu-card p {
+.prod-menu-row-body p {
+  margin: 0.15rem 0 0;
   font-size: 0.85rem;
   color: #6b7280;
-  margin: 0;
+}
+
+.prod-menu-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #9a9d95;
+  flex-shrink: 0;
+}
+
+.prod-menu-chev {
+  color: #9a9d95;
+  flex-shrink: 0;
+  transition: transform 0.12s;
+}
+
+.prod-menu-row-highlight .prod-menu-chev {
+  color: #2d8a1f;
 }
 
 /* ── Inventory table ── */

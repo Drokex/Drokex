@@ -133,6 +133,9 @@ function MobileNavPanel({ items, top, onClose, panelRef, sessionChecked, user, a
         {!sessionChecked ? null : user ? (
           <>
             <Link href={accountLink} className="mobile-nav-account-link" onClick={onClose}>
+              <span className="header-account-avatar" aria-hidden="true">
+                {(user.fullName || "?").charAt(0).toUpperCase()}
+              </span>
               {user.fullName || (lang === "en" ? "My account" : "Mi cuenta")}
             </Link>
             <LogoutButton />
@@ -164,9 +167,17 @@ export default function SiteHeader({ hideCountry = false }) {
   const [lang, setLang] = useState("es");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [panelTop, setPanelTop] = useState(0);
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
   const headerRef = useRef(null);
   const panelRef = useRef(null);
   const toggleRef = useRef(null);
+  const accountMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (!accountMenuRef.current?.contains(e.target)) setShowAccountMenu(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -358,12 +369,30 @@ export default function SiteHeader({ hideCountry = false }) {
             // Espacio reservado: evita el salto "Iniciar sesión" → nombre del usuario.
             <span className="header-session-placeholder" aria-hidden="true" />
           ) : user ? (
-            <>
-              <Link href={accountLink} className="text-link header-account-link">
+            <div className="nav-dropdown-wrap" ref={accountMenuRef}>
+              <button
+                type="button"
+                className="header-account-link"
+                onClick={() => setShowAccountMenu((v) => !v)}
+                aria-expanded={showAccountMenu}
+              >
+                <span className="header-account-avatar" aria-hidden="true">
+                  {(user.fullName || "?").charAt(0).toUpperCase()}
+                </span>
                 <span className="header-user-name">{user.fullName || (lang === "en" ? "My account" : "Mi cuenta")}</span>
-              </Link>
-              <LogoutButton />
-            </>
+                <span className={showAccountMenu ? "nav-dropdown-chevron is-open" : "nav-dropdown-chevron"}>▾</span>
+              </button>
+              {showAccountMenu && (
+                <div className="nav-dropdown-menu header-account-menu">
+                  <Link href={accountLink} className="nav-dropdown-link" onClick={() => setShowAccountMenu(false)}>
+                    {lang === "en" ? "My account" : "Mi cuenta"}
+                  </Link>
+                  <div className="nav-dropdown-logout">
+                    <LogoutButton />
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <>
               <Link href="/login" className="text-link">

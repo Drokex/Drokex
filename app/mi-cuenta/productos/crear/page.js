@@ -21,6 +21,19 @@ export default async function CrearProductoPage() {
     );
   }
 
+  if (user.role !== "PROVIDER" && user.role !== "ADMIN") {
+    return (
+      <main className="commerce-page">
+        <section className={`shell ${authStyles.accountShell}`}>
+          <div className="empty-state">
+            <h1>No tienes acceso a esta sección.</h1>
+            <a href="/mi-cuenta" className="green-link">Volver a mi cuenta</a>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className={styles.providerDashboardPage}>
       <SiteHeader />

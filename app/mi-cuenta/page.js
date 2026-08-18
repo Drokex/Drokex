@@ -272,6 +272,14 @@ export default async function AccountPage({ searchParams }) {
               <span>{action.title}</span>
             </Link>
           ))}
+          {!isCustomer && (
+            <Link href="/admin" className={styles.providerCleanMenuItem}>
+              <span className={styles.providerCleanMenuIcon}>
+                <DashboardIcon name="grid" />
+              </span>
+              <span>Ver panel completo</span>
+            </Link>
+          )}
         </nav>
 
         <section className={`${styles.providerActivityCard} ${styles.providerActivityCardClean}`}>
@@ -280,9 +288,11 @@ export default async function AccountPage({ searchParams }) {
               <p className={styles.providerSectionKicker}>Seguimiento</p>
               <h2>Actividad Reciente</h2>
             </div>
-            <Link href={isCustomer ? "/categorias" : "/admin"} className={styles.providerTextLink}>
-              {isCustomer ? "Ver catálogo" : "Ver panel completo"}
-            </Link>
+            {isCustomer && (
+              <Link href="/categorias" className={styles.providerTextLinkBtn}>
+                Ver catálogo
+              </Link>
+            )}
           </div>
 
           <div className={styles.providerActivityList}>

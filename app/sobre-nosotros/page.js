@@ -8,6 +8,7 @@ import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import HeroDistortion from "@/app/components/hero-distortion";
 import AmericasMap from "@/app/components/americas-map";
+import { useAccountCta } from "@/app/components/use-account-cta";
 import styles from "./page.module.css";
 
 const mapStats = [
@@ -104,6 +105,8 @@ function AnimatedStat({ stat }) {
 
 export default function AboutPage() {
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const providerCta = useAccountCta("/registro?role=proveedor");
+  const clientCta = useAccountCta("/registro?role=cliente");
 
   return (
     <main className={styles.aboutPage}>
@@ -219,7 +222,7 @@ export default function AboutPage() {
           <motion.div className={styles.aboutTeamCopy} {...fadeLeft(0)}>
             <h2>Nuestro <span>Equipo</span></h2>
             <p>Un grupo de personas apasionadas por transformar el comercio entre empresas de la región.</p>
-            <Link href="/registro" className={styles.aboutSmallLink}>Conoce más sobre nosotros</Link>
+            <Link href={clientCta} className={styles.aboutSmallLink}>Conoce más sobre nosotros</Link>
           </motion.div>
 
           <div className={styles.aboutTeamList}>
@@ -297,13 +300,13 @@ export default function AboutPage() {
           </motion.div>
           <motion.div className={styles.aboutCtaActions} {...fadeRight(0.25)}>
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-              <Link href="/registro" className={styles.aboutCtaPrimary}>
+              <Link href={providerCta} className={styles.aboutCtaPrimary}>
                 Soy proveedor
                 <span>Quiero publicar productos</span>
               </Link>
             </motion.div>
             <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-              <Link href="/registro" className={styles.aboutCtaSecondary}>
+              <Link href={clientCta} className={styles.aboutCtaSecondary}>
                 Soy cliente
                 <span>Quiero comprar</span>
               </Link>

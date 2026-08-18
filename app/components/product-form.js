@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Select from "./select";
 import styles from "./product-form.module.css";
 
 const CATEGORIES = [
@@ -11,6 +12,14 @@ const CATEGORIES = [
   "Agroindustria",
   "Retail y consumo",
   "Construccion modular",
+  "Energia y electricidad",
+  "Cableado y conectores",
+  "Iluminacion",
+  "Herramientas electricas",
+  "Instrumentacion y medicion",
+  "Seguridad y proteccion",
+  "Telecomunicaciones",
+  "Mineria e industria pesada",
 ];
 
 const AVAILABILITY = [
@@ -53,6 +62,7 @@ export default function ProductForm({ initial = {}, productId = null }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState(CATEGORIES);
 
   const [form, setForm] = useState({
     name: initial.name || "",
@@ -173,15 +183,21 @@ export default function ProductForm({ initial = {}, productId = null }) {
           </div>
           <div className={styles.pfField}>
             <label>Categoría</label>
-            <select value={form.category} onChange={(e) => set("category", e.target.value)}>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <Select
+              value={form.category}
+              onChange={(v) => set("category", v)}
+              options={categories}
+              onCreate={(v) => setCategories((cats) => cats.includes(v) ? cats : [...cats, v])}
+              createLabel="Crear categoría"
+            />
           </div>
           <div className={styles.pfField}>
             <label>Disponibilidad</label>
-            <select value={form.availability} onChange={(e) => set("availability", e.target.value)}>
-              {AVAILABILITY.map((a) => <option key={a} value={a}>{a}</option>)}
-            </select>
+            <Select
+              value={form.availability}
+              onChange={(v) => set("availability", v)}
+              options={AVAILABILITY}
+            />
           </div>
           <div className={styles.pfField}>
             <label>Proveedor / Empresa</label>
