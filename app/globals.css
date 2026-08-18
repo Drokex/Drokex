@@ -680,10 +680,19 @@ button {
 
 @media (max-width: 1023px) {
   .header-row {
-    grid-template-columns: 1fr;
-    min-height: auto;
-    padding: 18px 0;
-    gap: 14px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand actions";
+    min-height: 80px;
+    padding: 10px 0;
+    gap: 16px;
+  }
+
+  .brand-link {
+    grid-area: brand;
+  }
+
+  .header-actions {
+    grid-area: actions;
   }
 
 .main-nav {
@@ -720,8 +729,8 @@ button {
   }
 
   .header-row {
-    padding: 14px 0;
-    gap: 12px;
+    padding: 8px 0;
+    gap: 16px;
   }
 
   .brand-image {
