@@ -479,6 +479,23 @@
     display: none;
   }
 }
+
+@media (max-width: 1024px) {
+  /* El flow de cinco pasos necesita dos filas a 1024px para no desbordar. */
+  .pfFlowBar {
+    flex-wrap: wrap;
+    gap: 18px 0;
+  }
+
+  .pfFlowRow {
+    flex: 1 1 45%;
+    min-width: 0;
+  }
+
+  .pfFlowStep {
+    min-width: 0;
+  }
+}
 .featureVideoCarousel {
   width: min(100%, 700px);
   display: grid;
@@ -1294,7 +1311,7 @@
   height: auto;
   display: block;
 }
-@media (max-width: 1180px) {
+@media (max-width: 1279px) {
   .systemSection {
     padding: 96px 0 84px;
   }
@@ -1368,7 +1385,7 @@
     display: none;
   }
 }
-@media (max-width: 960px) {
+@media (max-width: 1023px) {
 .contactGrid
 {
     grid-template-columns: 1fr;
@@ -1478,7 +1495,7 @@
     gap: 28px;
   }
 }
-@media (max-width: 720px) {
+@media (max-width: 767px) {
 .systemHeader h2,
 .testimonialsHeader h2,
 .contactCopy h2
@@ -1529,11 +1546,11 @@
     font-size: 1rem;
   }
   .marketsCards {
-    width: 268px;
+    width: min(268px, 100%);
     height: 320px;
   }
   .marketCardFrame {
-    width: 210px;
+    width: min(210px, 100%);
     padding: 12px;
   }
   .marketCardPhoto {
@@ -2210,7 +2227,7 @@
   background: radial-gradient(ellipse 80% 100% at 50% 100%, rgba(255,255,255,0.1) 0%, transparent 70%);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .pfCarouselSlide {
     padding: 32px 20px;
   }
@@ -2229,29 +2246,35 @@
 .pfCheckMarcas { color: var(--orange); }
 .pfCheckDropshippers { color: rgba(255,255,255,0.6); }
 
-@media (max-width: 960px) {
+@media (max-width: 1023px) {
   .heroShell {
-    width: min(1460px, calc(100% - 56px));
+    width: min(1460px, calc(100% - 72px));
+    min-height: auto;
+    padding-top: 34px;
+    padding-bottom: 32px;
   }
 
   .heroActionsSplit {
     position: static;
-    width: min(100%, 760px);
-    margin-top: 280px;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 28px;
+    justify-content: center;
+    gap: 20px;
   }
 
   .heroCopy {
-    position: absolute;
-    top: 36px;
-    left: 0;
+    position: static;
     max-width: 100%;
     transform: none;
   }
+
+  .heroBtnFeaturesCard {
+    left: 50%;
+    transform: translateX(-50%);
+  }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 767px) {
   .heroCopy h1 {
     line-height: 1.06;
   }
@@ -2263,7 +2286,7 @@
   .heroShell {
     width: min(1460px, calc(100% - 32px));
     min-height: auto;
-    padding-top: 34px;
+    padding-top: 0;
     padding-bottom: 24px;
     gap: 26px;
   }
@@ -2289,7 +2312,13 @@
     position: static;
     width: 100%;
     margin-top: 28px;
+    flex-direction: column;
+    align-items: stretch;
     gap: 14px;
+  }
+
+  .heroBtnGroup {
+    width: 100%;
   }
 
   .heroOptionButton {
@@ -2307,6 +2336,32 @@
   .heroOptionButton strong {
     max-width: none;
     font-size: 1.2rem;
+  }
+
+  .tcStage {
+    margin-top: 36px;
+  }
+
+  .tcTrack {
+    height: 500px;
+  }
+
+  .tcCardActive {
+    width: min(330px, calc(100vw - 96px));
+    height: 470px;
+  }
+
+  .tcArrow {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pfFlowRow {
+    flex-basis: 100%;
+  }
+
+  .pfFlowArrow {
+    display: none;
   }
 }
 .heroDistortion {

@@ -153,18 +153,41 @@ export default function SiteHeader({ hideCountry = false }) {
     if (!mobileOpen) return;
 
     const previousOverflow = document.body.style.overflow;
+    const returnFocusElement = toggleRef.current;
     document.body.style.overflow = "hidden";
 
     function updateTop() {
       if (headerRef.current) setPanelTop(headerRef.current.offsetHeight);
     }
     updateTop();
+    const focusPanel = window.requestAnimationFrame(() => {
+      panelRef.current?.querySelector("a[href], button:not([disabled])")?.focus();
+    });
 
     function handleKeyDown(e) {
-      if (e.key === "Escape") setMobileOpen(false);
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const focusable = Array.from(
+        panelRef.current?.querySelectorAll('a[href], button:not([disabled])') || [],
+      );
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
     function handleResize() {
-      if (window.innerWidth > 720) setMobileOpen(false);
+      if (window.innerWidth > 1023) setMobileOpen(false);
       else updateTop();
     }
     function handleClickOutside(e) {
@@ -179,9 +202,11 @@ export default function SiteHeader({ hideCountry = false }) {
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      window.cancelAnimationFrame(focusPanel);
       window.removeEventListener("resize", handleResize);
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("mousedown", handleClickOutside);
+      returnFocusElement?.focus();
     };
   }, [mobileOpen]);
 
