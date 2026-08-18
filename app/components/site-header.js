@@ -88,7 +88,7 @@ function NavDropdown({ item }) {
   );
 }
 
-function MobileNavPanel({ items, top, onClose, panelRef }) {
+function MobileNavPanel({ items, top, onClose, panelRef, sessionChecked, user, accountLink, lang }) {
   const [openSub, setOpenSub] = useState(null);
 
   return (
@@ -129,6 +129,25 @@ function MobileNavPanel({ items, top, onClose, panelRef }) {
           </Link>
         )
       )}
+      <div className="mobile-nav-session-actions">
+        {!sessionChecked ? null : user ? (
+          <>
+            <Link href={accountLink} className="mobile-nav-account-link" onClick={onClose}>
+              {user.fullName || (lang === "en" ? "My account" : "Mi cuenta")}
+            </Link>
+            <LogoutButton />
+          </>
+        ) : (
+          <>
+            <Link href="/login" className="mobile-nav-login-link" onClick={onClose}>
+              {lang === "en" ? "Sign in" : "Iniciar sesión"}
+            </Link>
+            <Link href="/registro" className="mobile-nav-register-link" onClick={onClose}>
+              {lang === "en" ? "Sign up" : "Registrate"}
+            </Link>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -372,7 +391,16 @@ export default function SiteHeader({ hideCountry = false }) {
 
       {mobileOpen && typeof document !== "undefined"
         ? createPortal(
-            <MobileNavPanel items={menuItems} top={panelTop} onClose={() => setMobileOpen(false)} panelRef={panelRef} />,
+            <MobileNavPanel
+              items={menuItems}
+              top={panelTop}
+              onClose={() => setMobileOpen(false)}
+              panelRef={panelRef}
+              sessionChecked={sessionChecked}
+              user={user}
+              accountLink={accountLink}
+              lang={lang}
+            />,
             document.body
           )
         : null}

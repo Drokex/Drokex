@@ -240,6 +240,36 @@ button {
   color: rgba(255, 255, 255, 0.7);
 }
 
+.mobile-nav-session-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.mobile-nav-login-link,
+.mobile-nav-register-link,
+.mobile-nav-account-link {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.mobile-nav-login-link,
+.mobile-nav-account-link {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.mobile-nav-register-link {
+  background: var(--lime);
+  color: #111;
+}
+
 .header-country-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -663,6 +693,14 @@ button {
 .main-nav,
   .header-actions {
     justify-content: flex-start;
+  }
+
+  .header-actions > :not(.mobile-menu-trigger) {
+    display: none;
+  }
+
+  .header-actions {
+    justify-content: flex-end;
   }
 
 .header-actions {

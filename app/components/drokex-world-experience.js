@@ -414,6 +414,20 @@ export function DrokexWorldSection() {
   const [query, setQuery] = useState("");
   const [proLandings, setProLandings] = useState([]);
   const [activeModal, setActiveModal] = useState(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(null);
+  const [isWorldOpen, setIsWorldOpen] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 767px)");
+    const syncViewport = () => {
+      setIsMobileViewport(media.matches);
+      setIsWorldOpen(!media.matches);
+    };
+
+    syncViewport();
+    media.addEventListener("change", syncViewport);
+    return () => media.removeEventListener("change", syncViewport);
+  }, []);
 
   useEffect(() => {
     fetch("/api/proveedor-pro")
@@ -433,10 +447,43 @@ export function DrokexWorldSection() {
     return countries.filter(c => c.country.toLowerCase().includes(q));
   }, [query]);
 
+  if (isMobileViewport !== false && !isWorldOpen) {
+    return (
+      <section className={styles.worldMobileSection} aria-labelledby="world-mobile-title">
+        <div className="shell">
+          <div className={styles.worldMobileCard}>
+            <span className={styles.worldMobileEyebrow}>Marketplace · LATAM</span>
+            <h2 id="world-mobile-title">Drokex World</h2>
+            <p>Explora proveedores y mercados activos cuando estés listo.</p>
+            <button
+              type="button"
+              className={styles.worldMobileOpenButton}
+              onClick={() => setIsWorldOpen(true)}
+              aria-expanded={false}
+            >
+              Explorar mercados <ArrowRight size={18} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <div style={{ background: "#f4f4f2" }}>
     <div className="shell" style={{ padding: "48px 0" }}>
     <div className="relative h-[640px] w-full overflow-hidden rounded-[2rem] border border-white/10 bg-black text-white">
+
+      {isMobileViewport && (
+        <button
+          type="button"
+          onClick={() => setIsWorldOpen(false)}
+          className={styles.worldMobileCloseButton}
+          aria-label="Ocultar mercados"
+        >
+          <X size={18} aria-hidden="true" />
+        </button>
+      )}
 
       {/* Globe */}
       <div className="absolute inset-0">

@@ -885,6 +885,71 @@
   font-size: 0.82rem;
   line-height: 1.55;
 }
+
+.worldMobileSection {
+  display: none;
+  background: #f4f4f2;
+}
+
+.worldMobileCard {
+  padding: 28px 24px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(127, 224, 64, 0.2), transparent 42%),
+    #07090a;
+  color: #fff;
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.15);
+}
+
+.worldMobileEyebrow {
+  color: var(--lime);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.worldMobileCard h2 {
+  margin: 8px 0 0;
+  font-size: 2rem;
+  letter-spacing: -0.05em;
+}
+
+.worldMobileCard p {
+  margin: 12px 0 0;
+  color: rgba(255, 255, 255, 0.66);
+  line-height: 1.55;
+}
+
+.worldMobileOpenButton {
+  min-height: 48px;
+  margin-top: 22px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--lime);
+  color: #111;
+  font-weight: 800;
+}
+
+.worldMobileCloseButton {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.68);
+  color: #fff;
+}
 .testimonialsHeader {
   max-width: 760px;
   text-align: center;
@@ -1496,6 +1561,16 @@
   }
 }
 @media (max-width: 767px) {
+  .worldMobileSection {
+    display: block;
+    padding: 28px 0;
+  }
+
+  .heroBtnFeaturesCard,
+  .heroFeaturesBar {
+    display: none;
+  }
+
 .systemHeader h2,
 .testimonialsHeader h2,
 .contactCopy h2
