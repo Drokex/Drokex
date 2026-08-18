@@ -7,6 +7,7 @@ import CatalogHeart from "@/app/components/catalog-heart";
 import CatalogThemeToggle from "@/app/components/catalog-theme-toggle";
 import CatalogSidebar from "@/app/components/catalog-sidebar";
 import CatalogHeroCarousel from "@/app/components/catalog-hero-carousel";
+import CatalogAnimatedGrid from "@/app/components/catalog-animated-grid";
 import styles from "./page.module.css";
 
 const COUNTRY_FLAG = {
@@ -66,7 +67,7 @@ export default async function CategoriasPage({ searchParams }) {
           </div>
 
           {/* Product grid */}
-          <div className={styles.cdkGrid}>
+          <CatalogAnimatedGrid className={styles.cdkGrid} gridKey={products.map((p) => p.slug).join(",")}>
             {products.length === 0 ? (
               <div className={styles.cdkNoResults}>
                 <p>No hay productos con los filtros seleccionados.</p>
@@ -104,7 +105,7 @@ export default async function CategoriasPage({ searchParams }) {
                 </article>
               );
             })}
-          </div>
+          </CatalogAnimatedGrid>
 
           {/* Bottom trust bar */}
           <div className={styles.cdkBottomTrust}>

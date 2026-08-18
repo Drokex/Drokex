@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import { useAccountCta } from "@/app/components/use-account-cta";
+import { useHeroEntrance } from "@/app/components/use-hero-entrance";
+import ScrollReveal from "@/app/components/scroll-reveal";
 import styles from "../servicios-proveedor.module.css";
 
 const ORG = "#FF790F";
@@ -97,13 +99,16 @@ function Faq() {
 
 export default function ClientePage() {
   const accountCta = useAccountCta("/registro?role=cliente");
+  const heroRef = useRef(null);
+  useHeroEntrance(heroRef);
   const [activeStep, setActiveStep] = useState(0);
 
-  const visibleSteps = steps.map((step, index) => ({ ...step, index })).filter((step) => {
-    const total = steps.length;
-    const prev = (activeStep - 1 + total) % total;
-    const next = (activeStep + 1) % total;
-    return [prev, activeStep, next].includes(step.index);
+  // mismo patrón que /servicios/proveedor: 4 tarjetas en orden, para que
+  // coincida con el grid de 4 columnas (el filtro anterior a veces devolvía
+  // solo 3, dejando el grid desalineado y el orden desordenado)
+  const visibleSteps = [-1, 0, 1, 2].map((offset) => {
+    const index = (activeStep + offset + steps.length) % steps.length;
+    return { ...steps[index], index };
   });
 
   function moveStep(dir) {
@@ -113,21 +118,22 @@ export default function ClientePage() {
   return (
     <div className={`${styles.spPage} ${styles.spPageCliente}`}>
       <SiteHeader />
+      <ScrollReveal />
 
       {/* HERO */}
       <section className={styles.spHero}>
         <img src="/sp-hero-bga.jpg" alt="" className={styles.spHeroBg} aria-hidden="true" />
         <div className="shell">
-          <div className={styles.spHeroContent}>
-            <p className={styles.spHeroTag} style={{ color: ORG }}>Clientes</p>
-            <h1>
+          <div className={styles.spHeroContent} ref={heroRef}>
+            <p className={styles.spHeroTag} style={{ color: ORG }} data-hero-item>Clientes</p>
+            <h1 data-hero-item>
               Encuentra los proveedores que necesitas para tu <span style={{ color: ORG }}>negocio</span>
             </h1>
-            <p className={styles.spHeroDesc}>
+            <p className={styles.spHeroDesc} data-hero-item>
               Explora catálogos verificados, contacta directamente y cierra tratos sin intermediarios.
               Con Cliente Pro, mensajes ilimitados sin restricciones.
             </p>
-            <Link href="/productos" className={styles.spHeroCta} style={{ background: ORG, color: "#fff" }}>
+            <Link href="/productos" className={styles.spHeroCta} style={{ background: ORG, color: "#fff" }} data-hero-item>
               Explorar catálogos
             </Link>
           </div>
@@ -137,11 +143,11 @@ export default function ClientePage() {
       {/* SERVICIOS */}
       <section className={styles.spServices}>
         <div className="shell">
-          <p className={styles.spServicesTag} style={{ color: ORG }}>Para clientes</p>
-          <h2>Todo lo que necesitas para<br />encontrar tu proveedor ideal</h2>
+          <p className={styles.spServicesTag} style={{ color: ORG }} data-reveal>Para clientes</p>
+          <h2 data-reveal>Todo lo que necesitas para<br />encontrar tu proveedor ideal</h2>
           <div className={styles.spServicesGrid}>
             {services.map((s, i) => (
-              <div key={i} className={styles.spServiceCard}>
+              <div key={i} className={styles.spServiceCard} data-reveal>
                 <img src={s.icon} alt={s.title} />
                 <h4>{s.title}</h4>
                 <p>{s.desc}</p>
@@ -153,7 +159,7 @@ export default function ClientePage() {
 
       {/* CLIENTE PRO BANNER */}
       <section style={{ background: ORG_BG, borderTop: `1px solid ${ORG_BORDER}`, borderBottom: `1px solid ${ORG_BORDER}`, padding: "48px 0" }}>
-        <div className="shell" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32, flexWrap: "wrap" }}>
+        <div className="shell" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 32, flexWrap: "wrap" }} data-reveal>
           <div>
             <p style={{ color: ORG, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8, fontSize: "0.82rem" }}>Cliente Pro</p>
             <h2 style={{ margin: 0, fontSize: "clamp(1.4rem, 2.5vw, 2rem)", fontWeight: 800 }}>
@@ -172,7 +178,7 @@ export default function ClientePage() {
       {/* COBERTURA */}
       <section className={styles.spCoverage}>
         <div className={`shell ${styles.spCoverageGrid}`}>
-          <div>
+          <div data-reveal>
             <h2>Proveedores en los<br />países donde <span style={{ color: ORG }}>operas</span></h2>
             <p className={styles.spCoverageDesc}>
               Tenemos proveedores verificados en los principales mercados de Latinoamérica
@@ -181,7 +187,7 @@ export default function ClientePage() {
           </div>
           <div className={styles.spCountriesGrid}>
             {countries.map((c, i) => (
-              <div key={i} className={styles.spCountryCard}>
+              <div key={i} className={styles.spCountryCard} data-reveal>
                 <p className={styles.flagLabel}>{c.flag} {c.label}</p>
                 <p className={styles.activos}>Proveedores</p>
                 <p className={styles.count}>{c.count}</p>
@@ -194,9 +200,9 @@ export default function ClientePage() {
       {/* PASOS */}
       <section className={styles.spSteps}>
         <div className="shell">
-          <h2>Empieza a encontrar proveedores en <span style={{ color: ORG }}>5 pasos</span></h2>
+          <h2 data-reveal>Empieza a encontrar proveedores en <span style={{ color: ORG }}>5 pasos</span></h2>
           <div className={styles.spStepsShowcase}>
-            <aside className={styles.spStepsIntro}>
+            <aside className={styles.spStepsIntro} data-reveal>
               <p>
                 Busca, contacta y negocia con proveedores reales de toda LATAM — directo, sin intermediarios.
               </p>
@@ -210,7 +216,7 @@ export default function ClientePage() {
               </div>
             </aside>
 
-            <div className={styles.spStepsCarousel} aria-live="polite">
+            <div className={styles.spStepsCarousel} aria-live="polite" data-reveal>
               <button type="button" className={styles.spStepsArrow} aria-label="Paso anterior" onClick={() => moveStep(-1)}>&lt;</button>
               <div className={styles.spStepCards}>
                 {visibleSteps.map((step) => (
@@ -249,7 +255,7 @@ export default function ClientePage() {
       {/* BENEFICIOS */}
       <section className={styles.spBenefits}>
         <div className={`shell ${styles.spBenefitsGrid}`}>
-          <div>
+          <div data-reveal>
             <h2>
               Más que un directorio,<br />
               tu puente directo<br />
@@ -258,7 +264,7 @@ export default function ClientePage() {
           </div>
           <div className={styles.spBenefitsCards}>
             {benefits.map((b, i) => (
-              <div key={i} className={styles.spBenefitCard}>
+              <div key={i} className={styles.spBenefitCard} data-reveal>
                 <img src={b.icon} alt={b.title} />
                 <h4>{b.title}</h4>
                 <p>{b.desc}</p>
@@ -271,12 +277,14 @@ export default function ClientePage() {
       {/* FAQ */}
       <section className={styles.spFaq}>
         <div className="shell">
-          <h2>Resolvemos tus <span style={{ color: ORG }}>dudas</span> más comunes</h2>
+          <h2 data-reveal>Resolvemos tus <span style={{ color: ORG }}>dudas</span> más comunes</h2>
           <div className={styles.spFaqGrid}>
-            <div className={styles.spFaqImage}>
+            <div className={styles.spFaqImage} data-reveal>
               <img src="/sp-faq-image.png" alt="Soporte Drokex" />
             </div>
-            <Faq />
+            <div data-reveal>
+              <Faq />
+            </div>
           </div>
         </div>
       </section>
@@ -284,7 +292,7 @@ export default function ClientePage() {
       {/* CTA FINAL */}
       <section className={styles.spCta}>
         <img src="/banner venta final.jpg" alt="" className={styles.spCtaBg} aria-hidden="true" />
-        <div className={styles.spCtaContent}>
+        <div className={styles.spCtaContent} data-reveal>
           <h2>¿Listo para encontrar<br /><span style={{ color: ORG }}>tu proveedor ideal?</span></h2>
           <p>Explora catálogos verificados y empieza a negociar directo con proveedores reales en toda LATAM.</p>
           <Link href="/productos" style={{ background: ORG, color: "#fff" }}>Explorar catálogos</Link>
