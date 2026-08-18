@@ -96,3 +96,4 @@ build/Release
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vercel
+.worktrees/
