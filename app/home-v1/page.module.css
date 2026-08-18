@@ -464,6 +464,12 @@
     min-width: 0;
   }
 
+  .pfFlowNum {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
   .pfFlowArrow {
     display: none;
   }
@@ -2174,6 +2180,21 @@
   background: radial-gradient(ellipse 80% 100% at 50% 100%, rgba(255,255,255,0.1) 0%, transparent 70%);
 }
 
+@media (max-width: 720px) {
+  .pfCarouselSlide {
+    padding: 32px 20px;
+  }
+
+  .pfGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .pfFeatured {
+    height: min(320px, 48vh);
+  }
+}
+
 .pfCheck { color: var(--lime); flex-shrink: 0; }
 .pfCheckMarcas { color: var(--orange); }
 .pfCheckDropshippers { color: rgba(255,255,255,0.6); }
@@ -2237,21 +2258,25 @@
   .heroActionsSplit {
     position: static;
     width: 100%;
-    margin-top: 0;
-    gap: 16px;
+    margin-top: 28px;
+    gap: 14px;
   }
 
   .heroOptionButton {
     width: 100%;
     min-width: 0;
-    min-height: 110px;
-    padding: 18px 20px;
-    border-radius: 20px;
+    min-height: 84px;
+    padding: 14px 18px;
+    border-radius: 18px;
+  }
+
+  .heroOptionButton span {
+    font-size: 0.8rem;
   }
 
   .heroOptionButton strong {
     max-width: none;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 }
 .heroDistortion {

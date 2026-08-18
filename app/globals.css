@@ -622,6 +622,7 @@ button {
     grid-template-columns: 1fr;
     min-height: auto;
     padding: 18px 0;
+    gap: 14px;
   }
 
 .main-nav {
@@ -640,6 +641,27 @@ button {
 
 .mobile-menu-trigger {
     display: inline-flex;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    background: #050505;
+    backdrop-filter: none;
+  }
+
+  .header-row {
+    padding: 14px 0;
+    gap: 12px;
+  }
+
+  .brand-image {
+    width: 130px;
+  }
+
+  .header-actions {
+    gap: 14px;
+    align-items: center;
   }
 }
 
