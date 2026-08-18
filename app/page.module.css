@@ -2226,6 +2226,7 @@
     top: 36px;
     left: 0;
     max-width: 100%;
+    transform: none;
   }
 }
 
@@ -2249,6 +2250,7 @@
   .heroCopy {
     position: static;
     max-width: 100%;
+    transform: none;
   }
 
   .heroCopyCompact h1 {
