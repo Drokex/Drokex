@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
+import DashboardEntrance from "@/app/components/dashboard-entrance";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
 import { getOrdersForProvider, getOrdersForUser } from "@/lib/orders";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
@@ -40,7 +41,7 @@ export default async function ProviderOrdersPage() {
     <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
       <SiteHeader />
 
-      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+      <DashboardEntrance as="section" className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`} data-hero-item>
         <Link href={isCustomer ? "/mi-cuenta?role=cliente" : "/mi-cuenta?role=proveedor"} className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>
@@ -73,7 +74,7 @@ export default async function ProviderOrdersPage() {
             </div>
           )}
         </section>
-      </section>
+      </DashboardEntrance>
     </main>
   );
 }

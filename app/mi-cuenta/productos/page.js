@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
+import DashboardEntrance from "@/app/components/dashboard-entrance";
 import { getCurrentUser } from "@/lib/current-user";
 import { getProductsByProvider } from "@/lib/products";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
@@ -26,7 +27,7 @@ export default async function ProductosPage() {
   return (
     <main className={styles.providerDashboardPage}>
       <SiteHeader />
-      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+      <DashboardEntrance as="section" className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`} data-hero-item>
         <Link href="/mi-cuenta" className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>
@@ -81,7 +82,7 @@ export default async function ProductosPage() {
             </div>
           </Link>
         </div>
-      </section>
+      </DashboardEntrance>
     </main>
   );
 }

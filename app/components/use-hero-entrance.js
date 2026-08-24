@@ -10,7 +10,8 @@ export function useHeroEntrance(rootRef) {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const root = rootRef.current;
     if (!root) return;
-    const items = root.querySelectorAll("[data-hero-item]");
+    const descendants = root.querySelectorAll("[data-hero-item]");
+    const items = root.hasAttribute("data-hero-item") ? [root, ...descendants] : descendants;
     if (!items.length) return;
 
     if (reduceMotion) {
@@ -25,6 +26,12 @@ export function useHeroEntrance(rootRef) {
       });
     }, root);
 
-    return () => ctx.revert();
+    return () => {
+      // Si el cleanup corta la animación a medias (doble-invocación de
+      // efectos en desarrollo, o desmontaje real) los items quedaban
+      // atascados con opacity intermedia — forzar el estado final visible.
+      ctx.revert();
+      gsap.set(items, { clearProps: "transform,opacity" });
+    };
   }, [rootRef]);
 }

@@ -189,7 +189,7 @@ export default function ProveedorPage() {
       {/* PASOS */}
       <section className={styles.spSteps}>
         <div className="shell">
-          <h2 data-reveal>Empieza a vender en <span>8 simples pasos</span></h2>
+          <h2 data-reveal>Empieza a vender en <span>{steps.length} simples pasos</span></h2>
           <div className={styles.spStepsShowcase}>
             <aside className={styles.spStepsIntro} data-reveal>
               <p>

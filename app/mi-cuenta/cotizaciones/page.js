@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useHeroEntrance } from "@/app/components/use-hero-entrance";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import ProductChat from "@/app/components/product-chat";
@@ -14,6 +15,8 @@ export default function MisChats() {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeConv, setActiveConv] = useState(null);
+  const heroRef = useRef(null);
+  useHeroEntrance(heroRef);
 
   async function load() {
     const res = await fetch("/api/conversations");
@@ -43,7 +46,7 @@ export default function MisChats() {
   return (
     <main className={providerStyles.providerDashboardPage}>
       <SiteHeader />
-      <section className={`shell ${providerStyles.providerCleanShell} ${providerStyles.providerSubpageStack}`}>
+      <section className={`shell ${providerStyles.providerCleanShell} ${providerStyles.providerSubpageStack}`} ref={heroRef} data-hero-item>
         <Link href="/mi-cuenta" className={`${providerStyles.providerTextLink} ${providerStyles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>

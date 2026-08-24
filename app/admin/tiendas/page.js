@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useHeroEntrance } from "@/app/components/use-hero-entrance";
 import Link from "next/link";
 import { Search, Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, ArrowUpDown, X } from "lucide-react";
 import SiteHeader from "@/app/components/site-header";
@@ -32,12 +33,9 @@ export default function AdminTiendasPage() {
   const [filter, setFilter] = useState("todos");
   const [sortNewestFirst, setSortNewestFirst] = useState(true);
   const [page, setPage] = useState(1);
+  const heroRef = useRef(null);
+  useHeroEntrance(heroRef);
 
-  const [editing, setEditing] = useState(null);
-  const [editError, setEditError] = useState("");
-  const [storeJson, setStoreJson] = useState("");
-  const [productsJson, setProductsJson] = useState("");
-  const [saving, setSaving] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
 
   const [creating, setCreating] = useState(false);
@@ -65,13 +63,6 @@ export default function AdminTiendasPage() {
     load();
   }, []);
 
-  function startEdit(landing) {
-    setEditError("");
-    setEditing(landing);
-    setStoreJson(JSON.stringify(landing.store, null, 2));
-    setProductsJson(JSON.stringify(landing.products, null, 2));
-  }
-
   async function togglePublish(landing) {
     await fetch("/api/proveedor-pro", {
       method: "POST",
@@ -93,34 +84,6 @@ export default function AdminTiendasPage() {
     setPendingDelete(null);
     await fetch(`/api/proveedor-pro?targetUserId=${landing.userId}`, { method: "DELETE" });
     load();
-  }
-
-  async function saveEdit() {
-    setSaving(true);
-    setEditError("");
-    try {
-      const store = JSON.parse(storeJson);
-      const products = JSON.parse(productsJson);
-      const res = await fetch("/api/proveedor-pro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          targetUserId: editing.userId,
-          slug: editing.slug,
-          store,
-          products,
-          publish: editing.published,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error al guardar");
-      setEditing(null);
-      load();
-    } catch (err) {
-      setEditError(err.message);
-    } finally {
-      setSaving(false);
-    }
   }
 
   async function createStore(e) {
@@ -188,7 +151,7 @@ export default function AdminTiendasPage() {
   return (
     <div className={styles.page}>
       <SiteHeader />
-      <div className={styles.shell}>
+      <div className={styles.shell} ref={heroRef} data-hero-item>
         <div className={styles.topBar}>
           <div>
             <Link href="/admin" className={styles.backLink}>← Panel admin</Link>
@@ -275,9 +238,9 @@ export default function AdminTiendasPage() {
                       {landing.published ? <EyeOff size={14} /> : <Eye size={14} />}
                       {landing.published ? "Despublicar" : "Publicar"}
                     </button>
-                    <button className={styles.actionBtn} onClick={() => startEdit(landing)}>
+                    <Link href={`/admin/tiendas/${landing.slug}`} className={styles.actionBtn}>
                       <Pencil size={14} /> Editar
-                    </button>
+                    </Link>
                     <button className={`${styles.actionBtn} ${styles.actionBtnDanger}`} onClick={() => setPendingDelete(landing)}>
                       <Trash2 size={14} /> Borrar
                     </button>
@@ -303,40 +266,6 @@ export default function AdminTiendasPage() {
                 {n}
               </button>
             ))}
-          </div>
-        )}
-
-        {editing && (
-          <div className={styles.modalOverlay} onClick={() => setEditing(null)}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-              <div className={styles.modalHead}>
-                <h2>Editando: {editing.slug}</h2>
-                <button type="button" className={styles.ghostBtn} onClick={() => setEditing(null)} style={{ padding: 6 }}>
-                  <X size={18} />
-                </button>
-              </div>
-              <p style={{ fontSize: "0.8rem", color: "rgba(17,17,17,0.55)", marginTop: -6, marginBottom: 14 }}>
-                Edición avanzada en JSON — cámbialo solo si sabes lo que estás tocando. El proveedor edita su tienda
-                visualmente desde su propia cuenta; esto es para moderación puntual.
-              </p>
-              <div className={styles.field}>
-                <label>store (JSON)</label>
-                <textarea value={storeJson} onChange={(e) => setStoreJson(e.target.value)} rows={12} />
-              </div>
-              <div className={styles.field}>
-                <label>products (JSON)</label>
-                <textarea value={productsJson} onChange={(e) => setProductsJson(e.target.value)} rows={8} />
-              </div>
-              {editError && <p className={styles.fieldError}>{editError}</p>}
-              <div className={styles.modalActions}>
-                <button className={styles.primaryBtn} onClick={saveEdit} disabled={saving}>
-                  {saving ? "Guardando…" : "Guardar"}
-                </button>
-                <button className={styles.ghostBtn} onClick={() => setEditing(null)}>
-                  Cancelar
-                </button>
-              </div>
-            </div>
           </div>
         )}
 

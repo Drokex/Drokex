@@ -138,8 +138,19 @@ button {
 .header-account-menu {
   left: auto;
   right: 0;
-  transform: none;
   min-width: 180px;
+  animation-name: nav-dropdown-in-right;
+}
+
+@keyframes nav-dropdown-in-right {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .nav-dropdown-logout {
@@ -715,42 +726,7 @@ button {
   gap: 26px;
 }
 
-@media (max-width: 1439px) and (min-width: 1024px) {
-  .header-row {
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "brand actions"
-      "nav nav";
-    gap: 14px 20px;
-    padding: 14px 0;
-  }
-
-  .brand-image {
-    width: 150px;
-  }
-
-  .brand-link {
-    grid-area: brand;
-  }
-
-  .main-nav {
-    grid-area: nav;
-    gap: 14px;
-  }
-
-  .main-nav a,
-  .nav-dropdown-trigger,
-  .text-link {
-    font-size: 12px;
-  }
-
-  .header-actions {
-    grid-area: actions;
-    gap: 12px;
-  }
-}
-
-@media (max-width: 1023px) {
+@media (max-width: 1439px) {
   .header-row {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: "brand actions";
@@ -1010,6 +986,25 @@ button {
   gap: 2px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.5);
   z-index: 100;
+  animation: nav-dropdown-in 0.16s ease both;
+  transform-origin: top center;
+}
+
+@keyframes nav-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-dropdown-menu {
+    animation: none;
+  }
 }
 
 .nav-dropdown-link {

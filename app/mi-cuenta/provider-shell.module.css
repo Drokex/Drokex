@@ -1184,3 +1184,10 @@
   .providerExperienceSteps > div { min-width: 0; }
   .providerFloatingTag { display: none; }
 }
+
+/* provider-float-a (Muebles del Sur) usa clamp(460px,...) para no tapar la
+   columna de texto/íconos de "Tu catálogo, siempre visible" — por debajo de
+   ese ancho mínimo la tarjeta ya no tiene espacio ni con el clamp. */
+@media (max-width: 680px) {
+  .providerFloatingTag { display: none; }
+}

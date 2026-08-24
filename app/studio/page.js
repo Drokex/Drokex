@@ -5,7 +5,6 @@ import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import AiImageWizard from "@/app/components/ai-image-wizard";
 import PortalPixelCursor from "@/app/components/portal-pixel-cursor";
-import Personaje360 from "@/app/components/personaje-360";
 import styles from "./page.module.css";
 import portalStyles from "./portal.module.css";
 
@@ -198,18 +197,6 @@ export default function StudioPage() {
               Crea tu página con Proveedor Pro
             </Link>
           </div>
-        </div>
-
-        {/* Personaje 360 centrado */}
-        <div style={{
-          position: "absolute",
-          right: "18%",
-          top: "50%",
-          transform: "translateY(-50%)",
-          zIndex: 7,
-          pointerEvents: "auto",
-        }}>
-          <Personaje360 size={380} />
         </div>
 
         {/* HUD izquierdo — clicable */}

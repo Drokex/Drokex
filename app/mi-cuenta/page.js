@@ -2,6 +2,7 @@ import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import LogoutButton from "@/app/components/logout-button";
 import AvatarUpload from "@/app/components/avatar-upload";
+import DashboardEntrance from "@/app/components/dashboard-entrance";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
 import { getProducts } from "@/lib/products";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
@@ -225,8 +226,8 @@ export default async function AccountPage({ searchParams }) {
     <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
       <SiteHeader />
 
-      <section className={`shell ${styles.providerCleanShell}`}>
-        <div className={styles.providerCleanHero}>
+      <DashboardEntrance as="section" className={`shell ${styles.providerCleanShell}`}>
+        <div className={styles.providerCleanHero} data-hero-item>
           <AvatarUpload initials={initials} logoUrl={user.logoUrl} />
 
           <div className={styles.providerCleanCopy}>
@@ -259,6 +260,7 @@ export default async function AccountPage({ searchParams }) {
         <nav
           className={styles.providerCleanMenu}
           aria-label={isCustomer ? "Accesos del cliente" : "Accesos del proveedor"}
+          data-hero-item
         >
           {(isCustomer ? customerQuickActions : providerQuickActions).map((action) => (
             <Link
@@ -290,17 +292,12 @@ export default async function AccountPage({ searchParams }) {
           )}
         </nav>
 
-        <section className={`${styles.providerActivityCard} ${styles.providerActivityCardClean}`}>
+        <section className={`${styles.providerActivityCard} ${styles.providerActivityCardClean}`} data-hero-item>
           <div className={`${styles.providerSectionHeading} ${styles.providerSectionHeadingStack}`}>
             <div>
               <p className={styles.providerSectionKicker}>Seguimiento</p>
               <h2>Actividad Reciente</h2>
             </div>
-            {isCustomer && (
-              <Link href="/categorias" className={styles.providerTextLinkBtn}>
-                Ver catálogo
-              </Link>
-            )}
           </div>
 
           <div className={styles.providerActivityList}>
@@ -321,7 +318,7 @@ export default async function AccountPage({ searchParams }) {
             ))}
           </div>
         </section>
-      </section>
+      </DashboardEntrance>
 
       {showProveedorProUpgrade ? (
         <div

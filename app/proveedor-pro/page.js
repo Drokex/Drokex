@@ -193,6 +193,7 @@ export default function ProveedorProPage({
   initialSlug = "",
   initialPublished = false,
   accountMode = false,
+  targetUserId = "",
 }) {
   const router = useRouter();
   const [code, setCode] = useState("");
@@ -492,7 +493,13 @@ export default function ProveedorProPage({
         const res = await fetch("/api/proveedor-pro", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slug, store: finalStore, products, publish: Boolean(publish) }),
+          body: JSON.stringify({
+            slug,
+            store: finalStore,
+            products,
+            publish: Boolean(publish),
+            ...(targetUserId ? { targetUserId } : {}),
+          }),
           signal: ctrl.signal,
         });
         if (!res.ok) {
@@ -523,7 +530,13 @@ export default function ProveedorProPage({
         fetch("/api/proveedor-pro", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slug, store: finalStore, products, publish: false }),
+          body: JSON.stringify({
+            slug,
+            store: finalStore,
+            products,
+            publish: false,
+            ...(targetUserId ? { targetUserId } : {}),
+          }),
         }).catch(() => {});
         setIsSaving(false);
         return;

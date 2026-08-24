@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Package, Store, ShoppingCart, Truck, DollarSign, Image as ImageIcon } from "lucide-react";
 import SiteHeader from "@/app/components/site-header";
 import LogoutButton from "@/app/components/logout-button";
 import { inferCurrencyFromOriginCountry } from "@/lib/market-pricing";
+import { useHeroEntrance } from "@/app/components/use-hero-entrance";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import adminStyles from "./page.module.css";
 
@@ -103,6 +105,8 @@ export default function AdminPage() {
   const [activePanel, setActivePanel] = useState(null);
   const productListRef = useRef(null);
   const productFormRef = useRef(null);
+  const dashboardHeroRef = useRef(null);
+  useHeroEntrance(dashboardHeroRef);
 
   async function loadProducts() {
     setStatus("Cargando productos...");
@@ -115,6 +119,14 @@ export default function AdminPage() {
   useEffect(() => {
     loadProducts();
   }, []);
+
+  useEffect(() => {
+    if (!products.length) return;
+    const editId = new URLSearchParams(window.location.search).get("edit");
+    if (!editId) return;
+    const product = products.find((p) => p.id === editId);
+    if (product) openPanel("form", product);
+  }, [products]);
 
   useEffect(() => {
     async function loadAccount() {
@@ -194,8 +206,9 @@ export default function AdminPage() {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function openPanel(panel) {
+  function openPanel(panel, productToEdit) {
     setActivePanel(panel);
+    if (productToEdit) setForm(toFormState(productToEdit));
 
     window.requestAnimationFrame(() => {
       if (panel === "list") {
@@ -211,8 +224,8 @@ export default function AdminPage() {
   return (
     <main className={`${styles.providerDashboardPage} ${adminStyles.adminPage}`}>
       <SiteHeader />
-      <section className={`shell ${styles.providerCleanShell}`}>
-        <div className={styles.providerCleanHero}>
+      <section className={`shell ${styles.providerCleanShell}`} ref={dashboardHeroRef}>
+        <div className={styles.providerCleanHero} data-hero-item>
           <div className={styles.providerCleanAvatarWrap}>
             <div className={styles.providerCleanAvatar} aria-hidden="true">
               {initials}
@@ -237,31 +250,39 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <nav className={styles.providerCleanMenu} aria-label="Accesos del proveedor">
+        <nav className={styles.providerCleanMenu} aria-label="Accesos del proveedor" data-hero-item>
+          <Link href="/admin/productos" className={styles.providerCleanMenuItem}>
+            <Package size={17} strokeWidth={2.4} />
+            <span>Productos</span>
+          </Link>
           <Link href="/admin/tiendas" className={styles.providerCleanMenuItem}>
+            <Store size={17} strokeWidth={2.4} />
             <span>Mis tiendas</span>
           </Link>
           <Link href="/mi-cuenta/ventas" className={styles.providerCleanMenuItem}>
+            <ShoppingCart size={17} strokeWidth={2.4} />
             <span>Ventas</span>
           </Link>
           <Link href="/mi-cuenta/logistica" className={styles.providerCleanMenuItem}>
+            <Truck size={17} strokeWidth={2.4} />
             <span>Envíos / logística</span>
           </Link>
           <Link href="/mi-cuenta/ganancias" className={styles.providerCleanMenuItem}>
+            <DollarSign size={17} strokeWidth={2.4} />
             <span>Ganancias / comisiones</span>
           </Link>
           <Link href="/admin/banners" className={styles.providerCleanMenuItem}>
+            <ImageIcon size={17} strokeWidth={2.4} />
             <span>Editar banners</span>
           </Link>
         </nav>
 
-        <section className={`${styles.providerActivityCard} ${styles.providerActivityCardClean}`}>
+        <section className={`${styles.providerActivityCard} ${styles.providerActivityCardClean}`} data-hero-item>
           <div className={styles.providerSectionHeading}>
             <div>
               <p className={styles.providerSectionKicker}>Seguimiento</p>
               <h2>Actividad Reciente</h2>
             </div>
-            <span className={styles.providerTextLink}>Vista administrador</span>
           </div>
 
           <div className={styles.providerActivityList}>

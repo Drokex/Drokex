@@ -59,6 +59,7 @@ model Product {
   minimumStock       Int                 @default(3)
   image              String
   galleryImages      String[]            @default([])
+  video              String?
   availability       String
   shortDescription   String             @default("")
   description        String

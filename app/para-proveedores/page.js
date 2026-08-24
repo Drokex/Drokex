@@ -713,7 +713,7 @@ export default function ParaProveedoresPage() {
               </div>
             </div>
 
-            <div className={`${styles.providerFloatingTag} provider-float-a`} style={{ position: "absolute", bottom: "22%", left: "34%", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(127, 224, 64, 0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+            <div className={`${styles.providerFloatingTag} provider-float-a`} style={{ position: "absolute", bottom: "22%", left: "clamp(460px, 34%, 620px)", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(127, 224, 64, 0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
               <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
               <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
             </div>

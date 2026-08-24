@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { useQuoteStream } from "@/app/components/use-quote-stream";
+import { useHeroEntrance } from "@/app/components/use-hero-entrance";
 import qfStyles from "@/app/components/quote-form.module.css";
 import qdStyles from "../quotes-dashboard.module.css";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
@@ -69,6 +70,8 @@ export default function ProviderQuotesDashboard() {
   const [activeReply, setActiveReply] = useState(null);
   const [filter, setFilter] = useState("ALL");
   const [newCount, setNewCount] = useState(0);
+  const heroRef = useRef(null);
+  useHeroEntrance(heroRef);
 
   async function load() {
     const res = await fetch("/api/quotes");
@@ -101,7 +104,7 @@ export default function ProviderQuotesDashboard() {
   return (
     <main className={styles.providerDashboardPage}>
       <SiteHeader />
-      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
+      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`} ref={heroRef} data-hero-item>
         <Link href="/mi-cuenta" className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
           Volver al dashboard
         </Link>

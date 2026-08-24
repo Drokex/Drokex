@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
+import DashboardEntrance from "@/app/components/dashboard-entrance";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
 import { getOrdersForProvider, getOrdersForAdmin } from "@/lib/orders";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
@@ -60,8 +61,11 @@ export default async function EarningsPage() {
     <main className={isCustomer ? `${styles.providerDashboardPage} ${styles.isCustomer}` : styles.providerDashboardPage}>
       <SiteHeader />
 
-      <section className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`}>
-        <Link href="/mi-cuenta?role=proveedor" className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}>
+      <DashboardEntrance as="section" className={`shell ${styles.providerCleanShell} ${styles.providerSubpageStack}`} data-hero-item>
+        <Link
+          href={user.role === "ADMIN" ? "/admin" : "/mi-cuenta?role=proveedor"}
+          className={`${styles.providerTextLink} ${styles.providerSubpageBack}`}
+        >
           Volver al dashboard
         </Link>
 
@@ -82,7 +86,7 @@ export default async function EarningsPage() {
             ))}
           </div>
         </section>
-      </section>
+      </DashboardEntrance>
     </main>
   );
 }

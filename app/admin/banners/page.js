@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useHeroEntrance } from "@/app/components/use-hero-entrance";
 import Link from "next/link";
 import Image from "next/image";
 import { Plus, Pencil, Trash2, Eye, EyeOff, ArrowUpDown, X } from "lucide-react";
@@ -59,6 +60,8 @@ export default function AdminBannersPage() {
   const [uploadError, setUploadError] = useState("");
   const [formError, setFormError] = useState("");
   const [pendingDelete, setPendingDelete] = useState(null);
+  const heroRef = useRef(null);
+  useHeroEntrance(heroRef);
 
   async function load() {
     setLoading(true);
@@ -158,7 +161,7 @@ export default function AdminBannersPage() {
   return (
     <div className={styles.page}>
       <SiteHeader />
-      <div className={styles.shell}>
+      <div className={styles.shell} ref={heroRef} data-hero-item>
         <div className={styles.topBar}>
           <div>
             <Link href="/admin" className={styles.backLink}>← Panel admin</Link>
