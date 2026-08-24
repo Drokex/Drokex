@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-const BANNERS = [
+// Fallback si /api/banners?slot=sidebar falla o aún no hay banners en BD.
+const FALLBACK_BANNERS = [
   { src: "/popup-geu.png", alt: "GEU — Resistencia que perdura. Soluciones en caucho para cada industria" },
   { src: "/popup-kliniu.png", alt: "Kliniu — Higiene que se siente, calidad que se nota" },
-  { src: "/popup-totalpars.png", alt: "TotalPars — Compatibles con tu ruta. Repuestos para vehículos de carga" },
-  { src: "/popup-lego.png", alt: "LEGO — Construye tu mundo. Imagina. Crea. Juega." },
 ];
 
 // Se elige tras montar (no en el render del servidor) para no romper la hidratación.
@@ -15,7 +14,17 @@ export default function SidebarAd() {
   const [banner, setBanner] = useState(null);
 
   useEffect(() => {
-    setBanner(BANNERS[Math.floor(Math.random() * BANNERS.length)]);
+    fetch("/api/banners?slot=sidebar")
+      .then((r) => r.json())
+      .then((data) => {
+        const pool = data.banners?.length
+          ? data.banners.map((b) => ({ src: b.imageUrl, alt: b.alt }))
+          : FALLBACK_BANNERS;
+        setBanner(pool[Math.floor(Math.random() * pool.length)]);
+      })
+      .catch(() => {
+        setBanner(FALLBACK_BANNERS[Math.floor(Math.random() * FALLBACK_BANNERS.length)]);
+      });
   }, []);
 
   if (!banner) return null;

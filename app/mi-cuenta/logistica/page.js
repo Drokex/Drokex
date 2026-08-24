@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
-import { getOrdersForProvider } from "@/lib/orders";
+import { getOrdersForProvider, getAllOrders } from "@/lib/orders";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
 
@@ -34,7 +34,7 @@ export default async function LogisticsPage() {
     session?.role === "CUSTOMER" ||
     session?.audience === "cliente";
 
-  const orders = isCustomer ? [] : await getOrdersForProvider(user.id);
+  const orders = isCustomer ? [] : user.role === "ADMIN" ? await getAllOrders() : await getOrdersForProvider(user.id);
   const activeGuides = orders.filter((order) => order.trackingNumber && order.status !== "DELIVERED" && order.status !== "CANCELLED");
   const carriers = Array.from(new Set(orders.map((order) => order.carrier).filter(Boolean)));
   const inTransit = orders.filter((order) => order.status === "SHIPPED");
@@ -82,7 +82,7 @@ export default async function LogisticsPage() {
           <div className={styles.providerSectionHeading}>
             <div>
               <p className={styles.providerSectionKicker}>Envíos / logística</p>
-              <h2>Operación logística del proveedor</h2>
+              <h2>{user.role === "ADMIN" ? "Operación logística — todos los proveedores" : "Operación logística del proveedor"}</h2>
             </div>
           </div>
 

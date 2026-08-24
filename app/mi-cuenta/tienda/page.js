@@ -32,7 +32,7 @@ export default async function StorePage() {
 
   const hasProveedorPro = Boolean(landing);
 
-  if (!hasProveedorPro) {
+  if (!hasProveedorPro && user.role !== "ADMIN") {
     redirect("/mi-cuenta?upgrade=proveedor-pro");
   }
 

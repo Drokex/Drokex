@@ -238,11 +238,8 @@ export default function AdminPage() {
         </div>
 
         <nav className={styles.providerCleanMenu} aria-label="Accesos del proveedor">
-          <Link href="/mi-cuenta/tienda" className={styles.providerCleanMenuItem}>
-            <span>Mi tienda</span>
-          </Link>
-          <Link href="/mi-cuenta/productos" className={styles.providerCleanMenuItem}>
-            <span>Mis productos</span>
+          <Link href="/admin/tiendas" className={styles.providerCleanMenuItem}>
+            <span>Mis tiendas</span>
           </Link>
           <Link href="/mi-cuenta/ventas" className={styles.providerCleanMenuItem}>
             <span>Ventas</span>
@@ -252,6 +249,9 @@ export default function AdminPage() {
           </Link>
           <Link href="/mi-cuenta/ganancias" className={styles.providerCleanMenuItem}>
             <span>Ganancias / comisiones</span>
+          </Link>
+          <Link href="/admin/banners" className={styles.providerCleanMenuItem}>
+            <span>Editar banners</span>
           </Link>
         </nav>
 

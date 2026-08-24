@@ -27,6 +27,28 @@ export async function GET(request) {
     });
   }
 
+  const userId = searchParams.get("userId");
+  if (userId) {
+    const session = await getCurrentSession();
+    if (session?.role !== "ADMIN") return Response.json({ error: "No autorizado." }, { status: 401 });
+
+    const landing = await prisma.proveedorProLanding.findUnique({ where: { userId } });
+    if (!landing) return Response.json({ landing: null });
+    return Response.json({ landing });
+  }
+
+  const all = searchParams.get("all") === "1";
+  if (all) {
+    const session = await getCurrentSession();
+    if (session?.role !== "ADMIN") return Response.json({ error: "No autorizado." }, { status: 401 });
+
+    const landings = await prisma.proveedorProLanding.findMany({
+      orderBy: { updatedAt: "desc" },
+      include: { user: { select: { fullName: true, email: true } } },
+    });
+    return Response.json({ landings });
+  }
+
   if (!slug) {
     const landings = await prisma.proveedorProLanding.findMany({
       where: { published: true },
@@ -52,8 +74,15 @@ export async function POST(request) {
   const session = await getCurrentSession();
   if (!session?.userId) return Response.json({ error: "No autorizado." }, { status: 401 });
 
-  const { slug, store, products, publish } = await request.json();
+  const { slug, store, products, publish, unpublish, targetUserId } = await request.json();
   if (!slug) return Response.json({ error: "slug requerido" }, { status: 400 });
+
+  if (targetUserId && targetUserId !== session.userId && session.role !== "ADMIN") {
+    return Response.json({ error: "No autorizado." }, { status: 401 });
+  }
+  const ownerId = targetUserId && session.role === "ADMIN" ? targetUserId : session.userId;
+  // unpublish solo lo puede forzar un ADMIN moderando una tienda ajena — un autoguardado normal nunca lo pide.
+  const forceUnpublish = unpublish && session.role === "ADMIN";
 
   if (publish) {
     if (!store?.countries?.length) {
@@ -69,10 +98,10 @@ export async function POST(request) {
 
   const [landingWithSlug, landingForUser] = await Promise.all([
     prisma.proveedorProLanding.findUnique({ where: { slug } }),
-    prisma.proveedorProLanding.findUnique({ where: { userId: session.userId } }),
+    prisma.proveedorProLanding.findUnique({ where: { userId: ownerId } }),
   ]);
 
-  if (landingWithSlug?.userId && landingWithSlug.userId !== session.userId) {
+  if (landingWithSlug?.userId && landingWithSlug.userId !== ownerId) {
     return Response.json({ error: "Ese nombre de página ya está en uso." }, { status: 409 });
   }
 
@@ -80,35 +109,39 @@ export async function POST(request) {
     return Response.json({ error: "Ese nombre de página ya está en uso." }, { status: 409 });
   }
 
-  // published nunca se revierte a false por un autoguardado — solo "publish: true" lo activa.
+  // published nunca se revierte a false por un autoguardado — solo "publish: true" lo activa
+  // (o "unpublish: true" desde un ADMIN moderando).
+  const publishedPatch = forceUnpublish ? { published: false } : publish ? { published: true } : {};
   const landing = landingForUser
     ? await prisma.proveedorProLanding.update({
         where: { id: landingForUser.id },
-        data: { slug, store, products, ...(publish ? { published: true } : {}) },
+        data: { slug, store, products, ...publishedPatch },
       })
     : landingWithSlug
       ? await prisma.proveedorProLanding.update({
           where: { id: landingWithSlug.id },
-          data: { userId: session.userId, store, products, ...(publish ? { published: true } : {}) },
+          data: { userId: ownerId, store, products, ...publishedPatch },
         })
       : await prisma.proveedorProLanding.create({
-          data: { slug, userId: session.userId, store, products, published: Boolean(publish) },
+          data: { slug, userId: ownerId, store, products, published: Boolean(publish) },
         });
 
   // Invalidar caché del directorio para que aparezca de inmediato
   if (globalThis.__drokexDirCache5) globalThis.__drokexDirCache5.ts = 0;
 
-  const updatedUser = await prisma.user.update({
-    where: { id: session.userId },
-    data: { role: session.role === "ADMIN" ? "ADMIN" : "PROVIDER" },
-  });
+  if (ownerId === session.userId) {
+    const updatedUser = await prisma.user.update({
+      where: { id: session.userId },
+      data: { role: session.role === "ADMIN" ? "ADMIN" : "PROVIDER" },
+    });
 
-  await setSessionCookie({
-    userId: updatedUser.id,
-    email: updatedUser.email,
-    role: updatedUser.role,
-    audience: "proveedor",
-  });
+    await setSessionCookie({
+      userId: updatedUser.id,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      audience: "proveedor",
+    });
+  }
 
   return Response.json({ ok: true, slug: landing.slug, published: landing.published });
 }
@@ -117,7 +150,14 @@ export async function DELETE(request) {
   const session = await getCurrentSession();
   if (!session?.userId) return Response.json({ error: "No autorizado." }, { status: 401 });
 
-  const landing = await prisma.proveedorProLanding.findUnique({ where: { userId: session.userId } });
+  const { searchParams } = new URL(request.url);
+  const targetUserId = searchParams.get("targetUserId");
+  if (targetUserId && targetUserId !== session.userId && session.role !== "ADMIN") {
+    return Response.json({ error: "No autorizado." }, { status: 401 });
+  }
+  const ownerId = targetUserId && session.role === "ADMIN" ? targetUserId : session.userId;
+
+  const landing = await prisma.proveedorProLanding.findUnique({ where: { userId: ownerId } });
   if (!landing) return Response.json({ error: "No encontrado." }, { status: 404 });
 
   await prisma.proveedorProLanding.delete({ where: { id: landing.id } });

@@ -5,14 +5,10 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { X } from "lucide-react";
 
-// width/height marcan la proporción: los hay verticales (300x600) y cuadrados (1080).
-const BANNERS = [
+// Fallback si /api/banners?slot=popup falla o aún no hay banners en BD.
+const FALLBACK_BANNERS = [
   { src: "/popup-geu.png", alt: "GEU — Resistencia que perdura. Soluciones en caucho para cada industria", width: 300, height: 600 },
   { src: "/popup-kliniu.png", alt: "Kliniu — Higiene que se siente, calidad que se nota", width: 300, height: 600 },
-  { src: "/popup-totalpars.png", alt: "TotalPars — Compatibles con tu ruta. Repuestos para vehículos de carga", width: 300, height: 600 },
-  { src: "/popup-lego.png", alt: "LEGO — Construye tu mundo. Imagina. Crea. Juega.", width: 300, height: 600 },
-  { src: "/popup-geu-cuadrado.webp", alt: "GEU — Todo empieza con una buena solución", width: 1080, height: 1080 },
-  { src: "/popup-kliniu-cuadrado.webp", alt: "Kliniu — Limpieza profesional para cada necesidad", width: 1080, height: 1080 },
 ];
 
 // Páginas del menú principal: el popup no aparece en ninguna otra.
@@ -32,9 +28,23 @@ export default function AdPopup() {
   const pathname = usePathname();
   const [banner, setBanner] = useState(null);
   const [closing, setClosing] = useState(false);
+  const banners = useRef(null);
   // Guardamos la ruta de entrada: solo dispara cuando cambia de verdad.
   // (Un flag "primera vez" no vale: en dev los efectos se montan dos veces.)
   const previousPath = useRef(pathname);
+
+  useEffect(() => {
+    fetch("/api/banners?slot=popup")
+      .then((r) => r.json())
+      .then((data) => {
+        banners.current = data.banners?.length
+          ? data.banners.map((b) => ({ src: b.imageUrl, alt: b.alt, width: b.width, height: b.height }))
+          : FALLBACK_BANNERS;
+      })
+      .catch(() => {
+        banners.current = FALLBACK_BANNERS;
+      });
+  }, []);
 
   useEffect(() => {
     if (previousPath.current === pathname) return;
@@ -43,7 +53,8 @@ export default function AdPopup() {
       setBanner(null);
       return;
     }
-    setBanner(BANNERS[Math.floor(Math.random() * BANNERS.length)]);
+    const pool = banners.current || FALLBACK_BANNERS;
+    setBanner(pool[Math.floor(Math.random() * pool.length)]);
   }, [pathname]);
 
   useEffect(() => {

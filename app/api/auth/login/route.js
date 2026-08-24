@@ -14,7 +14,11 @@ export async function POST(request) {
     }
 
     const user = await authenticateUser(email, password);
-    const expectedAdminPin = process.env.ADMIN_EXTRA_PIN?.trim() || "1234";
+    const expectedAdminPin = process.env.ADMIN_EXTRA_PIN?.trim() || "";
+
+    if (user.role === "ADMIN" && !expectedAdminPin) {
+      return Response.json({ error: "PIN de administrador no configurado en el servidor." }, { status: 500 });
+    }
 
     if (user.role === "ADMIN" && !adminPin) {
       return Response.json(

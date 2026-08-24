@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import HomeBanner from "@/app/components/home-banner";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import HeroDistortion from "@/app/components/hero-distortion";
 import { DrokexWorldSection, MarketsSection } from "@/app/components/drokex-world-experience";
@@ -1046,15 +1047,7 @@ export default function Home() {
       <section className={styles.adBannerSection}>
         <div className="shell">
           <motion.div className={styles.adBanner} {...fadeUp()}>
-            <Image
-              src="/banner-lego-dragon.png"
-              alt="LEGO — Cada pieza despierta una aventura"
-              width={2400}
-              height={800}
-              sizes="(max-width: 1200px) 100vw, 1200px"
-              className={styles.adBannerImage}
-              priority={false}
-            />
+            <HomeBanner className={styles.adBannerImage} />
           </motion.div>
         </div>
       </section>

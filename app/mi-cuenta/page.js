@@ -272,12 +272,20 @@ export default async function AccountPage({ searchParams }) {
               <span>{action.title}</span>
             </Link>
           ))}
-          {!isCustomer && (
+          {!isCustomer && user.role !== "ADMIN" && (
             <Link href="/admin" className={styles.providerCleanMenuItem}>
               <span className={styles.providerCleanMenuIcon}>
                 <DashboardIcon name="grid" />
               </span>
               <span>Ver panel completo</span>
+            </Link>
+          )}
+          {user.role === "ADMIN" && (
+            <Link href="/admin/banners" className={styles.providerCleanMenuItem}>
+              <span className={styles.providerCleanMenuIcon}>
+                <DashboardIcon name="grid" />
+              </span>
+              <span>Editar banners</span>
             </Link>
           )}
         </nav>

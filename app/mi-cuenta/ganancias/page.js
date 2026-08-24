@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import { getCurrentSession, getCurrentUser } from "@/lib/current-user";
-import { getOrdersForProvider } from "@/lib/orders";
+import { getOrdersForProvider, getOrdersForAdmin } from "@/lib/orders";
 import styles from "@/app/mi-cuenta/provider-shell.module.css";
 import authStyles from "@/app/components/auth-account.module.css";
 
@@ -36,7 +36,7 @@ export default async function EarningsPage() {
     session?.role === "CUSTOMER" ||
     session?.audience === "cliente";
 
-  const orders = isCustomer ? [] : await getOrdersForProvider(user.id);
+  const orders = isCustomer ? [] : user.role === "ADMIN" ? await getOrdersForAdmin() : await getOrdersForProvider(user.id);
   const paidOrders = orders.filter((order) => order.paymentStatus === "PAID");
   const totalVendido = paidOrders.reduce((sum, order) => sum + order.providerSubtotal, 0);
   const lastPaidOrder = paidOrders[0];
@@ -69,7 +69,7 @@ export default async function EarningsPage() {
           <div className={styles.providerSectionHeading}>
             <div>
               <p className={styles.providerSectionKicker}>Ganancias / comisiones</p>
-              <h2>Resumen financiero del proveedor</h2>
+              <h2>{user.role === "ADMIN" ? "Resumen financiero — todos los proveedores" : "Resumen financiero del proveedor"}</h2>
             </div>
           </div>
 

@@ -199,3 +199,20 @@ model ProveedorProLanding {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// slot: "popup" (modal al navegar) | "sidebar" (banner lateral del catálogo)
+model Banner {
+  id        String   @id @default(cuid())
+  slot      String
+  imageUrl  String
+  alt       String
+  linkUrl   String?
+  width     Int      @default(300)
+  height    Int      @default(600)
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slot, active])
+}
