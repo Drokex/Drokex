@@ -773,7 +773,7 @@ export default function Home() {
 
   function handleMarketContact(market) {
     const msg = encodeURIComponent(`Hola, estoy interesado en conectar con el mercado de ${market.label} a través de Drokex. ¿Me puedes ayudar?`);
-    window.open(`https://wa.me/573209654384?text=${msg}`, "_blank");
+    window.open(`https://wa.me/573115312623?text=${msg}`, "_blank");
   }
   const [activeMarket, setActiveMarket] = useState(0);
   const marketPausedRef = useRef(false);

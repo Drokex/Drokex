@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
         <CookieConsent />
         <AdPopup />
         <a
-          href="https://wa.me/573209654384"
+          href="https://wa.me/573115312623"
           target="_blank"
           rel="noopener noreferrer"
           className="whatsapp-fab"
