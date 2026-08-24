@@ -1,22 +1,50 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { Search, Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, ArrowUpDown, X } from "lucide-react";
 import SiteHeader from "@/app/components/site-header";
-import LogoutButton from "@/app/components/logout-button";
 import ConfirmPopup from "@/app/components/confirm-popup";
-import adminStyles from "../page.module.css";
+import LandingPreview from "@/app/components/landing-preview";
+import styles from "./tiendas.module.css";
+
+const FILTERS = [
+  { key: "todos", label: "Todos" },
+  { key: "published", label: "Publicadas" },
+  { key: "draft", label: "Borrador" },
+];
+
+const AVATAR_COLORS = ["#ffd6dd", "#d8f5c2", "#d6e4ff", "#ffe6b3", "#e3d6ff", "#c9f2e6"];
+
+function avatarColor(seed) {
+  let hash = 0;
+  for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[hash];
+}
+
+const PAGE_SIZE = 10;
 
 export default function AdminTiendasPage() {
   const [landings, setLandings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("todos");
+  const [sortNewestFirst, setSortNewestFirst] = useState(true);
+  const [page, setPage] = useState(1);
+
   const [editing, setEditing] = useState(null);
   const [editError, setEditError] = useState("");
   const [storeJson, setStoreJson] = useState("");
   const [productsJson, setProductsJson] = useState("");
   const [saving, setSaving] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
+
+  const [creating, setCreating] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [newSlug, setNewSlug] = useState("");
+  const [createError, setCreateError] = useState("");
+  const [createBusy, setCreateBusy] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -38,6 +66,7 @@ export default function AdminTiendasPage() {
   }, []);
 
   function startEdit(landing) {
+    setEditError("");
     setEditing(landing);
     setStoreJson(JSON.stringify(landing.store, null, 2));
     setProductsJson(JSON.stringify(landing.products, null, 2));
@@ -94,74 +123,250 @@ export default function AdminTiendasPage() {
     }
   }
 
+  async function createStore(e) {
+    e.preventDefault();
+    setCreateError("");
+    if (!newEmail.trim() || !newSlug.trim()) {
+      setCreateError("Completa el correo del proveedor y el slug de la tienda.");
+      return;
+    }
+    setCreateBusy(true);
+    try {
+      const lookupRes = await fetch(`/api/admin/users/lookup?email=${encodeURIComponent(newEmail.trim())}`);
+      const lookupData = await lookupRes.json();
+      if (!lookupRes.ok) throw new Error(lookupData.error || "No se encontró ese usuario");
+
+      const res = await fetch("/api/proveedor-pro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetUserId: lookupData.user.id,
+          slug: newSlug.trim().toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
+          store: { brand: lookupData.user.fullName || lookupData.user.email },
+          products: [],
+          publish: false,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error al crear la tienda");
+      setCreating(false);
+      setNewEmail("");
+      setNewSlug("");
+      load();
+    } catch (err) {
+      setCreateError(err.message);
+    } finally {
+      setCreateBusy(false);
+    }
+  }
+
+  const filtered = useMemo(() => {
+    let list = landings;
+    if (filter === "published") list = list.filter((l) => l.published);
+    if (filter === "draft") list = list.filter((l) => !l.published);
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(
+        (l) =>
+          l.slug.toLowerCase().includes(q) ||
+          l.user?.fullName?.toLowerCase().includes(q) ||
+          l.user?.email?.toLowerCase().includes(q),
+      );
+    }
+    return [...list].sort((a, b) =>
+      sortNewestFirst ? new Date(b.updatedAt) - new Date(a.updatedAt) : new Date(a.updatedAt) - new Date(b.updatedAt),
+    );
+  }, [landings, filter, search, sortNewestFirst]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageItems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  useEffect(() => {
+    setPage(1);
+  }, [filter, search]);
+
   return (
-    <div className={adminStyles.adminPage}>
+    <div className={styles.page}>
       <SiteHeader />
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "36px 20px 88px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+      <div className={styles.shell}>
+        <div className={styles.topBar}>
           <div>
-            <Link href="/admin" style={{ fontSize: "0.85rem" }}>← Panel admin</Link>
-            <h1 style={{ margin: "8px 0 0" }}>Tiendas de proveedores</h1>
+            <Link href="/admin" className={styles.backLink}>← Panel admin</Link>
+            <h1 className={styles.title}>Tiendas de proveedores</h1>
+            <p className={styles.subtitle}>Gestiona y publica las tiendas de los proveedores.</p>
           </div>
-          <LogoutButton />
+          <button
+            type="button"
+            className={styles.newButton}
+            onClick={() => {
+              setCreateError("");
+              setCreating(true);
+            }}
+          >
+            <Plus size={16} strokeWidth={2.5} /> Nueva tienda
+          </button>
         </div>
 
         {error && <p style={{ color: "#b00020" }}>{error}</p>}
-        {loading ? (
-          <p>Cargando…</p>
-        ) : (
-          <div className={adminStyles.adminList}>
-            {landings.map((landing) => (
-              <div key={landing.id} className={adminStyles.adminPanelCard}>
-                <div className={adminStyles.adminPanelHeading}>
-                  <h2>{landing.slug}</h2>
-                  <span>{landing.published ? "Publicada" : "Borrador"}</span>
-                </div>
-                <p style={{ margin: "6px 0", fontSize: "0.9rem" }}>
-                  {landing.user?.fullName} — {landing.user?.email}
-                </p>
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  <button onClick={() => togglePublish(landing)}>
-                    {landing.published ? "Despublicar" : "Publicar"}
-                  </button>
-                  <button onClick={() => startEdit(landing)}>Editar JSON</button>
-                  <button onClick={() => setPendingDelete(landing)} style={{ color: "#b00020" }}>
-                    Borrar
-                  </button>
-                  <Link href="/directorio" target="_blank">
-                    Ver en directorio ↗
-                  </Link>
-                </div>
-              </div>
+
+        <div className={styles.toolbar}>
+          <div className={styles.searchBox}>
+            <Search size={15} />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar tiendas, proveedores o correo..."
+            />
+          </div>
+          <div className={styles.pills}>
+            {FILTERS.map((f) => (
+              <button
+                key={f.key}
+                type="button"
+                className={`${styles.pill} ${filter === f.key ? styles.pillActive : ""}`}
+                onClick={() => setFilter(f.key)}
+              >
+                {f.label}
+              </button>
             ))}
-            {landings.length === 0 && <p>No hay tiendas registradas todavía.</p>}
+          </div>
+          <button type="button" className={styles.sortSelect} onClick={() => setSortNewestFirst((v) => !v)}>
+            <ArrowUpDown size={14} /> {sortNewestFirst ? "Más recientes" : "Más antiguas"}
+          </button>
+        </div>
+
+        <p className={styles.countRow}>{filtered.length} tiendas</p>
+
+        {loading ? (
+          <p className={styles.emptyState}>Cargando…</p>
+        ) : pageItems.length === 0 ? (
+          <p className={styles.emptyState}>No hay tiendas que coincidan con la búsqueda/filtro.</p>
+        ) : (
+          <div className={styles.list}>
+            {pageItems.map((landing) => {
+              const name = landing.user?.fullName || landing.slug;
+              const initial = name.charAt(0).toUpperCase();
+              return (
+                <div key={landing.id} className={styles.card}>
+                  <div className={styles.cardMedia}>
+                    <div className={styles.cardMediaInner}>
+                      <LandingPreview store={landing.store} products={landing.products} standalone />
+                    </div>
+                  </div>
+
+                  <div className={styles.cardBody}>
+                    <span className={styles.avatar} style={{ background: avatarColor(landing.slug) }}>
+                      {initial}
+                    </span>
+                    <div className={styles.identity}>
+                      <strong>{landing.slug}</strong>
+                      <span>{landing.user?.fullName} — {landing.user?.email}</span>
+                    </div>
+                    <span className={`${styles.statusBadge} ${landing.published ? styles.statusPublished : styles.statusDraft}`}>
+                      {landing.published ? "● Publicada" : "● Borrador"}
+                    </span>
+                  </div>
+
+                  <div className={styles.actionsRow}>
+                    <button
+                      className={`${styles.actionBtn} ${landing.published ? "" : styles.actionBtnPublish}`}
+                      onClick={() => togglePublish(landing)}
+                    >
+                      {landing.published ? <EyeOff size={14} /> : <Eye size={14} />}
+                      {landing.published ? "Despublicar" : "Publicar"}
+                    </button>
+                    <button className={styles.actionBtn} onClick={() => startEdit(landing)}>
+                      <Pencil size={14} /> Editar
+                    </button>
+                    <button className={`${styles.actionBtn} ${styles.actionBtnDanger}`} onClick={() => setPendingDelete(landing)}>
+                      <Trash2 size={14} /> Borrar
+                    </button>
+                    <span className={styles.spacer} />
+                    <Link href="/directorio" target="_blank" className={styles.actionBtn}>
+                      <ExternalLink size={14} /> Ver en directorio
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                className={`${styles.pageBtn} ${n === page ? styles.pageBtnActive : ""}`}
+                onClick={() => setPage(n)}
+              >
+                {n}
+              </button>
+            ))}
           </div>
         )}
 
         {editing && (
-          <div className={adminStyles.adminPanelCard} style={{ marginTop: 24 }}>
-            <h2>Editando: {editing.slug}</h2>
-            <label>store (JSON)</label>
-            <textarea
-              value={storeJson}
-              onChange={(e) => setStoreJson(e.target.value)}
-              rows={14}
-              style={{ width: "100%", fontFamily: "monospace", fontSize: "0.8rem" }}
-            />
-            <label>products (JSON)</label>
-            <textarea
-              value={productsJson}
-              onChange={(e) => setProductsJson(e.target.value)}
-              rows={10}
-              style={{ width: "100%", fontFamily: "monospace", fontSize: "0.8rem" }}
-            />
-            {editError && <p style={{ color: "#b00020", fontSize: "0.85rem" }}>{editError}</p>}
-            <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-              <button onClick={saveEdit} disabled={saving}>
-                {saving ? "Guardando…" : "Guardar"}
-              </button>
-              <button onClick={() => setEditing(null)}>Cancelar</button>
+          <div className={styles.modalOverlay} onClick={() => setEditing(null)}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHead}>
+                <h2>Editando: {editing.slug}</h2>
+                <button type="button" className={styles.ghostBtn} onClick={() => setEditing(null)} style={{ padding: 6 }}>
+                  <X size={18} />
+                </button>
+              </div>
+              <p style={{ fontSize: "0.8rem", color: "rgba(17,17,17,0.55)", marginTop: -6, marginBottom: 14 }}>
+                Edición avanzada en JSON — cámbialo solo si sabes lo que estás tocando. El proveedor edita su tienda
+                visualmente desde su propia cuenta; esto es para moderación puntual.
+              </p>
+              <div className={styles.field}>
+                <label>store (JSON)</label>
+                <textarea value={storeJson} onChange={(e) => setStoreJson(e.target.value)} rows={12} />
+              </div>
+              <div className={styles.field}>
+                <label>products (JSON)</label>
+                <textarea value={productsJson} onChange={(e) => setProductsJson(e.target.value)} rows={8} />
+              </div>
+              {editError && <p className={styles.fieldError}>{editError}</p>}
+              <div className={styles.modalActions}>
+                <button className={styles.primaryBtn} onClick={saveEdit} disabled={saving}>
+                  {saving ? "Guardando…" : "Guardar"}
+                </button>
+                <button className={styles.ghostBtn} onClick={() => setEditing(null)}>
+                  Cancelar
+                </button>
+              </div>
             </div>
+          </div>
+        )}
+
+        {creating && (
+          <div className={styles.modalOverlay} onClick={() => setCreating(false)}>
+            <form onSubmit={createStore} className={styles.modal} style={{ maxWidth: 420 }} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHead}>
+                <h2>Nueva tienda</h2>
+                <button type="button" className={styles.ghostBtn} onClick={() => setCreating(false)} style={{ padding: 6 }}>
+                  <X size={18} />
+                </button>
+              </div>
+              <div className={styles.field}>
+                <label>Correo del proveedor (debe tener cuenta ya creada)</label>
+                <input value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="proveedor@correo.com" />
+              </div>
+              <div className={styles.field}>
+                <label>Slug de la tienda</label>
+                <input value={newSlug} onChange={(e) => setNewSlug(e.target.value)} placeholder="mi-tienda" />
+              </div>
+              {createError && <p className={styles.fieldError}>{createError}</p>}
+              <div className={styles.modalActions}>
+                <button type="submit" className={styles.primaryBtn} disabled={createBusy}>
+                  {createBusy ? "Creando…" : "Crear tienda"}
+                </button>
+                <button type="button" className={styles.ghostBtn} onClick={() => setCreating(false)}>
+                  Cancelar
+                </button>
+              </div>
+            </form>
           </div>
         )}
 

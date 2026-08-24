@@ -57,6 +57,26 @@ export default function LoginClient() {
     setTone("neutral");
   }, [selectedAudience]);
 
+  // Si ya hay sesión activa (incluye volver con "atrás" del navegador tras un
+  // login exitoso), saca de /login en vez de mostrar el formulario de nuevo.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/account")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.user) return;
+        const nextPath = searchParams.get("next");
+        const redirectTo =
+          data.user.role === "ADMIN" ? "/admin" : nextPath || `/mi-cuenta?role=${selectedAudience || "cliente"}`;
+        router.replace(redirectTo);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function handleAudienceSelect(role) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("role", role);
@@ -113,7 +133,7 @@ export default function LoginClient() {
 
     setTone("success");
     setMessage(payload.message || "Inicio de sesión correcto.");
-    router.push(redirectTo);
+    router.replace(redirectTo);
     router.refresh();
   }
 
