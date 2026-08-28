@@ -87,6 +87,8 @@ model User {
   role         UserRole @default(CUSTOMER)
   plan         PlanType @default(FREE)
   passwordHash String
+  resetTokenHash      String?
+  resetTokenExpiresAt DateTime?
   logoUrl      String?
   proveedorProLanding ProveedorProLanding?
   orders       Order[]

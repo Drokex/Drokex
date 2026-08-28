@@ -232,6 +232,9 @@ export default function LoginClient() {
                     }
                   </button>
                 </div>
+                <Link href="/recuperar-password" className={styles.authBackLink}>
+                  ¿Olvidaste tu contraseña?
+                </Link>
               </label>
 
               {requiresAdminPin ? (
