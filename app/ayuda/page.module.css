@@ -40,9 +40,69 @@
 }
 .ayudaCatCard h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 16px; color: #fff; letter-spacing: -0.01em; }
 .ayudaCatCard ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.ayudaCatCard ul li { font-size: 0.83rem; color: rgba(255,255,255,0.5); cursor: default; transition: color 0.15s; display: flex; align-items: center; gap: 6px; }
+.ayudaCatCard ul li { font-size: 0.83rem; display: flex; align-items: center; gap: 6px; }
 .ayudaCatCard ul li::before { content: "→"; color: var(--lime); font-size: 0.75rem; opacity: 0.7; }
-.ayudaCatCard ul li:hover { color: rgba(255,255,255,0.85); }
+.ayudaCatCard ul li button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: rgba(255,255,255,0.5);
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.ayudaCatCard ul li button:hover { color: rgba(255,255,255,0.85); }
+
+/* Quick answer popup */
+.qaOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,5,5,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 200;
+}
+.qaCard {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: #0d0d0d;
+  border: 1px solid rgba(127,224,64,0.3);
+  border-radius: 16px;
+  padding: 28px 26px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.qaCard h3 { margin: 0 0 12px; font-size: 1.1rem; font-weight: 800; color: #fff; padding-right: 28px; }
+.qaCard p { margin: 0; font-size: 0.92rem; line-height: 1.6; color: rgba(255,255,255,0.7); }
+.qaClose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.qaClose:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.qaCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  color: var(--lime);
+  font-weight: 700;
+  font-size: 0.88rem;
+  text-decoration: none;
+}
+.qaCta:hover { color: #93ec5c; }
 
 /* FAQ */
 .ayudaFaq { padding: 72px 0; border-top: 1px solid rgba(255,255,255,0.06); }
@@ -70,14 +130,12 @@
 .ayudaFormField { display: flex; flex-direction: column; gap: 7px; }
 .ayudaFormField label { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.7); }
 .ayudaFormField input,
-.ayudaFormField select,
 .ayudaFormField textarea { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 0.9rem; font-family: inherit; outline: none; transition: border-color 0.2s; resize: vertical; }
 .ayudaFormField input::placeholder,
 .ayudaFormField textarea::placeholder { color: rgba(255,255,255,0.28); }
 .ayudaFormField input:focus,
-.ayudaFormField select:focus,
 .ayudaFormField textarea:focus { border-color: var(--lime); }
-.ayudaFormField select option { background: #1a1a1a; color: #fff; }
+.ayudaFormError { margin: 0; font-size: 0.85rem; color: #ff8a8a; }
 .ayudaFormSubmit { margin-top: 6px; padding: 14px 28px; background: var(--lime); color: #111; font-weight: 800; font-size: 0.95rem; border-radius: 10px; border: none; cursor: pointer; transition: background 0.2s, opacity 0.2s; }
 .ayudaFormSubmit:hover { background: #6dd436; }
 .ayudaFormSubmit:disabled { opacity: 0.6; cursor: not-allowed; }

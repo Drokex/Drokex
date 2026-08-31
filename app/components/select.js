@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./select.module.css";
 
-export default function Select({ value, onChange, options, placeholder = "Selecciona", onCreate, createLabel = "Crear nueva" }) {
+export default function Select({ value, onChange, options, placeholder = "Selecciona", onCreate, createLabel = "Crear nueva", variant }) {
   const [open, setOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newValue, setNewValue] = useState("");
@@ -37,7 +37,7 @@ export default function Select({ value, onChange, options, placeholder = "Selecc
   }
 
   return (
-    <div className={styles.selectRoot} ref={rootRef}>
+    <div className={variant === "dark" ? `${styles.selectRoot} ${styles.dark}` : styles.selectRoot} ref={rootRef}>
       <button
         type="button"
         className={styles.selectTrigger}

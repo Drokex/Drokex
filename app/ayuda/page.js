@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { X } from "lucide-react";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import Select from "@/app/components/select";
 import styles from "./page.module.css";
 import spStyles from "@/app/servicios/servicios-proveedor.module.css";
 
@@ -10,22 +12,105 @@ const CATEGORIES = [
   {
     icon: "📦",
     label: "Proveedores",
-    topics: ["Cómo publicar mi catálogo", "Verificación de empresa", "Gestión de mensajes", "Plan Proveedor Pro"],
+    topics: [
+      {
+        label: "Cómo publicar mi catálogo",
+        answer: "Entra a tu panel, ve a “Mis productos” y toca “Crear producto”. Sube fotos, precio y descripción — tu catálogo queda visible en el directorio al instante.",
+        cta: { label: "Ir a Mis productos", href: "/mi-cuenta/productos" },
+      },
+      {
+        label: "Verificación de empresa",
+        answer: "En “Mi cuenta → Empresa” completa tus datos y documentos. El equipo revisa y verifica tu perfil en 24–48 horas hábiles.",
+        cta: { label: "Ir a Empresa", href: "/mi-cuenta/empresa" },
+      },
+      {
+        label: "Gestión de mensajes",
+        answer: "Los mensajes de compradores llegan como cotizaciones. Entra a “Cotizaciones” en tu panel para responder y dar seguimiento a cada chat.",
+        cta: { label: "Ver cotizaciones", href: "/mi-cuenta/cotizaciones/proveedor" },
+      },
+      {
+        label: "Plan Proveedor Pro",
+        answer: "Proveedor Pro desbloquea mensajes ilimitados y mayor visibilidad en el directorio.",
+        cta: { label: "Ver Proveedor Pro", href: "/proveedor-pro" },
+      },
+    ],
   },
   {
     icon: "🛒",
     label: "Clientes",
-    topics: ["Cómo buscar proveedores", "Enviar un mensaje", "Cliente Pro", "Historial de contactos"],
+    topics: [
+      {
+        label: "Cómo buscar proveedores",
+        answer: "Usa el Directorio para filtrar proveedores por categoría, país o producto y contactarlos directamente.",
+        cta: { label: "Ir al Directorio", href: "/directorio" },
+      },
+      {
+        label: "Enviar un mensaje",
+        answer: "Entra al producto que te interesa y toca “Cotizar producto” para abrir un chat directo con el proveedor.",
+        cta: { label: "Ver mis chats", href: "/mi-cuenta/cotizaciones" },
+      },
+      {
+        label: "Cliente Pro",
+        answer: "Con Cliente Pro envías mensajes sin límite y accedes a funciones avanzadas de contacto y seguimiento.",
+        cta: { label: "Ver Cliente Pro", href: "/servicios/cliente" },
+      },
+      {
+        label: "Historial de contactos",
+        answer: "Todos tus chats con proveedores quedan guardados en “Mis chats”, dentro de tu panel de cuenta.",
+        cta: { label: "Ver mis chats", href: "/mi-cuenta/cotizaciones" },
+      },
+    ],
   },
   {
     icon: "👤",
     label: "Mi cuenta",
-    topics: ["Crear cuenta", "Cambiar contraseña", "Actualizar perfil", "Eliminar cuenta"],
+    topics: [
+      {
+        label: "Crear cuenta",
+        answer: "Regístrate gratis eligiendo si eres cliente o proveedor. Toma menos de un minuto.",
+        cta: { label: "Crear cuenta", href: "/registro" },
+      },
+      {
+        label: "Cambiar contraseña",
+        answer: "En la pantalla de inicio de sesión toca “¿Olvidaste tu contraseña?” e ingresa tu correo para recibir el enlace de restablecimiento.",
+        cta: { label: "Recuperar contraseña", href: "/recuperar-password" },
+      },
+      {
+        label: "Actualizar perfil",
+        answer: "Desde tu panel en “Mi cuenta” puedes cambiar tu foto y tus datos básicos en cualquier momento.",
+        cta: { label: "Ir a Mi cuenta", href: "/mi-cuenta" },
+      },
+      {
+        label: "Eliminar cuenta",
+        answer: "Todavía no hay autoeliminado desde el panel. Escríbenos con el formulario de abajo y la eliminamos por ti.",
+        cta: { label: "Ir al formulario", href: "#ayuda-pqr" },
+      },
+    ],
   },
   {
     icon: "💬",
     label: "Chat y mensajes",
-    topics: ["Límites de mensajes", "Mensajes no entregados", "Bloquear un usuario", "Reportar contenido"],
+    topics: [
+      {
+        label: "Límites de mensajes",
+        answer: "Las cuentas básicas tienen un número limitado de mensajes al mes. Con el plan Pro (Proveedor Pro o Cliente Pro) los mensajes son ilimitados.",
+      },
+      {
+        label: "Mensajes no entregados",
+        answer: "Si un mensaje no llega, revisa tu conexión y vuelve a intentarlo. Si el problema sigue, cuéntanos con el formulario de abajo.",
+        cta: { label: "Ir al formulario", href: "#ayuda-pqr" },
+      },
+      {
+        label: "Bloquear un usuario",
+        answer: "Todavía no hay botón de bloqueo dentro del chat. Si alguien te molesta, repórtalo con el formulario de abajo y lo revisamos.",
+        cta: { label: "Ir al formulario", href: "#ayuda-pqr" },
+      },
+      {
+        label: "Reportar contenido",
+        answer: "Usa el formulario de abajo para reportar un producto, mensaje o usuario. Nuestro equipo lo revisa en 24–48 horas.",
+        cta: { label: "Ir al formulario", href: "#ayuda-pqr" },
+      },
+    ],
   },
 ];
 
@@ -58,6 +143,39 @@ const FAQS = [
 
 const PQR_TYPES = ["Petición", "Queja", "Reclamo", "Sugerencia", "Otro"];
 
+function QuickAnswerPopup({ topic, onClose }) {
+  if (!topic) return null;
+  return (
+    <div className={styles.qaOverlay} onClick={onClose}>
+      <div className={styles.qaCard} onClick={(e) => e.stopPropagation()}>
+        <button type="button" className={styles.qaClose} onClick={onClose} aria-label="Cerrar">
+          <X size={18} />
+        </button>
+        <h3>{topic.label}</h3>
+        <p>{topic.answer}</p>
+        {topic.cta && (
+          <a
+            href={topic.cta.href}
+            className={styles.qaCta}
+            onClick={(e) => {
+              onClose();
+              if (topic.cta.href.startsWith("#")) {
+                e.preventDefault();
+                const id = topic.cta.href.slice(1);
+                requestAnimationFrame(() => {
+                  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+              }
+            }}
+          >
+            {topic.cta.label} →
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function FaqAccordion() {
   const [open, setOpen] = useState(null);
   return (
@@ -86,6 +204,7 @@ function PqrForm() {
   const [form, setForm] = useState({ name: "", email: "", type: "", message: "" });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   function handle(e) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -93,10 +212,22 @@ function PqrForm() {
 
   async function submit(e) {
     e.preventDefault();
+    if (!form.type) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 900));
-    setLoading(false);
-    setSent(true);
+    setError("");
+    try {
+      const res = await fetch("/api/pqr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error();
+      setSent(true);
+    } catch {
+      setError("No pudimos enviar tu solicitud. Intenta de nuevo o escríbenos a soporte@drokex.com.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (sent) {
@@ -123,15 +254,19 @@ function PqrForm() {
       </div>
       <div className={styles.ayudaFormField}>
         <label htmlFor="pqr-type">Tipo de solicitud</label>
-        <select id="pqr-type" name="type" required value={form.type} onChange={handle}>
-          <option value="">Selecciona una opción</option>
-          {PQR_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
+        <Select
+          variant="dark"
+          value={form.type}
+          onChange={(v) => setForm((f) => ({ ...f, type: v }))}
+          options={PQR_TYPES}
+          placeholder="Selecciona una opción"
+        />
       </div>
       <div className={styles.ayudaFormField}>
         <label htmlFor="pqr-message">Describe tu caso</label>
         <textarea id="pqr-message" name="message" rows={5} placeholder="Cuéntanos con detalle qué necesitas o qué ocurrió..." required value={form.message} onChange={handle} />
       </div>
+      {error && <p className={styles.ayudaFormError}>{error}</p>}
       <button type="submit" className={styles.ayudaFormSubmit} disabled={loading}>
         {loading ? "Enviando…" : "Enviar solicitud"}
       </button>
@@ -140,6 +275,8 @@ function PqrForm() {
 }
 
 export default function AyudaPage() {
+  const [activeTopic, setActiveTopic] = useState(null);
+
   return (
     <div className={styles.ayudaPage}>
       <SiteHeader />
@@ -164,7 +301,11 @@ export default function AyudaPage() {
                 <span className={styles.ayudaCatIcon}>{cat.icon}</span>
                 <h3>{cat.label}</h3>
                 <ul>
-                  {cat.topics.map((t) => <li key={t}>{t}</li>)}
+                  {cat.topics.map((t) => (
+                    <li key={t.label}>
+                      <button type="button" onClick={() => setActiveTopic(t)}>{t.label}</button>
+                    </li>
+                  ))}
                 </ul>
               </div>
             ))}
@@ -180,7 +321,7 @@ export default function AyudaPage() {
         </div>
       </section>
 
-      <section className={styles.ayudaPqr}>
+      <section id="ayuda-pqr" className={styles.ayudaPqr}>
         <div className={`shell ${styles.ayudaPqrGrid}`}>
           <div className={styles.ayudaPqrInfo}>
             <p className={styles.ayudaPqrTag}>PQR</p>
@@ -191,6 +332,7 @@ export default function AyudaPage() {
         </div>
       </section>
 
+      <QuickAnswerPopup topic={activeTopic} onClose={() => setActiveTopic(null)} />
 
       <SiteFooter />
     </div>

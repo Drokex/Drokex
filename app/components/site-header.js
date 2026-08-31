@@ -133,7 +133,11 @@ function MobileNavPanel({ items, top, onClose, panelRef, sessionChecked, user, a
         {!sessionChecked ? null : user ? (
           <>
             <Link href={accountLink} className="mobile-nav-account-link" onClick={onClose}>
-              <span className="header-account-avatar" aria-hidden="true">
+              <span
+                className="header-account-avatar"
+                aria-hidden="true"
+                style={{ background: user.role === "CUSTOMER" ? "var(--orange)" : "var(--lime)" }}
+              >
                 {(user.fullName || "?").charAt(0).toUpperCase()}
               </span>
               {user.fullName || (lang === "en" ? "My account" : "Mi cuenta")}
@@ -376,7 +380,11 @@ export default function SiteHeader({ hideCountry = false }) {
                 onClick={() => setShowAccountMenu((v) => !v)}
                 aria-expanded={showAccountMenu}
               >
-                <span className="header-account-avatar" aria-hidden="true">
+                <span
+                  className="header-account-avatar"
+                  aria-hidden="true"
+                  style={{ background: user.role === "CUSTOMER" ? "var(--orange)" : "var(--lime)" }}
+                >
                   {(user.fullName || "?").charAt(0).toUpperCase()}
                 </span>
                 <span className="header-user-name">{user.fullName || (lang === "en" ? "My account" : "Mi cuenta")}</span>

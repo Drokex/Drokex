@@ -1235,7 +1235,7 @@ button {
 .cookie-consent {
     left: 12px;
     right: 12px;
-    bottom: 12px;
+    bottom: 100px;
     flex-direction: column;
     align-items: stretch;
   }

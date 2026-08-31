@@ -119,3 +119,23 @@
   cursor: pointer;
   flex-shrink: 0;
 }
+
+/* Dark variant — páginas de fondo oscuro (ej. /ayuda) */
+.dark .selectTrigger {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+}
+.dark .selectTrigger:hover { border-color: rgba(255,255,255,0.24); }
+.dark .selectTrigger[aria-expanded="true"] { border-color: var(--lime); }
+.dark .selectChevron { color: rgba(255,255,255,0.6); }
+.dark .selectPanel {
+  background: #0d0d0d;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+}
+.dark .selectOption { color: #fff; }
+.dark .selectOption:hover { background: rgba(255,255,255,0.06); }
+.dark .selectOption.isSelected { background: rgba(127,224,64,0.14); color: var(--lime); }
