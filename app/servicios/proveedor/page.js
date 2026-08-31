@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
@@ -113,6 +113,7 @@ export default function ProveedorPage() {
   const heroRef = useRef(null);
   useHeroEntrance(heroRef);
   const [activeStep, setActiveStep] = useState(0);
+  const stepsPausedRef = useRef(false);
   const visibleSteps = [-1, 0, 1, 2].map((offset) => {
     const index = (activeStep + offset + steps.length) % steps.length;
     return { ...steps[index], index };
@@ -121,6 +122,13 @@ export default function ProveedorPage() {
   const moveStep = (direction) => {
     setActiveStep((current) => (current + direction + steps.length) % steps.length);
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!stepsPausedRef.current) moveStep(1);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className={styles.spPage}>
@@ -206,7 +214,13 @@ export default function ProveedorPage() {
               </div>
             </aside>
 
-            <div className={styles.spStepsCarousel} aria-live="polite" data-reveal>
+            <div
+              className={styles.spStepsCarousel}
+              aria-live="polite"
+              data-reveal
+              onMouseEnter={() => { stepsPausedRef.current = true; }}
+              onMouseLeave={() => { stepsPausedRef.current = false; }}
+            >
               <button
                 type="button"
                 className={styles.spStepsArrow}

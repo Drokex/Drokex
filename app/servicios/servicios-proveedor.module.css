@@ -350,27 +350,42 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(126px, 1fr));
   gap: 18px;
-  align-items: center;
+  align-items: stretch;
   min-width: 0;
 }
 
 .spStepCard {
   position: relative;
-  min-height: 214px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 246px;
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 18px;
   padding: 20px 16px 18px;
   background: #fff;
   text-align: center;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: spStepCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .spStepCard.isActive {
-  min-height: 246px;
-  border-color: rgba(74,154,26,0.42);
-  box-shadow: 0 8px 20px rgba(74,154,26,0.1);
-  transform: translateY(-8px);
+  border-color: rgba(74,154,26,0.5);
+  box-shadow: 0 14px 32px rgba(74,154,26,0.18);
+  transform: scale(1.08) translateY(-10px);
+  z-index: 2;
+}
+
+@keyframes spStepCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .spStepBadge {
@@ -398,11 +413,6 @@
   margin: 28px auto 10px;
 }
 
-.spStepCard.isActive img {
-  width: 132px;
-  height: 132px;
-  margin-top: 18px;
-}
 
 .spStepCard h3 {
   color: #111;
@@ -448,6 +458,7 @@
   flex-direction: column;
   align-items: center;
   gap: 5px;
+  transition: color 0.35s ease;
 }
 
 .spStepsProgress button::before {
@@ -476,6 +487,7 @@
   place-items: center;
   font-size: 0.62rem;
   font-weight: 800;
+  transition: border-color 0.35s ease, background-color 0.35s ease, color 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .spStepsProgress button.isActive {
@@ -486,6 +498,7 @@
   border-color: #2d8a1f;
   background: #7FE040;
   color: #fff;
+  transform: scale(1.15);
 }
 
 @media (max-width: 1080px) {

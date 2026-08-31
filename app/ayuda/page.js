@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { X } from "lucide-react";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
+import ScrollReveal from "@/app/components/scroll-reveal";
+import { useHeroEntrance } from "@/app/components/use-hero-entrance";
 import Select from "@/app/components/select";
 import styles from "./page.module.css";
 import spStyles from "@/app/servicios/servicios-proveedor.module.css";
@@ -183,7 +185,8 @@ function FaqAccordion() {
       {FAQS.map((item, i) => (
         <div
           key={i}
-          className={`${spStyles.spFaqItem} ${styles.ayudaFaqItem} ${open === i ? spStyles.isOpen : ""}`}
+          data-reveal
+          className={`${spStyles.spFaqItem} ${styles.ayudaFaqItem} ${open === i ? `${spStyles.isOpen} ${styles.isOpen}` : ""}`}
         >
           <button
             className={`${spStyles.spFaqQuestion} ${styles.ayudaFaqQuestion}`}
@@ -193,7 +196,12 @@ function FaqAccordion() {
           >
             {item.q}
           </button>
-          <div id={`ayuda-faq-${i}`} className={`${spStyles.spFaqAnswer} ${styles.ayudaFaqAnswer}`} hidden={open !== i}>{item.a}</div>
+          {/* sin `hidden`: display:none corta la transición de apertura.
+              El span interno es necesario para animar la altura real con
+              grid-template-rows 0fr→1fr (sin max-height mágico). */}
+          <div id={`ayuda-faq-${i}`} className={`${spStyles.spFaqAnswer} ${styles.ayudaFaqAnswer}`}>
+            <span>{item.a}</span>
+          </div>
         </div>
       ))}
     </div>
@@ -276,17 +284,20 @@ function PqrForm() {
 
 export default function AyudaPage() {
   const [activeTopic, setActiveTopic] = useState(null);
+  const heroRef = useRef(null);
+  useHeroEntrance(heroRef);
 
   return (
     <div className={styles.ayudaPage}>
       <SiteHeader />
+      <ScrollReveal />
 
       {/* HERO */}
       <section className={styles.ayudaHero}>
-        <div className="shell">
-          <p className={styles.ayudaHeroTag}>Centro de ayuda</p>
-          <h1>¿En qué podemos <span>ayudarte?</span></h1>
-          <p className={styles.ayudaHeroDesc}>
+        <div className="shell" ref={heroRef}>
+          <p className={styles.ayudaHeroTag} data-hero-item>Centro de ayuda</p>
+          <h1 data-hero-item>¿En qué podemos <span>ayudarte?</span></h1>
+          <p className={styles.ayudaHeroDesc} data-hero-item>
             Encuentra respuestas rápidas en nuestras preguntas frecuentes o envíanos una solicitud y te respondemos en 24–48 h.
           </p>
         </div>
@@ -297,7 +308,7 @@ export default function AyudaPage() {
         <div className="shell">
           <div className={styles.ayudaCategoriesGrid}>
             {CATEGORIES.map((cat) => (
-              <div key={cat.label} className={styles.ayudaCatCard}>
+              <div key={cat.label} className={styles.ayudaCatCard} data-reveal>
                 <span className={styles.ayudaCatIcon}>{cat.icon}</span>
                 <h3>{cat.label}</h3>
                 <ul>
@@ -316,19 +327,21 @@ export default function AyudaPage() {
       {/* FAQ */}
       <section className={styles.ayudaFaq}>
         <div className="shell">
-          <h2>Preguntas <span>frecuentes</span></h2>
+          <h2 data-reveal>Preguntas <span>frecuentes</span></h2>
           <FaqAccordion />
         </div>
       </section>
 
       <section id="ayuda-pqr" className={styles.ayudaPqr}>
         <div className={`shell ${styles.ayudaPqrGrid}`}>
-          <div className={styles.ayudaPqrInfo}>
+          <div className={styles.ayudaPqrInfo} data-reveal>
             <p className={styles.ayudaPqrTag}>PQR</p>
             <h2>¿Necesitas ayuda con un caso específico?</h2>
             <p>Cuéntanos qué ocurrió y nuestro equipo te responderá por correo.</p>
           </div>
-          <PqrForm />
+          <div data-reveal>
+            <PqrForm />
+          </div>
         </div>
       </section>
 

@@ -162,6 +162,7 @@
   width: 72px;
   height: 72px;
   object-fit: contain;
+  margin-inline: auto;
 }
 
 

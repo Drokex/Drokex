@@ -65,6 +65,7 @@
   justify-content: center;
   padding: 20px;
   z-index: 200;
+  animation: qaOverlayIn 0.25s ease;
 }
 .qaCard {
   position: relative;
@@ -75,6 +76,17 @@
   border-radius: 16px;
   padding: 28px 26px;
   box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  animation: qaCardIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes qaOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes qaCardIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to { opacity: 1; transform: none; }
 }
 .qaCard h3 { margin: 0 0 12px; font-size: 1.1rem; font-weight: 800; color: #fff; padding-right: 28px; }
 .qaCard p { margin: 0; font-size: 0.92rem; line-height: 1.6; color: rgba(255,255,255,0.7); }
@@ -110,7 +122,34 @@
 .ayudaFaq h2 span { color: var(--lime); }
 .ayudaFaqItem { border-bottom-color: rgba(255,255,255,0.08) !important; }
 .ayudaFaqQuestion { color: #ffffff !important; }
-.ayudaFaqAnswer { color: rgba(255,255,255,0.65) !important; display: block; max-height: 0; overflow: hidden; padding-bottom: 0; }
+/* Acordeón: grid-template-rows 0fr→1fr anima la altura REAL del texto, así
+   ninguna respuesta larga se corta y la apertura no salta (lo que sí pasaba
+   con un max-height fijo mucho mayor que el contenido). */
+.ayudaFaqAnswer {
+  color: rgba(255,255,255,0.65) !important;
+  display: grid !important;
+  grid-template-rows: 0fr;
+  padding-bottom: 0;
+  opacity: 0;
+  /* visibility saca la respuesta cerrada del árbol de accesibilidad sin usar
+     display:none (que no transiciona); al cerrar se retrasa hasta el final. */
+  visibility: hidden;
+  transition: grid-template-rows 0.35s ease, opacity 0.25s ease, padding-bottom 0.35s ease,
+    visibility 0s linear 0.35s;
+}
+
+.ayudaFaqAnswer > span {
+  overflow: hidden;
+}
+
+.ayudaFaqItem.isOpen .ayudaFaqAnswer {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  padding-bottom: 18px;
+  transition: grid-template-rows 0.35s ease, opacity 0.3s ease 0.05s, padding-bottom 0.35s ease,
+    visibility 0s;
+}
 
 /* PQR Form */
 .ayudaPqr { padding: 80px 0; border-top: 1px solid rgba(255,255,255,0.06); }
@@ -154,4 +193,11 @@
 @media (max-width: 560px) {
   .ayudaCategoriesGrid { grid-template-columns: 1fr; }
   .ayudaFormRow { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qaOverlay,
+  .qaCard { animation: none; }
+  .ayudaFaqAnswer,
+  .ayudaFaqItem.isOpen .ayudaFaqAnswer { transition: none; }
 }

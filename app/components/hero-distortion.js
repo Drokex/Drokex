@@ -83,12 +83,14 @@ export default function HeroDistortion({ image }) {
     window.addEventListener("mousemove", updatePointer);
     window.addEventListener("pointerleave", hidePointer);
     window.addEventListener("mouseleave", hidePointer);
+    window.addEventListener("scroll", hidePointer, { passive: true });
 
     return () => {
       window.removeEventListener("pointermove", updatePointer);
       window.removeEventListener("mousemove", updatePointer);
       window.removeEventListener("pointerleave", hidePointer);
       window.removeEventListener("mouseleave", hidePointer);
+      window.removeEventListener("scroll", hidePointer);
       if (frameRef.current) {
         window.cancelAnimationFrame(frameRef.current);
       }

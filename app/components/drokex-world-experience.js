@@ -472,7 +472,7 @@ export function DrokexWorldSection() {
   return (
     <div style={{ background: "#f4f4f2" }}>
     <div className="shell" style={{ padding: "48px 0" }}>
-    <div className="relative h-[640px] w-full overflow-hidden rounded-[2rem] border border-white/10 bg-black text-white">
+    <div className="relative isolate h-[640px] w-full overflow-hidden rounded-[2rem] border border-white/10 bg-black text-white">
 
       {isMobileViewport && (
         <button
@@ -529,7 +529,7 @@ export function DrokexWorldSection() {
       </div>
 
       {/* ── LEFT PANEL: cómo funciona ── */}
-      <div className="absolute left-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 max-lg:hidden">
+      <div className="absolute left-6 top-24 z-40 flex flex-col gap-4 max-lg:hidden">
         <p className="mb-1 text-[11px] font-bold tracking-[0.22em] text-lime-400/60 uppercase">Cómo funciona</p>
 
         {HOW_IT_WORKS.map((item) => (

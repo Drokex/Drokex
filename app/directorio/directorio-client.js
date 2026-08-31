@@ -152,7 +152,7 @@ function HeroFeatured({ lm = false }) {
 }
 
 // ── Card del grid ──
-function StoreCard({ slug, landing, lm = false, isLocal = false, onDelete }) {
+function StoreCard({ slug, landing, lm = false, isLocal = false, onDelete, index = 0 }) {
   const hero    = useThumbnail(slug, getHero(landing));
   const brand   = getBrand(landing);
   const country = getCountry(landing);
@@ -165,7 +165,11 @@ function StoreCard({ slug, landing, lm = false, isLocal = false, onDelete }) {
   const txtSub  = lm ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.4)";
 
   return (
-    <Link href={`/proveedor-pro/tienda/${slug}`} style={{ textDecoration: "none", display: "flex" }}>
+    <Link
+      href={`/proveedor-pro/tienda/${slug}`}
+      className={styles.dirCardIn}
+      style={{ textDecoration: "none", display: "flex", "--i": index % 12 }}
+    >
       <div
         style={{
           borderRadius: 14, overflow: "hidden",
@@ -406,7 +410,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
 
       {/* ── HERO ─────────────────────────────────────── */}
       {filteredPro.length > 0 && (
-        <section style={{ paddingTop: 0 }}>
+        <section style={{ paddingTop: 0 }} className={styles.dirFadeIn}>
           {/* Eyebrow */}
           <div className="shell" style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -422,7 +426,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
       )}
 
       {/* ── BANNER PATROCINADO ────────────────────────── */}
-      <section style={{ padding: "0 0 32px" }}>
+      <section style={{ padding: "0 0 32px" }} className={styles.dirFadeIn}>
         <div className="shell">
           <div style={{
             borderRadius: 14, overflow: "hidden", lineHeight: 0,
@@ -442,7 +446,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
       <section style={{ padding: "0 0 80px" }}>
         <div className="shell">
           {/* Search bar */}
-          <div className={styles.dirSearchRow}>
+          <div className={`${styles.dirSearchRow} ${styles.dirFadeIn}`}>
             <div className={styles.dirSearchField}>
               <svg style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.3)", pointerEvents: "none" }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
@@ -567,8 +571,8 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
             <div id="directorio-grid">
               {pagedPro.length > 0 ? (
                 <div className={styles.dirGrid}>
-                  {pagedPro.map(({ slug, landing }) => (
-                    <StoreCard key={slug} slug={slug} landing={landing} lm={lm} isLocal={localSlugs.has(slug)} onDelete={isAdmin ? setPendingDeleteSlug : null} />
+                  {pagedPro.map(({ slug, landing }, i) => (
+                    <StoreCard key={slug} index={i} slug={slug} landing={landing} lm={lm} isLocal={localSlugs.has(slug)} onDelete={isAdmin ? setPendingDeleteSlug : null} />
                   ))}
                 </div>
               ) : (

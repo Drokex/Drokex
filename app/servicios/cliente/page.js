@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
@@ -102,6 +102,7 @@ export default function ClientePage() {
   const heroRef = useRef(null);
   useHeroEntrance(heroRef);
   const [activeStep, setActiveStep] = useState(0);
+  const stepsPausedRef = useRef(false);
 
   // mismo patrón que /servicios/proveedor: 4 tarjetas en orden, para que
   // coincida con el grid de 4 columnas (el filtro anterior a veces devolvía
@@ -114,6 +115,13 @@ export default function ClientePage() {
   function moveStep(dir) {
     setActiveStep((s) => (s + dir + steps.length) % steps.length);
   }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!stepsPausedRef.current) moveStep(1);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className={`${styles.spPage} ${styles.spPageCliente}`}>
@@ -216,7 +224,13 @@ export default function ClientePage() {
               </div>
             </aside>
 
-            <div className={styles.spStepsCarousel} aria-live="polite" data-reveal>
+            <div
+              className={styles.spStepsCarousel}
+              aria-live="polite"
+              data-reveal
+              onMouseEnter={() => { stepsPausedRef.current = true; }}
+              onMouseLeave={() => { stepsPausedRef.current = false; }}
+            >
               <button type="button" className={styles.spStepsArrow} aria-label="Paso anterior" onClick={() => moveStep(-1)}>&lt;</button>
               <div className={styles.spStepCards}>
                 {visibleSteps.map((step) => (

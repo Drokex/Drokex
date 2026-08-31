@@ -276,7 +276,6 @@ export default function AboutPage() {
                 <motion.span
                   whileHover={{ rotate: 15, scale: 1.2 }}
                   transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                  style={{ display: "inline-block" }}
                 >
                   <Image src={value.icon} alt="" width={46} height={46} />
                 </motion.span>
