@@ -8,6 +8,7 @@ import CatalogThemeToggle from "@/app/components/catalog-theme-toggle";
 import CatalogSidebar from "@/app/components/catalog-sidebar";
 import CatalogHeroCarousel from "@/app/components/catalog-hero-carousel";
 import CatalogAnimatedGrid from "@/app/components/catalog-animated-grid";
+import CatalogSortMenu from "@/app/components/catalog-sort-menu";
 import styles from "./page.module.css";
 
 const COUNTRY_FLAG = {
@@ -42,6 +43,12 @@ export default async function CategoriasPage({ searchParams }) {
   if (selectedOrigin.length > 0)
     products = products.filter(p => selectedOrigin.includes(p.originCountry));
 
+  const orden = params?.orden;
+  if (orden === "precio-asc") products = [...products].sort((a, b) => a.priceValue - b.priceValue);
+  else if (orden === "precio-desc") products = [...products].sort((a, b) => b.priceValue - a.priceValue);
+  else if (orden === "recientes") products = [...products].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  else if (orden === "nombre") products = [...products].sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <main className={styles.cdkPage}>
       <SiteHeader />
@@ -59,11 +66,7 @@ export default async function CategoriasPage({ searchParams }) {
           {/* Toolbar */}
           <div className={styles.cdkToolbar}>
             <p>Mostrando <strong>{products.length}</strong> resultados disponibles</p>
-            <button className={styles.cdkSortBtn}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-              Más relevantes
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
+            <CatalogSortMenu />
           </div>
 
           {/* Product grid */}

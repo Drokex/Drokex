@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -62,6 +62,28 @@ function RegisterPageInner() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const fileInputRef = useRef(null);
+  const [existingAccount, setExistingAccount] = useState(null);
+
+  // Si ya hay sesión activa del MISMO tipo de cuenta que se quiere crear, no
+  // tiene sentido mostrar el formulario — se manda directo al panel. Si la
+  // sesión es de otro tipo (p.ej. cliente que quiere crear cuenta de
+  // proveedor) se deja seguir, pero se avisa con un mensaje.
+  useEffect(() => {
+    fetch("/api/account", { credentials: "include", cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((payload) => {
+        if (!payload?.user) return;
+        const audience = payload.session?.audience === "proveedor" || payload.user?.role === "PROVIDER"
+          ? "proveedor"
+          : "cliente";
+        if (selectedAudience && audience === selectedAudience) {
+          router.replace(`/mi-cuenta?role=${audience}`);
+          return;
+        }
+        setExistingAccount({ audience });
+      })
+      .catch(() => {});
+  }, [router, selectedAudience]);
 
   function handleLogoChange(e) {
     const file = e.target.files?.[0];
@@ -177,6 +199,18 @@ function RegisterPageInner() {
                     ? "Publica tu catálogo, recibe pedidos y conecta con compradores en toda la región."
                     : "Explora productos, haz seguimiento de tus pedidos y gestiona tu experiencia comercial."}
                 </p>
+                {existingAccount && existingAccount.audience !== selectedAudience && (
+                  <p style={{
+                    margin: "14px 0 0", padding: "10px 14px", borderRadius: 10,
+                    background: "rgba(251, 191, 36, 0.1)", border: "1px solid rgba(251, 191, 36, 0.3)",
+                    color: "#fbbf24", fontSize: "0.85rem", fontWeight: 600,
+                  }}>
+                    Ya tienes una cuenta como {existingAccount.audience === "proveedor" ? "proveedor" : "cliente"}.
+                    {isProvider
+                      ? " Para vender en Drokex crea una cuenta de proveedor con otro correo."
+                      : " Para comprar en Drokex crea una cuenta de cliente con otro correo."}
+                  </p>
+                )}
               </div>
               <button type="button" className={authStyles.authBackLink} onClick={handleBackToSelector}>
                 Cambiar tipo de cuenta

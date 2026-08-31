@@ -1,0 +1,64 @@
+.floatingCard {
+  position: fixed;
+  top: 154px;
+  right: 22px;
+  z-index: 90;
+  width: min(430px, calc(100vw - 32px));
+  max-height: calc(100vh - 184px);
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background: rgba(6, 9, 6, 0.94);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(18px);
+  padding: 16px;
+}
+
+@media (max-width: 860px) {
+  .floatingCard {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 78vh;
+    border-radius: 20px 20px 0 0;
+    border-width: 1px 0 0;
+  }
+}
+
+.toolbar {
+  width: min(1120px, 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .toolbarLeft {
+    justify-content: space-between;
+  }
+  .toolbarRight {
+    justify-content: flex-start;
+  }
+}

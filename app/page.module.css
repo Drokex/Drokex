@@ -935,6 +935,22 @@
   font-weight: 800;
 }
 
+.worldTopBar {
+}
+@media (max-width: 767px) {
+  .worldTopBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .worldTopBarSearch {
+    width: 100%;
+  }
+  .worldTopBarSearch input {
+    width: 100%;
+  }
+}
+
 .worldMobileCloseButton {
   position: absolute;
   top: 14px;

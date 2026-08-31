@@ -320,7 +320,7 @@ function StorePanel({ country, onClose, proLandings = [] }) {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 42 }}
           transition={{ duration: 0.28 }}
-          className="absolute right-5 top-5 z-[70] h-[calc(100%-2.5rem)] w-[360px] overflow-y-auto rounded-[2.2rem] border border-white/10 bg-zinc-950/90 p-5 text-white shadow-2xl shadow-black/60 backdrop-blur-2xl max-lg:bottom-5 max-lg:left-5 max-lg:right-5 max-lg:top-auto max-lg:h-auto max-lg:w-auto"
+          className="absolute right-5 top-5 z-[70] h-[calc(100%-2.5rem)] w-[360px] overflow-y-auto rounded-[2.2rem] border border-white/10 bg-zinc-950/90 p-5 text-white shadow-2xl shadow-black/60 backdrop-blur-2xl max-lg:bottom-5 max-lg:left-5 max-lg:right-5 max-lg:top-auto max-lg:h-auto max-lg:max-h-[75%] max-lg:w-auto"
           onClick={(e) => e.stopPropagation()}
         >
           <div className={`absolute -right-20 -top-20 h-52 w-52 rounded-full ${country.glow} blur-3xl`} />
@@ -491,7 +491,7 @@ export function DrokexWorldSection() {
       </div>
 
       {/* ── TOP BAR ── */}
-      <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 pt-5">
+      <div className={`absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 pt-5 ${styles.worldTopBar}`}>
 
         {/* Brand */}
         <div className="flex items-center gap-3">
@@ -503,7 +503,7 @@ export function DrokexWorldSection() {
         </div>
 
         {/* Search */}
-        <div className="relative">
+        <div className={`relative ${styles.worldTopBarSearch}`}>
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={15} />
           <input
             value={query}

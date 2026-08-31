@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
@@ -259,10 +260,12 @@ const footerStatsIcons = [
 ];
 
 export default function ParaProveedoresPage() {
+  const router = useRouter();
   const [theme, toggleTheme] = useGlobalTheme();
   const lightMode = theme === "light";
   const [lang, setLang] = useState("es");
   const [providerLink, setProviderLink] = useState("/registro?role=proveedor");
+  const providerLinkPromiseRef = useRef(null);
 
   useEffect(() => {
     // Read initial language from localStorage
@@ -276,22 +279,37 @@ export default function ParaProveedoresPage() {
     };
     window.addEventListener("drokex-lang-change", handleLangChange);
 
-    // Check session for provider link
-    fetch("/api/account", { credentials: "include", cache: "no-store" })
+    // Check session for provider link. Se guarda la promesa para que un click
+    // que llegue antes de que resuelva espere el resultado real en vez de
+    // navegar con el href por defecto (esa carrera mandaba a proveedores ya
+    // logueados a /registro).
+    providerLinkPromiseRef.current = fetch("/api/account", { credentials: "include", cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((payload) => {
-        if (!payload?.user) return;
+        if (!payload?.user) return "/registro?role=proveedor";
         const isProvider =
           payload.session?.audience === "proveedor" ||
           (payload.user?.role !== "ADMIN" && payload.user?.role !== "CUSTOMER");
-        if (isProvider) setProviderLink("/mi-cuenta?role=proveedor");
+        const link = isProvider ? "/mi-cuenta?role=proveedor" : "/registro?role=proveedor";
+        setProviderLink(link);
+        return link;
       })
-      .catch(() => {});
+      .catch(() => "/registro?role=proveedor");
 
     return () => {
       window.removeEventListener("drokex-lang-change", handleLangChange);
     };
   }, []);
+
+  function goToProviderArea(e) {
+    e.preventDefault();
+    const promise = providerLinkPromiseRef.current;
+    if (!promise) {
+      router.push(providerLink);
+      return;
+    }
+    promise.then((link) => router.push(link));
+  }
 
   const t = T[lang] || T["es"];
 
@@ -391,7 +409,7 @@ export default function ParaProveedoresPage() {
             {t.heroBody}
           </p>
           <div className={`${styles.providerReveal} ${styles.providerDelay4}`} style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-            <Link className={`${styles.providerCtaPulse} ${styles.providerHoverLift}`} href={providerLink} style={{
+            <Link className={`${styles.providerCtaPulse} ${styles.providerHoverLift}`} href={providerLink} onClick={goToProviderArea} style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               background: "#7FE040", color: "#050505", fontWeight: 700,
               padding: "14px 28px", borderRadius: 10, fontSize: "0.95rem",
@@ -496,7 +514,7 @@ export default function ParaProveedoresPage() {
                     </div>
                   ))}
                 </div>
-                <Link className={styles.providerHoverLift} href={providerLink} style={{
+                <Link className={styles.providerHoverLift} href={providerLink} onClick={goToProviderArea} style={{
                   display: "inline-flex", alignItems: "center", gap: 8,
                   background: "transparent", color: w(0.5), fontWeight: 600,
                   padding: "11px 22px", borderRadius: 10, fontSize: "0.88rem",
@@ -592,7 +610,7 @@ export default function ParaProveedoresPage() {
 
       {/* ── TABLA COMPARATIVA ───────────────────────────── */}
       <section className={`${styles.providerSectionRise} ${styles.providerDelay2}`} style={{ padding: "0 0 80px" }}>
-        <div className={`shell ${styles.providerComparisonLayout}`} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, alignItems: "start" }}>
+        <div className={`shell ${styles.providerComparisonLayout}`} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, alignItems: "stretch" }}>
           <div>
             <h2 style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.7rem)", fontWeight: 800, margin: "0 0 28px" }}>
               {t.compareTitle} <span style={{ color: "#7FE040" }}>{t.compareTitleHighlight}</span>{t.compareTitleEnd}
@@ -643,26 +661,30 @@ export default function ParaProveedoresPage() {
           <div className={styles.providerSideCardAnimated} style={{
             background: card, border: `1px solid ${w(0.1)}`,
             borderRadius: 16, padding: 28, maxWidth: 230, marginTop: 52,
+            display: "flex", flexDirection: "column", justifyContent: "space-between",
           }}>
-            <div style={{
-              width: 52, height: 52, borderRadius: 14, marginBottom: 16,
-              background: "rgba(127, 224, 64, 0.15)", border: "1px solid rgba(127, 224, 64, 0.3)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="2" y1="12" x2="22" y2="12"/>
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-              </svg>
+            <div>
+              <div style={{
+                width: 52, height: 52, borderRadius: 14, marginBottom: 16,
+                background: "rgba(127, 224, 64, 0.15)", border: "1px solid rgba(127, 224, 64, 0.3)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+              </div>
+              <p style={{ color: w(0.85), fontSize: "1rem", lineHeight: 1.6, margin: 0, fontWeight: 600 }}>
+                {t.sideCardBody}
+              </p>
             </div>
-            <p style={{ color: w(0.85), fontSize: "1rem", lineHeight: 1.6, margin: "0 0 22px", fontWeight: 600 }}>
-              {t.sideCardBody}
-            </p>
-            <Link className={styles.providerHoverLift} href={providerLink} style={{
+            <Link className={styles.providerHoverLift} href={providerLink} onClick={goToProviderArea} style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
               background: "transparent", color: txt, fontWeight: 700,
               padding: "12px 18px", borderRadius: 10, fontSize: "0.92rem",
               border: "1px solid rgba(127, 224, 64, 0.5)", textDecoration: "none",
+              marginTop: 22,
             }}>
               {t.sideCardCta} <span style={{ color: "#7FE040" }}>→</span>
             </Link>
@@ -694,7 +716,7 @@ export default function ParaProveedoresPage() {
                 {t.experienceBody1}<br />
                 <strong style={{ color: "rgba(255,255,255,0.85)" }}>{t.experienceBody2}</strong>
               </p>
-              <div className={styles.providerExperienceSteps} style={{ display: "flex", gap: 28 }}>
+              <div className={styles.providerExperienceSteps} style={{ display: "flex", gap: 18 }}>
                 {[
                   { label: t.experienceSteps[0], icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
                   { label: t.experienceSteps[1], icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
@@ -713,7 +735,7 @@ export default function ParaProveedoresPage() {
               </div>
             </div>
 
-            <div className={`${styles.providerFloatingTag} provider-float-a`} style={{ position: "absolute", bottom: "22%", left: "clamp(460px, 34%, 620px)", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(127, 224, 64, 0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
+            <div className={`${styles.providerFloatingTag} provider-float-a`} style={{ position: "absolute", bottom: "22%", left: "clamp(540px, 44%, 720px)", zIndex: 3, background: "rgba(10,10,10,0.82)", border: "1px solid rgba(127, 224, 64, 0.25)", backdropFilter: "blur(8px)", borderRadius: 10, padding: "8px 14px" }}>
               <div style={{ fontWeight: 700, fontSize: "0.82rem", color: "#fff" }}>🏠 Muebles del Sur</div>
               <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 2 }}>🇨🇴 Colombia</div>
             </div>
@@ -842,7 +864,7 @@ export default function ParaProveedoresPage() {
               {t.finalCtaTitle1} <span style={{ color: "#7FE040" }}>{t.finalCtaTitle2}</span><br />
               {t.finalCtaTitle3}
             </h2>
-            <Link className={`${styles.providerCtaPulse} ${styles.providerHoverLift}`} href={providerLink} style={{
+            <Link className={`${styles.providerCtaPulse} ${styles.providerHoverLift}`} href={providerLink} onClick={goToProviderArea} style={{
               display: "inline-flex", alignItems: "center", gap: 10,
               background: "#7FE040", color: "#050505", fontWeight: 800,
               padding: "16px 36px", borderRadius: 12, fontSize: "1rem",

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import SiteHeader from "@/app/components/site-header";
 import LandingPreview, { hexToRgba as _hexToRgba } from "@/app/components/landing-preview";
 import { uploadImage } from "@/app/proveedor-pro/upload-image";
+import editorStyles from "@/app/proveedor-pro/editor.module.css";
 
 const VALID_CODE = "15472007";
 
@@ -205,7 +206,7 @@ export default function ProveedorProPage({
   const countryDropdownRef = useRef(null);
   const countryBtnRef = useRef(null);
   const logoInputRef = useRef(null);
-  const [countryDropdownPos, setCountryDropdownPos] = useState({ top: 0, right: 0 });
+  const [countryDropdownPos, setCountryDropdownPos] = useState({ top: 0, left: 0 });
   const [previewPage, setPreviewPage] = useState("home");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [landingLink, setLandingLink] = useState("");
@@ -327,6 +328,15 @@ export default function ProveedorProPage({
 
         if (!response.ok) {
           router.replace(`/login?role=proveedor&next=${encodeURIComponent("/proveedor-pro")}`);
+          return;
+        }
+
+        const payload = await response.json();
+        const role = payload?.user?.role;
+        if (role !== "PROVIDER" && role !== "ADMIN") {
+          // Cuenta de cliente: no puede entrar al editor de tiendas Pro.
+          // Se manda a crear una cuenta de proveedor (con aviso si ya tiene cliente).
+          router.replace("/registro?role=proveedor");
           return;
         }
 
@@ -822,12 +832,8 @@ export default function ProveedorProPage({
             }}
           >
             <div
+              className={editorStyles.toolbar}
               style={{
-                width: "min(1120px, 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
                 border: "1px solid rgba(0,0,0,0.12)",
                 borderRadius: 18,
                 background: "rgba(255,255,255,0.88)",
@@ -837,7 +843,7 @@ export default function ProveedorProPage({
                 pointerEvents: "auto",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+              <div className={editorStyles.toolbarLeft}>
                 <input
                   ref={logoInputRef}
                   type="file"
@@ -877,7 +883,7 @@ export default function ProveedorProPage({
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              <div className={editorStyles.toolbarRight}>
                 {error && <span style={{ color: "#b91c1c", fontSize: "0.74rem", fontWeight: 800 }}>{error}</span>}
                 {(() => {
                   const COUNTRIES = [
@@ -911,7 +917,9 @@ export default function ProveedorProPage({
                           e.stopPropagation();
                           if (!showCountryDropdown && countryBtnRef.current) {
                             const r = countryBtnRef.current.getBoundingClientRect();
-                            setCountryDropdownPos({ top: r.bottom + 6, right: window.innerWidth - r.right });
+                            const dropdownWidth = 210;
+                            const left = Math.min(Math.max(r.left, 8), window.innerWidth - dropdownWidth - 8);
+                            setCountryDropdownPos({ top: r.bottom + 6, left });
                           }
                           setShowCountryDropdown(v => !v);
                         }}
@@ -926,7 +934,7 @@ export default function ProveedorProPage({
                         <div
                           onMouseDown={e => e.stopPropagation()}
                           onClick={e => e.stopPropagation()}
-                          style={{ position: "fixed", top: countryDropdownPos.top, right: countryDropdownPos.right, zIndex: 99999, background: "#fff", borderRadius: 14, boxShadow: "0 12px 36px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.08)", overflow: "hidden", minWidth: 210 }}
+                          style={{ position: "fixed", top: countryDropdownPos.top, left: countryDropdownPos.left, zIndex: 99999, background: "#fff", borderRadius: 14, boxShadow: "0 12px 36px rgba(0,0,0,0.14)", border: "1px solid rgba(0,0,0,0.08)", overflow: "hidden", minWidth: 210, maxWidth: "calc(100vw - 16px)" }}
                         >
                           <p style={{ margin: 0, padding: "10px 14px 6px", fontSize: "0.7rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.12em", color: "#aaa" }}>Selecciona los países</p>
                           {COUNTRIES.map(c => {
@@ -1593,23 +1601,7 @@ function ClickableImageZone({ value, onUpload, isEditable, className, style, pla
 
 function FloatingEditorCard({ title, onClose, children }) {
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 154,
-        right: 22,
-        zIndex: 90,
-        width: "min(430px, calc(100vw - 32px))",
-        maxHeight: "calc(100vh - 184px)",
-        overflowY: "auto",
-        border: "1px solid rgba(255,255,255,0.12)",
-        borderRadius: 22,
-        background: "rgba(6,9,6,0.94)",
-        boxShadow: "0 28px 80px rgba(0,0,0,0.36)",
-        backdropFilter: "blur(18px)",
-        padding: 16,
-      }}
-    >
+    <div className={editorStyles.floatingCard}>
       <div
         style={{
           position: "sticky",

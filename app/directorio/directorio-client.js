@@ -5,6 +5,7 @@ import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import SidebarAd from "@/app/components/sidebar-ad";
+import { SlidersHorizontal } from "lucide-react";
 import styles from "./directorio.module.css";
 import { useGlobalTheme } from "@/app/components/global-theme";
 
@@ -399,7 +400,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
           <div className="shell" style={{ marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ background: "#7FE040", color: "#050505", fontSize: "0.6rem", fontWeight: 900, letterSpacing: "0.12em", padding: "3px 9px", borderRadius: 6, textTransform: "uppercase" }}>Pro</span>
-              <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "rgba(255,255,255,0.45)" }}>Tiendas Proveedor Pro</span>
+              <span style={{ fontSize: "0.82rem", fontWeight: 700, color: w(0.45) }}>Tiendas Proveedor Pro</span>
             </div>
           </div>
 
@@ -459,7 +460,39 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
             <span style={{ fontSize: "0.78rem", color: w(0.3), fontWeight: 600 }}>
               {filteredPro.length} tienda{filteredPro.length !== 1 ? "s" : ""}
             </span>
-            <button type="button" className={styles.dirFiltersToggle} aria-expanded={filtersOpen} onClick={() => setFiltersOpen((open) => !open)}>Filtros</button>
+            <button
+              type="button"
+              className={styles.dirFiltersToggle}
+              aria-expanded={filtersOpen}
+              onClick={() => setFiltersOpen((open) => !open)}
+              style={{
+                alignSelf: "flex-start",
+                alignItems: "center",
+                gap: 6,
+                minHeight: 44,
+                padding: "0 14px",
+                background: filtersOpen ? "#7FE040" : (lm ? "#fff" : "rgba(255,255,255,0.05)"),
+                border: `1px solid ${filtersOpen ? "#7FE040" : brd}`,
+                borderRadius: 10,
+                color: filtersOpen ? "#050505" : txt,
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                fontFamily: "inherit",
+                cursor: "pointer",
+                boxShadow: lm && !filtersOpen ? "0 2px 8px rgba(0,0,0,0.06)" : "none",
+                position: "relative",
+              }}
+            >
+              <SlidersHorizontal size={16} />
+              Filtros
+              {(selCountry || selCategory) && !filtersOpen && (
+                <span style={{
+                  position: "absolute", top: -3, right: -3, width: 9, height: 9,
+                  borderRadius: "50%", background: "#7FE040",
+                  border: `2px solid ${lm ? "#f4f6f4" : "#040806"}`,
+                }} />
+              )}
+            </button>
           </div>
 
           {/* Sidebar + Grid */}
