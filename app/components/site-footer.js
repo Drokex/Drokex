@@ -1,18 +1,9 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import AprendeLink from "@/app/components/aprende-link";
-
-const exploreLinks = [
-  { label: "Productos", href: "/productos" },
-  { label: "Directorio", href: "/productos" },
-  { label: "Registrate", href: "/registro" },
-];
-
-const companyLinks = [
-  { label: "Registrar Empresa", href: "/registro" },
-  { label: "Iniciar Sesion", href: "/login" },
-  { label: "Publicar Productos", href: "/admin" },
-];
 
 const legalLinks = [
   { label: "Terminos", href: "/" },
@@ -21,6 +12,35 @@ const legalLinks = [
 ];
 
 export default function SiteFooter() {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/account", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.user) setLoggedIn(true);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const exploreLinks = [
+    { label: "Productos", href: "/productos" },
+    { label: "Directorio", href: "/productos" },
+    ...(loggedIn ? [] : [{ label: "Registrate", href: "/registro" }]),
+  ];
+
+  const companyLinks = [
+    ...(loggedIn ? [] : [
+      { label: "Registrar Empresa", href: "/registro" },
+      { label: "Iniciar Sesion", href: "/login" },
+    ]),
+    { label: "Publicar Productos", href: "/admin" },
+  ];
+
   return (
     <footer className="site-footer">
       <div className="site-footer-bar" />

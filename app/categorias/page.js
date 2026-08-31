@@ -84,7 +84,7 @@ export default async function CategoriasPage({ searchParams }) {
                     <Link href={`/producto/${product.slug}`} style={{ position: "absolute", inset: 0, display: "block" }}>
                       <img src={product.image} alt={product.name} style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
                     </Link>
-                    <CatalogHeart />
+                    <CatalogHeart slug={product.slug} />
                   </div>
                   <div className={styles.cdkCardBody}>
                     <div className={styles.cdkCardSupplierRow}>

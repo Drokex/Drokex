@@ -49,6 +49,7 @@ export default function LoginClient() {
   const [message, setMessage] = useState("");
   const [tone, setTone] = useState("neutral");
   const [showPassword, setShowPassword] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
     setMessage(
@@ -64,13 +65,19 @@ export default function LoginClient() {
     fetch("/api/account")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (cancelled || !data?.user) return;
+        if (cancelled) return;
+        if (!data?.user) {
+          setCheckingSession(false);
+          return;
+        }
         const nextPath = searchParams.get("next");
         const redirectTo =
           data.user.role === "ADMIN" ? "/admin" : nextPath || `/mi-cuenta?role=${selectedAudience || "cliente"}`;
         router.replace(redirectTo);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setCheckingSession(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -135,6 +142,14 @@ export default function LoginClient() {
     setMessage(payload.message || "Inicio de sesión correcto.");
     router.replace(redirectTo);
     router.refresh();
+  }
+
+  if (checkingSession) {
+    return (
+      <main className="commerce-page">
+        <SiteHeader />
+      </main>
+    );
   }
 
   return (

@@ -142,6 +142,9 @@ function MobileNavPanel({ items, top, onClose, panelRef, sessionChecked, user, a
               </span>
               {user.fullName || (lang === "en" ? "My account" : "Mi cuenta")}
             </Link>
+            <Link href="/favoritos" className="mobile-nav-link" onClick={onClose}>
+              {lang === "en" ? "My favorites" : "Mis favoritos"}
+            </Link>
             <LogoutButton />
           </>
         ) : (
@@ -394,6 +397,9 @@ export default function SiteHeader({ hideCountry = false }) {
                 <div className="nav-dropdown-menu header-account-menu">
                   <Link href={accountLink} className="nav-dropdown-link" onClick={() => setShowAccountMenu(false)}>
                     {lang === "en" ? "My account" : "Mi cuenta"}
+                  </Link>
+                  <Link href="/favoritos" className="nav-dropdown-link" onClick={() => setShowAccountMenu(false)}>
+                    {lang === "en" ? "My favorites" : "Mis favoritos"}
                   </Link>
                   <div className="nav-dropdown-logout">
                     <LogoutButton />

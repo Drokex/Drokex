@@ -5,6 +5,7 @@ import Link from "next/link";
 import SiteHeader from "@/app/components/site-header";
 import SiteFooter from "@/app/components/site-footer";
 import SidebarAd from "@/app/components/sidebar-ad";
+import ConfirmPopup from "@/app/components/confirm-popup";
 import { SlidersHorizontal } from "lucide-react";
 import styles from "./directorio.module.css";
 import { useGlobalTheme } from "@/app/components/global-theme";
@@ -231,7 +232,15 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
   const [theme, toggleTheme] = useGlobalTheme();
   const lm = theme === "light";
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const PER_PAGE = 24;
+
+  useEffect(() => {
+    fetch("/api/account", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => setIsAdmin(data?.user?.role === "ADMIN"))
+      .catch(() => {});
+  }, []);
 
   // Helpers de tema
   const bg    = lm ? "#f4f6f4" : "#040806";
@@ -312,6 +321,8 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
     setProLandings(c => c.filter(x => x.slug !== slug));
     setLocalSlugs(s => { const n = new Set(s); n.delete(slug); return n; });
   }
+
+  const [pendingDeleteSlug, setPendingDeleteSlug] = useState(null);
 
   const allCountries = [...new Set(proLandings.map(({ landing }) => landing.store?.country).filter(Boolean))].sort();
 
@@ -557,7 +568,7 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
               {pagedPro.length > 0 ? (
                 <div className={styles.dirGrid}>
                   {pagedPro.map(({ slug, landing }) => (
-                    <StoreCard key={slug} slug={slug} landing={landing} lm={lm} isLocal={localSlugs.has(slug)} onDelete={deleteLocalLanding} />
+                    <StoreCard key={slug} slug={slug} landing={landing} lm={lm} isLocal={localSlugs.has(slug)} onDelete={isAdmin ? setPendingDeleteSlug : null} />
                   ))}
                 </div>
               ) : (
@@ -598,6 +609,15 @@ export default function DirectorioPage({ initialSuppliers = [], initialProLandin
       </section>
 
       <SiteFooter />
+
+      <ConfirmPopup
+        open={Boolean(pendingDeleteSlug)}
+        title="Eliminar tienda"
+        message={pendingDeleteSlug ? `¿Eliminar "${pendingDeleteSlug}" del directorio? Esta acción no se puede deshacer.` : ""}
+        confirmLabel="Eliminar"
+        onConfirm={() => { deleteLocalLanding(pendingDeleteSlug); setPendingDeleteSlug(null); }}
+        onCancel={() => setPendingDeleteSlug(null)}
+      />
     </main>
   );
 }

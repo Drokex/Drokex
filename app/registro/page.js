@@ -63,27 +63,26 @@ function RegisterPageInner() {
   const [showPassword, setShowPassword] = useState(false);
   const fileInputRef = useRef(null);
   const [existingAccount, setExistingAccount] = useState(null);
+  const [checkingSession, setCheckingSession] = useState(true);
 
-  // Si ya hay sesión activa del MISMO tipo de cuenta que se quiere crear, no
-  // tiene sentido mostrar el formulario — se manda directo al panel. Si la
-  // sesión es de otro tipo (p.ej. cliente que quiere crear cuenta de
-  // proveedor) se deja seguir, pero se avisa con un mensaje.
+  // Si ya hay sesión activa, no tiene sentido mostrar el selector — se manda
+  // directo al panel. Se gatea el render con checkingSession para que no
+  // alcance a parpadear el selector antes de redirigir.
   useEffect(() => {
     fetch("/api/account", { credentials: "include", cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((payload) => {
-        if (!payload?.user) return;
+        if (!payload?.user) {
+          setCheckingSession(false);
+          return;
+        }
         const audience = payload.session?.audience === "proveedor" || payload.user?.role === "PROVIDER"
           ? "proveedor"
           : "cliente";
-        if (selectedAudience && audience === selectedAudience) {
-          router.replace(`/mi-cuenta?role=${audience}`);
-          return;
-        }
-        setExistingAccount({ audience });
+        router.replace(`/mi-cuenta?role=${audience}`);
       })
-      .catch(() => {});
-  }, [router, selectedAudience]);
+      .catch(() => setCheckingSession(false));
+  }, [router]);
 
   function handleLogoChange(e) {
     const file = e.target.files?.[0];
@@ -135,6 +134,14 @@ function RegisterPageInner() {
     setMessage(payload.message || "Cuenta creada correctamente.");
     router.push(`/mi-cuenta?role=${selectedAudience}`);
     router.refresh();
+  }
+
+  if (checkingSession) {
+    return (
+      <main className="commerce-page">
+        <SiteHeader />
+      </main>
+    );
   }
 
   return (
