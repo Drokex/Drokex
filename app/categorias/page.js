@@ -9,6 +9,7 @@ import CatalogSidebar from "@/app/components/catalog-sidebar";
 import CatalogHeroCarousel from "@/app/components/catalog-hero-carousel";
 import CatalogAnimatedGrid from "@/app/components/catalog-animated-grid";
 import CatalogSortMenu from "@/app/components/catalog-sort-menu";
+import CatalogSearch from "@/app/components/catalog-search";
 import styles from "./page.module.css";
 
 const COUNTRY_FLAG = {
@@ -28,13 +29,30 @@ function toArray(val) {
   return Array.isArray(val) ? val : [val];
 }
 
+// Sin mayúsculas ni tildes: "liquido" encuentra "Líquido".
+function normalizeText(value) {
+  return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
 export default async function CategoriasPage({ searchParams }) {
   const params = await searchParams;
   const selectedCategories = toArray(params?.categoria);
   const selectedAvailability = toArray(params?.disponibilidad);
   const selectedOrigin = toArray(params?.origen);
 
+  const query = normalizeText(toArray(params?.q)[0]).trim().slice(0, 100);
+
   let products = await getProducts();
+
+  if (query) {
+    const terms = query.split(/\s+/);
+    products = products.filter((p) => {
+      const haystack = normalizeText(
+        [p.name, p.supplier, p.sku, p.category, p.shortDescription, p.description].join(" "),
+      );
+      return terms.every((t) => haystack.includes(t));
+    });
+  }
 
   if (selectedCategories.length > 0)
     products = products.filter(p => selectedCategories.includes(p.category));
@@ -63,6 +81,8 @@ export default async function CategoriasPage({ searchParams }) {
           {/* Hero carousel */}
           <CatalogHeroCarousel />
 
+          <CatalogSearch />
+
           {/* Toolbar */}
           <div className={styles.cdkToolbar}>
             <p>Mostrando <strong>{products.length}</strong> resultados disponibles</p>
@@ -73,7 +93,7 @@ export default async function CategoriasPage({ searchParams }) {
           <CatalogAnimatedGrid className={styles.cdkGrid} gridKey={products.map((p) => p.slug).join(",")}>
             {products.length === 0 ? (
               <div className={styles.cdkNoResults}>
-                <p>No hay productos con los filtros seleccionados.</p>
+                <p>No hay productos que coincidan con tu búsqueda o filtros.</p>
                 <Link href="/productos" className={styles.cdkBtnPrimary}>Limpiar filtros</Link>
               </div>
             ) : products.map((product) => {

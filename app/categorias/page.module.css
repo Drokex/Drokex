@@ -400,6 +400,54 @@
   position: relative;
 }
 
+/* Buscador */
+.cdkSearch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.5);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.cdkSearch:focus-within {
+  border-color: rgba(127, 224, 64, 0.6);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.cdkSearch input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.cdkSearch input::placeholder { color: rgba(255, 255, 255, 0.4); }
+.cdkSearch input::-webkit-search-cancel-button { display: none; }
+
+.cdkSearchClear {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cdkSearchClear:hover { background: rgba(255, 255, 255, 0.08); }
+
 .cdkSortBtn {
   display: inline-flex;
   align-items: center;
@@ -746,6 +794,11 @@
 .cdkLight .cdkToolbar { border-color: rgba(0,0,0,0.08); }
 .cdkLight .cdkToolbar p { color: rgba(0,0,0,0.6); }
 .cdkLight .cdkToolbar strong { color: #111; }
+.cdkLight .cdkSearch { background: #fff; border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.5); }
+.cdkLight .cdkSearch:focus-within { border-color: #2d8a1f; background: #fff; }
+.cdkLight .cdkSearch input { color: #111; }
+.cdkLight .cdkSearch input::placeholder { color: rgba(0,0,0,0.4); }
+.cdkLight .cdkSearchClear:hover { background: rgba(0,0,0,0.06); }
 .cdkLight .cdkSortBtn { background: #fff; border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.75); }
 .cdkLight .cdkBtnOutline { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.7); }
 .cdkLight .cdkBottomTrust { background: #fff; border-color: rgba(0,0,0,0.08); }
