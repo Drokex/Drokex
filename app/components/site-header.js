@@ -43,7 +43,6 @@ const menuItemsEs = [
   { label: "Servicios", submenu: [{ label: "Proveedor", href: "/servicios/proveedor" }, { label: "Cliente", href: "/servicios/cliente" }] },
   { label: "Sobre nosotros", href: "/sobre-nosotros" },
   { label: "Ayuda / PQR", href: "/ayuda" },
-  { label: "Home V1", href: "/home-v1" },
 ];
 const menuItemsEn = [
   { label: "Products", href: "/productos" },
@@ -52,7 +51,6 @@ const menuItemsEn = [
   { label: "Services", submenu: [{ label: "Supplier", href: "/servicios/proveedor" }, { label: "Buyer", href: "/servicios/cliente" }] },
   { label: "About us", href: "/sobre-nosotros" },
   { label: "Help / PQR", href: "/ayuda" },
-  { label: "Home V1", href: "/home-v1" },
 ];
 
 function NavDropdown({ item }) {
