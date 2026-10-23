@@ -502,7 +502,7 @@ const toolbarBtn = { width: 34, height: 34, borderRadius: 9, background: "rgba(2
 
 // frame: selector del recuadro real donde se ve la imagen (el hero mide su marco, no el botón de cámara).
 // onUpload(url, { focusX }) — focusX: dónde quedó el sujeto, para encuadrar.
-export function ClickableImageZone({ value, onUpload, isEditable, className, style, children, frame, noWide = false }) {
+export function ClickableImageZone({ value, onUpload, isEditable, className, style, children, frame, noWide = false, layout = null, brandColor = null }) {
   const [hovered, setHovered] = useState(false);
   const [compact, setCompact] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
@@ -563,6 +563,8 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
           targetAspect={targetAspect}
           noWide={noWide}
           currentImage={value || null}
+          layout={layout}
+          brandColor={brandColor}
           onClose={() => setShowWizard(false)}
           onGenerated={(img, meta) => { save(img, meta); setShowWizard(false); }}
           onUploadFile={() => fileRef.current?.click()}
@@ -817,7 +819,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             </>)}
             <button type="button" title="Efectos" onClick={(e) => { const el = e.currentTarget; setFxAnchor((cur) => (cur ? null : el)); }} style={{ ...toolbarBtn, ...(fxAnchor ? { background: "rgba(127,224,64,0.16)", border: "1px solid rgba(127,224,64,0.45)", color: "#7FE040" } : {}) }}><SlidersHorizontal size={16} /></button>
             {fxAnchor && <HeroEffectsPanel store={store} onUpdate={onUpdate} anchor={fxAnchor} onClose={closeFx} onReplay={() => setEntranceReplay((n) => n + 1)} />}
-            <ClickableImageZone value={store.heroImage} frame="[data-hero-frame]" isEditable={isEditable}
+            <ClickableImageZone value={store.heroImage} frame="[data-hero-frame]" layout={layout} brandColor={store.primaryColor} isEditable={isEditable}
               onUpload={(v, meta) => { onUpdate?.("heroImage", v); onUpdate?.("heroImageX", meta?.focusX ?? 50); onUpdate?.("heroImageY", 50); onUpdate?.("heroImageZoom", 1); }}
               style={{ ...toolbarBtn, background: "rgba(127,224,64,0.16)", border: "1px solid rgba(127,224,64,0.45)", overflow: "hidden" }}>
               <Camera size={17} color="#7FE040" />

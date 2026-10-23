@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/app/components/site-header";
 import LandingPreview, { hexToRgba as _hexToRgba, HERO_FX_DEFAULTS } from "@/app/components/landing-preview";
@@ -1105,8 +1106,8 @@ export default function ProveedorProPage({
               <ImageUploader label="Imagen hero" value={store.heroImage} onChange={v => updateStore("heroImage", v)} />
               {store.heroImage && (
                 <button type="button" onClick={() => updateStore("heroImage", "")}
-                  style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(220,50,50,0.4)", background: "rgba(220,50,50,0.08)", color: "#f87171", fontWeight: 800, padding: "8px", cursor: "pointer", fontSize: "0.82rem" }}>
-                  🗑 Eliminar imagen
+                  style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(220,50,50,0.4)", background: "rgba(220,50,50,0.08)", color: "#f87171", fontWeight: 800, padding: "8px", cursor: "pointer", fontSize: "0.82rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <Trash2 size={14} /> Eliminar imagen
                 </button>
               )}
             </FloatingEditorCard>
@@ -1119,8 +1120,8 @@ export default function ProveedorProPage({
               <ImageUploader label="Banner de marca" value={store.bannerSecondary} onChange={v => updateStore("bannerSecondary", v)} />
               {store.bannerSecondary && (
                 <button type="button" onClick={() => updateStore("bannerSecondary", "")}
-                  style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(220,50,50,0.4)", background: "rgba(220,50,50,0.08)", color: "#f87171", fontWeight: 800, padding: "8px", cursor: "pointer", fontSize: "0.82rem" }}>
-                  🗑 Eliminar banner
+                  style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(220,50,50,0.4)", background: "rgba(220,50,50,0.08)", color: "#f87171", fontWeight: 800, padding: "8px", cursor: "pointer", fontSize: "0.82rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <Trash2 size={14} /> Eliminar banner
                 </button>
               )}
             </FloatingEditorCard>

@@ -30,7 +30,16 @@ function dataUrlToFile(dataUrl, name) {
   return new File([buffer], `${name}.${match[2]}`, { type: match[1] });
 }
 
-function buildPrompt({ color, productos, mustInclude, estilo, format, hasMascota, productCount }) {
+// Dónde pone cada plantilla el título sobre la imagen del hero (layout de landing-preview).
+// Océano (split) no está: su imagen va en una columna sin texto encima.
+const LAYOUT_COMPOSITION = {
+  overlay: "The store title will be overlaid on the LEFT side: keep the left part calm and plain, place the subjects large on the right half.",
+  centered: "The store title will be overlaid in the CENTER: keep the middle calm, soft and low-contrast; place the subjects toward the sides and the lower part of the frame.",
+  feature: "The store title will be overlaid on the BOTTOM-LEFT over a dark gradient: place the subjects on the right half, with moody, premium, low-key lighting.",
+  magazine: "The store title will be overlaid across the BOTTOM third over a dark gradient: place the subjects in the upper two-thirds, with an editorial fashion-magazine look.",
+};
+
+function buildPrompt({ color, productos, mustInclude, estilo, format, hasMascota, productCount, layout }) {
   const lines = [
     format === "wide"
       ? "Create a premium horizontal website banner."
@@ -42,7 +51,8 @@ function buildPrompt({ color, productos, mustInclude, estilo, format, hasMascota
   if (hasMascota) lines.push("The FIRST reference image is the brand mascot/character: include it FULLY VISIBLE, keeping its exact design, colors and proportions.");
   if (productCount) lines.push(`${hasMascota ? "The other reference images show" : "The reference images show"} the real products: show them faithfully (same shape, colors, packaging and label design, including any printed text or artwork on them), naturally arranged in the scene.`);
   if (!hasMascota) lines.push("No people, no characters, no animals.");
-  lines.push(format === "wide"
+  if (Object.hasOwn(LAYOUT_COMPOSITION, layout)) lines.push(`Composition: ${LAYOUT_COMPOSITION[layout]}${format === "wide" ? " Keep a narrow strip on the far LEFT edge as plain background, so it blends into a wider banner." : ""} Nothing important touching the edges.`);
+  else lines.push(format === "wide"
     // El cliente ya extiende el banner con espacio vacío a la izquierda (toWideFormat)
     ? "Composition: the subjects are large and prominent, filling the center and right of the frame. Keep only a narrow strip on the far LEFT edge as plain background, so it blends into a wider banner."
     : "Composition: subjects centered and filling most of the frame, with comfortable margins; nothing important touching the edges. Clean commercial photography.");
@@ -85,6 +95,7 @@ export async function POST(request) {
         format,
         hasMascota,
         productCount: productImgs.length,
+        layout: body.layout,
       });
     } else {
       prompt = String(body.prompt || "").trim().slice(0, 1000);

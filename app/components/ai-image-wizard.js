@@ -57,9 +57,11 @@ const STEPS = [
 
 // targetAspect: ancho/alto del recuadro donde va la imagen (medido al abrir).
 // noWide: nunca estirar a banner (fotos de producto). currentImage: imagen ya puesta, editable con IA.
-export default function AiImageWizard({ onClose, onGenerated, onUploadFile, targetAspect = 1.5, noWide = false, currentImage = null }) {
+// layout: plantilla del hero (dónde irá el título), para que la IA deje ese hueco libre.
+// brandColor: color de la tienda, para que el paso 1 arranque con él.
+export default function AiImageWizard({ onClose, onGenerated, onUploadFile, targetAspect = 1.5, noWide = false, currentImage = null, layout = null, brandColor = null }) {
   const [step, setStep]                 = useState(-1); // -1 = pantalla inicial
-  const [color, setColor]               = useState("#7FE040");
+  const [color, setColor]               = useState(/^#[0-9a-f]{6}$/i.test(brandColor || "") ? brandColor : "#7FE040");
   const [productos, setProductos]       = useState("");
   const [tieneMascota, setTieneMascota] = useState(null);
   const [mascotaImg, setMascotaImg]     = useState(null);
@@ -231,6 +233,7 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, targ
       productosImgs: await Promise.all(productosImgs.map(img => shrinkImage(img))),
       estilo,
       format,
+      layout,
     };
     setLastBody(body);
     runRequest(body);
