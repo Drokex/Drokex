@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/app/components/site-header";
-import LandingPreview, { hexToRgba as _hexToRgba } from "@/app/components/landing-preview";
+import LandingPreview, { hexToRgba as _hexToRgba, HERO_FX_DEFAULTS } from "@/app/components/landing-preview";
 import { uploadImage } from "@/app/proveedor-pro/upload-image";
 import editorStyles from "@/app/proveedor-pro/editor.module.css";
 
@@ -13,6 +13,7 @@ const VALID_CODE = "15472007";
 const TEMPLATES = [
   {
     id: "oceano",
+    font: "grotesk", fx: { heroMotion: "parallax", heroEntrance: "fadeup" },
     name: "Océano",
     tag: "Tecnología · Servicios",
     primaryColor: "#0e7490",
@@ -32,6 +33,7 @@ const TEMPLATES = [
   },
   {
     id: "fuego",
+    font: "bold", fx: { heroOverlay: "duotone", heroMotion: "kenburns", heroEntrance: "fadeup" },
     name: "Fuego",
     tag: "Comercio · Retail",
     primaryColor: "#ea580c",
@@ -51,6 +53,7 @@ const TEMPLATES = [
   },
   {
     id: "bosque",
+    font: "serif", fx: { heroOverlay: "light", heroOverlayStrength: 55, heroGrain: true, heroEntrance: "blur" },
     name: "Bosque",
     tag: "Natural · Alimentos · Salud",
     primaryColor: "#15803d",
@@ -70,6 +73,7 @@ const TEMPLATES = [
   },
   {
     id: "noche",
+    font: "luxury", fx: { heroEntrance: "letters", heroGrain: true, heroBlend: true },
     name: "Noche",
     tag: "Premium · Lujo · Exclusivo",
     primaryColor: "#d4af37",
@@ -89,6 +93,7 @@ const TEMPLATES = [
   },
   {
     id: "coral",
+    font: "editorial", fx: { heroOverlay: "duotone", heroEntrance: "letters" },
     name: "Coral",
     tag: "Moda · Belleza · Lifestyle",
     primaryColor: "#db2777",
@@ -437,6 +442,10 @@ export default function ProveedorProPage({
       aboutTitle: tpl.aboutTitle,
       aboutText: tpl.aboutText,
       heroBlock: { xPct: 0, yPct: 0 },
+      // Cada plantilla trae su tipografía y efectos; cambiar de plantilla no arrastra los de la anterior
+      fontHeading: tpl.font,
+      ...HERO_FX_DEFAULTS,
+      ...tpl.fx,
     }));
     setTemplateChosen(true);
   }

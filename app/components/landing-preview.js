@@ -328,6 +328,13 @@ function useHeroTextEntrance(rootRef, mode, replay) {
   }, [rootRef, mode, replay]);
 }
 
+// Tipografía de títulos. Las variables vienen de next/font en app/layout.js.
+const STORE_FONTS = [["system", "Clásica"], ["grotesk", "Geométrica"], ["bold", "Impacto"], ["serif", "Cálida"], ["luxury", "Lujo"], ["editorial", "Editorial"]];
+const FONT_VARS = { grotesk: "var(--font-space-grotesk)", bold: "var(--font-bricolage)", serif: "var(--font-fraunces)", luxury: "var(--font-playfair)", editorial: "var(--font-bodoni)" };
+// Tiendas guardadas antes de existir fontHeading: la fuente sale de su plantilla (layout)
+const LAYOUT_FONT = { split: "grotesk", overlay: "bold", centered: "serif", feature: "luxury", magazine: "editorial" };
+const storeFont = (store) => store.fontHeading || LAYOUT_FONT[store.layout || "overlay"];
+
 const HERO_FILTERS = {
   none: undefined,
   bw: "grayscale(1) contrast(1.08)",
@@ -448,6 +455,12 @@ function HeroEffectsPanel({ store, onUpdate, anchor, onClose, onReplay }) {
           <button type="button" title="Restablecer" onClick={() => Object.entries(HERO_FX_DEFAULTS).forEach(([k, v]) => onUpdate?.(k, v))} style={{ ...toolbarBtn, width: 30, height: 30 }}><RotateCcw size={14} /></button>
           <button type="button" title="Cerrar" onClick={onClose} style={{ ...toolbarBtn, width: 30, height: 30 }}><X size={15} /></button>
         </div>
+      </div>
+      <p style={label}>Tipografía de títulos</p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {STORE_FONTS.map(([value, text]) => (
+          <button key={value} type="button" onClick={() => onUpdate?.("fontHeading", value)} style={{ ...chip(storeFont(store) === value), fontFamily: FONT_VARS[value] }}>{text}</button>
+        ))}
       </div>
       <p style={label}>Entrada del texto</p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
@@ -707,8 +720,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
     <div
       ref={shellRef}
       data-hero-entrance={store.heroEntrance && store.heroEntrance !== "none" ? "" : undefined}
+      data-store-font={FONT_VARS[storeFont(store)] ? "" : undefined}
       className={shellClassName}
-      style={{ backgroundColor: store.surfaceColor, color: store.textColor }}
+      style={{ backgroundColor: store.surfaceColor, color: store.textColor, "--store-font": FONT_VARS[storeFont(store)] }}
     >
       {/* Header */}
       <header style={{
@@ -810,17 +824,22 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             </ClickableImageZone>
           </div>
         );
+        // Detalle propio de Fuego (layout overlay): sticker girado + botón con pulso
+        const sticker = layout === "overlay";
         const heroTextContent = (centered = false, dark = false) => (
           <>
             {(store.promoText || isEditable) && (
-              <span className="rounded-full px-4 py-2 text-sm font-black" style={{ display: "inline-block", backgroundColor: dark ? hexToRgba(store.primaryColor,0.25) : primarySoft, color: dark ? "#fff" : store.primaryColor }}>
-                <EditableText tag="span" value={store.promoText} fontColor={textColor("promoTextColor", dark ? "#fff" : store.primaryColor)} onTextChange={v => onUpdate?.("promoText", v)} onFontColorChange={v => onUpdate?.("promoTextColor", v)} isEditable={isEditable} inline />
-              </span>
+              // Envoltorio: la entrada GSAP anima y limpia el transform del hijo directo; el giro va dentro
+              <span style={{ display: "inline-block" }}><span className="rounded-full px-4 py-2 text-sm font-black" style={sticker
+                ? { display: "inline-block", backgroundColor: store.primaryColor, color: store.buttonTextColor, transform: "rotate(-4deg)", boxShadow: `0 8px 22px ${primaryGlow}`, textTransform: "uppercase", letterSpacing: "0.06em" }
+                : { display: "inline-block", backgroundColor: dark ? hexToRgba(store.primaryColor,0.25) : primarySoft, color: dark ? "#fff" : store.primaryColor }}>
+                <EditableText tag="span" value={store.promoText} fontColor={textColor("promoTextColor", sticker ? store.buttonTextColor : dark ? "#fff" : store.primaryColor)} onTextChange={v => onUpdate?.("promoText", v)} onFontColorChange={v => onUpdate?.("promoTextColor", v)} isEditable={isEditable} inline />
+              </span></span>
             )}
             <EditableText tag="h1" value={store.heroTitle} fontSize={heroTitleSize} fontColor={store.heroTitleColor || (dark ? "#fff" : store.textColor)} onTextChange={v => onUpdate?.("heroTitle", v)} onFontSizeChange={v => onUpdate?.("heroTitleSize", v)} onFontColorChange={v => onUpdate?.("heroTitleColor", v)} isEditable={isEditable} className={`mt-6 font-black leading-none ${centered ? "mx-auto" : "max-w-3xl"}`} />
             <EditableText tag="p" value={store.heroSubtitle} fontSize={heroSubtitleSize} fontColor={store.heroSubtitleColor || (dark ? "rgba(255,255,255,0.7)" : store.mutedTextColor)} onTextChange={v => onUpdate?.("heroSubtitle", v)} onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)} onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)} isEditable={isEditable} className={`mt-4 ${centered ? "mx-auto max-w-lg" : "max-w-xl"}`} />
             <div className={`mt-8 flex gap-3 ${centered ? "justify-center" : ""} flex-wrap`}>
-              <button className="rounded-2xl px-8 py-4 font-black" style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
+              <button className={`rounded-2xl px-8 py-4 font-black ${sticker ? "hero-sig-pulse" : ""}`} style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor, "--sig-color": hexToRgba(store.primaryColor, 0.45) }}>
                 <EditableText tag="span" value={store.ctaText} fontColor={textColor("ctaTextColor", store.buttonTextColor)} onTextChange={v => onUpdate?.("ctaText", v)} onFontColorChange={v => onUpdate?.("ctaTextColor", v)} isEditable={isEditable} inline />
               </button>
               <button className="rounded-2xl px-8 py-4 font-black" style={{ border: `1px solid ${dark ? "rgba(255,255,255,0.2)" : hexToRgba(store.textColor,0.15)}`, color: dark ? "#fff" : store.textColor, background: "transparent" }}>
@@ -832,8 +851,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── SPLIT (Océano): text left | image right explicit ── */
         if (layout === "split") return (
-          <section id="inicio" data-hero-frame style={{ display: "grid", gridTemplateColumns: standalone ? "1fr 1fr" : "1fr 1fr", backgroundColor: store.backgroundColor, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, position: "relative" }}>
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: standalone ? "56px 40px 56px 56px" : "56px 40px" }}>
+          <section id="inicio" data-hero-frame style={{ display: "grid", gridTemplateColumns: standalone ? "1fr 1fr" : "1fr 1fr", backgroundColor: store.backgroundColor, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, position: "relative", overflow: "clip" }}>
+            <div aria-hidden className="hero-sig-mesh" style={{ position: "absolute", inset: "-20%", pointerEvents: "none", backgroundImage: `radial-gradient(circle at 20% 30%, ${hexToRgba(store.primaryColor, 0.22)}, transparent 40%), radial-gradient(circle at 70% 70%, ${hexToRgba(store.gradientToColor || store.primaryColor, 0.2)}, transparent 45%), radial-gradient(circle at 45% 90%, ${hexToRgba(store.gradientFromColor || store.primaryColor, 0.14)}, transparent 40%)` }} />
+            <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "center", padding: standalone ? "56px 40px 56px 56px" : "56px 40px" }}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {heroTextContent()}
               </DraggableBlock>
@@ -875,7 +895,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             <HeroImageLayer store={store} />
             {imgToolbar}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.38) 55%, transparent 85%)" }} />
-            <div style={{ position: "relative", zIndex: 2, padding: standalone ? "56px 48px" : "56px 40px", maxWidth: "58%" }}>
+            <div className="hero-feature-text" style={{ position: "relative", zIndex: 2, padding: standalone ? "56px 48px" : "56px 40px", maxWidth: "58%" }}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {(store.promoText || isEditable) && (
                   <span className="rounded-full px-4 py-1.5 text-xs font-black uppercase tracking-widest mb-6 self-start" style={{ backgroundColor: hexToRgba(store.primaryColor,0.25), color: store.primaryColor, letterSpacing: "0.2em", display: "inline-block" }}>
@@ -885,7 +905,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
                 <EditableText tag="h1" value={store.heroTitle} fontSize={Math.min((heroTitleSize*1.25)|0, 80)} fontColor={store.heroTitleColor||"#fff"} onTextChange={v => onUpdate?.("heroTitle", v)} onFontSizeChange={v => onUpdate?.("heroTitleSize", v)} onFontColorChange={v => onUpdate?.("heroTitleColor", v)} isEditable={isEditable} className="font-black leading-none" />
                 <div style={{ width: 48, height: 4, borderRadius: 2, background: store.primaryColor, margin: "20px 0" }} />
                 <EditableText tag="p" value={store.heroSubtitle} fontSize={heroSubtitleSize} fontColor={store.heroSubtitleColor||"rgba(255,255,255,0.72)"} onTextChange={v => onUpdate?.("heroSubtitle", v)} onFontSizeChange={v => onUpdate?.("heroSubtitleSize", v)} onFontColorChange={v => onUpdate?.("heroSubtitleColor", v)} isEditable={isEditable} className="max-w-md mb-8" />
-                <button className="rounded-2xl px-8 py-4 font-black self-start" style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
+                <button className="hero-sig-shimmer rounded-2xl px-8 py-4 font-black self-start" style={{ backgroundColor: store.primaryColor, color: store.buttonTextColor }}>
                   <EditableText tag="span" value={store.ctaText} fontColor={textColor("ctaTextColor", store.buttonTextColor)} onTextChange={v => onUpdate?.("ctaText", v)} onFontColorChange={v => onUpdate?.("ctaTextColor", v)} isEditable={isEditable} inline />
                 </button>
               </DraggableBlock>
@@ -899,6 +919,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
             <HeroImageLayer store={store} />
             {imgToolbar}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)" }} />
+            {store.brand && <p aria-hidden className="hidden md:block" style={{ position: "absolute", right: 28, bottom: 48, zIndex: 1, margin: 0, writingMode: "vertical-rl", transform: "rotate(180deg)", fontFamily: "var(--store-font)", fontStyle: "italic", fontSize: "0.85rem", letterSpacing: "0.45em", textTransform: "uppercase", color: "rgba(255,255,255,0.7)", whiteSpace: "nowrap", maxHeight: "calc(100% - 96px)", overflow: "hidden", textOverflow: "ellipsis" }}>{store.brand}</p>}
             <div style={{ position: "relative", zIndex: 2, padding: standalone ? "0 48px 48px" : "0 40px 56px", maxWidth: 800 }}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {(store.promoText || isEditable) && (

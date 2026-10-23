@@ -2,6 +2,16 @@ import "./globals.css";
 import CookieConsent from "@/app/components/cookie-consent";
 import AdPopup from "@/app/components/ad-popup";
 import GlobalTheme from "@/app/components/global-theme";
+import { Space_Grotesk, Bricolage_Grotesque, Fraunces, Playfair_Display, Bodoni_Moda } from "next/font/google";
+
+// Tipografías de las plantillas de tiendas (landing-preview usa var(--font-*)). Sin preload:
+// el navegador solo descarga la que pinta cada tienda. next/font exige opciones literales.
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], display: "swap", preload: false, variable: "--font-space-grotesk" });
+const bricolage = Bricolage_Grotesque({ subsets: ["latin"], display: "swap", preload: false, variable: "--font-bricolage" });
+const fraunces = Fraunces({ subsets: ["latin"], display: "swap", preload: false, variable: "--font-fraunces" });
+const playfair = Playfair_Display({ subsets: ["latin"], display: "swap", preload: false, variable: "--font-playfair" });
+const bodoni = Bodoni_Moda({ subsets: ["latin"], display: "swap", preload: false, variable: "--font-bodoni" });
+const storeFontVars = [spaceGrotesk, bricolage, fraunces, playfair, bodoni].map((f) => f.variable).join(" ");
 
 export const metadata = {
   title: "Drokex",
@@ -10,7 +20,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" data-scroll-behavior="smooth" data-theme="dark">
+    <html lang="es" data-scroll-behavior="smooth" data-theme="dark" className={storeFontVars}>
       <body>
         <GlobalTheme />
         {children}
