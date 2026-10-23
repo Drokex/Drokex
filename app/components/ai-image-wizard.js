@@ -1,36 +1,81 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { Briefcase, Palette, Sparkles, Leaf, Paperclip, Check, X, RefreshCw, Wand2 } from "lucide-react";
 
-function hexToRgba(hex, alpha) {
-  const h = hex.replace("#", "").padEnd(6, "0").slice(0, 6);
-  const n = parseInt(h, 16);
-  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+// Reduce fotos del usuario antes de subirlas (Vercel corta el body en 4.5 MB)
+function shrinkImage(dataUrl, max = 1024) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      // PNG si puede traer transparencia (mascota recortada), JPEG si no
+      resolve(dataUrl.startsWith("data:image/png") ? canvas.toDataURL("image/png") : canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.src = dataUrl;
+  });
 }
 
+async function urlToDataUrl(url) {
+  if (url.startsWith("data:")) return url;
+  const blob = await (await fetch(url)).blob();
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Tamaños que acepta el modelo, según la forma
+const SIZE_BY_ASPECT = (a) => (a >= 1.2 ? "1536x1024" : a <= 0.8 ? "1024x1536" : "1024x1024");
+
+const LOADING_MESSAGES = [
+  [0,  "Preparando la escena..."],
+  [6,  "Dibujando tu imagen..."],
+  [18, "Ajustando luces y detalles..."],
+  [35, "Dando los últimos toques..."],
+];
+
 const STYLES = [
-  { id: "profesional", label: "Profesional", emoji: "💼", desc: "Limpio, serio y moderno" },
-  { id: "alegre",      label: "Alegre",       emoji: "🎨", desc: "Colorido y llamativo" },
-  { id: "elegante",    label: "Elegante",     emoji: "✨", desc: "Lujoso y sofisticado" },
-  { id: "natural",     label: "Natural",      emoji: "🌿", desc: "Orgánico y fresco" },
+  { id: "profesional", label: "Profesional", Icon: Briefcase, desc: "Limpio, serio y moderno" },
+  { id: "alegre",      label: "Alegre",       Icon: Palette,   desc: "Colorido y llamativo" },
+  { id: "elegante",    label: "Elegante",     Icon: Sparkles,  desc: "Lujoso y sofisticado" },
+  { id: "natural",     label: "Natural",      Icon: Leaf,      desc: "Orgánico y fresco" },
 ];
 
 const STEPS = [
   { id: "color",       title: "¿Cuál es el color principal de tu marca?",     sub: "Elige el color que más representa tu negocio." },
-  { id: "productos",   title: "¿Qué productos o servicios ofreces?",           sub: "Descríbelos brevemente. Ej: café molido, café en grano." },
+  { id: "productos",   title: "¿Qué productos o servicios ofreces?",           sub: "Descríbelos brevemente y, si quieres, di qué debe aparecer sí o sí." },
   { id: "mascota",     title: "¿Tu marca tiene mascota o personaje?",          sub: "Si tienes una imagen de referencia, súbela para incluirla." },
   { id: "fotoproducto",title: "¿Quieres mostrar productos en el banner?",      sub: "Opcional — sube hasta 3 fotos de tus productos." },
   { id: "estilo",      title: "¿Qué estilo quieres para tu banner?",           sub: "Elige el que mejor describe tu marca." },
 ];
 
-export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bannerLabel = "banner" }) {
+// targetAspect: ancho/alto del recuadro donde va la imagen (medido al abrir).
+// noWide: nunca estirar a banner (fotos de producto). currentImage: imagen ya puesta, editable con IA.
+export default function AiImageWizard({ onClose, onGenerated, onUploadFile, targetAspect = 1.5, noWide = false, currentImage = null }) {
   const [step, setStep]                 = useState(-1); // -1 = pantalla inicial
   const [color, setColor]               = useState("#7FE040");
   const [productos, setProductos]       = useState("");
   const [tieneMascota, setTieneMascota] = useState(null);
   const [mascotaImg, setMascotaImg]     = useState(null);
   const [productosImgs, setProductosImgs] = useState([]);
+  const [mustInclude, setMustInclude]   = useState("");
   const [estilo, setEstilo]             = useState("profesional");
   const [loading, setLoading]           = useState(false);
+  const [partial, setPartial]           = useState(null);   // imagen a medio generar (stream)
+  const [elapsed, setElapsed]           = useState(0);
+  const [result, setResult]             = useState(null);   // imagen cruda del modelo
+  const [preview, setPreview]           = useState(null);   // lo que se va a usar (banner ya compuesto)
+  const [lastBody, setLastBody]         = useState(null);
+  const [changeText, setChangeText]     = useState("");
+  const [showChange, setShowChange]     = useState(false);
+  const [focusX, setFocusX]             = useState(50);     // dónde queda el sujeto (% horizontal) para encuadrar
+  const [openingCurrent, setOpeningCurrent] = useState(false);
   const [error, setError]               = useState("");
   const mascotaRef     = useRef(null);
   const productoRef    = useRef(null);
@@ -65,126 +110,236 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
     return true;
   }
 
-  // Construye referencia combinada: mascota (dcha) + fotos producto (izq) en un canvas
-  function buildReferenceImage(mascotUrl, productoUrls) {
+  // Extiende la imagen a la forma ancha del recuadro, con relleno del color del borde izquierdo.
+  // Devuelve también focusX: dónde quedó el sujeto, para que el encuadre (móvil) no caiga en el relleno.
+  function toWideFormat(imageUrl) {
     return new Promise((resolve) => {
-      const SIZE = 1024;
-      const canvas = document.createElement("canvas");
-      canvas.width = SIZE;
-      canvas.height = SIZE;
-      const ctx = canvas.getContext("2d");
-      ctx.fillStyle = "#f0f0f0";
-      ctx.fillRect(0, 0, SIZE, SIZE);
-
-      const loadImg = (url) => new Promise((res) => {
-        const i = new Image(); i.onload = () => res(i); i.src = url;
-      });
-
-      Promise.all([loadImg(mascotUrl), ...productoUrls.map(loadImg)]).then(([mascot, ...prods]) => {
-        // Mascota en mitad derecha
-        const mScale = Math.min((SIZE / 2) / mascot.width, SIZE / mascot.height);
-        const mw = mascot.width * mScale, mh = mascot.height * mScale;
-        ctx.drawImage(mascot, SIZE / 2 + (SIZE / 2 - mw) / 2, (SIZE - mh) / 2, mw, mh);
-
-        // Productos en mitad izquierda (hasta 3, apilados)
-        if (prods.length > 0) {
-          const cellH = SIZE / prods.length;
-          prods.forEach((p, i) => {
-            const pScale = Math.min((SIZE / 2 - 16) / p.width, (cellH - 8) / p.height);
-            const pw = p.width * pScale, ph = p.height * pScale;
-            ctx.drawImage(p, (SIZE / 2 - pw) / 2, i * cellH + (cellH - ph) / 2, pw, ph);
-          });
-        }
-
-        // Línea divisoria sutil
-        ctx.strokeStyle = "rgba(0,0,0,0.15)";
-        ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(SIZE / 2, 0); ctx.lineTo(SIZE / 2, SIZE); ctx.stroke();
-
-        resolve(canvas.toDataURL("image/png"));
-      });
-    });
-  }
-
-  // Extiende la imagen generada a formato banner horizontal con degradado
-  function toBannerFormat(imageUrl, brandColor) {
-    return new Promise((resolve) => {
-      const BANNER_W = 1920;
-      const BANNER_H = 600;
-      const canvas = document.createElement("canvas");
-      canvas.width = BANNER_W;
-      canvas.height = BANNER_H;
-      const ctx = canvas.getContext("2d");
-
-      ctx.fillStyle = brandColor;
-      ctx.fillRect(0, 0, BANNER_W, BANNER_H);
-
       const img = new Image();
       img.onload = () => {
-        const scale = BANNER_H / img.height;
-        const sw = img.width * scale;
-        const x = BANNER_W - sw;
-        ctx.drawImage(img, x, 0, sw, BANNER_H);
+        const H = 800;
+        const W = Math.round(H * Math.min(targetAspect, 3.2));
+        const sw = img.width * (H / img.height);
+        if (W <= sw + 1) return resolve({ image: imageUrl, focusX: 50 });
 
-        // Degradado solo en la zona de unión — no toca el contenido de la imagen
+        const canvas = document.createElement("canvas");
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext("2d");
+        // Color real del borde izquierdo, no el hex de marca: el modelo nunca clava el tono y se notaba la costura
+        const probe = document.createElement("canvas");
+        probe.width = 1; probe.height = 1;
+        const pctx = probe.getContext("2d");
+        pctx.drawImage(img, 0, 0, Math.max(1, Math.round(img.width * 0.04)), img.height, 0, 0, 1, 1);
+        const [r, g, b] = pctx.getImageData(0, 0, 1, 1).data;
+
+        // Si el borde izquierdo no es un fondo liso (mesa, escena), estirarlo deja una costura:
+        // mejor devolverla tal cual y que el recuadro la recorte un poco arriba/abajo
+        const strip = document.createElement("canvas");
+        strip.width = 1; strip.height = 12;
+        const sctx = strip.getContext("2d");
+        sctx.drawImage(img, 0, 0, Math.max(1, Math.round(img.width * 0.02)), img.height, 0, 0, 1, 12);
+        const px = sctx.getImageData(0, 0, 1, 12).data;
+        let maxDiff = 0;
+        for (let i = 0; i < px.length; i += 4) maxDiff = Math.max(maxDiff, Math.abs(px[i] - r) + Math.abs(px[i + 1] - g) + Math.abs(px[i + 2] - b));
+        if (maxDiff > 60) return resolve({ image: imageUrl, focusX: 50 });
+
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(0, 0, W, H);
+
+        const x = W - sw;
+        ctx.drawImage(img, x, 0, sw, H);
         const blendW = Math.min(sw * 0.18, 220);
         const grad = ctx.createLinearGradient(x, 0, x + blendW, 0);
-        grad.addColorStop(0, brandColor);
-        grad.addColorStop(0.7, hexToRgba(brandColor, 0.3));
-        grad.addColorStop(1, "rgba(0,0,0,0)");
+        grad.addColorStop(0, `rgb(${r},${g},${b})`);
+        grad.addColorStop(0.7, `rgba(${r},${g},${b},0.3)`);
+        grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
         ctx.fillStyle = grad;
-        ctx.fillRect(x, 0, blendW, BANNER_H);
+        ctx.fillRect(x, 0, blendW, H);
 
-        resolve(canvas.toDataURL("image/png"));
+        resolve({ image: canvas.toDataURL("image/jpeg", 0.9), focusX: Math.round(((x + sw * 0.55) / W) * 100) });
       };
       img.src = imageUrl;
     });
   }
 
-  async function handleGenerate() {
+  useEffect(() => {
+    if (!loading) return;
+    const t0 = Date.now();
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - t0) / 1000)), 500);
+    return () => clearInterval(id);
+  }, [loading]);
+
+  const format = !noWide && targetAspect >= 1.7 ? "wide" : targetAspect >= 1.2 ? "landscape" : targetAspect <= 0.8 ? "portrait" : "square";
+  const isBanner = format === "wide";
+  const frameRatio = format === "portrait" ? "2 / 3" : format === "square" ? "1 / 1" : "3 / 2";
+  const frameMaxWidth = format === "portrait" ? 300 : format === "square" ? 440 : "none";
+
+  async function runRequest(body) {
     setLoading(true);
     setError("");
+    setPartial(null);
+    setElapsed(0);
+    setShowChange(false);
     try {
-      // Si hay mascota + fotos de producto, crear imagen de referencia combinada
-      let refImg = tieneMascota ? mascotaImg : null;
-      if (tieneMascota && mascotaImg && productosImgs.length > 0) {
-        refImg = await buildReferenceImage(mascotaImg, productosImgs);
-      }
-
       const res = await fetch("/api/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          guided: true,
-          color,
-          productos: productos.trim(),
-          tieneMascota,
-          mascotaImg: refImg,
-          tieneProductosImg: productosImgs.length > 0,
-          estilo,
-          bannerLabel,
-        }),
+        body: JSON.stringify(body),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error generando imagen");
-      const isBanner = bannerLabel !== "imagen";
-      const finalImage = isBanner ? await toBannerFormat(data.image, color) : data.image;
-      onGenerated(finalImage);
-      onClose();
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Error generando imagen");
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "", finalImage = null;
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const msg = JSON.parse(line);
+          if (msg.type === "partial") setPartial(msg.image);
+          else if (msg.type === "done") finalImage = msg.image;
+          else if (msg.type === "error") throw new Error(msg.error);
+        }
+      }
+      if (!finalImage) throw new Error("La generación se cortó, intenta de nuevo");
+      setResult(finalImage);
+      const composed = isBanner ? await toWideFormat(finalImage) : { image: finalImage, focusX: 50 };
+      setPreview(composed.image);
+      setFocusX(composed.focusX);
+      setChangeText("");
     } catch (err) {
       setError(err.message);
+    } finally {
       setLoading(false);
     }
   }
 
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
-      onClick={() => { if (!loading) onClose(); }}>
-      <div style={{ background: "#0f0f0f", border: "1px solid rgba(127,224,64,0.25)", borderRadius: 24, padding: "36px 32px", width: "100%", maxWidth: 500, position: "relative" }}
+  async function handleGenerate() {
+    const body = {
+      guided: true,
+      color,
+      productos: productos.trim(),
+      mustInclude: mustInclude.trim(),
+      tieneMascota,
+      mascotaImg: tieneMascota && mascotaImg ? await shrinkImage(mascotaImg) : null,
+      productosImgs: await Promise.all(productosImgs.map(img => shrinkImage(img))),
+      estilo,
+      format,
+    };
+    setLastBody(body);
+    runRequest(body);
+  }
+
+  function handleChange() {
+    if (!changeText.trim() || !result) return;
+    // Se pide ya con la forma del recuadro destino, así no hay que estirarla después
+    runRequest({ edit: { image: result, instruction: changeText.trim(), size: SIZE_BY_ASPECT(targetAspect) } });
+  }
+
+  // Editar con IA la imagen que ya está puesta, sin generar una nueva desde cero
+  async function openCurrent() {
+    setOpeningCurrent(true);
+    setError("");
+    try {
+      setResult(await shrinkImage(await urlToDataUrl(currentImage), 1536));
+      setPreview(currentImage);
+      setFocusX(50);
+      setLastBody(null);
+      setShowChange(true);
+    } catch {
+      setError("No se pudo abrir la imagen actual");
+    } finally {
+      setOpeningCurrent(false);
+    }
+  }
+
+  function usePreview() {
+    if (preview !== currentImage) onGenerated(preview, { focusX });
+    onClose();
+  }
+
+  const loadingMessage = [...LOADING_MESSAGES].reverse().find(([t]) => elapsed >= t)[1];
+  const busy = loading || !!preview;
+
+  return createPortal(
+    <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, overflowY: "auto" }}
+      onClick={() => { if (!busy) onClose(); }}>
+      <div style={{ background: "#0f0f0f", border: "1px solid rgba(127,224,64,0.25)", borderRadius: 24, padding: "36px 32px", width: "100%", maxWidth: (loading || preview) ? 640 : 500, position: "relative", margin: "auto" }}
         onClick={e => e.stopPropagation()}>
 
+        {/* Generando: progreso en vivo con la imagen a medio dibujar */}
+        {loading && (
+          <div style={{ textAlign: "center" }}>
+            <p style={{ color: "#7FE040", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 8px" }}>Drokex Estudio</p>
+            <h3 style={{ color: "#fff", fontSize: "1.15rem", fontWeight: 800, margin: "0 0 18px" }}>{loadingMessage}</h3>
+            <div style={{ position: "relative", width: "100%", maxWidth: frameMaxWidth, margin: "0 auto", aspectRatio: frameRatio, borderRadius: 16, overflow: "hidden", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+              {/* Mientras llega el primer parcial, la imagen anterior (si es un cambio u otra versión) */}
+              {partial || result
+                ? <img src={partial || result} alt="Generando" style={{ width: "100%", height: "100%", objectFit: "cover", filter: partial ? "blur(2px)" : "blur(6px) brightness(0.6)", transition: "filter 0.4s" }} />
+                : <div className="ai-wizard-shimmer" style={{ position: "absolute", inset: 0 }} />}
+            </div>
+            <div style={{ marginTop: 16, height: 4, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+              {/* ponytail: progreso estimado (~40s), la API no da porcentaje real */}
+              <div style={{ height: "100%", width: `${Math.min(95, (elapsed / 40) * 100)}%`, background: "#7FE040", transition: "width 0.5s linear" }} />
+            </div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.78rem", margin: "10px 0 0" }}>{elapsed}s · suele tardar entre 20 y 40 segundos</p>
+            <style>{`.ai-wizard-shimmer{background:linear-gradient(110deg,rgba(255,255,255,0.03) 30%,rgba(127,224,64,0.12) 50%,rgba(255,255,255,0.03) 70%);background-size:200% 100%;animation:aiWizardShimmer 1.4s linear infinite}@keyframes aiWizardShimmer{to{background-position:-200% 0}}`}</style>
+          </div>
+        )}
+
+        {/* Vista previa: usar, generar otra o pedir un cambio */}
+        {!loading && preview && (
+          <div>
+            <p style={{ color: "#7FE040", fontSize: "0.72rem", fontWeight: 900, letterSpacing: "0.15em", textTransform: "uppercase", margin: "0 0 8px" }}>Vista previa</p>
+            <h3 style={{ color: "#fff", fontSize: "1.15rem", fontWeight: 800, margin: "0 0 16px" }}>¿Te gusta cómo quedó?</h3>
+            <img src={preview} alt="Imagen generada" style={{ width: "auto", maxWidth: "100%", maxHeight: "55vh", margin: "0 auto", borderRadius: 16, border: "1px solid rgba(255,255,255,0.1)", display: "block" }} />
+
+            {showChange ? (
+              <div style={{ marginTop: 16 }}>
+                <textarea value={changeText} onChange={e => setChangeText(e.target.value)} rows={3} autoFocus
+                  placeholder="Ej: agrega una taza con vapor al lado del empaque, haz el fondo más oscuro"
+                  style={{ ...inputStyle, resize: "vertical" }} />
+                <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                  <button type="button" onClick={() => setShowChange(false)} style={secondaryBtn}>Cancelar</button>
+                  <button type="button" onClick={handleChange} disabled={!changeText.trim()}
+                    style={{ ...primaryBtn, opacity: changeText.trim() ? 1 : 0.4, cursor: changeText.trim() ? "pointer" : "not-allowed" }}>
+                    <Wand2 size={16} strokeWidth={2.5} /> Aplicar cambio
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <button type="button" onClick={usePreview} style={{ ...primaryBtn, width: "100%", marginTop: 16 }}>
+                  <Check size={17} strokeWidth={3} /> Usar esta imagen
+                </button>
+                <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                  <button type="button" onClick={() => setShowChange(true)} style={secondaryBtn}>
+                    <Wand2 size={15} /> Pedir un cambio
+                  </button>
+                  {lastBody && (
+                    <button type="button" onClick={() => runRequest(lastBody)} style={secondaryBtn}>
+                      <RefreshCw size={15} /> Generar otra
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+            {error && <p style={{ color: "#f87171", fontSize: "0.8rem", marginTop: 12 }}>{error}</p>}
+            <button type="button" onClick={onClose}
+              style={{ width: "100%", borderRadius: 12, border: "none", background: "transparent", color: "rgba(255,255,255,0.3)", padding: "12px 10px 0", fontWeight: 600, cursor: "pointer", fontSize: "0.8rem" }}>
+              Descartar
+            </button>
+          </div>
+        )}
+
         {/* Pantalla inicial de selección */}
-        {step === -1 && (
+        {!busy && step === -1 && (
           <div>
             {/* Header llamativo */}
             <div style={{ textAlign: "center", marginBottom: 24 }}>
@@ -226,6 +381,15 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
               <span style={{ color: "#050505", fontWeight: 900, fontSize: "0.97rem" }}>Crear con Drokex Estudio</span>
             </button>
 
+            {/* Editar con IA la imagen actual */}
+            {currentImage && (
+              <button type="button" onClick={openCurrent} disabled={openingCurrent}
+                style={{ width: "100%", borderRadius: 14, border: "1.5px solid rgba(127,224,64,0.35)", background: "rgba(127,224,64,0.06)", padding: "13px 18px", cursor: openingCurrent ? "wait" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, marginBottom: 10, color: "#7FE040", fontWeight: 800, fontSize: "0.88rem" }}>
+                <Wand2 size={16} /> {openingCurrent ? "Abriendo imagen..." : "Editar la imagen actual con IA"}
+              </button>
+            )}
+            {!busy && step === -1 && error && <p style={{ color: "#f87171", fontSize: "0.8rem", margin: "0 0 10px", textAlign: "center" }}>{error}</p>}
+
             {/* Opción subir imagen */}
             {onUploadFile && (
               <button type="button" onClick={() => { onUploadFile(); onClose(); }}
@@ -243,7 +407,7 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
         )}
 
         {/* Barra de progreso (solo en pasos del wizard) */}
-        {step >= 0 && (<>
+        {!busy && step >= 0 && (<>
         <div style={{ display: "flex", gap: 6, marginBottom: 28 }}>
           {STEPS.map((s, i) => (
             <div key={s.id} style={{ flex: 1, height: 4, borderRadius: 4, background: i <= step ? "#7FE040" : "rgba(255,255,255,0.1)", transition: "background 0.3s" }} />
@@ -281,9 +445,17 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
 
         {/* PASO: PRODUCTOS (texto) */}
         {current.id === "productos" && (
-          <textarea value={productos} onChange={e => setProductos(e.target.value)} rows={4}
-            placeholder="Ej: Café molido premium, café en grano, café instantáneo, té verde"
-            style={{ ...inputStyle, resize: "vertical" }} />
+          <div>
+            <textarea value={productos} onChange={e => setProductos(e.target.value)} rows={3}
+              placeholder="Ej: Café molido premium, café en grano, café instantáneo, té verde"
+              style={{ ...inputStyle, resize: "vertical" }} />
+            <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: "0.8rem", fontWeight: 700, margin: "16px 0 8px" }}>
+              ¿Algo que deba aparecer sí o sí? <span style={{ color: "rgba(255,255,255,0.3)", fontWeight: 500 }}>(opcional)</span>
+            </label>
+            <textarea value={mustInclude} onChange={e => setMustInclude(e.target.value)} rows={2}
+              placeholder="Ej: una taza de café humeante, una prensa francesa"
+              style={{ ...inputStyle, resize: "vertical" }} />
+          </div>
         )}
 
         {/* PASO: MASCOTA */}
@@ -306,7 +478,9 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
                 </p>
                 <button type="button" onClick={() => mascotaRef.current?.click()}
                   style={{ width: "100%", border: "2px dashed rgba(127,224,64,0.35)", borderRadius: 14, background: "rgba(127,224,64,0.04)", padding: "18px", cursor: "pointer", color: "#7FE040", fontWeight: 700, fontSize: "0.85rem" }}>
-                  {mascotaImg ? "✓ Imagen cargada — clic para cambiar" : "📎 Subir imagen de la mascota"}
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    {mascotaImg ? <><Check size={16} strokeWidth={3} /> Imagen cargada — clic para cambiar</> : <><Paperclip size={16} /> Subir imagen de la mascota</>}
+                  </span>
                 </button>
                 <input ref={mascotaRef} type="file" accept="image/*" onChange={handleMascotaFile} style={{ display: "none" }} />
                 {mascotaImg && (
@@ -325,7 +499,7 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
                 <div key={i} style={{ position: "relative" }}>
                   <img src={img} alt={`producto ${i+1}`} style={{ width: 90, height: 90, objectFit: "cover", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)" }} />
                   <button type="button" onClick={() => setProductosImgs(prev => prev.filter((_, j) => j !== i))}
-                    style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#f87171", border: "none", color: "#fff", fontSize: "0.7rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900 }}>✕</button>
+                    style={{ position: "absolute", top: -6, right: -6, width: 20, height: 20, borderRadius: "50%", background: "#f87171", border: "none", color: "#fff", fontSize: "0.7rem", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900 }}><X size={12} strokeWidth={3} /></button>
                 </div>
               ))}
               {productosImgs.length < 3 && (
@@ -348,7 +522,7 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
                 style={{ padding: "18px 14px", borderRadius: 14, border: `2px solid ${estilo === s.id ? "#7FE040" : "rgba(255,255,255,0.1)"}`,
                   background: estilo === s.id ? "rgba(127,224,64,0.1)" : "rgba(255,255,255,0.03)",
                   cursor: "pointer", textAlign: "left" }}>
-                <div style={{ fontSize: "1.6rem", marginBottom: 6 }}>{s.emoji}</div>
+                <s.Icon size={24} color={estilo === s.id ? "#7FE040" : "rgba(255,255,255,0.7)"} style={{ marginBottom: 8 }} />
                 <div style={{ color: estilo === s.id ? "#7FE040" : "#fff", fontWeight: 800, fontSize: "0.92rem" }}>{s.label}</div>
                 <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", marginTop: 2 }}>{s.desc}</div>
               </button>
@@ -375,15 +549,28 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, bann
           ) : (
             <button type="button" onClick={handleGenerate} disabled={loading || !canNext()}
               style={{ flex: 2, borderRadius: 12, border: "none", background: loading ? "rgba(127,224,64,0.4)" : "#7FE040", color: "#050505", padding: "13px", fontWeight: 900, cursor: loading ? "not-allowed" : "pointer", fontSize: "0.88rem" }}>
-              {loading ? "Creando tu banner... ⏳" : "✦ Crear mi banner"}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <Sparkles size={16} strokeWidth={2.5} /> {isBanner ? "Crear mi banner" : "Crear mi imagen"}
+              </span>
             </button>
           )}
         </div>
         </>)}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
+
+const primaryBtn = {
+  flex: 2, borderRadius: 12, border: "none", background: "#7FE040", color: "#050505", padding: "13px",
+  fontWeight: 900, cursor: "pointer", fontSize: "0.9rem", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+};
+
+const secondaryBtn = {
+  flex: 1, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.75)",
+  padding: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.85rem", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7,
+};
 
 const inputStyle = {
   width: "100%", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)",

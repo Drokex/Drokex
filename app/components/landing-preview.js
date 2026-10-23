@@ -3,8 +3,9 @@
 import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { buildMarketPrice, inferCurrencyFromOriginCountry, COUNTRY_PREFERENCE_STORAGE_KEY } from "@/lib/market-pricing";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, ZoomIn, ZoomOut, Trash2, Camera } from "lucide-react";
 import AiImageWizard from "@/app/components/ai-image-wizard";
+import { uploadImage } from "@/app/proveedor-pro/upload-image";
 
 export function hexToRgba(hex, alpha) {
   const normalized = (hex || "#000000").replace("#", "");
@@ -288,18 +289,45 @@ function DraggableBlock({ xPct, yPct, onChange, isEditable, children, style }) {
   );
 }
 
-export function ClickableImageZone({ value, onUpload, isEditable, className, style, children, bannerLabel = "banner" }) {
+// Imagen del hero como capa (no background-image) para poder hacer zoom además de encuadrar
+function HeroImageLayer({ store }) {
+  if (!store.heroImage) return null;
+  const x = store.heroImageX ?? 50, y = store.heroImageY ?? 50, zoom = store.heroImageZoom ?? 1;
+  return (
+    <img src={store.heroImage} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: `${x}% ${y}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, transformOrigin: `${x}% ${y}%`, pointerEvents: "none" }} />
+  );
+}
+
+const toolbarBtn = { width: 34, height: 34, borderRadius: 9, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, flexShrink: 0 };
+
+// frame: selector del recuadro real donde se ve la imagen (el hero mide su marco, no el botón de cámara).
+// onUpload(url, { focusX }) — focusX: dónde quedó el sujeto, para encuadrar.
+export function ClickableImageZone({ value, onUpload, isEditable, className, style, children, frame, noWide = false }) {
   const [hovered, setHovered] = useState(false);
   const [compact, setCompact] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
+  const [targetAspect, setTargetAspect] = useState(1.5);
   const fileRef = useRef(null);
+
+  // Sube a Storage y guarda la URL: el base64 dentro del JSONB de la landing cuelga el pooler
+  async function save(fileOrDataUrl, meta) {
+    try {
+      let file = fileOrDataUrl;
+      if (typeof file === "string") {
+        const blob = await (await fetch(file)).blob();
+        file = new File([blob], `imagen.${blob.type.split("/")[1] || "jpg"}`, { type: blob.type });
+      }
+      onUpload(await uploadImage(file), meta);
+    } catch (error) {
+      console.error("[landing] subida fallida:", error.message);
+      // Imagen generada (ya pagada): mejor guardarla en base64 que perderla
+      if (typeof fileOrDataUrl === "string") onUpload(fileOrDataUrl, meta);
+    }
+  }
 
   function handleFile(event) {
     const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => onUpload(e.target.result);
-    reader.readAsDataURL(file);
+    if (file) save(file);
   }
 
   if (!isEditable) return <div className={className} style={style}>{children}</div>;
@@ -309,7 +337,12 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
       <div
         className={className}
         style={{ position: "relative", cursor: "pointer", ...style }}
-        onClick={(e) => { if (e.target.isContentEditable || e.target.closest("[contenteditable]")) return; setShowWizard(true); }}
+        onClick={(e) => {
+          if (e.target.isContentEditable || e.target.closest("[contenteditable]")) return;
+          const box = ((frame && e.currentTarget.closest(frame)) || e.currentTarget).getBoundingClientRect();
+          if (box.width && box.height) setTargetAspect(box.width / box.height);
+          setShowWizard(true);
+        }}
         onMouseEnter={(e) => { setCompact(e.currentTarget.offsetWidth < 170 || e.currentTarget.offsetHeight < 110); setHovered(true); }}
         onMouseLeave={() => setHovered(false)}
       >
@@ -327,9 +360,11 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
 
       {showWizard && (
         <AiImageWizard
-          bannerLabel={bannerLabel}
+          targetAspect={targetAspect}
+          noWide={noWide}
+          currentImage={value || null}
           onClose={() => setShowWizard(false)}
-          onGenerated={(img) => { onUpload(img); setShowWizard(false); }}
+          onGenerated={(img, meta) => { save(img, meta); setShowWizard(false); }}
           onUploadFile={() => fileRef.current?.click()}
         />
       )}
@@ -394,7 +429,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
   const renderProductCard = (product, index) => {
     const imgZone = (cls, sty = {}) => (
-      <ClickableImageZone value={product.image} onUpload={v => { const c=[...products]; c[index]={...c[index],image:v}; onUpdate?.("__products__",c); }} isEditable={isEditable} className={`overflow-hidden ${cls}`} style={{ backgroundColor: store.backgroundColor, ...sty }}>
+      <ClickableImageZone value={product.image} noWide onUpload={v => { const c=[...products]; c[index]={...c[index],image:v}; onUpdate?.("__products__",c); }} isEditable={isEditable} className={`overflow-hidden ${cls}`} style={{ backgroundColor: store.backgroundColor, ...sty }}>
         {product.image ? <img src={product.image} alt={product.name||"Producto"} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center" style={{ color: store.mutedTextColor, minHeight: 120 }}><EditableText tag="span" value={product.imageLabel||"Imagen"} fontColor={productTextColor(product,"imageLabelColor",store.mutedTextColor)} onTextChange={v=>updateProductField(index,"imageLabel",v)} onFontColorChange={v=>updateProductField(index,"imageLabelColor",v)} isEditable={isEditable} inline /></div>}
       </ClickableImageZone>
     );
@@ -557,22 +592,26 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         const heroBlockYPct = store.heroBlock?.yPct || 0;
         const heroBlockChange = isEditable ? (xPct, yPct) => onUpdate?.("heroBlock", { xPct, yPct }) : null;
 
-        const imgUploadBtn = isEditable && (
-          <ClickableImageZone value={store.heroImage} onUpload={v => onUpdate?.("heroImage", v)} isEditable={isEditable}
-            style={{ position: "absolute", top: 12, right: 12, zIndex: 30, borderRadius: 12, overflow: "hidden", width: 44, height: 44, background: "rgba(0,0,0,0.5)", border: "1px solid rgba(127,224,64,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7FE040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          </ClickableImageZone>
-        );
-        const imgPosControls = isEditable && store.heroImage && (
-          <div style={{ position: "absolute", top: 12, right: 64, zIndex: 30, display: "flex", gap: 4 }}>
-            {[["←","heroImageX",-10,0],["↑","heroImageY",-10,0],["↓","heroImageY",10,100],["→","heroImageX",10,100]].map(([label,field,delta,clamp],i)=>(
-              <button key={i} type="button" title={label} onClick={() => onUpdate?.(field, delta<0 ? Math.max(clamp,(store[field]??50)+delta) : Math.min(clamp,(store[field]??50)+delta))}
-                style={{ width:36,height:36,borderRadius:10,background:"rgba(0,0,0,0.6)",border:"1px solid rgba(255,255,255,0.2)",color:"#fff",fontSize:"1rem",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center" }}>{label}</button>
-            ))}
-            <button type="button" title="Eliminar imagen" onClick={() => onUpdate?.("heroImage", "")}
-              style={{ width:36,height:36,borderRadius:10,background:"rgba(180,20,20,0.75)",border:"1px solid rgba(255,100,100,0.3)",color:"#fff",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center" }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-            </button>
+        // Mover = la imagen va hacia donde apunta la flecha (object-position al revés)
+        const nudge = (field, delta) => onUpdate?.(field, Math.max(0, Math.min(100, (store[field] ?? 50) + delta)));
+        const heroZoom = store.heroImageZoom ?? 1;
+        const setZoom = (z) => onUpdate?.("heroImageZoom", Math.round(Math.max(1, Math.min(2.5, z)) * 100) / 100);
+        const imgToolbar = isEditable && (
+          <div style={{ position: "absolute", top: 12, right: 12, zIndex: 20, display: "flex", flexWrap: "wrap", justifyContent: "flex-end", gap: 4, padding: 4, borderRadius: 13, background: "rgba(8,8,8,0.72)", border: "1px solid rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", maxWidth: "calc(100% - 24px)" }}>
+            {store.heroImage && (<>
+              <button type="button" title="Alejar" disabled={heroZoom <= 1} onClick={() => setZoom(heroZoom - 0.25)} style={{ ...toolbarBtn, opacity: heroZoom <= 1 ? 0.35 : 1 }}><ZoomOut size={16} /></button>
+              <button type="button" title="Acercar" disabled={heroZoom >= 2.5} onClick={() => setZoom(heroZoom + 0.25)} style={{ ...toolbarBtn, opacity: heroZoom >= 2.5 ? 0.35 : 1 }}><ZoomIn size={16} /></button>
+              <button type="button" title="Mover a la izquierda" onClick={() => nudge("heroImageX", 10)} style={toolbarBtn}><ArrowLeft size={16} /></button>
+              <button type="button" title="Mover arriba" onClick={() => nudge("heroImageY", 10)} style={toolbarBtn}><ArrowUp size={16} /></button>
+              <button type="button" title="Mover abajo" onClick={() => nudge("heroImageY", -10)} style={toolbarBtn}><ArrowDown size={16} /></button>
+              <button type="button" title="Mover a la derecha" onClick={() => nudge("heroImageX", -10)} style={toolbarBtn}><ArrowRight size={16} /></button>
+              <button type="button" title="Eliminar imagen" onClick={() => onUpdate?.("heroImage", "")} style={{ ...toolbarBtn, background: "rgba(220,38,38,0.22)", border: "1px solid rgba(248,113,113,0.35)", color: "#fca5a5" }}><Trash2 size={15} /></button>
+            </>)}
+            <ClickableImageZone value={store.heroImage} frame="[data-hero-frame]" isEditable={isEditable}
+              onUpload={(v, meta) => { onUpdate?.("heroImage", v); onUpdate?.("heroImageX", meta?.focusX ?? 50); onUpdate?.("heroImageY", 50); onUpdate?.("heroImageZoom", 1); }}
+              style={{ ...toolbarBtn, background: "rgba(127,224,64,0.16)", border: "1px solid rgba(127,224,64,0.45)", overflow: "hidden" }}>
+              <Camera size={17} color="#7FE040" />
+            </ClickableImageZone>
           </div>
         );
         const heroTextContent = (centered = false, dark = false) => (
@@ -597,29 +636,28 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── SPLIT (Océano): text left | image right explicit ── */
         if (layout === "split") return (
-          <section id="inicio" style={{ display: "grid", gridTemplateColumns: standalone ? "1fr 1fr" : "1fr 1fr", backgroundColor: store.backgroundColor, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, position: "relative" }}>
+          <section id="inicio" data-hero-frame style={{ display: "grid", gridTemplateColumns: standalone ? "1fr 1fr" : "1fr 1fr", backgroundColor: store.backgroundColor, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, position: "relative" }}>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: standalone ? "56px 40px 56px 56px" : "56px 40px" }}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {heroTextContent()}
               </DraggableBlock>
             </div>
-            <div style={{ position: "relative", overflow: "hidden" }}>
-              {imgUploadBtn}
-              {imgPosControls}
+            <div data-hero-frame style={{ position: "relative", overflow: "hidden" }}>
               {store.heroImage
-                ? <img src={store.heroImage} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: `${store.heroImageX??50}% ${store.heroImageY??50}%` }} />
+                ? <HeroImageLayer store={store} />
                 : <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor}, ${store.gradientToColor||store.primaryColor})` }} />
               }
+              {imgToolbar}
             </div>
           </section>
         );
 
         /* ── CENTERED (Bosque): full-width centered text, gradient bg ── */
         if (layout === "centered") return (
-          <section id="inicio" style={{ position: "relative", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? `url(${store.heroImage})` : `radial-gradient(ellipse at 50% -10%, ${primaryGlow}, transparent 55%), radial-gradient(ellipse at 80% 100%, ${hexToRgba(store.primaryColor,0.12)}, transparent 40%)`, backgroundSize: "cover", backgroundPosition: `${store.heroImageX??50}% ${store.heroImageY??50}%`, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, padding: standalone ? "72px 24px" : "80px 32px" }}>
-            {imgUploadBtn}
-            {imgPosControls}
-            <div style={{ maxWidth: 780, width: "100%", margin: "0 auto" }}>
+          <section id="inicio" data-hero-frame style={{ position: "relative", overflow: "hidden", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `radial-gradient(ellipse at 50% -10%, ${primaryGlow}, transparent 55%), radial-gradient(ellipse at 80% 100%, ${hexToRgba(store.primaryColor,0.12)}, transparent 40%)`, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, padding: standalone ? "72px 24px" : "80px 32px" }}>
+            <HeroImageLayer store={store} />
+            {imgToolbar}
+            <div style={{ position: "relative", maxWidth: 780, width: "100%", margin: "0 auto" }}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {heroTextContent(true)}
               </DraggableBlock>
@@ -629,19 +667,17 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── FEATURE (Noche): full-bleed bg + text anchored bottom-left ── */
         if (layout === "feature") return (
-          <section id="inicio" style={{
+          <section id="inicio" data-hero-frame style={{
             position: "relative", overflow: "hidden",
             backgroundColor: store.backgroundColor,
             backgroundImage: store.heroImage
-              ? `url(${store.heroImage})`
+              ? undefined
               : `linear-gradient(160deg, ${store.gradientFromColor||store.primaryColor} 0%, ${store.gradientToColor||store.primaryColor} 100%)`,
-            backgroundSize: "cover",
-            backgroundPosition: store.heroImage ? `${store.heroImageX??50}% ${store.heroImageY??50}%` : "center",
             minHeight: standalone ? "clamp(520px,68vh,760px)" : 520,
             display: "flex", flexDirection: "column", justifyContent: "flex-end",
           }}>
-            {imgUploadBtn}
-            {imgPosControls}
+            <HeroImageLayer store={store} />
+            {imgToolbar}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.38) 55%, transparent 85%)" }} />
             <div style={{ position: "relative", zIndex: 2, padding: standalone ? "56px 48px" : "56px 40px", maxWidth: "58%" }}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
@@ -663,9 +699,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── MAGAZINE (Coral): bg image full + accent stripe bottom ── */
         if (layout === "magazine") return (
-          <section id="inicio" style={{ position: "relative", overflow: "hidden", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? `url(${store.heroImage})` : `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor} 0%, ${store.gradientToColor||store.primaryColor} 100%)`, backgroundSize: "cover", backgroundPosition: `${store.heroImageX??50}% ${store.heroImageY??50}%`, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-            {imgUploadBtn}
-            {imgPosControls}
+          <section id="inicio" data-hero-frame style={{ position: "relative", overflow: "hidden", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor} 0%, ${store.gradientToColor||store.primaryColor} 100%)`, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+            <HeroImageLayer store={store} />
+            {imgToolbar}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)" }} />
             <div style={{ position: "relative", zIndex: 2, padding: standalone ? "0 48px 48px" : "0 40px 56px", maxWidth: 800 }}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
@@ -692,10 +728,10 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── OVERLAY (default / Fuego): text overlay on bg image ── */
         return (
-          <section id="inicio" className={heroClassName} style={{ minHeight: standalone ? "clamp(520px,68vh,760px)" : undefined, backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? `url(${store.heroImage})` : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)`, backgroundSize: store.heroImage ? "cover" : undefined, backgroundPosition: store.heroImage ? `${store.heroImageX??50}% ${store.heroImageY??50}%` : undefined }}>
-            {imgUploadBtn}
-            {imgPosControls}
-            <div className={`${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
+          <section id="inicio" data-hero-frame className={heroClassName} style={{ overflow: "hidden", minHeight: standalone ? "clamp(520px,68vh,760px)" : undefined, backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)` }}>
+            <HeroImageLayer store={store} />
+            {imgToolbar}
+            <div className={`relative ${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
               <div className={standalone ? "max-w-xl" : ""}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {heroTextContent()}
@@ -789,7 +825,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
           </>
         );
         const aboutImage = (
-          <ClickableImageZone value={store.bannerSecondary} onUpload={v=>onUpdate?.("bannerSecondary",v)} isEditable={isEditable} bannerLabel="imagen" className="overflow-hidden rounded-[1.5rem]" style={{ backgroundColor: store.backgroundColor, position: "relative", height: "clamp(280px, 42vh, 500px)" }}>
+          <ClickableImageZone value={store.bannerSecondary} onUpload={v=>onUpdate?.("bannerSecondary",v)} isEditable={isEditable} className="overflow-hidden rounded-[1.5rem]" style={{ backgroundColor: store.backgroundColor, position: "relative", height: "clamp(280px, 42vh, 500px)" }}>
             {store.bannerSecondary
               ? <img src={store.bannerSecondary} alt="Banner secundario" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
               : <div className="flex h-full items-center justify-center" style={{ color: store.mutedTextColor, minHeight: 280 }}><EditableText tag="span" value={store.bannerSecondaryLabel||"Banner secundario"} fontColor={textColor("bannerSecondaryLabelColor",store.mutedTextColor)} onTextChange={v=>onUpdate?.("bannerSecondaryLabel",v)} onFontColorChange={v=>onUpdate?.("bannerSecondaryLabelColor",v)} isEditable={isEditable} inline /></div>}
