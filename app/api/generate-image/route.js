@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { getCurrentUser } from "@/lib/current-user";
 
 function hexToColorName(hex) {
   const h = hex.replace("#", "").toLowerCase();
@@ -18,6 +19,10 @@ function hexToColorName(hex) {
 }
 
 export async function POST(request) {
+  const user = await getCurrentUser();
+  if (!user || (user.role !== "PROVIDER" && user.role !== "ADMIN")) {
+    return Response.json({ error: "No autorizado." }, { status: 401 });
+  }
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   try {
     const body = await request.json();
@@ -77,17 +82,16 @@ Background: solid ${colorName} (${color}). Style: ${styleWord}.`;
         b64 = res.data[0].b64_json;
 
       } else {
-        // Sin mascota: DALL-E 3 genera escena de productos, sin personajes
+        // Sin mascota: gpt-image-1 genera escena de productos, sin personajes
         const noMascotPrompt = isBanner
           ? `Premium horizontal website banner. NO TEXT. NO CHARACTERS. NO ANIMALS. NO PEOPLE. Solid ${colorName} (${color}) background. Right side has elegant product/lifestyle objects: ${businessContext}. Left side empty. ${styleWord} style.`
           : `Premium product lifestyle photo. NO TEXT. NO PEOPLE. Elegant arrangement of ${businessContext} on a ${colorName} background. ${styleWord} style, ultra clean, commercial photography aesthetic.`;
 
         const res = await openai.images.generate({
-          model: "dall-e-3",
+          model: "gpt-image-1",
           prompt: noMascotPrompt,
           n: 1,
-          size: isBanner ? "1792x1024" : "1024x1024",
-          response_format: "b64_json",
+          size: isBanner ? "1536x1024" : "1024x1024",
         });
         b64 = res.data[0].b64_json;
       }
@@ -97,11 +101,10 @@ Background: solid ${colorName} (${color}). Style: ${styleWord}.`;
         return Response.json({ error: "Descripción requerida" }, { status: 400 });
       }
       const response = await openai.images.generate({
-        model: "dall-e-3",
+        model: "gpt-image-1",
         prompt: body.prompt.trim(),
         n: 1,
-        size: "1792x1024",
-        response_format: "b64_json",
+        size: "1536x1024",
       });
       b64 = response.data[0].b64_json;
     }
