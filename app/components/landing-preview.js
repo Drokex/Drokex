@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { buildMarketPrice, inferCurrencyFromOriginCountry, COUNTRY_PREFERENCE_STORAGE_KEY } from "@/lib/market-pricing";
+import { ImagePlus } from "lucide-react";
 import AiImageWizard from "@/app/components/ai-image-wizard";
 
 export function hexToRgba(hex, alpha) {
@@ -289,6 +290,7 @@ function DraggableBlock({ xPct, yPct, onChange, isEditable, children, style }) {
 
 export function ClickableImageZone({ value, onUpload, isEditable, className, style, children, bannerLabel = "banner" }) {
   const [hovered, setHovered] = useState(false);
+  const [compact, setCompact] = useState(false);
   const [showWizard, setShowWizard] = useState(false);
   const fileRef = useRef(null);
 
@@ -308,16 +310,16 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
         className={className}
         style={{ position: "relative", cursor: "pointer", ...style }}
         onClick={(e) => { if (e.target.isContentEditable || e.target.closest("[contenteditable]")) return; setShowWizard(true); }}
-        onMouseEnter={() => setHovered(true)}
+        onMouseEnter={(e) => { setCompact(e.currentTarget.offsetWidth < 170 || e.currentTarget.offsetHeight < 110); setHovered(true); }}
         onMouseLeave={() => setHovered(false)}
       >
         {children}
         {hovered && (
           <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, borderRadius: "inherit", zIndex: 20, overflow: "hidden", pointerEvents: "none" }}>
-            <div style={{ background: "#7FE040", borderRadius: 10, padding: "8px 18px", color: "#050505", fontSize: "0.78rem", fontWeight: 900 }}>
-              ✦ Crear imagen
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#7FE040", borderRadius: 10, padding: compact ? 8 : "8px 18px", color: "#050505", fontSize: "0.78rem", fontWeight: 900, whiteSpace: "nowrap" }}>
+              <ImagePlus size={compact ? 18 : 14} strokeWidth={2.5} />{!compact && "Crear imagen"}
             </div>
-            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.72rem" }}>Subir o generar con IA</div>
+            {!compact && <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.72rem" }}>Subir o generar con IA</div>}
           </div>
         )}
         <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} onClick={e => e.stopPropagation()} />
