@@ -1400,8 +1400,17 @@ to { transform: rotate(360deg); }
   .hero-sig-mesh, .hero-sig-pulse, .hero-sig-shimmer::after { animation: none; }
 }
 
-/* Noche (layout feature) en móvil: la columna al 58% y el título de 75px se salían */
+/* Hero de tiendas en móvil: el tamaño del título es fijo en px (editable) y partía palabras por
+   sílabas; Noche tenía la columna al 58% y Océano no apilaba sus dos columnas */
 @media (max-width: 767px) {
+  #inicio[data-hero-frame] h1 { font-size: clamp(2.1rem, 10.5vw, 3.4rem) !important; }
   .hero-feature-text { max-width: 100% !important; padding: 40px 20px !important; }
-  .hero-feature-text h1 { font-size: clamp(2.1rem, 11vw, 3.4rem) !important; }
+  .hero-split { grid-template-columns: 1fr !important; }
+  .hero-split-text { padding: 40px 20px !important; }
+  .hero-split-media { min-height: 280px; }
+}
+
+/* Overlay (Fuego) en móvil: el texto ocupa todo el ancho, el velo cubre todo */
+@media (max-width: 767px) {
+  .hero-overlay-scrim { background: var(--scrim-mobile) !important; }
 }

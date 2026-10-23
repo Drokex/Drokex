@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
-import { Trash2 } from "lucide-react";
+import { Trash2, Globe, Package, ImageIcon, Tag, Palette } from "lucide-react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/app/components/site-header";
 import LandingPreview, { hexToRgba as _hexToRgba, HERO_FX_DEFAULTS } from "@/app/components/landing-preview";
@@ -206,7 +206,7 @@ export default function ProveedorProPage({
   const [code, setCode] = useState("");
   const [isPro, setIsPro] = useState(initialIsPro);
   const [authStatus, setAuthStatus] = useState(accountMode ? "ready" : "checking");
-  const [openSection, setOpenSection] = useState("hero");
+  const [openSection, setOpenSection] = useState(null);
   const [showProductsDrawer, setShowProductsDrawer] = useState(false);
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const countryDropdownRef = useRef(null);
@@ -914,10 +914,10 @@ export default function ProveedorProPage({
                     updateStore("countries", next);
                   };
                   const label = selected.length === 0
-                    ? "🌎 Países"
+                    ? <><Globe size={14} /> Países</>
                     : selected.length === 1
                       ? `${COUNTRIES.find(c => c.label === selected[0])?.flag} ${selected[0]}`
-                      : `🌎 ${selected.length} países`;
+                      : <><Globe size={14} /> {selected.length} países</>;
                   return (
                     <div ref={countryDropdownRef} style={{ position: "relative" }}>
                       <button
@@ -935,7 +935,7 @@ export default function ProveedorProPage({
                         }}
                         style={{ borderRadius: 13, border: `1px solid ${selected.length ? "rgba(0,0,0,0.1)" : "rgba(127, 224, 64, 0.5)"}`, background: selected.length ? "#fff" : "rgba(127, 224, 64, 0.06)", color: "#111", fontWeight: 900, padding: "10px 13px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: "0.85rem", whiteSpace: "nowrap" }}
                       >
-                        <span>{label}</span>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>{label}</span>
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ opacity: 0.4, flexShrink: 0 }}>
                           <path d="M2 3.5L5 6.5L8 3.5" stroke="#111" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
@@ -994,16 +994,16 @@ export default function ProveedorProPage({
                   {showAddMenu && (
                     <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, zIndex: 200, background: "#fff", borderRadius: 16, border: "1px solid rgba(0,0,0,0.1)", boxShadow: "0 16px 40px rgba(0,0,0,0.14)", padding: "8px", minWidth: 210 }}>
                       {[
-                        { icon: "📦", label: "Producto", desc: "Añade un producto al catálogo", action: () => { addProduct(); setShowProductsDrawer(true); setOpenSection(null); setShowAddMenu(false); } },
-                        { icon: "🖼️", label: "Imagen del hero", desc: "Sube la foto principal", action: () => { setOpenSection("hero"); setShowProductsDrawer(false); setShowAddMenu(false); } },
-                        { icon: "🏷️", label: "Banner de marca", desc: "Foto en la sección Marca", action: () => { setOpenSection("about"); setShowProductsDrawer(false); setShowAddMenu(false); } },
-                        { icon: "🎨", label: "Cambiar colores", desc: "Paleta y tipografía", action: () => { setOpenSection("style"); setShowProductsDrawer(false); setShowAddMenu(false); } },
-                      ].map(({ icon, label, desc, action }) => (
+                        { icon: Package, label: "Producto", desc: "Añade un producto al catálogo", action: () => { addProduct(); setShowProductsDrawer(true); setOpenSection(null); setShowAddMenu(false); } },
+                        { icon: ImageIcon, label: "Imagen del hero", desc: "Sube la foto principal", action: () => { setOpenSection("hero"); setShowProductsDrawer(false); setShowAddMenu(false); } },
+                        { icon: Tag, label: "Banner de marca", desc: "Foto en la sección Marca", action: () => { setOpenSection("about"); setShowProductsDrawer(false); setShowAddMenu(false); } },
+                        { icon: Palette, label: "Cambiar colores", desc: "Paleta y tipografía", action: () => { setOpenSection("style"); setShowProductsDrawer(false); setShowAddMenu(false); } },
+                      ].map(({ icon: Icon, label, desc, action }) => (
                         <button key={label} type="button" onClick={action}
                           style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", textAlign: "left" }}
                           onMouseEnter={e => e.currentTarget.style.background = "#f5f5f5"}
                           onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                          <span style={{ fontSize: "1.2rem", flexShrink: 0 }}>{icon}</span>
+                          <Icon size={18} style={{ flexShrink: 0, color: "#111" }} />
                           <div>
                             <p style={{ margin: 0, fontWeight: 800, fontSize: "0.86rem", color: "#111" }}>{label}</p>
                             <p style={{ margin: 0, fontSize: "0.72rem", color: "#888" }}>{desc}</p>

@@ -853,14 +853,14 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── SPLIT (Océano): text left | image right explicit ── */
         if (layout === "split") return (
-          <section id="inicio" data-hero-frame style={{ display: "grid", gridTemplateColumns: standalone ? "1fr 1fr" : "1fr 1fr", backgroundColor: store.backgroundColor, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, position: "relative", overflow: "clip" }}>
+          <section id="inicio" data-hero-frame className="hero-split" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", backgroundColor: store.backgroundColor, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, position: "relative", overflow: "clip" }}>
             <div aria-hidden className="hero-sig-mesh" style={{ position: "absolute", inset: "-20%", pointerEvents: "none", backgroundImage: `radial-gradient(circle at 20% 30%, ${hexToRgba(store.primaryColor, 0.22)}, transparent 40%), radial-gradient(circle at 70% 70%, ${hexToRgba(store.gradientToColor || store.primaryColor, 0.2)}, transparent 45%), radial-gradient(circle at 45% 90%, ${hexToRgba(store.gradientFromColor || store.primaryColor, 0.14)}, transparent 40%)` }} />
-            <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "center", padding: standalone ? "56px 40px 56px 56px" : "56px 40px" }}>
+            <div className="hero-split-text" style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "center", padding: standalone ? "56px 40px 56px 56px" : "56px 40px" }}>
               <DraggableBlock xPct={heroBlockXPct} yPct={heroBlockYPct} onChange={heroBlockChange} isEditable={isEditable}>
                 {heroTextContent()}
               </DraggableBlock>
             </div>
-            <div data-hero-frame style={{ position: "relative", overflow: "clip" }}>
+            <div data-hero-frame className="hero-split-media" style={{ position: "relative", overflow: "clip" }}>
               {store.heroImage
                 ? <HeroImageLayer store={store} />
                 : <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor}, ${store.gradientToColor||store.primaryColor})` }} />
@@ -949,6 +949,9 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         return (
           <section id="inicio" data-hero-frame className={heroClassName} style={{ overflow: "clip", minHeight: standalone ? "clamp(520px,68vh,760px)" : undefined, backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)` }}>
             <HeroImageLayer store={store} />
+            {/* El texto va sobre la foto con los colores del tema: un velo del color de fondo a la
+                izquierda lo mantiene legible con cualquier foto (clara u oscura) */}
+            {store.heroImage && <div className="hero-overlay-scrim" style={{ position: "absolute", inset: 0, pointerEvents: "none", "--scrim-mobile": hexToRgba(store.backgroundColor, 0.78), background: `linear-gradient(to right, ${hexToRgba(store.backgroundColor, 0.92)} 0%, ${hexToRgba(store.backgroundColor, 0.7)} 38%, transparent 68%)` }} />}
             {imgToolbar}
             <div className={`relative ${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
               <div className={standalone ? "max-w-xl" : ""}>

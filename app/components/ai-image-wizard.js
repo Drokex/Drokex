@@ -55,6 +55,13 @@ const STEPS = [
   { id: "estilo",      title: "¿Qué estilo quieres para tu banner?",           sub: "Elige el que mejor describe tu marca." },
 ];
 
+// Luminancia simple: texto oscuro sobre colores claros, blanco sobre oscuros
+function isLight(hex) {
+  const h = (hex || "#000000").replace("#", "");
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) || 0);
+  return 0.299 * r + 0.587 * g + 0.114 * b > 150;
+}
+
 // targetAspect: ancho/alto del recuadro donde va la imagen (medido al abrir).
 // noWide: nunca estirar a banner (fotos de producto). currentImage: imagen ya puesta, editable con IA.
 // layout: plantilla del hero (dónde irá el título), para que la IA deje ese hueco libre.
@@ -441,7 +448,7 @@ export default function AiImageWizard({ onClose, onGenerated, onUploadFile, targ
                 style={{ width: 40, height: 40, border: "none", borderRadius: 8, cursor: "pointer", background: "none", padding: 0 }} />
             </div>
             <div style={{ marginTop: 14, padding: "12px 16px", borderRadius: 12, background: color, display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: "0.82rem", fontWeight: 700, color: "#000", mixBlendMode: "difference", filter: "invert(1)" }}>Vista previa del color seleccionado</span>
+              <span style={{ fontSize: "0.82rem", fontWeight: 700, color: isLight(color) ? "#111" : "#fff" }}>Vista previa del color seleccionado</span>
             </div>
           </div>
         )}
