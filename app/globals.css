@@ -1355,3 +1355,27 @@ to { transform: rotate(360deg); }
   width: 168px;
   height: 44px;
 }
+
+/* Efectos del hero de tiendas Proveedor Pro (landing-preview.js → HeroImageLayer) */
+@keyframes heroFxKenBurns {
+  from { transform: scale(1) translate(0, 0); }
+  to { transform: scale(1.09) translate(-1.5%, -1%); }
+}
+@keyframes heroFxParallax {
+  from { transform: translateY(-7%); }
+  to { transform: translateY(7%); }
+}
+.hero-fx-kenburns { animation: heroFxKenBurns 18s ease-in-out infinite alternate; }
+/* Scroll-driven nativo; sin soporte (Firefox) la imagen queda quieta */
+.hero-fx-parallax { inset: -8% 0 !important; animation: heroFxParallax linear both; animation-timeline: view(); }
+.hero-fx-tilt { transition: transform 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-fx-kenburns, .hero-fx-parallax { animation: none; }
+  .hero-fx-tilt { transform: none !important; }
+}
+/* Entrada del texto del hero: oculto hasta que GSAP arranca; si el JS no llega, aparece a los 2.5s */
+@keyframes heroEntranceFallback { to { visibility: visible; } }
+[data-hero-entrance]:not([data-hero-entrance-ready]) #inicio [data-hero-text] {
+  visibility: hidden;
+  animation: heroEntranceFallback 0s 2.5s forwards;
+}

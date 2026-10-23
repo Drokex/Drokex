@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { buildMarketPrice, inferCurrencyFromOriginCountry, COUNTRY_PREFERENCE_STORAGE_KEY } from "@/lib/market-pricing";
-import { ImagePlus, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, ZoomIn, ZoomOut, Trash2, Camera } from "lucide-react";
+import gsap from "gsap";
+import { SplitText } from "gsap/SplitText";
+import { ImagePlus, ArrowLeft, ArrowRight, ArrowUp, ArrowDown, ZoomIn, ZoomOut, Trash2, Camera, SlidersHorizontal, X, RotateCcw, Play } from "lucide-react";
 import AiImageWizard from "@/app/components/ai-image-wizard";
 import { uploadImage } from "@/app/proveedor-pro/upload-image";
 
@@ -251,7 +253,7 @@ function DraggableBlock({ xPct, yPct, onChange, isEditable, children, style }) {
     : { position: "relative" };
 
   if (!isEditable) {
-    return <div ref={containerRef} style={{ ...offsetStyle, ...style }}>{children}</div>;
+    return <div ref={containerRef} data-hero-text style={{ ...offsetStyle, ...style }}>{children}</div>;
   }
 
   function handleOuterMouseDown(e) {
@@ -262,13 +264,14 @@ function DraggableBlock({ xPct, yPct, onChange, isEditable, children, style }) {
   return (
     <div
       ref={containerRef}
+      data-hero-text
       style={{ ...offsetStyle, cursor: dragging ? "grabbing" : "grab", userSelect: dragging ? "none" : undefined, ...style }}
       onPointerDown={handleOuterMouseDown}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => { if (!dragging) setHovering(false); }}
     >
       {/* Handle pill — siempre visible en edit mode */}
-      <div style={{ position: "absolute", top: -38, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, zIndex: 200, pointerEvents: "auto", userSelect: "none" }}>
+      <div data-drag-handle style={{ position: "absolute", top: -38, left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: 5, zIndex: 200, pointerEvents: "auto", userSelect: "none" }}>
         <div
           onPointerDown={e => { e.stopPropagation(); startDrag(e); }}
           title="Arrastra para mover el bloque de texto"
@@ -289,12 +292,196 @@ function DraggableBlock({ xPct, yPct, onChange, isEditable, children, style }) {
   );
 }
 
-// Imagen del hero como capa (no background-image) para poder hacer zoom además de encuadrar
+export const HERO_FX_DEFAULTS = { heroOverlay: "none", heroOverlayStrength: 40, heroMotion: "none", heroFilter: "none", heroGrain: false, heroBlend: false, heroEntrance: "none" };
+
+// Entrada del texto del hero. El título se parte en letras solo durante la animación y se
+// restaura al terminar (EditableText escribe con innerText, así que el editor no se rompe).
+function useHeroTextEntrance(rootRef, mode, replay) {
+  useEffect(() => {
+    const root = rootRef.current;
+    // El SSR deja el texto oculto (data-hero-entrance) para que no parpadee antes de animar
+    const ready = () => root?.setAttribute("data-hero-entrance-ready", "");
+    const block = root?.querySelector("#inicio [data-hero-text]");
+    if (!block || !mode || mode === "none" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return ready();
+    gsap.registerPlugin(SplitText);
+    const items = [...block.children].filter((c) => !c.hasAttribute("data-drag-handle"));
+    const title = items.find((c) => c.matches("h1") || c.querySelector("h1"));
+    const titleEl = title && (title.matches("h1") ? title : title.querySelector("h1"));
+    const rest = items.filter((c) => c !== title);
+    const clear = "opacity,transform,filter";
+    let split;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ onComplete: () => { split?.revert(); split = null; gsap.set(items, { clearProps: clear }); } });
+      if (mode === "fadeup") {
+        tl.from(items, { opacity: 0, y: 28, duration: 0.7, ease: "power3.out", stagger: 0.12 });
+      } else if (mode === "blur") {
+        tl.from(items, { opacity: 0, filter: "blur(14px)", scale: 1.03, duration: 0.9, ease: "power2.out", stagger: 0.12 });
+      } else if (titleEl) {
+        split = SplitText.create(titleEl, { type: "words,chars", mask: mode === "letters" ? "words" : undefined });
+        if (mode === "letters") tl.from(split.chars, { yPercent: 110, duration: 0.7, ease: "power4.out", stagger: 0.025 });
+        else tl.from(split.chars, { opacity: 0, duration: 0.01, ease: "none", stagger: 0.045 }); // máquina de escribir
+        if (rest.length) tl.from(rest, { opacity: 0, y: 16, duration: 0.5, ease: "power2.out", stagger: 0.1 }, "-=0.25");
+      }
+    }, block);
+    ready();
+    return () => { ctx.revert(); split?.revert(); gsap.set(items, { clearProps: clear }); };
+  }, [rootRef, mode, replay]);
+}
+
+const HERO_FILTERS = {
+  none: undefined,
+  bw: "grayscale(1) contrast(1.08)",
+  warm: "sepia(0.25) saturate(1.2) hue-rotate(-8deg)",
+  cool: "saturate(0.9) hue-rotate(12deg) brightness(1.03)",
+  contrast: "contrast(1.25) saturate(1.15)",
+};
+
+const GRAIN_URL = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
+
+function isLightColor(hex) {
+  const h = (hex || "#000000").replace("#", "");
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) || 0);
+  return 0.299 * r + 0.587 * g + 0.114 * b > 150;
+}
+
+// Imagen del hero como capa (no background-image): zoom/encuadre + efectos (superposición, filtro,
+// movimiento, grano, fundir con el tema). Todo CSS; el "tilt" es lo único con JS.
 function HeroImageLayer({ store }) {
+  const motionRef = useRef(null);
+  const fx = { ...HERO_FX_DEFAULTS, ...store };
+  const motion = fx.heroMotion;
+
+  useEffect(() => {
+    if (motion !== "tilt" || !motionRef.current) return;
+    const el = motionRef.current;
+    const frame = el.parentElement?.parentElement;
+    if (!frame || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const onMove = (e) => {
+      const r = frame.getBoundingClientRect();
+      const dx = (e.clientX - r.left) / r.width - 0.5, dy = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = `scale(1.06) translate(${(-dx * 2.5).toFixed(2)}%, ${(-dy * 2.5).toFixed(2)}%)`;
+    };
+    const onLeave = () => { el.style.transform = "scale(1.06)"; };
+    onLeave();
+    frame.addEventListener("mousemove", onMove);
+    frame.addEventListener("mouseleave", onLeave);
+    return () => { frame.removeEventListener("mousemove", onMove); frame.removeEventListener("mouseleave", onLeave); el.style.transform = ""; };
+  }, [motion]);
+
   if (!store.heroImage) return null;
   const x = store.heroImageX ?? 50, y = store.heroImageY ?? 50, zoom = store.heroImageZoom ?? 1;
+  const a = Math.max(0, Math.min(80, fx.heroOverlayStrength)) / 100;
+  const lightTheme = isLightColor(store.backgroundColor);
+  const duotone = fx.heroOverlay === "duotone";
+  const overlay = {
+    gradient: `linear-gradient(to right, rgba(0,0,0,${a + 0.15}) 0%, rgba(0,0,0,${a / 2}) 45%, transparent 80%)`,
+    vignette: `radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,${a + 0.2}) 100%)`,
+    dark: `rgba(0,0,0,${a})`,
+    light: `rgba(255,255,255,${a})`,
+    duotone: `linear-gradient(135deg, ${store.gradientFromColor || store.primaryColor}, ${store.gradientToColor || store.primaryColor})`,
+  }[fx.heroOverlay];
+  // Fundir: en tema claro el blanco de la foto desaparece (multiply); en oscuro, los bordes se desvanecen
+  const blendStyle = fx.heroBlend
+    ? lightTheme
+      ? { mixBlendMode: "multiply" }
+      : { maskImage: "radial-gradient(ellipse 70% 75% at 50% 50%, #000 45%, transparent 100%)", WebkitMaskImage: "radial-gradient(ellipse 70% 75% at 50% 50%, #000 45%, transparent 100%)" }
+    : {};
+  const filter = [duotone ? "grayscale(1) contrast(1.1)" : HERO_FILTERS[fx.heroFilter]].filter(Boolean).join(" ") || undefined;
+
   return (
-    <img src={store.heroImage} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: `${x}% ${y}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, transformOrigin: `${x}% ${y}%`, pointerEvents: "none" }} />
+    // overflow "clip" (no "hidden"): hidden crea un contenedor de scroll y rompe animation-timeline: view() del parallax
+    <div style={{ position: "absolute", inset: 0, overflow: "clip", pointerEvents: "none", backgroundColor: fx.heroBlend ? store.backgroundColor : undefined }}>
+      <div ref={motionRef} className={motion === "kenburns" ? "hero-fx-kenburns" : motion === "parallax" ? "hero-fx-parallax" : motion === "tilt" ? "hero-fx-tilt" : undefined} style={{ position: "absolute", inset: 0 }}>
+        <img src={store.heroImage} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: `${x}% ${y}%`, transform: zoom !== 1 ? `scale(${zoom})` : undefined, transformOrigin: `${x}% ${y}%`, filter, ...blendStyle }} />
+      </div>
+      {overlay && <div style={{ position: "absolute", inset: 0, background: overlay, mixBlendMode: duotone ? "multiply" : undefined, opacity: duotone ? Math.min(1, a + 0.45) : 1 }} />}
+      {fx.heroGrain && <div style={{ position: "absolute", inset: 0, backgroundImage: GRAIN_URL, opacity: 0.16, mixBlendMode: "overlay" }} />}
+    </div>
+  );
+}
+
+const FX_GROUPS = [
+  ["heroOverlay", "Superposición", [["none", "Ninguna"], ["gradient", "Degradado"], ["vignette", "Viñeta"], ["dark", "Oscurecer"], ["light", "Aclarar"], ["duotone", "Duotono"]]],
+  ["heroFilter", "Filtro", [["none", "Normal"], ["bw", "B/N"], ["warm", "Cálido"], ["cool", "Frío"], ["contrast", "Contraste"]]],
+  ["heroMotion", "Movimiento", [["none", "Quieta"], ["kenburns", "Zoom lento"], ["parallax", "Parallax"], ["tilt", "Sigue el mouse"]]],
+];
+
+// Panel portalizado (el hero tiene overflow:hidden); se posiciona bajo el botón que lo abre
+const ENTRANCE_OPTIONS = [["none", "Ninguna"], ["fadeup", "Desde abajo"], ["letters", "Letra por letra"], ["typewriter", "Máquina de escribir"], ["blur", "Desenfoque"]];
+
+function HeroEffectsPanel({ store, onUpdate, anchor, onClose, onReplay }) {
+  const fx = { ...HERO_FX_DEFAULTS, ...store };
+  const panelRef = useRef(null);
+  const [pos, setPos] = useState(null);
+
+  useEffect(() => {
+    const place = () => {
+      const r = anchor.getBoundingClientRect();
+      const width = Math.min(340, window.innerWidth - 24);
+      // Si abajo no cabe (móvil), sube lo necesario para mostrar el panel entero (~510px)
+      setPos({ top: Math.max(12, Math.min(r.bottom + 8, window.innerHeight - 520)), left: Math.max(12, Math.min(r.right - width, window.innerWidth - width - 12)), width });
+    };
+    place();
+    const onDown = (e) => { if (!panelRef.current?.contains(e.target) && !anchor.contains(e.target)) onClose(); };
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("resize", place);
+    window.addEventListener("scroll", place, true);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("resize", place);
+      window.removeEventListener("scroll", place, true);
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [anchor, onClose]);
+
+  if (!pos) return null;
+  const chip = (active) => ({ borderRadius: 9, padding: "7px 11px", fontSize: "0.76rem", fontWeight: 700, cursor: "pointer", border: `1px solid ${active ? "#7FE040" : "rgba(255,255,255,0.12)"}`, background: active ? "rgba(127,224,64,0.14)" : "rgba(255,255,255,0.04)", color: active ? "#7FE040" : "rgba(255,255,255,0.75)" });
+  const label = { color: "rgba(255,255,255,0.45)", fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", margin: "14px 0 8px" };
+
+  return createPortal(
+    <div ref={panelRef} style={{ position: "fixed", top: pos.top, left: pos.left, width: pos.width, maxHeight: `calc(100vh - ${pos.top + 12}px)`, overflowY: "auto", zIndex: 9000, background: "#0f0f0f", border: "1px solid rgba(127,224,64,0.25)", borderRadius: 16, padding: "14px 16px 16px", boxShadow: "0 20px 50px rgba(0,0,0,0.5)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <p style={{ margin: 0, color: "#fff", fontWeight: 900, fontSize: "0.92rem" }}>Efectos del hero</p>
+        <div style={{ display: "flex", gap: 6 }}>
+          <button type="button" title="Restablecer" onClick={() => Object.entries(HERO_FX_DEFAULTS).forEach(([k, v]) => onUpdate?.(k, v))} style={{ ...toolbarBtn, width: 30, height: 30 }}><RotateCcw size={14} /></button>
+          <button type="button" title="Cerrar" onClick={onClose} style={{ ...toolbarBtn, width: 30, height: 30 }}><X size={15} /></button>
+        </div>
+      </div>
+      <p style={label}>Entrada del texto</p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {ENTRANCE_OPTIONS.map(([value, text]) => (
+          <button key={value} type="button" onClick={() => { onUpdate?.("heroEntrance", value); onReplay(); }} style={chip(fx.heroEntrance === value)}>{text}</button>
+        ))}
+        {fx.heroEntrance !== "none" && (
+          <button type="button" onClick={onReplay} style={{ ...chip(false), display: "inline-flex", alignItems: "center", gap: 5 }}><Play size={12} /> Ver de nuevo</button>
+        )}
+      </div>
+      {store.heroImage && FX_GROUPS.map(([field, title, options]) => (
+        <div key={field}>
+          <p style={label}>{title}</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {options.map(([value, text]) => (
+              <button key={value} type="button" onClick={() => onUpdate?.(field, value)} style={chip(fx[field] === value)}>{text}</button>
+            ))}
+          </div>
+          {field === "heroOverlay" && fx.heroOverlay !== "none" && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10 }}>
+              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.74rem" }}>Intensidad</span>
+              <input type="range" min={0} max={80} step={5} value={fx.heroOverlayStrength} onChange={(e) => onUpdate?.("heroOverlayStrength", Number(e.target.value))} style={{ flex: 1, accentColor: "#7FE040" }} />
+              <span style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.74rem", width: 32, textAlign: "right" }}>{fx.heroOverlayStrength}%</span>
+            </div>
+          )}
+        </div>
+      ))}
+      {store.heroImage && <p style={label}>Acabado</p>}
+      {store.heroImage && <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        <button type="button" onClick={() => onUpdate?.("heroGrain", !fx.heroGrain)} style={chip(fx.heroGrain)}>Grano fino</button>
+        <button type="button" onClick={() => onUpdate?.("heroBlend", !fx.heroBlend)} style={chip(fx.heroBlend)} title="Disuelve el fondo de la foto en el color de la plantilla">Fundir con el tema</button>
+      </div>}
+    </div>,
+    document.body
   );
 }
 
@@ -374,6 +561,11 @@ export function ClickableImageZone({ value, onUpload, isEditable, className, sty
 
 export default function LandingPreview({ store, products, fullWidth = false, standalone = false, basePath = "", productsOnly = false, marcaOnly = false, isEditable = false, onUpdate }) {
   const [visitorCountryId, setVisitorCountryId] = useState("");
+  const [fxAnchor, setFxAnchor] = useState(null);
+  const closeFx = useCallback(() => setFxAnchor(null), []);
+  const shellRef = useRef(null);
+  const [entranceReplay, setEntranceReplay] = useState(0);
+  useHeroTextEntrance(shellRef, store.heroEntrance, entranceReplay);
   useEffect(() => {
     try { setVisitorCountryId(localStorage.getItem(COUNTRY_PREFERENCE_STORAGE_KEY) || ""); } catch {}
     const sync = () => { try { setVisitorCountryId(localStorage.getItem(COUNTRY_PREFERENCE_STORAGE_KEY) || ""); } catch {} };
@@ -401,8 +593,8 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
   const textColor = (field, fallback) => store[field] || fallback;
   const productTextColor = (product, field, fallback) => product?.[field] || fallback;
   const shellClassName = standalone
-    ? "w-full overflow-hidden"
-    : `mx-auto overflow-hidden border border-white/10 ${fullWidth ? "max-w-7xl rounded-[2rem]" : "max-w-6xl rounded-[2rem]"}`;
+    ? "w-full overflow-clip"
+    : `mx-auto overflow-clip border border-white/10 ${fullWidth ? "max-w-7xl rounded-[2rem]" : "max-w-6xl rounded-[2rem]"}`;
   const sectionPadding = standalone ? "p-5 md:p-7" : "p-8";
   const heroClassName = standalone
     ? "relative bg-cover bg-center px-5 py-12 md:px-8 md:py-20"
@@ -513,6 +705,8 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
   return (
     <div
+      ref={shellRef}
+      data-hero-entrance={store.heroEntrance && store.heroEntrance !== "none" ? "" : undefined}
       className={shellClassName}
       style={{ backgroundColor: store.surfaceColor, color: store.textColor }}
     >
@@ -607,6 +801,8 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
               <button type="button" title="Mover a la derecha" onClick={() => nudge("heroImageX", -10)} style={toolbarBtn}><ArrowRight size={16} /></button>
               <button type="button" title="Eliminar imagen" onClick={() => onUpdate?.("heroImage", "")} style={{ ...toolbarBtn, background: "rgba(220,38,38,0.22)", border: "1px solid rgba(248,113,113,0.35)", color: "#fca5a5" }}><Trash2 size={15} /></button>
             </>)}
+            <button type="button" title="Efectos" onClick={(e) => { const el = e.currentTarget; setFxAnchor((cur) => (cur ? null : el)); }} style={{ ...toolbarBtn, ...(fxAnchor ? { background: "rgba(127,224,64,0.16)", border: "1px solid rgba(127,224,64,0.45)", color: "#7FE040" } : {}) }}><SlidersHorizontal size={16} /></button>
+            {fxAnchor && <HeroEffectsPanel store={store} onUpdate={onUpdate} anchor={fxAnchor} onClose={closeFx} onReplay={() => setEntranceReplay((n) => n + 1)} />}
             <ClickableImageZone value={store.heroImage} frame="[data-hero-frame]" isEditable={isEditable}
               onUpload={(v, meta) => { onUpdate?.("heroImage", v); onUpdate?.("heroImageX", meta?.focusX ?? 50); onUpdate?.("heroImageY", 50); onUpdate?.("heroImageZoom", 1); }}
               style={{ ...toolbarBtn, background: "rgba(127,224,64,0.16)", border: "1px solid rgba(127,224,64,0.45)", overflow: "hidden" }}>
@@ -642,7 +838,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
                 {heroTextContent()}
               </DraggableBlock>
             </div>
-            <div data-hero-frame style={{ position: "relative", overflow: "hidden" }}>
+            <div data-hero-frame style={{ position: "relative", overflow: "clip" }}>
               {store.heroImage
                 ? <HeroImageLayer store={store} />
                 : <div style={{ position: "absolute", inset: 0, background: `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor}, ${store.gradientToColor||store.primaryColor})` }} />
@@ -654,7 +850,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── CENTERED (Bosque): full-width centered text, gradient bg ── */
         if (layout === "centered") return (
-          <section id="inicio" data-hero-frame style={{ position: "relative", overflow: "hidden", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `radial-gradient(ellipse at 50% -10%, ${primaryGlow}, transparent 55%), radial-gradient(ellipse at 80% 100%, ${hexToRgba(store.primaryColor,0.12)}, transparent 40%)`, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, padding: standalone ? "72px 24px" : "80px 32px" }}>
+          <section id="inicio" data-hero-frame style={{ position: "relative", overflow: "clip", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `radial-gradient(ellipse at 50% -10%, ${primaryGlow}, transparent 55%), radial-gradient(ellipse at 80% 100%, ${hexToRgba(store.primaryColor,0.12)}, transparent 40%)`, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, padding: standalone ? "72px 24px" : "80px 32px" }}>
             <HeroImageLayer store={store} />
             {imgToolbar}
             <div style={{ position: "relative", maxWidth: 780, width: "100%", margin: "0 auto" }}>
@@ -668,7 +864,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
         /* ── FEATURE (Noche): full-bleed bg + text anchored bottom-left ── */
         if (layout === "feature") return (
           <section id="inicio" data-hero-frame style={{
-            position: "relative", overflow: "hidden",
+            position: "relative", overflow: "clip",
             backgroundColor: store.backgroundColor,
             backgroundImage: store.heroImage
               ? undefined
@@ -699,7 +895,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── MAGAZINE (Coral): bg image full + accent stripe bottom ── */
         if (layout === "magazine") return (
-          <section id="inicio" data-hero-frame style={{ position: "relative", overflow: "hidden", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor} 0%, ${store.gradientToColor||store.primaryColor} 100%)`, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+          <section id="inicio" data-hero-frame style={{ position: "relative", overflow: "clip", backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `linear-gradient(135deg, ${store.gradientFromColor||store.primaryColor} 0%, ${store.gradientToColor||store.primaryColor} 100%)`, minHeight: standalone ? "clamp(520px,68vh,760px)" : 520, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
             <HeroImageLayer store={store} />
             {imgToolbar}
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)" }} />
@@ -728,7 +924,7 @@ export default function LandingPreview({ store, products, fullWidth = false, sta
 
         /* ── OVERLAY (default / Fuego): text overlay on bg image ── */
         return (
-          <section id="inicio" data-hero-frame className={heroClassName} style={{ overflow: "hidden", minHeight: standalone ? "clamp(520px,68vh,760px)" : undefined, backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)` }}>
+          <section id="inicio" data-hero-frame className={heroClassName} style={{ overflow: "clip", minHeight: standalone ? "clamp(520px,68vh,760px)" : undefined, backgroundColor: store.backgroundColor, backgroundImage: store.heroImage ? undefined : `radial-gradient(circle at 75% 25%, ${primaryGlow}, transparent 35%)` }}>
             <HeroImageLayer store={store} />
             {imgToolbar}
             <div className={`relative ${standalone ? "mx-auto w-full max-w-6xl" : "max-w-3xl"} p-2`}>
